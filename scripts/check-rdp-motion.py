@@ -70,9 +70,22 @@ with sync_playwright() as p:
                 assert expected in page.locator('.demo-error').inner_text()
                 if width == 390:
                     demo.screenshot(path=str(out / f'rdp-demo-{method}-{theme}.png'))
+    for width, height in [(1024, 720), (1280, 720), (1366, 768), (1440, 900), (1920, 1080)]:
+        page.set_viewport_size({'width': width, 'height': height})
+        for label in ['固定密码', '临时密码', '通行密钥']:
+            page.get_by_role('button', name=label, exact=True).click()
+            for result in ['成功流程', '失败流程']:
+                page.get_by_role('button', name=result).click()
+                page.evaluate('scrollTo({top: 0, behavior: "instant"})')
+                for selector in ['.auth-demo', '.rdp-hero-copy']:
+                    rect = page.locator(selector).bounding_box()
+                    assert rect['y'] >= 0 and rect['y'] + rect['height'] <= height, (width, height, label, result, selector, rect)
+        page.screenshot(path=str(out / f'rdp-first-screen-{width}.png'))
     page.emulate_media(reduced_motion='no-preference')
+    page.locator('.demo-playback').wait_for()
     page.set_viewport_size({'width': 1440, 'height': 1000})
     page.get_by_role('button', name='临时密码', exact=True).click()
+    demo.scroll_into_view_if_needed()
     page.wait_for_function("document.querySelector('.auth-demo').dataset.phase === 'checking'")
     page.get_by_role('heading', name='认证成功', exact=True).wait_for()
     page.get_by_role('button', name='通行密钥', exact=True).click()
@@ -86,4 +99,4 @@ with sync_playwright() as p:
     assert all(method == 'GET' and url.startswith(base) for method, url in requests), requests
     assert not errors, errors
     browser.close()
-print('Typing, checking, success/failure, replay, pause, offscreen suspension, live reduced-motion preference, layout and no authentication requests: passed.')
+print('Three authentication methods, rotation, device confirmation, automatic cycling, replay/pause, reduced motion, both themes, narrow layouts, desktop first-screen fit and no authentication requests: passed.')

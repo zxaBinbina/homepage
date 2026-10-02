@@ -64,10 +64,10 @@
 }
 .rdp-hero {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   gap: 70px;
   align-items: center;
-  padding-block: 95px 90px;
+  padding-block: clamp(20px, 4vh, 44px) 36px;
 }
 .rdp-page h1 {
   font-size: clamp(38px, 4.4vw, 64px);

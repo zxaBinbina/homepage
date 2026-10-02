@@ -98,8 +98,8 @@ function onMotion() {
 onMounted(() => {
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(
-      ([entry]) => {
-        inView.value = !!entry?.isIntersecting
+      (entries) => {
+        inView.value = !!entries.at(-1)?.isIntersecting
       },
       { threshold: 0.15 },
     )
@@ -150,44 +150,46 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div class="demo-stage">
-        <Transition name="demo-result">
-          <div v-if="phase === 'failure'" class="demo-error">
-            <CircleX :size="18" />
-            <div>
-              <h3>认证失败</h3>
-              <p>{{ failureMessage }}</p>
+        <div class="demo-credential">
+          <Transition name="demo-result">
+            <div v-if="phase === 'failure'" class="demo-error">
+              <CircleX :size="18" />
+              <div>
+                <h3>认证失败</h3>
+                <p>{{ failureMessage }}</p>
+              </div>
+            </div>
+          </Transition>
+          <div v-if="method !== 'passkey'" class="demo-field">
+            <span>{{ method === 'temporary' ? '临时访问密码' : '固定访问密码' }}</span>
+            <div class="demo-input demo-password" aria-label="模拟输入密码">
+              <KeyRound :size="15" /><span aria-hidden="true"
+                >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i
+              ></span>
             </div>
           </div>
-        </Transition>
-        <div v-if="method !== 'passkey'" class="demo-field">
-          <span>{{ method === 'temporary' ? '临时访问密码' : '固定访问密码' }}</span>
-          <div class="demo-input demo-password" aria-label="模拟输入密码">
-            <KeyRound :size="15" /><span aria-hidden="true"
-              >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i
-            ></span>
+          <div
+            v-else
+            class="demo-passkey"
+            :class="{ 'is-confirming': phase === 'typing' || phase === 'checking' }"
+          >
+            <Fingerprint :size="32" aria-hidden="true" />
+            <strong>{{
+              phase === 'checking'
+                ? '设备已确认，正在验证…'
+                : phase === 'failure'
+                  ? '设备确认未完成'
+                  : '请在设备上确认'
+            }}</strong>
+            <p>使用指纹、面容或设备 PIN · 模拟提示</p>
           </div>
+          <p v-if="method === 'temporary'" class="demo-method-note">
+            三个中文词，以横线分隔；成功后轮换。
+          </p>
+          <p v-else-if="method === 'passkey'" class="demo-method-note">
+            首次使用需先用密码登录并绑定通行密钥。
+          </p>
         </div>
-        <div
-          v-else
-          class="demo-passkey"
-          :class="{ 'is-confirming': phase === 'typing' || phase === 'checking' }"
-        >
-          <Fingerprint :size="32" aria-hidden="true" />
-          <strong>{{
-            phase === 'checking'
-              ? '设备已确认，正在验证…'
-              : phase === 'failure'
-                ? '设备确认未完成'
-                : '请在设备上确认'
-          }}</strong>
-          <p>使用指纹、面容或设备 PIN · 模拟提示</p>
-        </div>
-        <p v-if="method === 'temporary'" class="demo-method-note">
-          三个中文词，以横线分隔；成功后轮换。
-        </p>
-        <p v-else-if="method === 'passkey'" class="demo-method-note">
-          首次使用需先用密码登录并绑定通行密钥。
-        </p>
         <div class="demo-network">
           <Monitor :size="15" /><span>连接网络的 IPv4</span><code>203.0.113.42</code>
         </div>
@@ -206,8 +208,10 @@ onBeforeUnmount(() => {
         <p class="demo-alternative"><ShieldCheck :size="15" /> 6 小时准入 · 仍需系统账户登录</p>
         <Transition name="demo-result">
           <div v-if="phase === 'success'" :key="phase" class="demo-result" :class="phase">
-            <span class="demo-result-icon"><Check :size="27" /></span>
-            <h3>认证成功</h3>
+            <div class="demo-result-title">
+              <span class="demo-result-icon"><Check :size="20" /></span>
+              <h3>认证成功</h3>
+            </div>
             <p>已授权网络：203.0.113.42</p>
             <div class="demo-result-detail">
               <ShieldCheck :size="16" /><span>6 小时内可发起新的 RDP 连接</span>
@@ -273,7 +277,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 16px 20px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   font-size: 11px;
   color: var(--muted);
@@ -303,14 +307,13 @@ onBeforeUnmount(() => {
 }
 .demo-scene {
   position: relative;
-  padding: 28px;
-  min-height: 390px;
+  padding: 16px 20px;
 }
 .demo-heading {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 .demo-shield {
   width: 43px;
@@ -354,20 +357,30 @@ onBeforeUnmount(() => {
 }
 .demo-stage {
   position: relative;
-  min-height: 340px;
+  min-height: 270px;
+  padding-top: 1px;
+}
+.demo-credential {
+  position: relative;
+  min-height: 110px;
   padding-top: 1px;
 }
 .demo-passkey {
   display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
   justify-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding: 18px 10px;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--bg);
   text-align: center;
   color: var(--blue);
+}
+.demo-passkey > svg {
+  grid-row: span 2;
 }
 .demo-passkey strong {
   font-size: 13px;
@@ -385,7 +398,7 @@ onBeforeUnmount(() => {
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 0;
   width: 100%;
   font-size: 12px;
 }
@@ -405,10 +418,10 @@ onBeforeUnmount(() => {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 14px 12px;
+  padding: 9px 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  margin-top: 18px;
+  margin-top: 8px;
   color: var(--muted);
   font-size: 11px;
 }
@@ -418,13 +431,16 @@ onBeforeUnmount(() => {
   font-size: 11px;
 }
 .demo-error {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   gap: 9px;
   align-items: center;
   margin-top: 16px;
   padding: 12px;
   border: 1px solid color-mix(in srgb, var(--status-danger) 25%, transparent);
-  background: color-mix(in srgb, var(--status-danger) 9%, var(--panel));
+  background: var(--panel);
   border-radius: 12px;
   color: var(--status-danger);
 }
@@ -437,7 +453,7 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 .demo-address {
-  padding: 12px;
+  padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--blue);
@@ -445,7 +461,7 @@ onBeforeUnmount(() => {
   font: 12px monospace;
   overflow-wrap: anywhere;
   max-width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 .demo-field {
   margin-top: 16px;
@@ -491,7 +507,7 @@ onBeforeUnmount(() => {
   border-radius: 22px;
   font-size: 12px;
   font-weight: 600;
-  margin-top: 22px;
+  margin-top: 10px;
 }
 .demo-alternative {
   display: flex;
@@ -500,7 +516,7 @@ onBeforeUnmount(() => {
   gap: 7px;
   color: var(--muted);
   font-size: 11px;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 .demo-result {
   position: absolute;
@@ -509,29 +525,35 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 18px;
+  padding: 12px;
+  gap: 7px;
   text-align: center;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--panel);
   box-shadow: 0 12px 40px var(--shadow);
 }
+.demo-result-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .demo-result-icon {
   display: grid;
   place-items: center;
-  width: 60px;
-  height: 60px;
+  width: 32px;
+  height: 32px;
   border-radius: 16px;
   background: color-mix(in srgb, var(--demo-status) 12%, transparent);
   color: var(--demo-status);
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 .demo-result.success {
   --demo-status: var(--status-success);
 }
 .demo-result h3 {
-  font-size: 24px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 0;
 }
 .demo-result p {
   color: var(--muted);
@@ -542,7 +564,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 22px 0 18px;
+  margin: 0;
   color: var(--demo-status);
   font-size: 12px;
 }
@@ -564,7 +586,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 12px 16px 0;
+  padding: 4px 12px 0;
 }
 .demo-scenarios,
 .demo-playback {
@@ -596,9 +618,9 @@ onBeforeUnmount(() => {
 }
 .demo-caption {
   font-size: 11px;
-  padding: 12px 20px 20px;
+  padding: 6px 16px 12px;
   color: var(--text);
-  min-height: 76px;
+  min-height: 54px;
 }
 .demo-caption span {
   display: block;
@@ -658,13 +680,13 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 480px) {
   .demo-scene {
-    padding: 20px;
+    padding: 16px;
   }
   .demo-heading h2 {
     font-size: 16px;
   }
   .demo-toolbar {
-    padding: 14px;
+    padding: 8px 14px;
   }
   .demo-controls {
     padding-inline: 10px;
