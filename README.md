@@ -42,11 +42,13 @@
 
 主页的 RDP 项目卡片进入官网。Wiki 提供源码部署的六个步骤、Turnstile 配置、维护与排错；项目可以直接克隆部署，不要求生成发行版。
 
-页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合公共导航和页脚。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站样式位于 `src/rdp/style.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为正文和目录数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成三个地址的 HTML，可直接访问、刷新并抓取分享元信息。与主页一起发布完整 `dist/` 到现有 Cloudflare Pages 即可，无需新建站点或 DNS 记录。
+页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合公共导航和页脚。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站通用样式位于 `src/rdp/style.css`，Wiki 阅读布局位于 `src/rdp/wiki.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为章节、内容块和搜索数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成三个地址的 HTML，可直接访问、刷新并抓取分享元信息。与主页一起发布完整 `dist/` 到现有 Cloudflare Pages 即可，无需新建站点或 DNS 记录。
+
+Wiki 按「开始部署、使用与维护、了解项目」组织内容，提供全文范围的章节搜索、可收起的移动目录、六步部署编号和命令复制。页面中的「交给 Agent 部署」提供可一键复制的 [部署提示词](docs/rdp-agent-deploy.md)，填写主机、认证域名、RDP 地址与隧道 ID 后即可交给具备终端能力的 Agent 使用。提示词要求凭据在服务器终端安全输入，并区分实际验收与待人工验证。
 
 官网首屏提供密码输入与认证成功 / 失败的动画演示，可暂停、重播或切换场景；滚动显现和进入动效遵循系统的减少动态效果偏好。演示仅在本地运行，不提交密码或调用认证接口。
 
-开发服务器启动后，执行 `python3 scripts/check-rdp-pages.py` 检查入口、目录锚点、主题与响应式。动效检查使用 `python3 scripts/check-rdp-motion.py`（默认端口 4174）；两个脚本都可用 `HOMEPAGE_TEST_URL` 指向开发或构建预览地址。分享标签检查使用 `python3 scripts/check-sharing.py`，覆盖主页、官网与 Wiki。
+开发服务器启动后，执行 `python3 scripts/check-rdp-pages.py` 检查入口、目录锚点、主题与响应式。动效检查使用 `python3 scripts/check-rdp-motion.py`（默认端口 4174）；两个脚本都可用 `HOMEPAGE_TEST_URL` 指向开发或构建预览地址。分享标签检查使用 `python3 scripts/check-sharing.py`，覆盖主页、官网与 Wiki。Wiki 搜索、复制与移动目录专项检查使用 `python3 scripts/check-rdp-wiki.py`，默认端口 4174，同样支持 `HOMEPAGE_TEST_URL`。
 
 ## 本地运行
 

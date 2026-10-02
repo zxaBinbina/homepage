@@ -1,58 +1,256 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
+import {
+  ArrowDown,
+  ArrowRight,
+  BookOpen,
+  ChevronDown,
+  Code2,
+  ExternalLink,
+  List,
+  Search,
+  Server,
+  ShieldCheck,
+  Wrench,
+  X,
+} from 'lucide-vue-next'
 import content from 'virtual:rdp-wiki'
+import agentPrompt from '../../../docs/rdp-agent-deploy.md?raw'
+import WikiCodeBlock from './WikiCodeBlock.vue'
+import '../wiki.css'
 const article = ref<HTMLElement>()
-const active = ref(content.toc[0]?.id)
+const agentOpen = ref(false)
+const query = ref('')
+const active = ref(content.sections[0]?.id)
+const menuOpen = ref(false)
+const menuButton = ref<HTMLButtonElement>()
+const desktop = matchMedia('(min-width: 761px)')
+const wide = ref(desktop.matches)
+const tocVisible = computed(() => wide.value || menuOpen.value)
+const groups = ['开始部署', '使用与维护', '了解项目']
+const results = computed(() =>
+  content.sections.filter((section) =>
+    section.search.toLocaleLowerCase().includes(query.value.trim().toLocaleLowerCase()),
+  ),
+)
+const activeSection = computed(() =>
+  content.sections.find((section) => section.id === active.value),
+)
+const progress = computed(() =>
+  Math.max(
+    0,
+    Math.round(
+      ((content.sections.findIndex((section) => section.id === active.value) + 1) /
+        content.sections.length) *
+        100,
+    ),
+  ),
+)
 let headings: HTMLElement[] = []
 function updateSection() {
   let current = headings[0]
-  for (const heading of headings) if (heading.getBoundingClientRect().top <= 160) current = heading
+  const threshold = (menuButton.value?.getBoundingClientRect().bottom || 0) > 110 ? 185 : 160
+  for (const heading of headings)
+    if (heading.getBoundingClientRect().top <= threshold) current = heading
   active.value = current?.id
 }
+function onWidth() {
+  wide.value = desktop.matches
+}
+async function navigate(id: string) {
+  menuOpen.value = false
+  await nextTick()
+  if (location.hash !== `#${id}`) location.hash = id
+  else document.getElementById(id)?.scrollIntoView()
+  document.getElementById(id)?.focus({ preventScroll: true })
+}
+function closeMenu(event: KeyboardEvent) {
+  if (event.key !== 'Escape') return
+  if (query.value) query.value = ''
+  else if (menuOpen.value) {
+    menuOpen.value = false
+    menuButton.value?.focus()
+  }
+}
 onMounted(() => {
-  headings = Array.from(article.value?.querySelectorAll<HTMLElement>('h2, h3, h4') || [])
-  // The anchor target becomes available after Vue mounts the Markdown content.
+  headings = Array.from(article.value?.querySelectorAll<HTMLElement>('.wiki-section-heading') || [])
   if (location.hash)
     document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'instant' })
   updateSection()
   window.addEventListener('scroll', updateSection, { passive: true })
+  desktop.addEventListener('change', onWidth)
 })
-onBeforeUnmount(() => window.removeEventListener('scroll', updateSection))
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateSection)
+  desktop.removeEventListener('change', onWidth)
+})
 </script>
 <template>
-  <main id="main" class="rdp-page shell">
+  <main id="main" class="rdp-page shell wiki-page">
     <div class="rdp-wiki-title">
-      <p class="rdp-eyebrow">DOCUMENTATION / WIKI</p>
-      <h1>把部署的每一步，<span>说清楚。</span></h1>
-      <p class="rdp-lead">从环境准备到第一次远程连接，以及之后的维护与排错。</p>
+      <div class="wiki-breadcrumb"><BookOpen :size="15" /> RDP Access Auth <span>/</span> WIKI</div>
+      <div class="wiki-title-row">
+        <div>
+          <h1>部署与使用<span>指南。</span></h1>
+          <p class="rdp-lead">从第一条命令，到一次安心的远程连接。</p>
+        </div>
+        <a
+          class="wiki-source"
+          href="https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md"
+          >在 GitHub 查看文档 <ExternalLink :size="14"
+        /></a>
+      </div>
+      <div class="wiki-start-grid">
+        <a href="#section-3" @click.prevent="navigate('section-3')"
+          ><Server :size="21" />
+          <div><b>部署前准备</b><span>Linux、域名与远程桌面</span></div>
+          <ArrowRight :size="17"
+        /></a>
+        <a href="#deployment" @click.prevent="navigate('deployment')"
+          ><Code2 :size="21" />
+          <div><b>六步完成部署</b><span>直接从源码开始，无需发行版</span></div>
+          <ArrowRight :size="17"
+        /></a>
+        <a href="#section-11" @click.prevent="navigate('section-11')"
+          ><Wrench :size="21" />
+          <div><b>遇到连接问题</b><span>日常维护与常见故障排查</span></div>
+          <ArrowRight :size="17"
+        /></a>
+      </div>
     </div>
     <div class="rdp-wiki-layout">
-      <aside class="rdp-toc">
-        <nav aria-label="Wiki 目录">
-          <p class="rdp-eyebrow">本页目录</p>
-          <a
-            v-for="item in content.toc"
-            :key="item.id"
-            :href="`#${item.id}`"
-            :aria-current="active === item.id ? 'location' : undefined"
-            >{{ item.text }}</a
-          >
-        </nav>
-        <a
-          class="rdp-text-link"
-          href="https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md"
-          >查看上游文档 ↗</a
+      <aside class="rdp-toc" @keydown="closeMenu">
+        <button
+          ref="menuButton"
+          class="wiki-mobile-toc"
+          :aria-expanded="tocVisible"
+          aria-controls="wiki-directory"
+          @click="menuOpen = !menuOpen"
         >
+          <List :size="17" />文档目录<ChevronDown :size="16" :class="{ rotated: menuOpen }" />
+        </button>
+        <div id="wiki-directory" v-show="tocVisible" :inert="!tocVisible">
+          <label class="wiki-search"
+            ><Search :size="15" /><input
+              v-model="query"
+              type="search"
+              placeholder="搜索文档内容…"
+              aria-label="搜索文档" /><button
+              v-if="query"
+              aria-label="清空搜索"
+              @click="query = ''"
+            >
+              <X :size="14" /></button
+          ></label>
+          <p v-if="query" class="wiki-search-count" role="status">
+            {{
+              results.length
+                ? `找到 ${results.length} 个相关章节`
+                : '没有找到相关内容，试试“域名”或“密码”。'
+            }}
+          </p>
+          <nav aria-label="Wiki 目录">
+            <div v-for="group in groups" :key="group" class="wiki-nav-group">
+              <template v-if="results.some((section) => section.group === group)"
+                ><p>{{ group }}</p>
+                <a
+                  v-for="section in results.filter((section) => section.group === group)"
+                  :key="section.id"
+                  :href="`#${section.id}`"
+                  :aria-current="active === section.id ? 'location' : undefined"
+                  :class="{ 'wiki-step-link': section.step }"
+                  @click.prevent="navigate(section.id)"
+                  ><span v-if="section.step" class="wiki-nav-number">{{ section.step }}</span
+                  >{{ section.step ? section.title.replace(/^\d+\. /, '') : section.title }}</a
+                ></template
+              >
+            </div>
+          </nav>
+          <div class="wiki-reading">
+            <span>当前阅读</span><b>{{ activeSection?.title }}</b>
+            <div aria-hidden="true"><i :style="{ width: `${progress}%` }"></i></div>
+          </div>
+        </div>
       </aside>
       <article ref="article" class="rdp-doc">
-        <div class="rdp-note">
-          <b>源码部署，无需生成发行版</b>
-          <p>
-            以下指南基于项目公开 README 与部署模板整理。域名、端口和隧道 ID
-            均为示例；升级前请核对上游变更。官网本身不提供认证服务。
-          </p>
+        <div class="wiki-intro-note">
+          <ShieldCheck :size="20" />
+          <div>
+            <b>在自己的主机上，搭建认证入口。</b>
+            <p>按顺序完成准备与六步部署。文中的域名、端口和隧道 ID 均为示例，请替换为自己的值。</p>
+          </div>
         </div>
-        <div v-html="content.html"></div>
+        <details
+          class="wiki-agent"
+          :open="agentOpen"
+          @toggle="agentOpen = ($event.target as HTMLDetailsElement).open"
+        >
+          <summary>
+            <Code2 :size="20" /><span
+              ><b>交给 Agent 部署</b
+              ><small>复制提示词，填写环境参数，让你的部署助手接着做。</small></span
+            ><ChevronDown :size="18" />
+          </summary>
+          <div class="wiki-agent-body">
+            <p>
+              适用于有终端操作能力的 Agent 工具。先替换尖括号中的参数，密码与 Token
+              在服务器终端安全填写。
+            </p>
+            <WikiCodeBlock :code="agentPrompt" language="text" copy-label="复制部署提示词" />
+          </div>
+        </details>
+        <section
+          v-for="section in content.sections"
+          :key="section.id"
+          class="wiki-section"
+          :class="{ 'wiki-deploy-step': section.step }"
+        >
+          <header class="wiki-section-header">
+            <span v-if="section.step" class="wiki-step-number">{{
+              section.step.padStart(2, '0')
+            }}</span>
+            <div>
+              <p class="wiki-section-kicker">
+                {{ section.step ? `部署步骤 ${section.step} · 共 6 步` : section.group }}
+              </p>
+              <h2 :id="section.id" class="wiki-section-heading" tabindex="-1">
+                {{ section.step ? section.title.replace(/^\d+\. /, '') : section.title }}
+              </h2>
+            </div>
+          </header>
+          <template v-for="(block, index) in section.blocks" :key="index">
+            <div v-if="block.type === 'html'" class="wiki-prose" v-html="block.html"></div>
+            <WikiCodeBlock
+              v-else-if="block.type === 'code'"
+              :code="block.code"
+              :language="block.language"
+            />
+            <div v-else class="wiki-architecture">
+              <div>
+                <b>网页认证</b>
+                <p>浏览器 → Cloudflare Tunnel</p>
+                <ArrowDown :size="16" />
+                <p>本机认证服务 → SakuraFrp 授权 API</p>
+              </div>
+              <div>
+                <b>远程连接</b>
+                <p>RDP 客户端 → SakuraFrp TCP 准入</p>
+                <ArrowDown :size="16" />
+                <p>现有远程桌面服务</p>
+              </div>
+            </div>
+          </template>
+        </section>
+        <div class="wiki-bottom">
+          <BookOpen :size="21" />
+          <div>
+            <b>文档没能解决你的问题？</b>
+            <p>带上复现步骤与脱敏后的错误信息，到仓库反馈。</p>
+          </div>
+          <a href="https://github.com/zxaBinbina/rdp-access-auth/issues"
+            >反馈问题 <ArrowRight :size="16"
+          /></a>
+        </div>
       </article>
     </div>
   </main>

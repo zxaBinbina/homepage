@@ -225,11 +225,11 @@
 
 官网位于 `/projects/rdp-access-auth/`，Wiki 位于其 `wiki/` 子路径，与主页共用一个 Vue 挂载入口，页面模板使用 Vue 3 / TypeScript 单文件组件。复用主页语义颜色、字体栈、毛玻璃胶囊导航与 `.shell`；子站样式集中于 `src/rdp/style.css`，用 `rdp-` 前缀隔离。官网采用左右分栏首屏与 Vue 模拟认证演示、三列认证方式卡片、适用范围和部署入口。760px 及以下切为单列。
 
-Wiki 采用左侧粘性目录与右侧正文，正文为 16px，窄屏为 15px；760px 及以下目录回到正文上方。长命令和表格在自身区域滚动，目录以文字和边框标记当前章节。页面不依赖动画呈现内容；主题与主页共享保存键并跟随系统。部署章节锚点固定为 `#deployment`。官网与 Wiki 页脚均展示作者、动态年份、萌ICP备20264016号、项目许可证和回到顶部入口。
+Wiki 使用紧凑标题、环境准备 / 六步部署 / 故障排查快捷入口，正文按「开始部署 → 使用与维护 → 了解项目」排列。桌面采用 236px 粘性目录与右侧正文，正文为 15px；760px 及以下目录改为可展开收起的按钮面板，正文为 14px。目录支持按章节全文搜索，提供无结果状态与清空操作，并标记当前章节和阅读位置。长命令和表格在自身区域滚动，六个部署步骤有独立编号。页面不依赖动画呈现内容；主题与主页共享保存键并跟随系统。部署章节锚点固定为 `#deployment`。官网与 Wiki 页脚均展示作者、动态年份、萌ICP备20264016号、项目许可证和回到顶部入口。
 
-子站导航使用与主页相同的 Lucide 线性图标：主题为 17px 的 Sun / Moon，GitHub 为 19px，品牌标记为 ShieldCheck。工具按钮直接复用 `.icon-button` 的 34 × 36px 尺寸与悬停反馈；图标使用 `lucide-vue-next` 组件，主题按钮复用 `src/components/ThemeToggle.vue`。
+子站导航使用与主页相同的 Lucide 线性图标：主题为 17px 的 Sun / Moon，GitHub 为 19px，品牌标记使用用户提供、去除外部白色背景后的 `public/images/rdp-access-auth.png`（512 × 394 透明 PNG）。导航以 38 × 38px 槽位、`object-fit: contain` 显示，认证演示以 43 × 43px 显示；官网与 Wiki 的浏览器图标也使用此素材。图标内部浅色窗口保持完整，不添加像素化渲染。工具按钮直接复用 `.icon-button` 的 34 × 36px 尺寸与悬停反馈；图标使用 `lucide-vue-next` 组件，主题按钮复用 `src/components/ThemeToggle.vue`。
 
-`src/rdp/App.vue` 组合导航、页脚与官网 / Wiki 组件；目录当前项通过 Vue 状态管理，滚动监听在组件卸载时清理。主题状态统一由 `src/composables/useTheme.ts` 管理。Wiki 正文在构建时转换为模块数据，运行时由 Vue 渲染；三个页面共用根目录 `index.html` 基础模板，仅负责挂载、首屏主题初始化和分享元信息；`build/pageTemplates.ts` 自动生成各 URL 的输出文件。
+`src/rdp/App.vue` 组合导航、页脚与官网 / Wiki 组件；目录当前项通过 Vue 状态管理，滚动监听在组件卸载时清理。主题状态统一由 `src/composables/useTheme.ts` 管理。Wiki 正文在构建时转换为章节及内容块数据，运行时由 Vue 渲染；三个页面共用根目录 `index.html` 基础模板，仅负责挂载、首屏主题初始化和分享元信息；`build/pageTemplates.ts` 自动生成各 URL 的输出文件。
 
 ### 子站动效与认证演示
 
@@ -238,3 +238,9 @@ Wiki 采用左侧粘性目录与右侧正文，正文为 16px，窄屏为 15px�
 `src/rdp/components/AuthDemo.vue` 在浏览器外观的演示窗口中展示逐字输入密码、验证中、成功 / 失败弹层。每个场景约 7.2 秒，结果层以 300–350ms 淡入淡出、12px 位移和轻微缩放切换。可选成功或失败场景，支持暂停和重播。离开视口或页面进入后台时暂停计时；组件卸载后清理计时器与监听。演示不包含真实输入框、密码或认证请求，使用保留的示例 IP 地址。
 
 减少动态效果时不自动播放，直接显示结果，按钮可切换成功 / 失败示例；运行中改变系统偏好也会立即停下动效。自动演示不触发屏幕阅读器连续播报。成功 / 失败使用 `--status-success`、`--status-danger` 的深浅两套颜色，并同时提供图标与文字。运行 `python3 scripts/check-rdp-motion.py` 验证演示流程、暂停、重播与减少动态效果；默认连接 `http://127.0.0.1:4174`，可用 `HOMEPAGE_TEST_URL` 指定地址。
+
+### Wiki 阅读与部署工具
+
+新版 Wiki 样式位于 `src/rdp/wiki.css`。`WikiCodeBlock.vue` 以 Vue 模板渲染命令、复制按钮和状态反馈；复制失败时保留手动选择入口。旧的 `#deployment`、`#architecture` 和 `#section-*` 锚点继续有效，导航跳转后将焦点移到对应标题。窄屏目录关闭时隐藏并设为 `inert`，Escape 可清空搜索或关闭目录并归还焦点。
+
+正文前的「交给 Agent 部署」可展开提示词，内容来自 [docs/rdp-agent-deploy.md](docs/rdp-agent-deploy.md)，支持一键复制。提示词包含环境参数、源码部署步骤、凭据处理、验收和回滚要求；命令块限制最大高度，避免展开后占满页面。运行 `python3 scripts/check-rdp-wiki.py` 检查搜索、代码与提示词复制、移动目录、旧链接与复制失败反馈。

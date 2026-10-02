@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Github, ShieldCheck } from 'lucide-vue-next'
+import { Github } from 'lucide-vue-next'
 import ThemeToggle from '../../components/ThemeToggle.vue'
 defineProps<{ wiki: boolean }>()
 </script>
 <template>
   <header class="rdp-header shell">
     <a class="rdp-brand" href="/projects/rdp-access-auth/"
-      ><span class="rdp-mark" aria-hidden="true"><ShieldCheck :size="19" /></span
-      ><span>RDP <b>Access Auth</b></span></a
+      ><img class="rdp-mark" src="/images/rdp-access-auth.png" alt="" width="38" height="38" />
+      <span>RDP <b>Access Auth</b></span></a
     >
     <nav aria-label="项目导航">
       <a href="/projects/rdp-access-auth/" :aria-current="wiki ? undefined : 'page'">概览</a

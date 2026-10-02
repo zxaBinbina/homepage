@@ -32,7 +32,7 @@
 | [index.html](index.html)                                         | 首次绘制前的主题初始化与 HTML 模板             |
 | [site.config.ts](site.config.ts)                                 | 站点标题、简介、域名及分享配置                 |
 
-主题按钮与状态分别维护在 [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue) 和 [src/composables/useTheme.ts](src/composables/useTheme.ts)，主页与项目子站共用。RDP 子站的 Vue 页面组件与样式位于 `src/rdp/`，部署正文位于 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，构建转换位于 [build/rdpWiki.ts](build/rdpWiki.ts)。三个页面由 `src/main.ts`、`src/App.vue` 与 `src/pages.ts` 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成三个地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。子站修改后运行 `python3 scripts/check-rdp-pages.py`。
+主题按钮与状态分别维护在 [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue) 和 [src/composables/useTheme.ts](src/composables/useTheme.ts)，主页与项目子站共用。RDP 子站的 Vue 页面组件与样式位于 `src/rdp/`，部署正文位于 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，构建转换位于 [build/rdpWiki.ts](build/rdpWiki.ts)。三个页面由 `src/main.ts`、`src/App.vue` 与 `src/pages.ts` 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成三个地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。子站修改后运行 `python3 scripts/check-rdp-pages.py`。Wiki 样式维护在 `src/rdp/wiki.css`，部署提示词维护在 `docs/rdp-agent-deploy.md`；修改 Wiki 搜索、目录或复制交互时执行 `python3 scripts/check-rdp-wiki.py`。
 
 保持 Vue 3、TypeScript、原生 CSS 和现有图标体系。局部样式工作优先用已有工具完成；确有必要引入依赖时，说明用途并保持锁文件一致。
 

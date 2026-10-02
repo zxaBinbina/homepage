@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
     </div>
     <div class="demo-scene">
       <div class="demo-heading">
-        <span class="demo-shield"><ShieldCheck :size="23" /></span>
+        <img class="demo-shield" src="/images/rdp-access-auth.png" alt="" width="43" height="43" />
         <div>
           <h2>连接之前，确认是你。</h2>
           <p>RDP Access Auth</p>
@@ -252,13 +252,10 @@ onBeforeUnmount(() => {
   margin-bottom: 24px;
 }
 .demo-shield {
-  display: grid;
-  place-items: center;
   width: 43px;
   height: 43px;
-  color: var(--blue);
-  background: color-mix(in srgb, var(--blue) 10%, transparent);
-  border-radius: 13px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .demo-heading h2 {
   font-size: 18px;

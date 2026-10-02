@@ -20,6 +20,8 @@ with sync_playwright() as p:
             assert page.locator('html').get_attribute('data-theme') == theme
             assert 'RDP Access Auth' in page.title()
             assert page.locator('h1').count() == 1
+            assert page.locator('.rdp-mark').evaluate('(img) => img.tagName === \"IMG\" && img.complete && img.naturalWidth > 0')
+            assert not page.locator('img').evaluate_all('(images) => images.filter(img => !img.complete || !img.naturalWidth).map(img => img.src)')
             assert page.get_by_role('link', name='萌ICP备20264016号').get_attribute('href') == 'https://icp.gov.moe/?keyword=20264016'
             assert page.locator('link[rel=canonical]').get_attribute('href') == 'https://zxabinbina.cc.cd' + route + '/'
             assert page.locator('.rdp-header [aria-current=page]').count() == 1
