@@ -11,6 +11,10 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --scrollbar-thumb: #505d80;
+  --scrollbar-thumb-hover: #7194c0;
+  --scrollbar-track: #191b29;
   --bg: #141521;
   --panel: #1b1d2b;
   --panel-hover: #202335;
@@ -26,6 +30,9 @@
   color-scheme: dark;
 }
 :root[data-theme='light'] {
+  --scrollbar-thumb: #a4b3ca;
+  --scrollbar-thumb-hover: #6a89af;
+  --scrollbar-track: #e9eef6;
   --bg: #f4f6fa;
   --panel: #fff;
   --panel-hover: #eaf0f8;
@@ -1061,19 +1068,19 @@ h1 > span {
 .toast-leave-active {
   transition:
     opacity 0.2s,
-    bottom 0.2s;
+    translate 0.25s var(--motion-ease);
 }
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  bottom: 15px;
+  translate: 0 10px;
 }
 .will-reveal {
   opacity: 0;
   translate: 0 20px;
   transition:
-    opacity 0.65s,
-    translate 0.65s;
+    opacity 0.65s var(--motion-ease) var(--reveal-delay, 0ms),
+    translate 0.65s var(--motion-ease) var(--reveal-delay, 0ms);
 }
 .will-reveal.visible {
   opacity: 1;
@@ -1638,6 +1645,9 @@ h1 > span {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
   .will-reveal {
@@ -1696,5 +1706,113 @@ h1 > span {
 @media (max-width: 380px) {
   .header-actions .nav-contact {
     display: none;
+  }
+}
+
+/* Short, staggered entrances keep the first screen readable while it settles. */
+@media (prefers-reduced-motion: no-preference) {
+  .header {
+    animation: header-enter 0.55s var(--motion-ease) both;
+  }
+  .hero-top > *,
+  .landscape-wrap {
+    animation: page-enter 0.75s var(--motion-ease) both;
+  }
+  .hero-top > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .hero-top > :nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .hero-top > :nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .hero-top > :nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .landscape-wrap {
+    animation-delay: 180ms;
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes header-enter {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transform-origin: top;
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s var(--motion-ease);
+}
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+}
+.mobile-menu-leave-active {
+  pointer-events: none;
+}
+.icon-button {
+  transition:
+    color 0.2s,
+    background-color 0.2s,
+    transform 0.2s var(--motion-ease);
+}
+.icon-button:active,
+.button:active,
+.music-play-button:active {
+  transform: scale(0.96);
+}
+@media (max-width: 760px) {
+  .project-card {
+    --reveal-delay: 0ms !important;
+  }
+}
+
+/* Native scrolling with a theme-aware, rounded thumb. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    min-height: 32px;
+    border: 2px solid var(--scrollbar-track);
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track);
   }
 }

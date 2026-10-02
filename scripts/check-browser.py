@@ -49,12 +49,12 @@ with sync_playwright() as p:
     page.get_by_role('button',name='打开菜单').click()
     assert page.locator('#mobile-nav').is_visible()
     page.locator('#mobile-nav a[href="#projects"]').click()
-    assert page.locator('#mobile-nav').count() == 0
+    page.locator('#mobile-nav').wait_for(state='detached')
     page.wait_for_timeout(800)
     assert page.evaluate('Math.abs(document.querySelector("#projects").getBoundingClientRect().top - 110) < 3')
     page.get_by_role('button',name='打开菜单').click()
     page.keyboard.press('Escape')
-    assert page.locator('#mobile-nav').count() == 0
+    page.locator('#mobile-nav').wait_for(state='detached')
     page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
     page.wait_for_timeout(400)
     page.screenshot(path=str(OUT / 'mobile.png'), full_page=True)

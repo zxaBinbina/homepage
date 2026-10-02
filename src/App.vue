@@ -81,27 +81,31 @@ onMounted(() => {
     /* keep default */
   }
   document.documentElement.dataset.theme = light.value ? 'light' : 'dark'
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) if (entry.isIntersecting) active.value = entry.target.id
-    },
-    { rootMargin: '-15% 0px -55% 0px', threshold: 0 },
-  )
-  document.querySelectorAll('main > section[id]').forEach((el) => observer?.observe(el))
-  revealObserver = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible')
-          revealObserver?.unobserve(entry.target)
-        }
-      }),
-    { threshold: 0.08 },
-  )
-  document.querySelectorAll('.reveal').forEach((el) => {
-    el.classList.add('will-reveal')
-    revealObserver?.observe(el)
-  })
+  if ('IntersectionObserver' in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) if (entry.isIntersecting) active.value = entry.target.id
+      },
+      { rootMargin: '-15% 0px -55% 0px', threshold: 0 },
+    )
+    document.querySelectorAll('main > section[id]').forEach((el) => observer?.observe(el))
+  }
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    revealObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+            revealObserver?.unobserve(entry.target)
+          }
+        }),
+      { threshold: 0.08 },
+    )
+    document.querySelectorAll('.reveal').forEach((el) => {
+      el.classList.add('will-reveal')
+      revealObserver?.observe(el)
+    })
+  }
   document.addEventListener('keydown', onKey)
 })
 onBeforeUnmount(() => {
@@ -172,15 +176,27 @@ onBeforeUnmount(() => {
         <X v-if="menuOpen" :size="21" /><Menu v-else :size="21" />
       </button>
     </div>
-    <nav v-if="menuOpen" id="mobile-nav" class="mobile-nav" aria-label="移动导航">
-      <a
-        v-for="item in [...nav, { id: 'contact', label: '联系我' }]"
-        :key="item.id"
-        :href="`#${item.id}`"
-        @click="menuOpen = false"
-        >{{ item.label }}<ArrowUpRight :size="16"
-      /></a>
-    </nav>
+    <Transition
+      @before-leave="(el) => el.setAttribute('inert', '')"
+      @before-enter="(el) => el.removeAttribute('inert')"
+      name="mobile-menu"
+    >
+      <nav
+        v-if="menuOpen"
+        :inert="!menuOpen"
+        id="mobile-nav"
+        class="mobile-nav"
+        aria-label="移动导航"
+      >
+        <a
+          v-for="item in [...nav, { id: 'contact', label: '联系我' }]"
+          :key="item.id"
+          :href="`#${item.id}`"
+          @click="menuOpen = false"
+          >{{ item.label }}<ArrowUpRight :size="16"
+        /></a>
+      </nav>
+    </Transition>
   </header>
 
   <main id="main">
@@ -306,12 +322,13 @@ onBeforeUnmount(() => {
         </div>
         <div class="project-grid">
           <a
-            v-for="project in projects"
+            v-for="(project, index) in projects"
             :key="project.id"
             :href="project.url"
             target="_blank"
             rel="noopener noreferrer"
             class="project-card reveal"
+            :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
             :class="`project-${project.id}`"
             ><div class="project-top">
               <div class="project-icon">

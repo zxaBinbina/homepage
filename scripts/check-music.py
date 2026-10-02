@@ -67,6 +67,9 @@ try:
         assert page.locator('.music-toggle').get_attribute('title')=='网易云音乐'
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
         assert page.locator('.music-popover').evaluate('(e)=>e.matches(":popover-open")')
+        page.wait_for_function('document.querySelector("audio").currentTime>.1&&!document.querySelector("audio").paused',timeout=45000)
+        assert page.locator('audio').evaluate('(e)=>e.volume')==1
+        page.get_by_role('button',name='暂停音乐',exact=True).click()
         assert page.locator('.music-info h3').inner_text()=='飞鼠进行曲 The Parade of Flying Squirrels'
         assert page.locator('.music-title-row .music-vip').count()==0
         page.get_by_text('纯音乐，请欣赏',exact=True).wait_for(timeout=20000)
@@ -146,6 +149,11 @@ try:
         page.route('**/api/music/lyrics?*',lambda route:route.fulfill(status=503,json={'error':'unavailable'}))
         page.get_by_role('button',name='下一首',exact=True).click()
         page.locator('.music-error').wait_for()
+        assert abs(page.locator('.music-popover').bounding_box()['height']-player_height)<1
+        assert page.locator('.music-error a').get_attribute('href').startswith('https://music.163.com/')
+        # Simulate playback recovery before checking the independent lyrics error state.
+        page.locator('audio').dispatch_event('playing')
+        page.locator('audio').dispatch_event('pause')
         page.get_by_role('button',name='重试',exact=True).wait_for()
         assert abs(page.locator('.music-lyrics').bounding_box()['height']-lyrics_height)<1
         page.unroute('**/api/music/lyrics?*')

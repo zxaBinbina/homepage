@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   ArrowUpRight,
   Check,
@@ -19,7 +19,12 @@ import { mergeLyrics } from '../utils/lyrics'
 import type { LyricLine } from '../utils/lyrics'
 
 const props = withDefaults(
-  defineProps<{ active?: boolean; compact?: boolean; overlayPlaylist?: boolean }>(),
+  defineProps<{
+    active?: boolean
+    compact?: boolean
+    overlayPlaylist?: boolean
+    playOnMount?: boolean
+  }>(),
   {
     active: true,
     compact: false,
@@ -48,12 +53,19 @@ const error = ref('')
 const position = ref(0)
 const duration = ref(0)
 const seekable = ref(false)
-const volume = ref(0.65)
+const volume = ref(1)
 const muted = ref(false)
 const listOpen = ref(false)
+const playlistVisible = ref(false)
+function finishPlaylistClose() {
+  if (listOpen.value) return
+  playlistVisible.value = false
+}
 const listButton = ref<HTMLButtonElement>()
 const searchInput = ref<HTMLInputElement>()
 watch(listOpen, async (value) => {
+  if (value) playlistVisible.value = true
+  // Resize with the content transition; retain the grid until the content leaves.
   emit('playlist', value)
   await nextTick()
   if (value) searchInput.value?.focus({ preventScroll: true })
@@ -235,6 +247,9 @@ function onPause(event: Event) {
   playing.value = false
   loading.value = false
 }
+onMounted(() => {
+  if (props.playOnMount && props.active) void play()
+})
 onBeforeUnmount(() => {
   ++playRequest
   lyricAbort?.abort()
@@ -247,7 +262,7 @@ onBeforeUnmount(() => {
     class="music-card"
     :class="{
       'is-compact': compact,
-      'has-playlist': listOpen,
+      'has-playlist': playlistVisible,
       'playlist-overlay': overlayPlaylist,
     }"
     aria-label="网易云音乐播放器"
@@ -349,14 +364,14 @@ onBeforeUnmount(() => {
           @input="seek"
         /><span>{{ formatTime(duration || current.duration) }}</span>
       </div>
-      <div v-if="error" class="music-error" role="status">
-        <span>{{ error }}</span
-        ><a :href="songUrl" target="_blank" rel="noopener noreferrer"
-          >在网易云打开 <ArrowUpRight :size="13"
-        /></a>
-      </div>
-      <section class="music-lyrics" aria-label="歌词">
-        <div v-if="lyricState === 'loading'" class="lyric-placeholder" role="status">
+      <section class="music-lyrics" :aria-label="error ? '播放状态' : '歌词'">
+        <div v-if="error" class="lyric-placeholder music-error" role="status">
+          <span>{{ error }}</span>
+          <a class="lyric-retry" :href="songUrl" target="_blank" rel="noopener noreferrer">
+            在网易云打开 <ArrowUpRight :size="13" />
+          </a>
+        </div>
+        <div v-else-if="lyricState === 'loading'" class="lyric-placeholder" role="status">
           <LoaderCircle class="music-spinner" :size="19" /><span>正在加载歌词…</span>
         </div>
         <div v-else-if="lyricState === 'instrumental'" class="lyric-placeholder">
@@ -391,47 +406,62 @@ onBeforeUnmount(() => {
         <p v-else class="lyric-plain">{{ plainLyrics }}</p>
       </section>
     </div>
-    <button
-      v-if="listOpen && overlayPlaylist"
-      class="playlist-scrim"
-      aria-label="关闭歌单侧栏"
-      @click="listOpen = false"
-    ></button>
-    <aside v-if="listOpen" id="music-playlist" class="music-playlist" aria-label="播放列表">
-      <div class="music-list-heading">
-        <span>{{ music.name }}</span
-        ><label class="music-search"
-          ><Search :size="14" /><input
-            ref="searchInput"
-            v-model="query"
-            type="search"
-            placeholder="搜索歌曲 / 歌手"
-            aria-label="搜索歌单" /></label
-        >
-      </div>
-      <div class="music-track-list" tabindex="0" aria-label="歌单曲目">
-        <button
-          v-for="track in filtered"
-          :key="track.id"
-          class="music-track"
-          :class="{ selected: track.id === current.id }"
-          :aria-pressed="track.id === current.id"
-          @click="selectTrack(track.trackIndex)"
-        >
-          <span class="music-track-number"
-            ><Check v-if="track.id === current.id" :size="14" /><template v-else>{{
-              String(track.trackIndex + 1).padStart(2, '0')
-            }}</template></span
-          ><span class="music-track-title"
-            ><span class="music-track-name"
-              ><span>{{ track.title }}</span
-              ><span v-if="track.vip" class="music-vip" aria-label="VIP 歌曲">VIP</span></span
-            ><small>{{ track.artist }}</small></span
-          ><span class="music-track-duration">{{ formatTime(track.duration) }}</span>
-        </button>
-        <p v-if="!filtered.length" class="music-empty">没有找到匹配的歌曲，换个关键词试试。</p>
-      </div>
-    </aside>
+    <Transition name="playlist-scrim">
+      <button
+        v-if="listOpen && overlayPlaylist"
+        class="playlist-scrim"
+        aria-label="关闭歌单侧栏"
+        @click="listOpen = false"
+      ></button>
+    </Transition>
+    <Transition
+      @before-leave="(el) => el.setAttribute('inert', '')"
+      @before-enter="(el) => el.removeAttribute('inert')"
+      name="playlist"
+      @after-leave="finishPlaylistClose"
+    >
+      <aside
+        v-if="listOpen"
+        :inert="!listOpen"
+        id="music-playlist"
+        class="music-playlist"
+        aria-label="播放列表"
+      >
+        <div class="music-list-heading">
+          <span>{{ music.name }}</span
+          ><label class="music-search"
+            ><Search :size="14" /><input
+              ref="searchInput"
+              v-model="query"
+              type="search"
+              placeholder="搜索歌曲 / 歌手"
+              aria-label="搜索歌单"
+          /></label>
+        </div>
+        <div class="music-track-list" tabindex="0" aria-label="歌单曲目">
+          <button
+            v-for="track in filtered"
+            :key="track.id"
+            class="music-track"
+            :class="{ selected: track.id === current.id }"
+            :aria-pressed="track.id === current.id"
+            @click="selectTrack(track.trackIndex)"
+          >
+            <span class="music-track-number"
+              ><Check v-if="track.id === current.id" :size="14" /><template v-else>{{
+                String(track.trackIndex + 1).padStart(2, '0')
+              }}</template></span
+            ><span class="music-track-title"
+              ><span class="music-track-name"
+                ><span>{{ track.title }}</span
+                ><span v-if="track.vip" class="music-vip" aria-label="VIP 歌曲">VIP</span></span
+              ><small>{{ track.artist }}</small></span
+            ><span class="music-track-duration">{{ formatTime(track.duration) }}</span>
+          </button>
+          <p v-if="!filtered.length" class="music-empty">没有找到匹配的歌曲，换个关键词试试。</p>
+        </div>
+      </aside>
+    </Transition>
     <audio
       :key="current.id"
       ref="audio"
@@ -536,8 +566,6 @@ onBeforeUnmount(() => {
   position: relative;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--indigo) transparent;
   padding: 30px 8px;
   mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
 }
@@ -794,10 +822,10 @@ input[type='range'] {
   opacity: 0.55;
 }
 .music-error {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px 15px;
+  padding: 12px 16px;
+  gap: 12px;
+  text-align: center;
+  overflow-y: auto;
   font-size: 11px;
   color: var(--muted);
   line-height: 1.8;
@@ -882,8 +910,6 @@ input[type='range'] {
   max-height: 280px;
   overflow: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--indigo) transparent;
 }
 .music-track {
   display: flex;
@@ -1169,9 +1195,13 @@ input[type='range'] {
   min-width: 0;
   padding: 14px 16px 15px;
 }
+/* The popover animates its width; keep the body from reflowing during that transition. */
+.music-card.is-compact:not(.playlist-overlay) .music-player-body {
+  width: 378px;
+}
 .music-card.is-compact.has-playlist:not(.playlist-overlay) {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
+  grid-template-columns: 378px 270px;
 }
 .music-card.is-compact .music-playlist {
   display: flex;
@@ -1184,7 +1214,6 @@ input[type='range'] {
   border-top: 0;
   border-left: 1px solid var(--border);
   background: var(--panel);
-  animation: playlist-slide-in 0.18s ease-out;
 }
 .music-card.is-compact .music-track-list {
   flex: 1;
@@ -1210,19 +1239,26 @@ input[type='range'] {
   max-height: none;
   box-shadow: -10px 0 25px var(--shadow);
 }
-@keyframes playlist-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(var(--playlist-enter-x, -10px));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.playlist-enter-active,
+.playlist-leave-active {
+  transition:
+    opacity 0.28s var(--motion-ease),
+    transform 0.28s var(--motion-ease);
 }
-@media (prefers-reduced-motion: reduce) {
-  .music-card.is-compact .music-playlist {
-    animation: none;
-  }
+.playlist-enter-from,
+.playlist-leave-to {
+  opacity: 0;
+  transform: translateX(var(--playlist-enter-x, -10px));
+}
+.playlist-leave-active {
+  pointer-events: none;
+}
+.playlist-scrim-enter-active,
+.playlist-scrim-leave-active {
+  transition: opacity 0.2s ease;
+}
+.playlist-scrim-enter-from,
+.playlist-scrim-leave-to {
+  opacity: 0;
 }
 </style>

@@ -106,6 +106,7 @@ onBeforeUnmount(() => {
         <MusicPlayer
           v-if="mounted"
           compact
+          play-on-mount
           :active="opened"
           :overlay-playlist="overlayPlaylist"
           @playing="emit('playing', $event)"
@@ -131,9 +132,18 @@ onBeforeUnmount(() => {
   color: var(--text);
   transform-origin: var(--arrow-left, 90%) top;
   filter: drop-shadow(0 15px 28px var(--shadow));
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+  transition:
+    opacity 0.2s ease,
+    transform 0.28s var(--motion-ease),
+    width 0.28s var(--motion-ease),
+    display 0.28s allow-discrete,
+    overlay 0.28s allow-discrete;
 }
 .music-popover:popover-open {
-  animation: music-bubble-in 0.18s ease-out;
+  opacity: 1;
+  transform: none;
 }
 .music-popover::before {
   content: '';
@@ -151,9 +161,8 @@ onBeforeUnmount(() => {
 .music-popover-surface {
   max-height: var(--panel-height, calc(100dvh - 110px));
   overflow: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--indigo) transparent;
   border: 1px solid var(--border);
   border-radius: 17px;
   background: var(--panel);
@@ -182,19 +191,16 @@ onBeforeUnmount(() => {
   height: 28px;
   border-radius: 9px;
 }
-@keyframes music-bubble-in {
-  from {
+/* Keep the native popover in the top layer until its exit completes. */
+@starting-style {
+  .music-popover:popover-open {
     opacity: 0;
-    transform: translateY(-5px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: none;
+    transform: translateY(-8px) scale(0.97);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .music-popover:popover-open {
-    animation: none;
+  .music-popover {
+    transition: none;
   }
 }
 </style>
