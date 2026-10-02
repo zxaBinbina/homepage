@@ -22,9 +22,18 @@ import {
   Moon,
 } from 'lucide-vue-next'
 import { profile, projects } from './content'
+import MusicDialog from './components/MusicDialog.vue'
+import NeteaseIcon from './components/NeteaseIcon.vue'
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
 const menuOpen = ref(false)
+const musicTrigger = ref<HTMLButtonElement>()
+const musicOpen = ref(false)
+const musicPlaying = ref(false)
+const musicTrack = ref('')
+function openMusic() {
+  menuOpen.value = false
+}
 const active = ref('home')
 const light = ref(false)
 const copied = ref(false)
@@ -126,14 +135,29 @@ onBeforeUnmount(() => {
         class="icon-button theme-toggle"
         @click="toggleTheme"
         :aria-label="light ? '切换深色主题' : '切换浅色主题'"
+        :title="light ? '切换深色主题' : '切换浅色主题'"
       >
         <Moon v-if="light" :size="17" /><Sun v-else :size="17" /></button
+      ><button
+        ref="musicTrigger"
+        class="icon-button music-toggle"
+        :class="{ 'is-playing': musicPlaying }"
+        aria-label="打开网易云音乐播放器"
+        aria-haspopup="dialog"
+        :aria-expanded="musicOpen"
+        aria-controls="music-popover"
+        popovertarget="music-popover"
+        :title="musicPlaying && musicTrack ? `正在播放：${musicTrack}` : '网易云音乐'"
+        @click="openMusic"
+      >
+        <NeteaseIcon /></button
       ><a
         :href="profile.github"
         target="_blank"
         rel="noopener noreferrer"
         class="icon-button"
-        aria-label="GitHub（新窗口）"
+        aria-label="GitHub"
+        title="GitHub"
         ><Github :size="19" /></a
       ><span class="nav-divider"></span
       ><a href="#contact" class="nav-contact">打个招呼 <ArrowUpRight :size="14" /></a
@@ -142,6 +166,7 @@ onBeforeUnmount(() => {
         :aria-expanded="menuOpen"
         aria-controls="mobile-nav"
         :aria-label="menuOpen ? '关闭菜单' : '打开菜单'"
+        :title="menuOpen ? '关闭菜单' : '打开菜单'"
         @click="menuOpen = !menuOpen"
       >
         <X v-if="menuOpen" :size="21" /><Menu v-else :size="21" />
@@ -411,6 +436,12 @@ onBeforeUnmount(() => {
       <div class="contact-watermark" aria-hidden="true">keep creating.</div>
     </section>
   </main>
+  <MusicDialog
+    :anchor="musicTrigger"
+    @playing="musicPlaying = $event"
+    @track="musicTrack = $event"
+    @opened="musicOpen = $event"
+  />
   <footer class="shell footer">
     <a class="brand" href="#home">a彬彬a<span class="brand-dot">.</span></a>
     <div class="footer-info">

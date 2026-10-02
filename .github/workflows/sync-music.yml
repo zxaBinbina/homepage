@@ -1,0 +1,56 @@
+name: Sync NetEase playlist
+
+on:
+  schedule:
+    # UTC 02:30 = 北京时间 10:30，每月 1 日、16 日各同步一次。
+    - cron: '30 2 1,16 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-music
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Sync playlist metadata
+        run: node scripts/sync-music.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check the site and lyrics function
+        run: |
+          node scripts/check-music-sync.mjs
+          npm run build
+          node scripts/check-lyrics.mjs
+
+      - name: Commit the refreshed playlist
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git add -- src/data/music.json
+          if git diff --cached --quiet; then
+            echo "Playlist metadata is unchanged."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: sync NetEase playlist'
+          git push origin "HEAD:${DEFAULT_BRANCH}"

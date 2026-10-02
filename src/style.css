@@ -1463,7 +1463,7 @@ h1 > span {
   }
 }
 @media (max-width: 480px) {
-  .header-actions > .icon-button:not(.theme-toggle):not(.mobile-toggle),
+  .header-actions > .icon-button:not(.theme-toggle):not(.music-toggle):not(.mobile-toggle),
   .nav-divider {
     display: none;
   }
@@ -1675,5 +1675,26 @@ h1 > span {
   }
   .footer-info > a {
     padding-left: 10px;
+  }
+}
+
+.music-toggle {
+  position: relative;
+}
+.music-toggle.is-playing {
+  color: var(--blue);
+}
+.music-toggle.is-playing::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--blue);
+  bottom: 1px;
+}
+@media (max-width: 380px) {
+  .header-actions .nav-contact {
+    display: none;
   }
 }
