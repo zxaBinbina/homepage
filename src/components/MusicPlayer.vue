@@ -63,6 +63,7 @@ function finishPlaylistClose() {
 }
 const listButton = ref<HTMLButtonElement>()
 const searchInput = ref<HTMLInputElement>()
+const playlistViewport = ref<HTMLDivElement>()
 watch(listOpen, async (value) => {
   if (value) playlistVisible.value = true
   // Resize with the content transition; retain the grid until the content leaves.
@@ -168,6 +169,39 @@ const filtered = computed(() =>
         .includes(query.value.trim().toLocaleLowerCase()),
     ),
 )
+function locateCurrentTrack(smooth = false) {
+  if (!listOpen.value || !props.active) return
+  const viewport = playlistViewport.value
+  const selected = viewport?.querySelector<HTMLElement>('.music-track.selected')
+  // A search can exclude the current track; keep the user's filter intact.
+  if (!viewport || !selected) return
+  const top = Math.max(
+    0,
+    Math.min(
+      viewport.scrollHeight - viewport.clientHeight,
+      viewport.scrollTop +
+        selected.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top -
+        (viewport.clientHeight - selected.offsetHeight) / 2,
+    ),
+  )
+  // Skip long journeys through the list when wrapping or selecting a distant track.
+  const nearby = Math.abs(top - viewport.scrollTop) <= viewport.clientHeight * 2
+  viewport.scrollTo({
+    top,
+    behavior:
+      smooth && nearby && !matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'smooth'
+        : 'instant',
+  })
+}
+watch(
+  [() => current.value.id, listOpen, () => props.active, query, () => props.overlayPlaylist],
+  ([id, open, active], [previousId, wasOpen, wasActive]) => {
+    locateCurrentTrack(id !== previousId && open && wasOpen && active && wasActive)
+  },
+  { flush: 'post' },
+)
 const playLabel = computed(() =>
   loading.value ? '取消加载' : playing.value ? '暂停音乐' : '播放音乐',
 )
@@ -178,6 +212,11 @@ function formatTime(seconds: number) {
 }
 function isCurrent(event: Event) {
   return event.currentTarget === audio.value
+}
+function onCoverError(event: Event) {
+  // A cover retained for its exit animation may fail after the track has changed.
+  if ((event.currentTarget as HTMLImageElement).dataset.trackId === String(current.value.id))
+    coverFailed.value = true
 }
 function reportError() {
   loading.value = false
@@ -276,17 +315,21 @@ onBeforeUnmount(() => {
       </div>
       <div class="music-main">
         <div class="music-cover" :class="{ 'is-playing': playing }">
-          <img
-            v-if="!coverFailed"
-            :src="cover"
-            :alt="`${current.album} 专辑封面`"
-            width="76"
-            height="76"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-            @error="coverFailed = true"
-          />
-          <Headphones v-else :size="30" />
+          <Transition name="track-cover">
+            <img
+              v-if="!coverFailed"
+              :key="current.id"
+              :data-track-id="current.id"
+              :src="cover"
+              :alt="`${current.album} 专辑封面`"
+              width="76"
+              height="76"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              @error="onCoverError"
+            />
+            <Headphones v-else :key="`fallback-${current.id}`" :size="30" />
+          </Transition>
           <span class="music-cover-shine" aria-hidden="true"></span>
         </div>
         <div class="music-info">
@@ -295,11 +338,11 @@ onBeforeUnmount(() => {
               ><i></i><i></i><i></i></span
             >{{ playing ? '正在播放' : loading ? '正在加载' : '给此刻一点旋律' }}</span
           >
-          <div class="music-title-row">
+          <div :key="`title-${current.id}`" class="music-title-row track-info-enter">
             <h3 :title="current.title">{{ current.title }}</h3>
             <span v-if="current.vip" class="music-vip" aria-label="VIP 歌曲">VIP</span>
           </div>
-          <p>{{ current.artist }}</p>
+          <p :key="`artist-${current.id}`" class="track-info-enter">{{ current.artist }}</p>
         </div>
         <div class="music-controls">
           <button class="music-icon-button" aria-label="上一首" @click="selectTrack(index - 1)">
@@ -365,45 +408,48 @@ onBeforeUnmount(() => {
         /><span>{{ formatTime(duration || current.duration) }}</span>
       </div>
       <section class="music-lyrics" :aria-label="error ? '播放状态' : '歌词'">
-        <div v-if="error" class="lyric-placeholder music-error" role="status">
-          <span>{{ error }}</span>
-          <a class="lyric-retry" :href="songUrl" target="_blank" rel="noopener noreferrer">
-            在网易云打开 <ArrowUpRight :size="13" />
-          </a>
-        </div>
-        <div v-else-if="lyricState === 'loading'" class="lyric-placeholder" role="status">
-          <LoaderCircle class="music-spinner" :size="19" /><span>正在加载歌词…</span>
-        </div>
-        <div v-else-if="lyricState === 'instrumental'" class="lyric-placeholder">
-          <Headphones :size="24" /><span>纯音乐，请欣赏</span>
-        </div>
-        <div v-else-if="lyricState === 'error'" class="lyric-placeholder" role="status">
-          <span>歌词暂时无法加载</span><button class="lyric-retry" @click="loadLyrics">重试</button>
-        </div>
-        <div v-else-if="lyricState === 'empty'" class="lyric-placeholder">
-          <span>暂无歌词，让旋律继续。</span>
-        </div>
-        <div
-          v-else-if="lyricLines.length"
-          ref="lyricsViewport"
-          class="lyric-lines"
-          tabindex="0"
-          aria-label="滚动歌词"
-        >
-          <button
-            v-for="(line, lineIndex) in lyricLines"
-            :key="`${line.time}-${lineIndex}`"
-            class="lyric-line"
-            :data-active="lineIndex === activeLine"
-            :aria-current="lineIndex === activeLine ? 'true' : undefined"
-            :disabled="!seekable"
-            @click="seekToLine(line.time)"
+        <div :key="`${current.id}-${lyricState}-${Boolean(error)}`" class="track-lyrics-enter">
+          <div v-if="error" class="lyric-placeholder music-error" role="status">
+            <span>{{ error }}</span>
+            <a class="lyric-retry" :href="songUrl" target="_blank" rel="noopener noreferrer">
+              在网易云打开 <ArrowUpRight :size="13" />
+            </a>
+          </div>
+          <div v-else-if="lyricState === 'loading'" class="lyric-placeholder" role="status">
+            <LoaderCircle class="music-spinner" :size="19" /><span>正在加载歌词…</span>
+          </div>
+          <div v-else-if="lyricState === 'instrumental'" class="lyric-placeholder">
+            <Headphones :size="24" /><span>纯音乐，请欣赏</span>
+          </div>
+          <div v-else-if="lyricState === 'error'" class="lyric-placeholder" role="status">
+            <span>歌词暂时无法加载</span
+            ><button class="lyric-retry" @click="loadLyrics">重试</button>
+          </div>
+          <div v-else-if="lyricState === 'empty'" class="lyric-placeholder">
+            <span>暂无歌词，让旋律继续。</span>
+          </div>
+          <div
+            v-else-if="lyricLines.length"
+            ref="lyricsViewport"
+            class="lyric-lines"
+            tabindex="0"
+            aria-label="滚动歌词"
           >
-            <span>{{ line.text }}</span
-            ><small v-if="line.translation">{{ line.translation }}</small>
-          </button>
+            <button
+              v-for="(line, lineIndex) in lyricLines"
+              :key="`${line.time}-${lineIndex}`"
+              class="lyric-line"
+              :data-active="lineIndex === activeLine"
+              :aria-current="lineIndex === activeLine ? 'true' : undefined"
+              :disabled="!seekable"
+              @click="seekToLine(line.time)"
+            >
+              <span>{{ line.text }}</span
+              ><small v-if="line.translation">{{ line.translation }}</small>
+            </button>
+          </div>
+          <p v-else class="lyric-plain">{{ plainLyrics }}</p>
         </div>
-        <p v-else class="lyric-plain">{{ plainLyrics }}</p>
       </section>
     </div>
     <Transition name="playlist-scrim">
@@ -419,6 +465,7 @@ onBeforeUnmount(() => {
       @before-enter="(el) => el.removeAttribute('inert')"
       name="playlist"
       @after-leave="finishPlaylistClose"
+      @after-enter="locateCurrentTrack()"
     >
       <aside
         v-if="listOpen"
@@ -438,7 +485,7 @@ onBeforeUnmount(() => {
               aria-label="搜索歌单"
           /></label>
         </div>
-        <div class="music-track-list" tabindex="0" aria-label="歌单曲目">
+        <div ref="playlistViewport" class="music-track-list" tabindex="0" aria-label="歌单曲目">
           <button
             v-for="track in filtered"
             :key="track.id"
@@ -533,6 +580,7 @@ onBeforeUnmount(() => {
 .music-lyrics {
   margin-top: 19px;
   padding-top: 17px;
+  overflow: hidden;
   border-top: 1px solid var(--border);
 }
 .lyric-placeholder,
@@ -1260,5 +1308,45 @@ input[type='range'] {
 .playlist-scrim-enter-from,
 .playlist-scrim-leave-to {
   opacity: 0;
+}
+/* Keep outgoing covers layered in the same fixed-size slot. */
+.music-cover > img,
+.music-cover > svg {
+  grid-area: 1 / 1;
+}
+.track-cover-enter-active,
+.track-cover-leave-active {
+  transition:
+    opacity 0.28s ease,
+    transform 0.32s var(--motion-ease);
+}
+.track-cover-enter-from {
+  opacity: 0;
+  transform: scale(1.08);
+}
+.track-cover-leave-to {
+  opacity: 0;
+  transform: scale(0.94);
+}
+.track-cover-leave-active {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .track-info-enter {
+    animation: track-info-in 0.32s var(--motion-ease);
+  }
+  .track-lyrics-enter {
+    animation: track-info-in 0.4s var(--motion-ease);
+  }
+}
+@keyframes track-info-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 </style>
