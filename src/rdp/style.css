@@ -1,0 +1,504 @@
+.rdp-site,
+.rdp-site #app {
+  display: flow-root;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.rdp-header {
+  position: sticky;
+  z-index: 20;
+  top: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: min(1020px, calc(100% - 48px));
+  margin-top: 22px;
+  padding: 10px 22px;
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.rdp-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  letter-spacing: -0.5px;
+}
+.rdp-brand b {
+  font-weight: 500;
+}
+.rdp-mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--blue);
+  border-radius: 12px;
+  color: var(--blue);
+  font-size: 24px;
+}
+.rdp-header nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 13px;
+}
+.rdp-header nav a:not(.icon-button) {
+  padding: 8px 14px;
+  border-radius: 24px;
+}
+.rdp-header nav a[aria-current] {
+  color: var(--blue);
+  background: var(--panel-hover);
+}
+.rdp-nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rdp-eyebrow {
+  font: 11px/1.7 monospace;
+  letter-spacing: 2px;
+  color: var(--blue);
+  margin-bottom: 22px;
+}
+.rdp-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 70px;
+  align-items: center;
+  padding-block: 95px 90px;
+}
+.rdp-page h1 {
+  font-size: clamp(38px, 4.4vw, 64px);
+  line-height: 1.22;
+  letter-spacing: -2px;
+  font-weight: 750;
+}
+.rdp-page h1 span {
+  color: var(--blue);
+}
+.rdp-lead {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.95;
+  margin-top: 24px;
+}
+.rdp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+.rdp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 12px 24px;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.rdp-button.primary {
+  background: #4ea4ef;
+  color: #0c1c31;
+  border-color: #4ea4ef;
+}
+.rdp-button:hover {
+  background: var(--panel-hover);
+}
+.rdp-button.primary:hover {
+  background: #81bff4;
+}
+.rdp-caption {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 26px;
+}
+.rdp-section {
+  padding-block: 66px;
+  border-top: 1px solid var(--border);
+}
+.rdp-page h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.4;
+  letter-spacing: -1px;
+}
+.rdp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 34px;
+}
+.rdp-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+}
+.rdp-card-icon {
+  color: var(--blue);
+  font: 11px monospace;
+  letter-spacing: 1px;
+}
+.rdp-card h3 {
+  font-size: 20px;
+  margin: 30px 0 12px;
+}
+.rdp-card p,
+.rdp-facts p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.rdp-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 90px;
+}
+.rdp-text-link {
+  display: inline-block;
+  color: var(--blue);
+  padding-block: 12px;
+  margin-top: 15px;
+}
+.rdp-facts article {
+  padding-block: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.rdp-facts article:first-child {
+  padding-top: 0;
+}
+.rdp-facts b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+.rdp-deploy-card {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  justify-content: space-between;
+  padding: 38px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.rdp-deploy-card h2 {
+  font-size: 28px;
+}
+.rdp-deploy-card p:not(.rdp-eyebrow) {
+  color: var(--muted);
+  margin-top: 18px;
+  font-size: 14px;
+}
+.rdp-deploy-card .rdp-button {
+  flex-shrink: 0;
+}
+.rdp-footer-info {
+  text-align: center;
+}
+.rdp-footer-links {
+  display: flex;
+  gap: 20px;
+}
+.rdp-footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding-block: 30px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+.rdp-wiki-title {
+  padding-block: 64px 44px;
+}
+.rdp-wiki-title h1 {
+  font-size: clamp(32px, 3.5vw, 46px);
+}
+.rdp-wiki-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 60px;
+  align-items: start;
+  padding-bottom: 80px;
+}
+.rdp-toc {
+  position: sticky;
+  top: 110px;
+  max-height: calc(100vh - 138px);
+  overflow-y: auto;
+  font-size: 13px;
+  padding: 5px;
+}
+.rdp-toc nav a {
+  display: block;
+  padding: 7px 12px;
+  border-left: 2px solid var(--border);
+  color: var(--muted);
+}
+.rdp-toc nav a[aria-current] {
+  color: var(--blue);
+  border-color: var(--blue);
+  background: var(--panel);
+}
+.rdp-doc {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.95;
+}
+.rdp-doc h2 {
+  font-size: 28px;
+  margin-top: 55px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.rdp-doc h3 {
+  font-size: 25px;
+  margin-top: 50px;
+  padding-top: 25px;
+  border-top: 1px solid var(--border);
+}
+.rdp-doc h4 {
+  font-size: 20px;
+  margin-top: 38px;
+}
+.rdp-doc p,
+.rdp-doc ul,
+.rdp-doc ol {
+  margin-block: 18px;
+}
+.rdp-doc li {
+  margin-block: 8px;
+}
+.rdp-doc a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.rdp-doc pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 22px;
+  background: var(--section);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.rdp-doc pre:focus-visible {
+  outline: 2px solid var(--blue);
+}
+.rdp-doc code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+}
+.rdp-doc :not(pre) > code {
+  font-size: 0.85em;
+  background: var(--panel);
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+.rdp-doc table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.rdp-doc th,
+.rdp-doc td {
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  min-width: 110px;
+}
+.rdp-doc th {
+  background: var(--panel);
+}
+.rdp-note {
+  border-left: 3px solid var(--blue);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  background: var(--panel);
+  font-size: 14px;
+}
+.rdp-note p {
+  margin-block: 10px 0;
+  color: var(--muted);
+}
+/* Keep entry and hover motion independent; content remains visible without animations. */
+@media (prefers-reduced-motion: no-preference) {
+  .rdp-header {
+    animation: header-enter 0.55s var(--motion-ease) both;
+  }
+  .rdp-hero-copy > *,
+  .rdp-hero-demo,
+  .rdp-wiki-title > * {
+    animation: page-enter 0.75s var(--motion-ease) both;
+  }
+  .rdp-hero-copy > :nth-child(2),
+  .rdp-wiki-title > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .rdp-hero-copy > :nth-child(3),
+  .rdp-wiki-title > :nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .rdp-hero-copy > :nth-child(4),
+  .rdp-hero-demo {
+    animation-delay: 180ms;
+  }
+  .rdp-hero-copy > :nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .rdp-button,
+  .rdp-card {
+    transition:
+      transform 0.25s var(--motion-ease),
+      border-color 0.25s,
+      background 0.25s,
+      box-shadow 0.25s;
+  }
+  .rdp-header nav a,
+  .rdp-toc nav a,
+  .rdp-text-link {
+    transition:
+      color 0.2s,
+      background 0.2s,
+      border-color 0.2s;
+  }
+  .rdp-button:active {
+    transform: scale(0.97);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .rdp-button:hover {
+    transform: translateY(-3px);
+  }
+  .rdp-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--blue);
+    box-shadow: 0 12px 28px var(--shadow);
+  }
+}
+@media (max-width: 1050px) {
+  .rdp-hero {
+    gap: 32px;
+  }
+  .rdp-split {
+    gap: 44px;
+  }
+  .rdp-wiki-layout {
+    gap: 32px;
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .rdp-card {
+    padding: 22px;
+  }
+  .rdp-deploy-card {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+@media (max-width: 760px) {
+  .rdp-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 16px;
+    top: 13px;
+    margin-top: 13px;
+  }
+  .rdp-header nav {
+    gap: 20px;
+  }
+  .rdp-hero {
+    grid-template-columns: 1fr;
+    padding-block: 55px;
+    gap: 40px;
+  }
+  .rdp-page h1 {
+    letter-spacing: -1px;
+  }
+  .rdp-grid {
+    grid-template-columns: 1fr;
+  }
+  .rdp-card h3 {
+    margin-top: 18px;
+  }
+  .rdp-split {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .rdp-section {
+    padding-block: 44px;
+  }
+  .rdp-wiki-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .rdp-toc {
+    position: static;
+    max-height: none;
+  }
+  .rdp-toc nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .rdp-toc .rdp-eyebrow {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .rdp-toc nav a {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .rdp-wiki-title {
+    padding-block: 44px 30px;
+  }
+  .rdp-doc {
+    font-size: 15px;
+  }
+}
+@media (max-width: 480px) {
+  .rdp-header {
+    border-radius: 24px;
+    width: calc(100% - 24px);
+  }
+  .rdp-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+  .rdp-header nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .rdp-deploy-card {
+    padding: 24px;
+  }
+  .rdp-lead {
+    font-size: 15px;
+  }
+  .rdp-doc pre {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rdp-doc [id] {
+    scroll-margin-top: 48px;
+  }
+}

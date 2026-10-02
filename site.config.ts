@@ -8,15 +8,33 @@ export const siteContent = {
   imageAlt: '蓝天下的 Minecraft 方块雕像，a彬彬a 的方块世界',
 }
 
-export function createSiteMeta(baseUrl = siteContent.url) {
+const projectPages = {
+  rdp: {
+    title: 'RDP Access Auth · 远程桌面，先认证再连接',
+    description:
+      '为 SakuraFrp 远程桌面增加 HTTPS 认证入口，支持固定密码、临时密码、WebAuthn 通行密钥与公网 IPv4 授权。',
+    path: 'projects/rdp-access-auth/',
+  },
+  wiki: {
+    title: '部署与维护 Wiki · RDP Access Auth',
+    description:
+      'RDP Access Auth 完整源码部署指南：Python 环境、systemd、Cloudflare Tunnel、SakuraFrp 准入、通行密钥与故障排查。',
+    path: 'projects/rdp-access-auth/wiki/',
+  },
+}
+
+export function createSiteMeta(baseUrl = siteContent.url, page: 'home' | 'rdp' | 'wiki' = 'home') {
   const url = new URL(baseUrl)
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
     throw new Error('SITE_URL 必须是不包含登录信息、查询参数和锚点的 HTTPS 网站地址')
   }
   if (!url.pathname.endsWith('/')) url.pathname += '/'
+  const content = page === 'home' ? siteContent : projectPages[page]
   return {
     ...siteContent,
-    url: url.href,
+    title: content.title,
+    description: content.description,
+    url: page === 'home' ? url.href : new URL(projectPages[page].path, url).href,
     image: new URL(siteContent.image, url).href,
   }
 }

@@ -23,7 +23,7 @@
 | 文件或目录                                                       | 适合修改的内容                                 |
 | ---------------------------------------------------------------- | ---------------------------------------------- |
 | [src/style.css](src/style.css)                                   | 全局主题变量、页面排版、通用组件、响应式和动效 |
-| [src/App.vue](src/App.vue)                                       | 页面结构、导航、主题状态、滚动显现、复制提示   |
+| [src/HomePage.vue](src/HomePage.vue)                             | 个人主页结构、导航、滚动显现、复制提示         |
 | [src/content.ts](src/content.ts)                                 | 个人资料、项目文案和链接                       |
 | [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、展开宽度及外观                   |
 | [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 播放器、歌词、歌单与局部样式                   |
@@ -31,6 +31,8 @@
 | [public/images/](public/images/)                                 | 头像、景观、项目和分享图片                     |
 | [index.html](index.html)                                         | 首次绘制前的主题初始化与 HTML 模板             |
 | [site.config.ts](site.config.ts)                                 | 站点标题、简介、域名及分享配置                 |
+
+主题按钮与状态分别维护在 [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue) 和 [src/composables/useTheme.ts](src/composables/useTheme.ts)，主页与项目子站共用。RDP 子站的 Vue 页面组件与样式位于 `src/rdp/`，部署正文位于 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，构建转换位于 [build/rdpWiki.ts](build/rdpWiki.ts)。三个页面由 `src/main.ts`、`src/App.vue` 与 `src/pages.ts` 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成三个地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。子站修改后运行 `python3 scripts/check-rdp-pages.py`。
 
 保持 Vue 3、TypeScript、原生 CSS 和现有图标体系。局部样式工作优先用已有工具完成；确有必要引入依赖时，说明用途并保持锁文件一致。
 

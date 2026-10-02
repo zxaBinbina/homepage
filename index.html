@@ -42,7 +42,7 @@
     <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
     <title><%= site.title %></title>
   </head>
-  <body>
+  <body id="top" class="<%= page === 'home' ? '' : 'rdp-site' %>">
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -211,7 +211,7 @@
 | 文件                                                             | 维护职责                                     |
 | ---------------------------------------------------------------- | -------------------------------------------- |
 | [src/style.css](src/style.css)                                   | 主题变量、页面布局、通用组件、断点、全局动效 |
-| [src/App.vue](src/App.vue)                                       | 页面结构、导航、主题状态、滚动显现、复制反馈 |
+| [src/HomePage.vue](src/HomePage.vue)                             | 页面结构、导航、滚动显现、复制反馈           |
 | [src/content.ts](src/content.ts)                                 | 个人资料、项目文案与链接                     |
 | [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、宽度、开合与外观               |
 | [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 音乐控制、歌词、列表与组件局部样式           |
@@ -220,3 +220,21 @@
 | [site.config.ts](site.config.ts)                                 | 站点标题、描述及分享视觉配置                 |
 
 修改设计时同步更新本文对应部分。视觉调整完成后，应检查深浅主题、桌面与窄屏、键盘焦点、减少动态效果模式，以及涉及组件的加载和失败状态。
+
+## 11. RDP Access Auth 项目子站
+
+官网位于 `/projects/rdp-access-auth/`，Wiki 位于其 `wiki/` 子路径，与主页共用一个 Vue 挂载入口，页面模板使用 Vue 3 / TypeScript 单文件组件。复用主页语义颜色、字体栈、毛玻璃胶囊导航与 `.shell`；子站样式集中于 `src/rdp/style.css`，用 `rdp-` 前缀隔离。官网采用左右分栏首屏与 Vue 模拟认证演示、三列认证方式卡片、适用范围和部署入口。760px 及以下切为单列。
+
+Wiki 采用左侧粘性目录与右侧正文，正文为 16px，窄屏为 15px；760px 及以下目录回到正文上方。长命令和表格在自身区域滚动，目录以文字和边框标记当前章节。页面不依赖动画呈现内容；主题与主页共享保存键并跟随系统。部署章节锚点固定为 `#deployment`。官网与 Wiki 页脚均展示作者、动态年份、萌ICP备20264016号、项目许可证和回到顶部入口。
+
+子站导航使用与主页相同的 Lucide 线性图标：主题为 17px 的 Sun / Moon，GitHub 为 19px，品牌标记为 ShieldCheck。工具按钮直接复用 `.icon-button` 的 34 × 36px 尺寸与悬停反馈；图标使用 `lucide-vue-next` 组件，主题按钮复用 `src/components/ThemeToggle.vue`。
+
+`src/rdp/App.vue` 组合导航、页脚与官网 / Wiki 组件；目录当前项通过 Vue 状态管理，滚动监听在组件卸载时清理。主题状态统一由 `src/composables/useTheme.ts` 管理。Wiki 正文在构建时转换为模块数据，运行时由 Vue 渲染；三个页面共用根目录 `index.html` 基础模板，仅负责挂载、首屏主题初始化和分享元信息；`build/pageTemplates.ts` 自动生成各 URL 的输出文件。
+
+### 子站动效与认证演示
+
+导航使用 550ms 淡入；首屏与 Wiki 标题使用 750ms 错峰进入，间隔 60ms。官网区块进入视口时以 650ms 淡入和 20px 位移显现；通过 Web Animations API 临时播放，不将正文可见性依赖于动画执行。按钮与卡片使用轻微悬停位移，沿用 `--motion-ease`，不劫持滚动。
+
+`src/rdp/components/AuthDemo.vue` 在浏览器外观的演示窗口中展示逐字输入密码、验证中、成功 / 失败弹层。每个场景约 7.2 秒，结果层以 300–350ms 淡入淡出、12px 位移和轻微缩放切换。可选成功或失败场景，支持暂停和重播。离开视口或页面进入后台时暂停计时；组件卸载后清理计时器与监听。演示不包含真实输入框、密码或认证请求，使用保留的示例 IP 地址。
+
+减少动态效果时不自动播放，直接显示结果，按钮可切换成功 / 失败示例；运行中改变系统偏好也会立即停下动效。自动演示不触发屏幕阅读器连续播报。成功 / 失败使用 `--status-success`、`--status-danger` 的深浅两套颜色，并同时提供图标与文字。运行 `python3 scripts/check-rdp-motion.py` 验证演示流程、暂停、重播与减少动态效果；默认连接 `http://127.0.0.1:4174`，可用 `HOMEPAGE_TEST_URL` 指定地址。

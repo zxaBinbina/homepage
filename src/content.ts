@@ -51,8 +51,8 @@ export const projects = [
     description:
       '面向 SakuraFrp 远程桌面的网页认证入口，结合通行密钥与 IP 授权，让远程访问更从容。',
     tags: ['Python', 'WebAuthn', 'Cloudflare'],
-    url: 'https://github.com/zxaBinbina/rdp-access-auth',
-    link: '探索源码',
+    url: '/projects/rdp-access-auth/',
+    link: '官网与部署 Wiki',
     icon: 'shield',
   },
 ]

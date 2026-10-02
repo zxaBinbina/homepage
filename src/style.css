@@ -23,6 +23,8 @@
   --blue: #4ea4ef;
   --indigo: #2d3c81;
   --warm: #937562;
+  --status-success: #75c7ac;
+  --status-danger: #ef999f;
   --border: rgba(218, 226, 237, 0.11);
   --glass: rgba(29, 31, 46, 0.76);
   --section: #11121d;
@@ -34,6 +36,8 @@
   --scrollbar-thumb-hover: #6a89af;
   --scrollbar-track: #e9eef6;
   --bg: #f4f6fa;
+  --status-success: #24765c;
+  --status-danger: #b33d4b;
   --panel: #fff;
   --panel-hover: #eaf0f8;
   --text: #141521;

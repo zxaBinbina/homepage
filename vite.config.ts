@@ -1,8 +1,9 @@
 import { cwd } from 'node:process'
+import { resolve } from 'node:path'
+import { compileRdpWiki } from './build/rdpWiki'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import ejs from 'ejs'
-import { createSiteMeta } from './site.config'
+import { pageTemplates } from './build/pageTemplates'
 import { lyricsResponse } from './server/lyrics'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
@@ -17,11 +18,22 @@ async function lyricsMiddleware(request: IncomingMessage, response: ServerRespon
   response.end(await result.text())
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, cwd(), 'SITE_')
-  const site = createSiteMeta(env.SITE_URL)
   return {
     plugins: [
+      {
+        name: 'rdp-wiki-content',
+        resolveId(id) {
+          if (id === 'virtual:rdp-wiki') return '\0virtual:rdp-wiki'
+        },
+        load(id) {
+          if (id !== '\0virtual:rdp-wiki') return
+          const path = resolve('docs/rdp-access-auth.md')
+          this.addWatchFile(path)
+          return `export default ${JSON.stringify(compileRdpWiki(path))}`
+        },
+      },
       {
         name: 'local-music-lyrics',
         configureServer(server) {
@@ -31,13 +43,7 @@ export default defineConfig(({ mode }) => {
           server.middlewares.use('/api/music/lyrics', lyricsMiddleware)
         },
       },
-      {
-        name: 'site-sharing-template',
-        transformIndexHtml: {
-          order: 'pre',
-          handler: (html) => ejs.render(html, { site }),
-        },
-      },
+      pageTemplates(env.SITE_URL, command === 'build'),
       vue(),
     ],
     base: './',
