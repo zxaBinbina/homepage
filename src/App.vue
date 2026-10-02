@@ -163,8 +163,7 @@ onBeforeUnmount(() => {
         aria-label="GitHub"
         title="GitHub"
         ><Github :size="19" /></a
-      ><span class="nav-divider"></span
-      ><a href="#contact" class="nav-contact">打个招呼 <ArrowUpRight :size="14" /></a
+      ><span class="nav-divider"></span><a href="#contact" class="nav-contact">打个招呼</a
       ><button
         class="icon-button mobile-toggle"
         :aria-expanded="menuOpen"
@@ -193,8 +192,8 @@ onBeforeUnmount(() => {
           :key="item.id"
           :href="`#${item.id}`"
           @click="menuOpen = false"
-          >{{ item.label }}<ArrowUpRight :size="16"
-        /></a>
+          >{{ item.label }}</a
+        >
       </nav>
     </Transition>
   </header>
@@ -213,7 +212,7 @@ onBeforeUnmount(() => {
           />写代码，做有趣的东西，把热爱慢慢变成现实。
         </p>
         <div class="hero-buttons">
-          <a class="button primary" href="#projects">看看我的作品 <ArrowUpRight :size="18" /></a
+          <a class="button primary" href="#projects">看看我的作品</a
           ><a class="button secondary" href="#world"><Blocks :size="18" /> 来悠哉世界坐坐</a>
         </div>
         <div class="hero-notes">
@@ -242,13 +241,13 @@ onBeforeUnmount(() => {
               <p>每一个世界，都从一个想法开始。</p>
             </div>
             <a href="#world" class="round-link" aria-label="了解悠哉世界"
-              ><ArrowUpRight :size="24"
+              ><ArrowDown :size="24" aria-hidden="true"
             /></a>
           </div>
         </div>
         <div class="image-caption">
           <span>MY WORLD, ONE BLOCK AT A TIME.</span
-          ><a href="#about">继续探索 <ArrowDown :size="13" /></a><span>01 / PERSONAL SPACE</span>
+          ><span>01 / PERSONAL SPACE</span>
         </div>
       </div>
     </section>
@@ -439,9 +438,7 @@ onBeforeUnmount(() => {
         <span class="overline">LET'S MAKE SOMETHING GOOD.</span>
         <h2>有趣的想法，<br />从一句「你好」开始。</h2>
         <p>聊聊项目、交换想法，或只是打个招呼。<br />很期待听到你的声音。</p>
-        <a class="email-link" :href="`mailto:${profile.email}`"
-          >{{ profile.email }} <ArrowUpRight :size="25"
-        /></a>
+        <a class="email-link" :href="`mailto:${profile.email}`">{{ profile.email }}</a>
         <div class="contact-links">
           <a :href="profile.github" target="_blank" rel="noopener noreferrer"
             ><Github :size="19" /> GitHub <ArrowUpRight :size="14" /></a
@@ -467,7 +464,7 @@ onBeforeUnmount(() => {
         >萌ICP备20264016号</a
       >
     </div>
-    <a href="#home">回到顶部 <ArrowUpRight :size="15" /></a>
+    <a href="#home">回到顶部</a>
   </footer>
   <Transition name="toast"
     ><div v-if="copyMessage" role="status" class="toast-message">
