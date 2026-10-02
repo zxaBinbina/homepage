@@ -14,6 +14,26 @@ with sync_playwright() as p:
     assert page.locator('.wiki-section-heading').count() == 16
     assert page.locator('.wiki-section-heading').first.inner_text() == '运行要求'
     assert page.locator('.wiki-deploy-step').count() == 6
+    assert page.get_by_text('当前阅读', exact=True).count() == 0
+    page.set_viewport_size({'width': 1440, 'height': 700})
+    for motion in ['reduce', 'no-preference']:
+        page.emulate_media(reduced_motion=motion)
+        for section_id in ['section-13', 'deployment']:
+            page.locator('#' + section_id).evaluate('(el) => el.scrollIntoView({behavior: "instant"})')
+            document_position = page.evaluate('scrollY')
+            page.wait_for_function("""(id) => {
+                const toc = document.querySelector('.rdp-toc');
+                const active = toc.querySelector('a[aria-current="location"]');
+                if (!active || active.hash !== '#' + id) return false;
+                const outer = toc.getBoundingClientRect(), inner = active.getBoundingClientRect();
+                return inner.top >= outer.top && inner.bottom <= outer.bottom;
+            }""", arg=section_id)
+            page.wait_for_timeout(300)
+            assert abs(page.evaluate('scrollY') - document_position) < 2, 'Directory following moved the document'
+            if section_id == 'section-13':
+                assert page.locator('.rdp-toc').evaluate('(el) => el.scrollTop') > 0
+    page.emulate_media(reduced_motion='reduce')
+    page.set_viewport_size({'width': 1440, 'height': 1000})
     page.get_by_role('searchbox', name='搜索文档').fill('DynamicUser')
     assert page.locator('.rdp-toc nav a').count() == 1
     assert '安装认证服务' in page.locator('.rdp-toc nav a').inner_text()

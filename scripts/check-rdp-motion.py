@@ -52,6 +52,37 @@ with sync_playwright() as p:
         page.set_viewport_size({'width': width, 'height': 1000})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), width
         assert page.locator('.demo-controls').evaluate('(e) => e.scrollWidth <= e.clientWidth'), width
+    # All authentication methods remain selectable even over the success result.
+    for theme in ['dark', 'light']:
+        page.evaluate("theme => document.documentElement.dataset.theme = theme", theme)
+        for width in [320, 390, 768, 1024, 1440]:
+            page.set_viewport_size({'width': width, 'height': 1000})
+            for label, method in [('固定密码', 'password'), ('临时密码', 'temporary'), ('通行密钥', 'passkey')]:
+                page.get_by_role('button', name=label, exact=True).click()
+                assert demo.get_attribute('data-method') == method
+                page.get_by_role('heading', name='认证成功', exact=True).wait_for()
+                assert page.locator('.demo-rotation').count() == (1 if method == 'temporary' else 0)
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (theme, width, method)
+                result = page.locator('.demo-result')
+                assert result.evaluate('(e) => e.scrollHeight <= e.clientHeight'), (theme, width, method, 'result overflow')
+                page.get_by_role('button', name='失败流程').click()
+                expected = {'password': '密码不正确', 'temporary': '已使用', 'passkey': '取消或超时'}[method]
+                assert expected in page.locator('.demo-error').inner_text()
+                if width == 390:
+                    demo.screenshot(path=str(out / f'rdp-demo-{method}-{theme}.png'))
+    page.emulate_media(reduced_motion='no-preference')
+    page.set_viewport_size({'width': 1440, 'height': 1000})
+    page.get_by_role('button', name='临时密码', exact=True).click()
+    page.wait_for_function("document.querySelector('.auth-demo').dataset.phase === 'checking'")
+    page.get_by_role('heading', name='认证成功', exact=True).wait_for()
+    page.get_by_role('button', name='通行密钥', exact=True).click()
+    assert '请在设备上确认' in page.locator('.demo-passkey').inner_text()
+    page.wait_for_function("document.querySelector('.auth-demo').dataset.phase === 'checking'")
+    assert '设备已确认' in page.locator('.demo-passkey').inner_text()
+    page.get_by_role('heading', name='认证成功', exact=True).wait_for()
+    page.get_by_role('button', name='失败流程').click()
+    page.get_by_role('heading', name='认证失败', exact=True).wait_for()
+    page.wait_for_function("document.querySelector('.auth-demo').dataset.method === 'password'", timeout=10000)
     assert all(method == 'GET' and url.startswith(base) for method, url in requests), requests
     assert not errors, errors
     browser.close()

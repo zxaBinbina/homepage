@@ -20,6 +20,21 @@ const reduced = ref(motion.matches)
 const paused = ref(false)
 const inView = ref(false)
 const visible = ref(!document.hidden)
+const methods = [
+  { id: 'password', label: '固定密码' },
+  { id: 'temporary', label: '临时密码' },
+  { id: 'passkey', label: '通行密钥' },
+] as const
+type Method = (typeof methods)[number]['id']
+const method = ref<Method>('password')
+const failureMessage = computed(
+  () =>
+    ({
+      password: '密码不正确，暂未放行此 IP。',
+      temporary: '临时密码不正确或已使用，请确认最新密码。',
+      passkey: '设备确认已取消或超时，可重试或改用密码。',
+    })[method.value],
+)
 const outcome = ref<'success' | 'failure'>('success')
 const frame = ref(reduced.value ? 24 : 0)
 const manual = ref(false)
@@ -31,8 +46,13 @@ const password = computed(() => '•'.repeat(Math.min(frame.value, 16)))
 const caption = computed(
   () =>
     ({
-      typing: '正在输入访问密码',
-      checking: '正在验证身份',
+      typing:
+        method.value === 'passkey'
+          ? '正在请求设备确认通行密钥'
+          : method.value === 'temporary'
+            ? '正在输入三个中文词组成的临时密码'
+            : '正在输入访问密码',
+      checking: method.value === 'passkey' ? '模拟设备确认后，验证通行密钥' : '正在验证身份',
       success: '认证成功，允许此 IPv4 建立新连接',
       failure: '认证失败，此 IPv4 仍未获得准入',
     })[phase.value],
@@ -46,6 +66,10 @@ function schedule() {
     frame.value += 1
     if (frame.value >= 48) {
       frame.value = 0
+      if (outcome.value === 'failure') {
+        const index = methods.findIndex((item) => item.id === method.value)
+        method.value = methods[(index + 1) % methods.length]!.id
+      }
       outcome.value = outcome.value === 'success' ? 'failure' : 'success'
       manual.value = false
     }
@@ -59,6 +83,10 @@ function demonstrate(result: 'success' | 'failure') {
   frame.value = reduced.value ? 24 : 0
   paused.value = false
   schedule()
+}
+function selectMethod(value: Method) {
+  method.value = value
+  demonstrate('success')
 }
 function onVisibility() {
   visible.value = !document.hidden
@@ -95,6 +123,7 @@ onBeforeUnmount(() => {
     :class="{ 'is-running': running }"
     aria-label="认证流程动画演示"
     :data-phase="phase"
+    :data-method="method"
   >
     <div class="demo-toolbar">
       <span class="demo-dots" aria-hidden="true"><i></i><i></i><i></i></span
@@ -105,62 +134,94 @@ onBeforeUnmount(() => {
       <div class="demo-heading">
         <img class="demo-shield" src="/images/rdp-access-auth.png" alt="" width="43" height="43" />
         <div>
-          <h2>连接之前，确认是你。</h2>
-          <p>RDP Access Auth</p>
+          <h2>验证访问身份</h2>
+          <p>RDP Access Auth · 选择你习惯的认证方式</p>
         </div>
       </div>
-      <div class="demo-field">
-        <span>需要授权的公网 IPv4</span>
-        <div class="demo-input">
-          <Monitor :size="15" /><span>203.0.113.42</span><span class="demo-example">示例</span>
-        </div>
-      </div>
-      <div class="demo-field">
-        <span>访问密码</span>
-        <div class="demo-input demo-password" aria-label="模拟输入密码">
-          <KeyRound :size="15" /><span aria-hidden="true"
-            >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i
-          ></span>
-        </div>
-      </div>
-      <div class="demo-submit" aria-hidden="true">
-        <LoaderCircle v-if="phase === 'checking'" class="demo-spinner" :size="16" /><LockKeyhole
-          v-else
-          :size="16"
-        />{{ phase === 'checking' ? '验证中…' : '认证并授权' }}
-      </div>
-      <p class="demo-alternative"><Fingerprint :size="15" /> 也支持通行密钥与临时密码</p>
-      <Transition name="demo-result">
-        <div
-          v-if="phase === 'success' || phase === 'failure'"
-          :key="phase"
-          class="demo-result"
-          :class="phase"
+      <div class="demo-tabs" role="group" aria-label="选择模拟认证方式">
+        <button
+          v-for="item in methods"
+          :key="item.id"
+          type="button"
+          :aria-pressed="method === item.id"
+          @click="selectMethod(item.id)"
         >
-          <span class="demo-result-icon"
-            ><Check v-if="phase === 'success'" :size="27" /><CircleX v-else :size="27"
-          /></span>
-          <h3>{{ phase === 'success' ? '认证成功' : '认证失败' }}</h3>
-          <p>
-            {{ phase === 'success' ? '此公网 IPv4 已获得准入。' : '密码不正确，暂未放行此 IP。' }}
-          </p>
-          <div class="demo-result-detail">
-            <ShieldCheck v-if="phase === 'success'" :size="16" /><LockKeyhole
-              v-else
-              :size="16"
-            /><span>{{
-              phase === 'success' ? '6 小时内可发起新的 RDP 连接' : '检查访问密码后，可以再次尝试'
-            }}</span>
+          {{ item.label }}
+        </button>
+      </div>
+      <div class="demo-stage">
+        <Transition name="demo-result">
+          <div v-if="phase === 'failure'" class="demo-error">
+            <CircleX :size="18" />
+            <div>
+              <h3>认证失败</h3>
+              <p>{{ failureMessage }}</p>
+            </div>
           </div>
-          <p class="demo-result-footnote">
-            {{
-              phase === 'success'
-                ? '接下来，使用系统账户登录远程桌面。'
-                : '连续失败会触发认证限流与封禁。'
-            }}
-          </p>
+        </Transition>
+        <div v-if="method !== 'passkey'" class="demo-field">
+          <span>{{ method === 'temporary' ? '临时访问密码' : '固定访问密码' }}</span>
+          <div class="demo-input demo-password" aria-label="模拟输入密码">
+            <KeyRound :size="15" /><span aria-hidden="true"
+              >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i
+            ></span>
+          </div>
         </div>
-      </Transition>
+        <div
+          v-else
+          class="demo-passkey"
+          :class="{ 'is-confirming': phase === 'typing' || phase === 'checking' }"
+        >
+          <Fingerprint :size="32" aria-hidden="true" />
+          <strong>{{
+            phase === 'checking'
+              ? '设备已确认，正在验证…'
+              : phase === 'failure'
+                ? '设备确认未完成'
+                : '请在设备上确认'
+          }}</strong>
+          <p>使用指纹、面容或设备 PIN · 模拟提示</p>
+        </div>
+        <p v-if="method === 'temporary'" class="demo-method-note">
+          三个中文词，以横线分隔；成功后轮换。
+        </p>
+        <p v-else-if="method === 'passkey'" class="demo-method-note">
+          首次使用需先用密码登录并绑定通行密钥。
+        </p>
+        <div class="demo-network">
+          <Monitor :size="15" /><span>连接网络的 IPv4</span><code>203.0.113.42</code>
+        </div>
+        <div class="demo-submit" aria-hidden="true">
+          <LoaderCircle v-if="phase === 'checking'" class="demo-spinner" :size="16" /><LockKeyhole
+            v-else
+            :size="16"
+          />{{
+            phase === 'checking'
+              ? '验证中…'
+              : method === 'passkey'
+                ? '使用通行密钥连接'
+                : '认证并授权'
+          }}
+        </div>
+        <p class="demo-alternative"><ShieldCheck :size="15" /> 6 小时准入 · 仍需系统账户登录</p>
+        <Transition name="demo-result">
+          <div v-if="phase === 'success'" :key="phase" class="demo-result" :class="phase">
+            <span class="demo-result-icon"><Check :size="27" /></span>
+            <h3>认证成功</h3>
+            <p>已授权网络：203.0.113.42</p>
+            <div class="demo-result-detail">
+              <ShieldCheck :size="16" /><span>6 小时内可发起新的 RDP 连接</span>
+            </div>
+            <div class="demo-address">desktop.example.com:3389</div>
+            <div v-if="method === 'temporary'" class="demo-rotation">
+              <strong>本次临时密码已作废</strong>
+              <p>下一条密码（仅示例）</p>
+              <code>钻石-苹果-蛋糕</code>
+            </div>
+            <p class="demo-result-footnote">接下来，使用系统账户登录远程桌面。</p>
+          </div>
+        </Transition>
+      </div>
     </div>
     <div class="demo-progress" aria-hidden="true">
       <span :style="{ transform: `scaleX(${(frame + 1) / 48})` }"></span>
@@ -243,7 +304,7 @@ onBeforeUnmount(() => {
 .demo-scene {
   position: relative;
   padding: 28px;
-  min-height: 354px;
+  min-height: 390px;
 }
 .demo-heading {
   display: flex;
@@ -266,6 +327,126 @@ onBeforeUnmount(() => {
   font-size: 11px;
   margin-top: 4px;
 }
+.demo-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--bg);
+  font-size: 11px;
+  color: var(--muted);
+}
+.demo-tabs button {
+  min-width: 0;
+  min-height: 44px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  flex: 1;
+  text-align: center;
+  padding: 9px 3px;
+  border-radius: 22px;
+}
+.demo-tabs button[aria-pressed='true'] {
+  background: var(--panel-hover);
+  color: var(--blue);
+}
+.demo-stage {
+  position: relative;
+  min-height: 340px;
+  padding-top: 1px;
+}
+.demo-passkey {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 18px 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  text-align: center;
+  color: var(--blue);
+}
+.demo-passkey strong {
+  font-size: 13px;
+}
+.demo-passkey p,
+.demo-method-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+.demo-method-note {
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.demo-rotation {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 14px;
+  width: 100%;
+  font-size: 12px;
+}
+.demo-rotation p {
+  font-size: 11px;
+  margin: 4px 0;
+}
+.demo-rotation code {
+  color: var(--blue);
+}
+.demo-tabs button:hover {
+  color: var(--text);
+  background: var(--panel-hover);
+}
+.demo-network {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.demo-network code {
+  margin-left: auto;
+  color: var(--blue);
+  font-size: 11px;
+}
+.demo-error {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--status-danger) 25%, transparent);
+  background: color-mix(in srgb, var(--status-danger) 9%, var(--panel));
+  border-radius: 12px;
+  color: var(--status-danger);
+}
+.demo-error h3 {
+  font-size: 13px;
+  margin: 0 0 3px;
+}
+.demo-error p {
+  font-size: 11px;
+  margin: 0;
+}
+.demo-address {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--blue);
+  background: var(--bg);
+  font: 12px monospace;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
 .demo-field {
   margin-top: 16px;
   font-size: 11px;
@@ -283,11 +464,6 @@ onBeforeUnmount(() => {
   margin-top: 6px;
   color: var(--text);
   font: 13px monospace;
-}
-.demo-example {
-  margin-left: auto;
-  color: var(--muted);
-  font: 10px sans-serif;
 }
 .demo-password {
   border-color: var(--blue);
@@ -328,7 +504,7 @@ onBeforeUnmount(() => {
 }
 .demo-result {
   position: absolute;
-  inset: 14px;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -345,16 +521,13 @@ onBeforeUnmount(() => {
   place-items: center;
   width: 60px;
   height: 60px;
-  border-radius: 50%;
+  border-radius: 16px;
   background: color-mix(in srgb, var(--demo-status) 12%, transparent);
   color: var(--demo-status);
   margin-bottom: 20px;
 }
 .demo-result.success {
   --demo-status: var(--status-success);
-}
-.demo-result.failure {
-  --demo-status: var(--status-danger);
 }
 .demo-result h3 {
   font-size: 24px;
@@ -445,6 +618,9 @@ onBeforeUnmount(() => {
   transform: translateY(12px) scale(0.97);
 }
 @media (prefers-reduced-motion: no-preference) {
+  .is-running .is-confirming > svg {
+    animation: demo-confirm 1.2s ease-in-out infinite alternate;
+  }
   .is-running .demo-caret {
     animation: demo-blink 1s steps(2, jump-none) infinite;
   }
@@ -458,6 +634,16 @@ onBeforeUnmount(() => {
   }
   .demo-progress span {
     transition: transform 0.15s linear;
+  }
+}
+@keyframes demo-confirm {
+  from {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
 @keyframes demo-blink {

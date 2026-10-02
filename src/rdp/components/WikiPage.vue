@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import {
   ArrowDown,
   ArrowRight,
@@ -19,6 +19,8 @@ import agentPrompt from '../../../docs/rdp-agent-deploy.md?raw'
 import WikiCodeBlock from './WikiCodeBlock.vue'
 import '../wiki.css'
 const article = ref<HTMLElement>()
+const toc = ref<HTMLElement>()
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 const agentOpen = ref(false)
 const query = ref('')
 const active = ref(content.sections[0]?.id)
@@ -33,19 +35,21 @@ const results = computed(() =>
     section.search.toLocaleLowerCase().includes(query.value.trim().toLocaleLowerCase()),
   ),
 )
-const activeSection = computed(() =>
-  content.sections.find((section) => section.id === active.value),
-)
-const progress = computed(() =>
-  Math.max(
-    0,
-    Math.round(
-      ((content.sections.findIndex((section) => section.id === active.value) + 1) /
-        content.sections.length) *
-        100,
-    ),
-  ),
-)
+function keepActiveVisible() {
+  const container = toc.value
+  if (!wide.value || !container) return
+  const link = container.querySelector<HTMLElement>('a[aria-current="location"]')
+  if (!link) return
+  const bounds = container.getBoundingClientRect()
+  const item = link.getBoundingClientRect()
+  if (item.top >= bounds.top + 16 && item.bottom <= bounds.bottom - 16) return
+  // Scroll only the directory; scrollIntoView would also move the document.
+  container.scrollTo({
+    top: container.scrollTop + item.top - bounds.top - (container.clientHeight - item.height) / 2,
+    behavior: reducedMotion.matches ? 'instant' : 'smooth',
+  })
+}
+watch([active, wide, results], keepActiveVisible, { flush: 'post' })
 let headings: HTMLElement[] = []
 function updateSection() {
   let current = headings[0]
@@ -79,10 +83,12 @@ onMounted(() => {
   updateSection()
   window.addEventListener('scroll', updateSection, { passive: true })
   desktop.addEventListener('change', onWidth)
+  window.addEventListener('resize', keepActiveVisible)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', updateSection)
   desktop.removeEventListener('change', onWidth)
+  window.removeEventListener('resize', keepActiveVisible)
 })
 </script>
 <template>
@@ -119,7 +125,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="rdp-wiki-layout">
-      <aside class="rdp-toc" @keydown="closeMenu">
+      <aside ref="toc" class="rdp-toc" @keydown="closeMenu">
         <button
           ref="menuButton"
           class="wiki-mobile-toc"
@@ -166,10 +172,6 @@ onBeforeUnmount(() => {
               >
             </div>
           </nav>
-          <div class="wiki-reading">
-            <span>当前阅读</span><b>{{ activeSection?.title }}</b>
-            <div aria-hidden="true"><i :style="{ width: `${progress}%` }"></i></div>
-          </div>
         </div>
       </aside>
       <article ref="article" class="rdp-doc">

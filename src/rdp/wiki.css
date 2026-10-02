@@ -87,7 +87,31 @@
   overflow-y: auto;
   padding: 6px 12px 12px 2px;
   font-size: 12px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+@supports selector(::-webkit-scrollbar) {
+  .rdp-toc {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  .rdp-toc::-webkit-scrollbar {
+    width: 8px;
+  }
+  .rdp-toc::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 8px;
+  }
+  .rdp-toc::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--scrollbar-track);
+    border-radius: 8px;
+  }
+  .rdp-toc::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
 }
 .wiki-mobile-toc {
   display: none;
@@ -174,33 +198,6 @@
   flex-shrink: 0;
   border: 1px solid var(--border);
   border-radius: 6px;
-}
-.wiki-reading {
-  margin: 28px 10px 0;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-.wiki-reading > span {
-  color: var(--muted);
-  font-size: 10px;
-}
-.wiki-reading b {
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
-  margin-top: 5px;
-}
-.wiki-reading > div {
-  height: 3px;
-  border-radius: 3px;
-  background: var(--border);
-  margin-top: 12px;
-}
-.wiki-reading i {
-  display: block;
-  height: 100%;
-  background: var(--blue);
-  border-radius: inherit;
 }
 .rdp-doc {
   min-width: 0;
@@ -568,9 +565,6 @@
   }
   .rdp-toc nav a {
     min-height: 44px;
-  }
-  .wiki-reading {
-    display: none;
   }
   .wiki-intro-note {
     padding: 18px;
