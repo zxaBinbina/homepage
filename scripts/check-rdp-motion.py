@@ -16,6 +16,9 @@ with sync_playwright() as p:
     demo = page.get_by_role('region', name='认证流程动画演示')
     page.wait_for_function("document.querySelector('.demo-password').textContent.includes('•')")
     page.get_by_role('button', name='暂停演示').click()
+    page.get_by_role('button', name='显示示例密码').click()
+    assert '•' not in page.locator('.demo-password').inner_text()
+    page.get_by_role('button', name='隐藏示例密码').click()
     paused = page.locator('.demo-password').inner_text()
     phase = demo.get_attribute('data-phase')
     page.wait_for_timeout(650)
@@ -86,6 +89,7 @@ with sync_playwright() as p:
     page.set_viewport_size({'width': 1440, 'height': 1000})
     page.get_by_role('button', name='临时密码', exact=True).click()
     demo.scroll_into_view_if_needed()
+    assert page.locator('.demo-temporary .demo-input').count() == 3
     page.wait_for_function("document.querySelector('.auth-demo').dataset.phase === 'checking'")
     page.get_by_role('heading', name='认证成功', exact=True).wait_for()
     page.get_by_role('button', name='通行密钥', exact=True).click()

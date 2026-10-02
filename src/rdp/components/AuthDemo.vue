@@ -4,6 +4,8 @@ import {
   Check,
   CircleX,
   Fingerprint,
+  Eye,
+  EyeOff,
   KeyRound,
   LoaderCircle,
   LockKeyhole,
@@ -42,7 +44,16 @@ const phase = computed(() =>
   frame.value < 16 ? 'typing' : frame.value < 24 ? 'checking' : outcome.value,
 )
 const running = computed(() => !reduced.value && !paused.value && inView.value && visible.value)
-const password = computed(() => '•'.repeat(Math.min(frame.value, 16)))
+const revealPassword = ref(false)
+const samplePassword = 'Demo-only-123456!'
+const sampleWords = ['钻石', '苹果', '蛋糕']
+const password = computed(() =>
+  (revealPassword.value ? samplePassword : '•'.repeat(16)).slice(0, Math.min(frame.value, 16)),
+)
+function temporaryWord(index: number) {
+  const count = Math.max(0, Math.min(2, Math.floor(frame.value / 2) - index * 2))
+  return (revealPassword.value ? sampleWords[index]! : '••').slice(0, count)
+}
 const caption = computed(
   () =>
     ({
@@ -86,6 +97,7 @@ function demonstrate(result: 'success' | 'failure') {
 }
 function selectMethod(value: Method) {
   method.value = value
+  revealPassword.value = false
   demonstrate('success')
 }
 function onVisibility() {
@@ -150,7 +162,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div class="demo-stage">
-        <div class="demo-credential">
+        <div class="demo-credential" :inert="phase === 'success' || phase === 'failure'">
           <Transition name="demo-result">
             <div v-if="phase === 'failure'" class="demo-error">
               <CircleX :size="18" />
@@ -161,11 +173,34 @@ onBeforeUnmount(() => {
             </div>
           </Transition>
           <div v-if="method !== 'passkey'" class="demo-field">
-            <span>{{ method === 'temporary' ? '临时访问密码' : '固定访问密码' }}</span>
-            <div class="demo-input demo-password" aria-label="模拟输入密码">
-              <KeyRound :size="15" /><span aria-hidden="true"
-                >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i
+            <div v-if="method === 'temporary'" class="demo-temporary" aria-label="模拟三段临时密码">
+              <span v-for="(_, index) in sampleWords" :key="index" class="demo-input"
+                >{{ temporaryWord(index)
+                }}<i
+                  v-if="phase === 'typing' && Math.min(2, Math.floor(frame / 4)) === index"
+                  class="demo-caret"
+                ></i
               ></span>
+              <button
+                type="button"
+                class="demo-eye"
+                :aria-label="revealPassword ? '隐藏示例密码' : '显示示例密码'"
+                @click="revealPassword = !revealPassword"
+              >
+                <EyeOff v-if="revealPassword" :size="16" /><Eye v-else :size="16" />
+              </button>
+            </div>
+            <div v-else class="demo-input demo-password" aria-label="模拟输入密码">
+              <KeyRound :size="15" /><span aria-hidden="true"
+                >{{ password }}<i v-if="phase === 'typing'" class="demo-caret"></i></span
+              ><button
+                type="button"
+                class="demo-eye"
+                :aria-label="revealPassword ? '隐藏示例密码' : '显示示例密码'"
+                @click="revealPassword = !revealPassword"
+              >
+                <EyeOff v-if="revealPassword" :size="16" /><Eye v-else :size="16" />
+              </button>
             </div>
           </div>
           <div
@@ -184,7 +219,7 @@ onBeforeUnmount(() => {
             <p>使用指纹、面容或设备 PIN · 模拟提示</p>
           </div>
           <p v-if="method === 'temporary'" class="demo-method-note">
-            三个中文词，以横线分隔；成功后轮换。
+            每格一个词，无需横线；成功后轮换。
           </p>
           <p v-else-if="method === 'passkey'" class="demo-method-note">
             首次使用需先用密码登录并绑定通行密钥。
@@ -480,6 +515,38 @@ onBeforeUnmount(() => {
   margin-top: 6px;
   color: var(--text);
   font: 13px monospace;
+}
+.demo-temporary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 36px;
+  gap: 6px;
+  align-items: center;
+}
+.demo-temporary .demo-input {
+  justify-content: center;
+  padding-inline: 4px;
+}
+.demo-eye {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-height: 40px;
+  padding: 0;
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 9px;
+  margin-left: auto;
+}
+.demo-eye:hover {
+  color: var(--text);
+  background: var(--panel-hover);
+}
+.demo-password > span {
+  flex: 1;
+}
+.demo-password {
+  padding-right: 3px;
 }
 .demo-password {
   border-color: var(--blue);
