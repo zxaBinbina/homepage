@@ -35,7 +35,26 @@ function openMusic() {
   menuOpen.value = false
 }
 const active = ref('home')
-const light = ref(false)
+const browserTheme = matchMedia('(prefers-color-scheme: light)')
+let manualTheme: 'light' | 'dark' | undefined
+try {
+  const saved = localStorage.getItem('homepage-theme')
+  if (saved === 'light' || saved === 'dark') manualTheme = saved
+} catch {
+  /* Follow the browser when storage is unavailable. */
+}
+const light = ref(manualTheme ? manualTheme === 'light' : browserTheme.matches)
+function applyTheme() {
+  document.documentElement.dataset.theme = light.value ? 'light' : 'dark'
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', light.value ? '#f4f6fa' : '#141521')
+}
+function followBrowserTheme() {
+  if (manualTheme) return
+  light.value = browserTheme.matches
+  applyTheme()
+}
 const copied = ref(false)
 const copyMessage = ref('')
 const nav = [
@@ -50,7 +69,8 @@ let revealObserver: IntersectionObserver | undefined
 let timer: ReturnType<typeof setTimeout> | undefined
 function toggleTheme() {
   light.value = !light.value
-  document.documentElement.dataset.theme = light.value ? 'light' : 'dark'
+  manualTheme = light.value ? 'light' : 'dark'
+  applyTheme()
   try {
     localStorage.setItem('homepage-theme', light.value ? 'light' : 'dark')
   } catch {
@@ -75,12 +95,8 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') menuOpen.value = false
 }
 onMounted(() => {
-  try {
-    light.value = localStorage.getItem('homepage-theme') === 'light'
-  } catch {
-    /* keep default */
-  }
-  document.documentElement.dataset.theme = light.value ? 'light' : 'dark'
+  applyTheme()
+  browserTheme.addEventListener('change', followBrowserTheme)
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(
       (entries) => {
@@ -109,6 +125,7 @@ onMounted(() => {
   document.addEventListener('keydown', onKey)
 })
 onBeforeUnmount(() => {
+  browserTheme.removeEventListener('change', followBrowserTheme)
   observer?.disconnect()
   revealObserver?.disconnect()
   clearTimeout(timer)
@@ -246,8 +263,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <div class="image-caption">
-          <span>MY WORLD, ONE BLOCK AT A TIME.</span
-          ><span>01 / PERSONAL SPACE</span>
+          <span>MY WORLD, ONE BLOCK AT A TIME.</span><span>01 / PERSONAL SPACE</span>
         </div>
       </div>
     </section>

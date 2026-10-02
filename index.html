@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="theme-color" content="#141521" />
+    <script>
+      // Set the theme before styles load to avoid a flash of the wrong color.
+      let savedTheme
+      try {
+        savedTheme = localStorage.getItem('homepage-theme')
+      } catch {
+        /* Fall back to the browser preference when storage is unavailable. */
+      }
+      const initialTheme =
+        savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark'
+      document.documentElement.dataset.theme = initialTheme
+      document.querySelector('meta[name="theme-color"]').content =
+        initialTheme === 'light' ? '#f4f6fa' : '#141521'
+    </script>
     <meta name="description" itemprop="description" content="<%= site.description %>" />
     <meta property="og:title" content="<%= site.title %>" />
     <meta property="og:description" content="<%= site.description %>" />

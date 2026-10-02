@@ -10,7 +10,7 @@ errors = []
 results = []
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('HOMEPAGE_BROWSER', '/usr/bin/google-chrome'), headless=True, args=['--no-sandbox'])
-    context = browser.new_context(viewport={'width': 1440, 'height': 1000}, permissions=['clipboard-read', 'clipboard-write'])
+    context = browser.new_context(color_scheme='dark',viewport={'width': 1440, 'height': 1000}, permissions=['clipboard-read', 'clipboard-write'])
     page = context.new_page()
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:5173'), wait_until='networkidle')

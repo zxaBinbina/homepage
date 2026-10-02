@@ -41,7 +41,7 @@ try:
     else: raise RuntimeError('Vite startup timed out')
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get('HOMEPAGE_BROWSER','/usr/bin/google-chrome'),headless=True,args=['--no-sandbox'])
-        context = browser.new_context(viewport={'width':1440,'height':1000})
+        context = browser.new_context(color_scheme='dark',viewport={'width':1440,'height':1000})
         def site(route):
             parsed = urlparse(route.request.url)
             if parsed.path == '/api/music/lyrics':
