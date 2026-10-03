@@ -41,12 +41,12 @@
     <link rel="canonical" href="<%= site.url %>" />
     <link
       rel="icon"
-      href="/<%= page === 'home' ? 'favicon.svg' : 'images/rdp-access-auth.png' %>"
-      type="<%= page === 'home' ? 'image/svg+xml' : 'image/png' %>"
+      href="/<%= (page === 'home' || page === 'directory') ? 'favicon.svg' : 'images/rdp-access-auth.png' %>"
+      type="<%= (page === 'home' || page === 'directory') ? 'image/svg+xml' : 'image/png' %>"
     />
     <title><%= site.title %></title>
   </head>
-  <body id="top" class="<%= page === 'home' ? '' : 'rdp-site' %>">
+  <body id="top" class="<%= (page === 'home' || page === 'directory') ? '' : 'rdp-site' %>">
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

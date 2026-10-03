@@ -1,3 +1,4 @@
+import type { PageName } from './src/pages'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -9,6 +10,12 @@ export const siteContent = {
 }
 
 const projectPages = {
+  directory: {
+    title: '项目目录 · a彬彬a',
+    description:
+      '浏览 a彬彬a 已公开的开发项目：YouzaiWorldCore、悠哉世界官网、Gaze 中文与登录修复和 RDP Access Auth，查看简介、技术栈与访问入口。',
+    path: 'project/',
+  },
   rdp: {
     title: 'RDP Access Auth · 远程桌面，先认证再连接',
     description:
@@ -23,7 +30,7 @@ const projectPages = {
   },
 }
 
-export function createSiteMeta(baseUrl = siteContent.url, page: 'home' | 'rdp' | 'wiki' = 'home') {
+export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home') {
   const url = new URL(baseUrl)
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
     throw new Error('SITE_URL 必须是不包含登录信息、查询参数和锚点的 HTTPS 网站地址')

@@ -90,7 +90,7 @@ try:
         assert page.locator('.music-track').first.locator('.music-vip').inner_text()=='VIP'
         page.get_by_role('button',name='展开或收起歌单',exact=True).click()
         page.wait_for_timeout(250)
-        assert page.locator('.music-popover').evaluate('(e)=>e.getBoundingClientRect().width<=380')
+        page.wait_for_function('document.querySelector(".music-popover").getBoundingClientRect().width <= 380', timeout=2000)
         assert page.evaluate('document.body.style.overflow')!='hidden'
         page.screenshot(path=str(OUT/'music-desktop.png'),animations='disabled')
         page.get_by_role('button',name='播放音乐',exact=True).click()
@@ -192,7 +192,7 @@ try:
         dark_fill=page.locator('.music-toggle svg').evaluate('(e)=>getComputedStyle(e).fill')
         page.get_by_role('button',name='切换浅色主题',exact=True).click()
         assert page.locator('.theme-toggle').get_attribute('title')=='切换深色主题'
-        assert page.locator('.music-toggle svg').evaluate('(e)=>getComputedStyle(e).fill')!=dark_fill
+        page.wait_for_function('previous => getComputedStyle(document.querySelector(".music-toggle svg")).fill !== previous', arg=dark_fill, timeout=2000)
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
         page.screenshot(path=str(OUT/'music-mobile-light.png'), animations='disabled')
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()

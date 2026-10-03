@@ -690,7 +690,9 @@ h1 > span {
   color: var(--blue);
 }
 .project-core,
-.project-web {
+.project-web,
+.project-rdp,
+.project-gaze {
   min-height: 414px;
 }
 .project-core {
@@ -702,7 +704,9 @@ h1 > span {
     radial-gradient(ellipse at 60% 5%, rgba(78, 164, 239, 0.12), transparent 70%), var(--panel);
 }
 .project-core .project-content,
-.project-web .project-content {
+.project-web .project-content,
+.project-rdp .project-content,
+.project-gaze .project-content {
   margin-top: auto;
   padding-top: 115px;
 }
@@ -777,6 +781,32 @@ h1 > span {
   object-fit: cover;
 }
 
+.project-logo-art {
+  position: absolute;
+  top: 48px;
+  right: 95px;
+  width: 160px;
+  transform: perspective(600px) rotateY(-12deg) rotateZ(5deg);
+  transition: transform 0.5s var(--motion-ease);
+}
+.project-logo-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(8px 16px 14px var(--shadow));
+}
+.project-card:hover .project-logo-art,
+.project-card:focus-visible .project-logo-art {
+  transform: perspective(600px) translateY(-6px) rotateY(-3deg) rotateZ(1deg);
+}
+
+.gaze-logo-art {
+  width: 128px;
+}
+.project-icon img {
+  object-fit: contain;
+}
 .project-gaze .project-icon {
   color: #b6bbeb;
   background: #a0a2d410;
@@ -1132,7 +1162,9 @@ h1 > span {
     gap: 14px;
   }
   .project-core,
-  .project-web {
+  .project-web,
+  .project-rdp,
+  .project-gaze {
     min-height: 435px;
   }
   .browser-art {
@@ -1330,7 +1362,9 @@ h1 > span {
     gap: 8px;
   }
   .project-core,
-  .project-web {
+  .project-web,
+  .project-rdp,
+  .project-gaze {
     min-height: 440px;
   }
   .project-content h3 {
@@ -1352,6 +1386,14 @@ h1 > span {
   .project-icon svg {
     width: 23px;
   }
+  .project-logo-art {
+    top: 52px;
+    right: 18px;
+    width: 120px;
+  }
+  .gaze-logo-art {
+    width: 94px;
+  }
   .voxel-art {
     --core-scale: 0.7;
     right: 12px;
@@ -1371,7 +1413,9 @@ h1 > span {
     margin-top: 20px;
   }
   .project-core .project-content,
-  .project-web .project-content {
+  .project-web .project-content,
+  .project-rdp .project-content,
+  .project-gaze .project-content {
     padding-top: 110px;
   }
   .world-section {
@@ -1530,11 +1574,15 @@ h1 > span {
     padding: 24px;
   }
   .project-core,
-  .project-web {
+  .project-web,
+  .project-rdp,
+  .project-gaze {
     min-height: 365px;
   }
   .project-core .project-content,
-  .project-web .project-content {
+  .project-web .project-content,
+  .project-rdp .project-content,
+  .project-gaze .project-content {
     padding-top: 93px;
   }
   .project-content h3 {
@@ -1818,5 +1866,189 @@ h1 > span {
   }
   ::-webkit-scrollbar-corner {
     background: var(--scrollbar-track);
+  }
+}
+
+/* Public project directory shares the homepage palette and spacing. */
+.directory-main {
+  padding-block: 164px 60px;
+}
+.directory-intro h1 {
+  font-size: clamp(32px, 4.5vw, 58px);
+  letter-spacing: -1.5px;
+  line-height: 1.3;
+  margin: 18px 0 24px;
+}
+.directory-intro > p:last-child {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.9;
+}
+.directory-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 44px 0 22px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.directory-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 0 14px;
+  background: var(--panel);
+  width: min(360px, 100%);
+}
+.directory-search:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.directory-search input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  font: inherit;
+  min-width: 0;
+  flex: 1;
+  height: 44px;
+}
+.directory-search input::placeholder {
+  color: var(--muted);
+}
+.directory-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.directory-search button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--muted);
+  background: transparent;
+}
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.directory-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+  transition:
+    transform 0.25s var(--motion-ease),
+    border-color 0.25s;
+}
+.directory-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--blue);
+}
+.directory-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.directory-card-top img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+.directory-pixel {
+  image-rendering: pixelated;
+}
+.directory-card-top > span {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: var(--muted);
+  font: 11px monospace;
+}
+.directory-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+}
+.directory-card h2 {
+  font-size: 25px;
+  line-height: 1.4;
+  margin: 10px 0 14px;
+  overflow-wrap: anywhere;
+}
+.directory-description {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-bottom: 26px;
+}
+.directory-card-bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.directory-visit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--blue);
+}
+.directory-more {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.directory-more a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--blue);
+}
+.directory-empty {
+  padding: 60px 20px;
+  border: 1px dashed var(--border);
+  border-radius: 20px;
+  text-align: center;
+}
+.directory-empty p {
+  margin: 14px 0;
+  color: var(--muted);
+}
+.directory-empty button {
+  padding: 12px 24px;
+  background: var(--blue);
+  color: var(--bg);
+  border-radius: 24px;
+  min-height: 44px;
+}
+@media (max-width: 760px) {
+  .directory-main {
+    padding-block: 126px 48px;
+  }
+  .directory-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .directory-card {
+    padding: 20px;
+  }
+  .directory-card h2 {
+    font-size: 21px;
+  }
+}
+@media (max-width: 480px) {
+  .directory-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -10,6 +10,7 @@ export const profile = {
 export const projects = [
   {
     id: 'core',
+    image: 'youzaiworld-core.png',
     number: '01',
     title: 'YouzaiWorldCore',
     subtitle: '让方块世界，多一点可能。',
@@ -22,6 +23,7 @@ export const projects = [
   },
   {
     id: 'web',
+    image: 'youzaiworld-web.webp',
     number: '02',
     title: 'Youzai World Web',
     subtitle: '一个世界，从这里开始。',
@@ -33,6 +35,7 @@ export const projects = [
   },
   {
     id: 'gaze',
+    image: 'gaze.svg',
     number: '03',
     title: 'Gaze · 中文与登录修复',
     subtitle: '让日常使用，顺手一点。',
@@ -45,6 +48,7 @@ export const projects = [
   },
   {
     id: 'rdp',
+    image: 'rdp-access-auth.png',
     number: '04',
     title: 'RDP Access Auth',
     subtitle: '为远程连接，多守一道门。',

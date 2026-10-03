@@ -13,35 +13,17 @@ import {
   ShieldCheck,
   Copy,
   Check,
-  Menu,
-  X,
   Heart,
   Mountain,
   Sparkles,
 } from 'lucide-vue-next'
 import { profile, projects } from './content'
-import MusicDialog from './components/MusicDialog.vue'
-import ThemeToggle from './components/ThemeToggle.vue'
-import NeteaseIcon from './components/NeteaseIcon.vue'
+import SiteHeader from './components/SiteHeader.vue'
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
-const menuOpen = ref(false)
-const musicTrigger = ref<HTMLButtonElement>()
-const musicOpen = ref(false)
-const musicPlaying = ref(false)
-const musicTrack = ref('')
-function openMusic() {
-  menuOpen.value = false
-}
 const active = ref('home')
 const copied = ref(false)
 const copyMessage = ref('')
-const nav = [
-  { id: 'home', label: '首页' },
-  { id: 'about', label: '关于' },
-  { id: 'projects', label: '项目' },
-  { id: 'world', label: '悠哉世界' },
-]
 const icons = { blocks: Blocks, globe: Globe2, scan: ScanFace, shield: ShieldCheck }
 let observer: IntersectionObserver | undefined
 let revealObserver: IntersectionObserver | undefined
@@ -59,9 +41,6 @@ async function copyAddress() {
     copied.value = false
     copyMessage.value = ''
   }, 3500)
-}
-function onKey(event: KeyboardEvent) {
-  if (event.key === 'Escape') menuOpen.value = false
 }
 onMounted(() => {
   if ('IntersectionObserver' in window) {
@@ -89,91 +68,17 @@ onMounted(() => {
       revealObserver?.observe(el)
     })
   }
-  document.addEventListener('keydown', onKey)
 })
 onBeforeUnmount(() => {
   observer?.disconnect()
   revealObserver?.disconnect()
   clearTimeout(timer)
-  document.removeEventListener('keydown', onKey)
 })
 </script>
 
 <template>
   <a class="skip-link" href="#main">跳至内容</a>
-  <header class="header">
-    <a href="#home" class="brand" @click="menuOpen = false"
-      ><img :src="asset('avatar.png')" alt="" width="30" height="30" /><span
-        >{{ profile.name }}<span class="brand-dot">.</span></span
-      ></a
-    >
-    <nav class="desktop-nav" aria-label="主导航">
-      <a
-        v-for="item in nav"
-        :key="item.id"
-        :href="`#${item.id}`"
-        :class="{ active: active === item.id }"
-        :aria-current="active === item.id ? 'location' : undefined"
-        >{{ item.label }}</a
-      >
-    </nav>
-    <div class="header-actions">
-      <ThemeToggle />
-      <button
-        ref="musicTrigger"
-        class="icon-button music-toggle"
-        :class="{ 'is-playing': musicPlaying }"
-        aria-label="打开网易云音乐播放器"
-        aria-haspopup="dialog"
-        :aria-expanded="musicOpen"
-        aria-controls="music-popover"
-        popovertarget="music-popover"
-        :title="musicPlaying && musicTrack ? `正在播放：${musicTrack}` : '网易云音乐'"
-        @click="openMusic"
-      >
-        <NeteaseIcon /></button
-      ><a
-        :href="profile.github"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="icon-button"
-        aria-label="GitHub"
-        title="GitHub"
-        ><Github :size="19" /></a
-      ><span class="nav-divider"></span><a href="#contact" class="nav-contact">打个招呼</a
-      ><button
-        class="icon-button mobile-toggle"
-        :aria-expanded="menuOpen"
-        aria-controls="mobile-nav"
-        :aria-label="menuOpen ? '关闭菜单' : '打开菜单'"
-        :title="menuOpen ? '关闭菜单' : '打开菜单'"
-        @click="menuOpen = !menuOpen"
-      >
-        <X v-if="menuOpen" :size="21" /><Menu v-else :size="21" />
-      </button>
-    </div>
-    <Transition
-      @before-leave="(el) => el.setAttribute('inert', '')"
-      @before-enter="(el) => el.removeAttribute('inert')"
-      name="mobile-menu"
-    >
-      <nav
-        v-if="menuOpen"
-        :inert="!menuOpen"
-        id="mobile-nav"
-        class="mobile-nav"
-        aria-label="移动导航"
-      >
-        <a
-          v-for="item in [...nav, { id: 'contact', label: '联系我' }]"
-          :key="item.id"
-          :href="`#${item.id}`"
-          @click="menuOpen = false"
-          >{{ item.label }}</a
-        >
-      </nav>
-    </Transition>
-  </header>
+  <SiteHeader home :active="active" />
 
   <main id="main">
     <section id="home" class="hero">
@@ -287,13 +192,7 @@ onBeforeUnmount(() => {
             <h2>想法，正在发生。</h2>
             <p>一些我参与开发的项目，从方块世界延伸到日常生活。</p>
           </div>
-          <a
-            class="text-link"
-            :href="`${profile.github}?tab=repositories`"
-            target="_blank"
-            rel="noopener noreferrer"
-            >更多 GitHub 项目 <ArrowUpRight :size="16"
-          /></a>
+          <a class="text-link" href="/project/">查看全部项目 <ArrowUpRight :size="16" /></a>
         </div>
         <div class="project-grid">
           <a
@@ -307,7 +206,16 @@ onBeforeUnmount(() => {
             :class="`project-${project.id}`"
             ><div class="project-top">
               <div class="project-icon">
+                <img
+                  v-if="project.id === 'gaze'"
+                  :src="asset('gaze.svg')"
+                  alt=""
+                  width="32"
+                  height="32"
+                  loading="lazy"
+                />
                 <component
+                  v-else
                   :is="icons[project.icon as keyof typeof icons]"
                   :size="26"
                   :stroke-width="1.5"
@@ -321,6 +229,26 @@ onBeforeUnmount(() => {
             <div v-if="project.id === 'web'" class="browser-art" aria-hidden="true">
               <div><i></i><i></i><i></i><span>mcyzw.top</span></div>
               <img :src="asset('youzaiworld-web.webp')" alt="" loading="lazy" />
+            </div>
+            <div
+              v-if="project.id === 'rdp'"
+              class="project-logo-art rdp-logo-art"
+              aria-hidden="true"
+            >
+              <img
+                :src="asset('rdp-access-auth.png')"
+                alt=""
+                width="512"
+                height="394"
+                loading="lazy"
+              />
+            </div>
+            <div
+              v-if="project.id === 'gaze'"
+              class="project-logo-art gaze-logo-art"
+              aria-hidden="true"
+            >
+              <img :src="asset('gaze.svg')" alt="" width="128" height="128" loading="lazy" />
             </div>
             <div class="project-content">
               <span class="project-role">开发者 <span>·</span> {{ project.subtitle }}</span>
@@ -426,12 +354,7 @@ onBeforeUnmount(() => {
       <div class="contact-watermark" aria-hidden="true">keep creating.</div>
     </section>
   </main>
-  <MusicDialog
-    :anchor="musicTrigger"
-    @playing="musicPlaying = $event"
-    @track="musicTrack = $event"
-    @opened="musicOpen = $event"
-  />
+
   <footer class="shell footer">
     <a class="brand" href="#home">a彬彬a<span class="brand-dot">.</span></a>
     <div class="footer-info">

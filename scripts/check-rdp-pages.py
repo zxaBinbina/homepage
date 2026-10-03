@@ -44,6 +44,7 @@ with sync_playwright() as p:
             assert page.locator('html').get_attribute('data-theme') != theme
     page.goto(base)
     card = page.locator('a.project-card[href="/projects/rdp-access-auth/"]')
+    card.wait_for(state='attached')
     assert card.count() == 1 and card.get_attribute('target') is None
     card.click()
     page.get_by_role('link', name='开始部署').click()

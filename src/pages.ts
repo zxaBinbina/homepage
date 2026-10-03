@@ -1,6 +1,7 @@
 /** One route table for Vue page selection and generated sharing documents. */
 export const pages = {
   home: '/',
+  directory: '/project/',
   rdp: '/projects/rdp-access-auth/',
   wiki: '/projects/rdp-access-auth/wiki/',
 } as const
