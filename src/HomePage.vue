@@ -8,9 +8,6 @@ import {
   MonitorPlay,
   Code2,
   Blocks,
-  Globe2,
-  ScanFace,
-  ShieldCheck,
   Copy,
   Check,
   Heart,
@@ -18,14 +15,11 @@ import {
   Sparkles,
 } from 'lucide-vue-next'
 import { profile, projects } from './content'
-import SiteHeader from './components/SiteHeader.vue'
+import ProjectCard from './components/ProjectCard.vue'
 
-const asset = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
-const active = ref('home')
+const asset = (name: string) => `/images/${name}`
 const copied = ref(false)
 const copyMessage = ref('')
-const icons = { blocks: Blocks, globe: Globe2, scan: ScanFace, shield: ShieldCheck }
-let observer: IntersectionObserver | undefined
 let revealObserver: IntersectionObserver | undefined
 let timer: ReturnType<typeof setTimeout> | undefined
 async function copyAddress() {
@@ -43,15 +37,6 @@ async function copyAddress() {
   }, 3500)
 }
 onMounted(() => {
-  if ('IntersectionObserver' in window) {
-    observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) if (entry.isIntersecting) active.value = entry.target.id
-      },
-      { rootMargin: '-15% 0px -55% 0px', threshold: 0 },
-    )
-    document.querySelectorAll('main > section[id]').forEach((el) => observer?.observe(el))
-  }
   if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     revealObserver = new IntersectionObserver(
       (entries) =>
@@ -70,16 +55,12 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => {
-  observer?.disconnect()
   revealObserver?.disconnect()
   clearTimeout(timer)
 })
 </script>
 
 <template>
-  <a class="skip-link" href="#main">跳至内容</a>
-  <SiteHeader home :active="active" />
-
   <main id="main">
     <section id="home" class="hero">
       <div class="hero-glow"></div>
@@ -192,75 +173,16 @@ onBeforeUnmount(() => {
             <h2>想法，正在发生。</h2>
             <p>一些我参与开发的项目，从方块世界延伸到日常生活。</p>
           </div>
-          <a class="text-link" href="/project/">查看全部项目 <ArrowUpRight :size="16" /></a>
+          <a class="text-link" href="/project">查看全部项目 <ArrowUpRight :size="16" /></a>
         </div>
         <div class="project-grid">
-          <a
+          <ProjectCard
             v-for="(project, index) in projects"
             :key="project.id"
-            :href="project.url"
-            :target="project.url.startsWith('/') ? undefined : '_blank'"
-            rel="noopener noreferrer"
-            class="project-card reveal"
+            :project="project"
+            class="reveal"
             :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
-            :class="`project-${project.id}`"
-            ><div class="project-top">
-              <div class="project-icon">
-                <img
-                  v-if="project.id === 'gaze'"
-                  :src="asset('gaze.svg')"
-                  alt=""
-                  width="32"
-                  height="32"
-                  loading="lazy"
-                />
-                <component
-                  v-else
-                  :is="icons[project.icon as keyof typeof icons]"
-                  :size="26"
-                  :stroke-width="1.5"
-                />
-              </div>
-              <span>{{ project.number }} <ArrowUpRight :size="20" /></span>
-            </div>
-            <div v-if="project.id === 'core'" class="voxel-art" aria-hidden="true">
-              <img :src="asset('youzaiworld-core.png')" alt="" loading="lazy" />
-            </div>
-            <div v-if="project.id === 'web'" class="browser-art" aria-hidden="true">
-              <div><i></i><i></i><i></i><span>mcyzw.top</span></div>
-              <img :src="asset('youzaiworld-web.webp')" alt="" loading="lazy" />
-            </div>
-            <div
-              v-if="project.id === 'rdp'"
-              class="project-logo-art rdp-logo-art"
-              aria-hidden="true"
-            >
-              <img
-                :src="asset('rdp-access-auth.png')"
-                alt=""
-                width="512"
-                height="394"
-                loading="lazy"
-              />
-            </div>
-            <div
-              v-if="project.id === 'gaze'"
-              class="project-logo-art gaze-logo-art"
-              aria-hidden="true"
-            >
-              <img :src="asset('gaze.svg')" alt="" width="128" height="128" loading="lazy" />
-            </div>
-            <div class="project-content">
-              <span class="project-role">开发者 <span>·</span> {{ project.subtitle }}</span>
-              <h3>{{ project.title }}</h3>
-              <p>{{ project.description }}</p>
-              <div class="project-bottom">
-                <div class="tags">
-                  <span v-for="tag in project.tags" :key="tag">{{ tag }}</span>
-                </div>
-                <span class="project-link">{{ project.link }} <ArrowUpRight :size="14" /></span>
-              </div></div
-          ></a>
+          />
         </div>
       </div>
     </section>

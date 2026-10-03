@@ -5,11 +5,10 @@ import { profile } from '../content'
 import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
-const props = withDefaults(defineProps<{ home?: boolean; active?: string }>(), {
+const props = withDefaults(defineProps<{ home?: boolean }>(), {
   home: false,
-  active: 'projects',
 })
-const asset = (name: string) => `${import.meta.env.BASE_URL}images/${name}`
+const asset = (name: string) => `/images/${name}`
 const menuOpen = ref(false)
 const musicTrigger = ref<HTMLButtonElement>()
 const musicOpen = ref(false)
@@ -17,15 +16,16 @@ const musicPlaying = ref(false)
 const musicTrack = ref('')
 const nav = [
   { id: 'home', label: '首页' },
-  { id: 'about', label: '关于' },
   { id: 'projects', label: '项目' },
   { id: 'world', label: '悠哉世界' },
 ]
 function navHref(id: string) {
-  return id === 'projects' ? '/project/' : `${props.home ? '' : '/'}#${id}`
+  if (id === 'home') return '/'
+  if (id === 'world') return profile.server
+  return id === 'projects' ? '/project' : `${props.home ? '' : '/'}#${id}`
 }
 function isActive(id: string) {
-  return props.active === id && (id !== 'projects' || !props.home)
+  return id === (props.home ? 'home' : 'projects')
 }
 function openMusic() {
   menuOpen.value = false
@@ -38,7 +38,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 </script>
 <template>
   <header class="header">
-    <a :href="home ? '#home' : '/'" class="brand" @click="menuOpen = false"
+    <a href="/" class="brand" @click="menuOpen = false"
       ><img :src="asset('avatar.png')" alt="" width="30" height="30" /><span
         >{{ profile.name }}<span class="brand-dot">.</span></span
       ></a
@@ -49,7 +49,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         :key="item.id"
         :href="navHref(item.id)"
         :class="{ active: isActive(item.id) }"
-        :aria-current="isActive(item.id) ? (home ? 'location' : 'page') : undefined"
+        :aria-current="isActive(item.id) ? 'page' : undefined"
         >{{ item.label }}</a
       >
     </nav>
@@ -105,6 +105,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
           v-for="item in [...nav, { id: 'contact', label: '联系我' }]"
           :key="item.id"
           :href="navHref(item.id)"
+          :aria-current="isActive(item.id) ? 'page' : undefined"
           @click="menuOpen = false"
           >{{ item.label }}</a
         >

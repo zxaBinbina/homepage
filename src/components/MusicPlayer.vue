@@ -156,9 +156,7 @@ const source = computed(
   () => `https://music.163.com/song/media/outer/url?id=${current.value.id}.mp3`,
 )
 const cover = computed(() =>
-  current.value.id === music.defaultTrackId
-    ? `${import.meta.env.BASE_URL}images/music-cover.webp`
-    : current.value.cover,
+  current.value.id === music.defaultTrackId ? '/images/music-cover.webp' : current.value.cover,
 )
 const filtered = computed(() =>
   tracks

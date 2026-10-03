@@ -11,7 +11,7 @@ defineProps<{ wiki: boolean }>()
     >
     <nav aria-label="项目导航">
       <a href="/projects/rdp-access-auth/" :aria-current="wiki ? undefined : 'page'">概览</a
-      ><a href="/projects/rdp-access-auth/wiki/" :aria-current="wiki ? 'page' : undefined">Wiki</a>
+      ><a href="/projects/rdp-access-auth/wiki" :aria-current="wiki ? 'page' : undefined">Wiki</a>
       <div class="rdp-nav-tools">
         <ThemeToggle class="rdp-theme" />
         <a

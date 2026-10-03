@@ -10,7 +10,7 @@ with sync_playwright() as p:
     page = context.new_page()
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
-    page.goto(base + '/projects/rdp-access-auth/wiki/', wait_until='networkidle')
+    page.goto(base + '/projects/rdp-access-auth/wiki', wait_until='networkidle')
     assert page.locator('.wiki-section-heading').count() == 16
     assert page.locator('.wiki-section-heading').first.inner_text() == '运行要求'
     assert page.locator('.wiki-deploy-step').count() == 6
@@ -56,7 +56,7 @@ with sync_playwright() as p:
         page.set_viewport_size({'width': width, 'height': 1000})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), width
     page.set_viewport_size({'width': 390, 'height': 844})
-    page.goto(base + '/projects/rdp-access-auth/wiki/', wait_until='networkidle')
+    page.goto(base + '/projects/rdp-access-auth/wiki', wait_until='networkidle')
     toggle = page.get_by_role('button', name='文档目录', exact=True)
     assert toggle.get_attribute('aria-expanded') == 'false'
     assert page.locator('#wiki-directory').get_attribute('inert') is not None

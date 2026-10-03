@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { ArrowUpRight, Search, X } from 'lucide-vue-next'
-import SiteHeader from './components/SiteHeader.vue'
+import ProjectCard from './components/ProjectCard.vue'
 import { profile, projects } from './content'
 const query = ref('')
 const matches = computed(() => {
@@ -16,8 +16,6 @@ const matches = computed(() => {
 </script>
 
 <template>
-  <a class="skip-link" href="#main">跳至项目列表</a>
-  <SiteHeader />
   <main id="main" class="directory-main shell">
     <section class="directory-intro">
       <p class="overline">PROJECTS / {{ projects.length.toString().padStart(2, '0') }}</p>
@@ -44,35 +42,8 @@ const matches = computed(() => {
         </button>
       </div>
     </div>
-    <div v-if="matches.length" class="directory-grid">
-      <a
-        v-for="project in matches"
-        :key="project.id"
-        class="directory-card"
-        :href="project.url"
-        :target="project.url.startsWith('/') ? undefined : '_blank'"
-        rel="noopener noreferrer"
-      >
-        <div class="directory-card-top">
-          <img
-            :src="`/images/${project.image}`"
-            alt=""
-            width="96"
-            height="96"
-            loading="lazy"
-            :class="{ 'directory-pixel': project.id === 'core' }"
-          /><span>{{ project.number }} <ArrowUpRight :size="19" /></span>
-        </div>
-        <p class="directory-subtitle">{{ project.subtitle }}</p>
-        <h2>{{ project.title }}</h2>
-        <p class="directory-description">{{ project.description }}</p>
-        <div class="directory-card-bottom">
-          <div class="tags">
-            <span v-for="tag in project.tags" :key="tag">{{ tag }}</span>
-          </div>
-          <span class="directory-visit">{{ project.link }} <ArrowUpRight :size="15" /></span>
-        </div>
-      </a>
+    <div v-if="matches.length" class="project-grid">
+      <ProjectCard v-for="project in matches" :key="project.id" :project="project" heading="h2" />
     </div>
     <div v-else class="directory-empty">
       <h2>暂时没有匹配的项目</h2>

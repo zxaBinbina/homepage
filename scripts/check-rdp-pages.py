@@ -48,11 +48,11 @@ with sync_playwright() as p:
     assert card.count() == 1 and card.get_attribute('target') is None
     card.click()
     page.get_by_role('link', name='开始部署').click()
-    assert page.url.endswith('/wiki/#deployment')
+    page.wait_for_url('**/wiki#deployment')
     page.reload(wait_until='networkidle')
     assert page.locator('#deployment').evaluate('(e) => Math.abs(e.getBoundingClientRect().top - 110) < 3')
     # Shared theme: follow system until an explicit preference is saved.
-    for route in ['/', '/projects/rdp-access-auth/', '/projects/rdp-access-auth/wiki/']:
+    for route in ['/', '/projects/rdp-access-auth', '/projects/rdp-access-auth/wiki']:
         fresh = browser.new_context(color_scheme='dark')
         view = fresh.new_page()
         view.goto(base + route, wait_until='networkidle')
@@ -63,7 +63,7 @@ with sync_playwright() as p:
         view.emulate_media(color_scheme='dark')
         view.emulate_media(color_scheme='light')
         assert view.locator('html').get_attribute('data-theme') == 'dark'
-        view.goto(base + '/projects/rdp-access-auth/wiki/', wait_until='networkidle')
+        view.goto(base + '/projects/rdp-access-auth/wiki', wait_until='networkidle')
         assert view.locator('html').get_attribute('data-theme') == 'dark'
         fresh.close()
     assert not errors, errors

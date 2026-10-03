@@ -25,8 +25,10 @@ https://zxabinbina.cc.cd/images/share-cover.jpg
 
 ## 项目子页
 
-RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `projectPages` 配置提供，通过 `createSiteMeta` 与主页共用生成逻辑，canonical 和 `og:url` 根据 `site.config.ts` 的基础域名生成，分别指向 `/projects/rdp-access-auth/` 和 `/projects/rdp-access-auth/wiki/`。目前复用个人主页分享封面。元信息在构建时写入 HTML，不依赖 JavaScript；Wiki 正文在构建时转换为模块数据，由 Vue 组件在浏览器中渲染，与主页的客户端渲染架构保持一致。项目页面的浏览器检查使用 `scripts/check-rdp-pages.py`，四个页面的原始 HTML 分享检查均使用 `scripts/check-sharing.py`。
+RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `projectPages` 配置提供，通过 `createSiteMeta` 与主页共用生成逻辑，canonical 和 `og:url` 根据 `site.config.ts` 的基础域名生成，分别指向 `/projects/rdp-access-auth/` 和 `/projects/rdp-access-auth/wiki`。目前复用个人主页分享封面。元信息在构建时写入 HTML，不依赖 JavaScript；Wiki 正文在构建时转换为模块数据，由 Vue 组件在浏览器中渲染，与主页的客户端渲染架构保持一致。项目页面的浏览器检查使用 `scripts/check-rdp-pages.py`，四个页面的原始 HTML 分享检查均使用 `scripts/check-sharing.py`。
 
 个人主页浏览器图标沿用 `public/favicon.svg`；RDP 官网与 Wiki 使用透明的 `public/images/rdp-access-auth.png`。图标按页面由同一 EJS 模板选择，分享封面配置独立于浏览器图标。
 
-项目目录 `/project/` 的标题、简介同样由 `site.config.ts` 提供，复用主页分享封面与 favicon；`/project` 可直接访问，canonical 统一为 `/project/`。
+项目目录 `/project` 的标题、简介同样由 `site.config.ts` 提供，复用主页分享封面与 favicon；`/project` 可直接访问，canonical 统一为 `/project`。
+
+站内无刷新切换时，`src/router.ts` 复用 `createSiteMeta` 更新浏览器标题、description、canonical、Open Graph、QQ 标签及 favicon。`vite.config.ts` 将同一 `SITE_URL` 注入客户端，确保运行时与 EJS 构建结果一致。分享平台直接请求各页面时仍可从 HTML 源码获取完整标签。

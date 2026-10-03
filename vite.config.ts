@@ -4,6 +4,7 @@ import { compileRdpWiki } from './build/rdpWiki'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { pageTemplates } from './build/pageTemplates'
+import { siteContent } from './site.config'
 import { lyricsResponse } from './server/lyrics'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
@@ -21,6 +22,7 @@ async function lyricsMiddleware(request: IncomingMessage, response: ServerRespon
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, cwd(), 'SITE_')
   return {
+    define: { 'import.meta.env.SITE_URL': JSON.stringify(env.SITE_URL || siteContent.url) },
     plugins: [
       {
         name: 'rdp-wiki-content',

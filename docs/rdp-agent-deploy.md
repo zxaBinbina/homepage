@@ -1,7 +1,7 @@
 请作为 Linux 部署助手，协助我从源码部署 RDP Access Auth。
 
 项目仓库：https://github.com/zxaBinbina/rdp-access-auth
-部署文档：https://zxabinbina.cc.cd/projects/rdp-access-auth/wiki/#deployment
+部署文档：https://zxabinbina.cc.cd/projects/rdp-access-auth/wiki#deployment
 上游说明：https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md
 
 ## 我的环境（请先让我补齐未填写项）

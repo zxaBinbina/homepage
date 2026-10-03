@@ -46,7 +46,6 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <a class="skip-link" href="#main">跳至内容</a>
   <ProjectHeader :wiki="wiki" />
   <WikiPage v-if="wiki" />
   <OverviewPage v-else />

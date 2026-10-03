@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   ArrowDown,
   ArrowRight,
@@ -19,6 +20,7 @@ import agentPrompt from '../../../docs/rdp-agent-deploy.md?raw'
 import WikiCodeBlock from './WikiCodeBlock.vue'
 import '../wiki.css'
 const article = ref<HTMLElement>()
+const router = useRouter()
 const toc = ref<HTMLElement>()
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 const agentOpen = ref(false)
@@ -64,9 +66,7 @@ function onWidth() {
 async function navigate(id: string) {
   menuOpen.value = false
   await nextTick()
-  if (location.hash !== `#${id}`) location.hash = id
-  else document.getElementById(id)?.scrollIntoView()
-  document.getElementById(id)?.focus({ preventScroll: true })
+  await router.push({ hash: `#${id}` })
 }
 function closeMenu(event: KeyboardEvent) {
   if (event.key !== 'Escape') return
@@ -78,8 +78,6 @@ function closeMenu(event: KeyboardEvent) {
 }
 onMounted(() => {
   headings = Array.from(article.value?.querySelectorAll<HTMLElement>('.wiki-section-heading') || [])
-  if (location.hash)
-    document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'instant' })
   updateSection()
   window.addEventListener('scroll', updateSection, { passive: true })
   desktop.addEventListener('change', onWidth)

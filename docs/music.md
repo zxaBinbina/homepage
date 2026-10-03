@@ -55,4 +55,4 @@ Cloudflare Pages 的项目根目录保持仓库根目录，构建命令 `npm run
 
 如使用命令行直接上传，应从仓库根目录执行 `npx wrangler pages deploy dist --project-name 你的项目名`，让 Wrangler 同时发现 `functions/`。仅在控制台拖拽上传 `dist` 不会部署歌词函数。无需网易云账号、Token 或额外密钥。
 
-主页与项目目录页的音乐入口由 `src/components/SiteHeader.vue` 共用，浮层仍由 `MusicDialog.vue` 管理。页面内收起浮层不会卸载播放器；跳转到另一页面会重新加载，不跨页面保留播放。
+主页与项目目录页的音乐入口由 `src/components/SiteHeader.vue` 共用，导航在 `src/App.vue` 中持久挂载，浮层仍由 `MusicDialog.vue` 管理。页面内收起浮层不会卸载播放器；主页与目录之间无刷新切换时保留歌曲、进度和播放状态。进入使用独立导航的 RDP 子站或离开本站时，个人主页播放器会卸载。

@@ -12,9 +12,9 @@ import AuthDemo from './AuthDemo.vue'
           客户端，回到自己的电脑。
         </p>
         <div class="rdp-actions">
-          <a class="rdp-button primary" href="/projects/rdp-access-auth/wiki/#deployment"
+          <a class="rdp-button primary" href="/projects/rdp-access-auth/wiki#deployment"
             >开始部署 <span>→</span></a
-          ><a class="rdp-button" href="/projects/rdp-access-auth/wiki/">阅读 Wiki ↗</a>
+          ><a class="rdp-button" href="/projects/rdp-access-auth/wiki">阅读 Wiki ↗</a>
         </div>
         <p class="rdp-caption">Python / Flask / SQLite / WebAuthn</p>
       </div>
@@ -46,7 +46,7 @@ import AuthDemo from './AuthDemo.vue'
         <p class="rdp-eyebrow">02 / HOW IT WORKS</p>
         <h2>把入口留给<br />完成认证的人。</h2>
         <p class="rdp-lead">未经授权的公网 IP，在进入 RDP 登录环节前被拦截。</p>
-        <a class="rdp-text-link" href="/projects/rdp-access-auth/wiki/#architecture"
+        <a class="rdp-text-link" href="/projects/rdp-access-auth/wiki#architecture"
           >了解架构与适用范围 →</a
         >
       </div>
@@ -80,7 +80,7 @@ import AuthDemo from './AuthDemo.vue'
             提供完整命令、配置说明与常见问题排查，无需等待发行版。
           </p>
         </div>
-        <a class="rdp-button primary" href="/projects/rdp-access-auth/wiki/#deployment"
+        <a class="rdp-button primary" href="/projects/rdp-access-auth/wiki#deployment"
           >跟着步骤部署 →</a
         >
       </div>

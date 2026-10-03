@@ -27,8 +27,8 @@ class Head(HTMLParser):
 pages = {
     '项目目录 · a彬彬a': 'project/',
     'a彬彬a · 在代码与方块之间': '',
-    'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth/',
-    '部署与维护 Wiki · RDP Access Auth': 'projects/rdp-access-auth/wiki/',
+    'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth',
+    '部署与维护 Wiki · RDP Access Auth': 'projects/rdp-access-auth/wiki',
 }
 paths = [Path(sys.argv[1])] if len(sys.argv) > 1 else [Path('dist') / route / 'index.html' for route in pages.values()]
 for path in paths:

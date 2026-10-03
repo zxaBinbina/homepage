@@ -20,13 +20,13 @@ const projectPages = {
     title: 'RDP Access Auth · 远程桌面，先认证再连接',
     description:
       '为 SakuraFrp 远程桌面增加 HTTPS 认证入口，支持固定密码、临时密码、WebAuthn 通行密钥与公网 IPv4 授权。',
-    path: 'projects/rdp-access-auth/',
+    path: 'projects/rdp-access-auth',
   },
   wiki: {
     title: '部署与维护 Wiki · RDP Access Auth',
     description:
       'RDP Access Auth 完整源码部署指南：Python 环境、systemd、Cloudflare Tunnel、SakuraFrp 准入、通行密钥与故障排查。',
-    path: 'projects/rdp-access-auth/wiki/',
+    path: 'projects/rdp-access-auth/wiki',
   },
 }
 

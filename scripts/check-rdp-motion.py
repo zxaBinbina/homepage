@@ -12,7 +12,7 @@ with sync_playwright() as p:
     page = browser.new_page(viewport={'width': 1440, 'height': 1000}, color_scheme='dark', reduced_motion='no-preference')
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.on('request', lambda request: requests.append((request.method, request.url)))
-    page.goto(base + '/projects/rdp-access-auth/', wait_until='networkidle')
+    page.goto(base + '/projects/rdp-access-auth', wait_until='networkidle')
     demo = page.get_by_role('region', name='认证流程动画演示')
     page.wait_for_function("document.querySelector('.demo-password').textContent.includes('•')")
     page.get_by_role('button', name='暂停演示').click()

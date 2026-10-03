@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-import { pageForPath } from './pages'
-const page = pageForPath(location.pathname)
-const ProjectDirectory = defineAsyncComponent(() => import('./ProjectDirectory.vue'))
-const HomePage = defineAsyncComponent(() => import('./HomePage.vue'))
-const ProjectPage = defineAsyncComponent(() => import('./rdp/App.vue'))
+import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
+import SiteHeader from './components/SiteHeader.vue'
+import { navigateInternalLink } from './router'
+const route = useRoute()
+const personal = computed(() => route.name === 'home' || route.name === 'directory')
+onMounted(() => document.addEventListener('click', navigateInternalLink))
+onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))
 </script>
 <template>
-  <HomePage v-if="page === 'home'" />
-  <ProjectDirectory v-else-if="page === 'directory'" />
-  <ProjectPage v-else :wiki="page === 'wiki'" />
+  <a class="skip-link" href="#main">跳至内容</a>
+  <SiteHeader v-if="personal" :home="route.name === 'home'" />
+  <RouterView v-slot="{ Component, route: currentRoute }">
+    <component :is="Component" :key="currentRoute.name" />
+  </RouterView>
 </template>
