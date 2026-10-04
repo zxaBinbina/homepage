@@ -37,6 +37,8 @@
 
 ## 项目目录
 
+主页、项目目录与 RDP 子站共用完全一致的 `src/components/SiteFooter.vue` 页脚。
+
 访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；新增项目后两处同步展示。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）和「悠哉世界」（`https://mcyzw.top`），联系入口保留主页锚点。发布完整构建产物即可上线。运行 `python3 scripts/check-project-directory.py` 检查目录访问、搜索、图片和响应式，可用 `HOMEPAGE_TEST_URL` 指定开发服务器地址。
 
 ## 站内页面切换

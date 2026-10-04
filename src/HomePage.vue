@@ -16,6 +16,7 @@ import {
 } from 'lucide-vue-next'
 import { profile, projects } from './content'
 import ProjectCard from './components/ProjectCard.vue'
+import SiteFooter from './components/SiteFooter.vue'
 
 const asset = (name: string) => `/images/${name}`
 const copied = ref(false)
@@ -277,16 +278,7 @@ onBeforeUnmount(() => {
     </section>
   </main>
 
-  <footer class="shell footer">
-    <a class="brand" href="#home">a彬彬a<span class="brand-dot">.</span></a>
-    <div class="footer-info">
-      <p>© {{ new Date().getFullYear() }} zxabinbina · 用代码与热爱构筑</p>
-      <a href="https://icp.gov.moe/?keyword=20264016" target="_blank" rel="noopener noreferrer"
-        >萌ICP备20264016号</a
-      >
-    </div>
-    <a href="#home">回到顶部</a>
-  </footer>
+  <SiteFooter />
   <Transition name="toast"
     ><div v-if="copyMessage" role="status" class="toast-message">
       <Check :size="17" />{{ copyMessage }}

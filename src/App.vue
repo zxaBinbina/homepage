@@ -27,5 +27,9 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
       </div>
     </Transition>
   </div>
-  <RouterView />
+  <RouterView v-slot="{ Component, route: pageRoute }">
+    <Transition name="page-swap">
+      <component :is="Component" :key="pageRoute.name" />
+    </Transition>
+  </RouterView>
 </template>
