@@ -28,7 +28,7 @@ with sync_playwright() as p:
  expect(page.locator('#mobile-nav a[href="/project"]')).to_be_visible()
  page.keyboard.press('Escape');expect(page.locator('#mobile-nav')).to_have_count(0)
  page.set_viewport_size(dict(width=1440,height=1000))
- for route in ['/project','/project']:
+ for route in ['/project','/project/']:
   page.goto(base+route)
   expect(page).to_have_title('项目目录 · a彬彬a')
   expect(page.locator('.project-card')).to_have_count(4)

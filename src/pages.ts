@@ -7,8 +7,15 @@ export const pages = {
 } as const
 export type PageName = keyof typeof pages
 export function knownPageForPath(path: string): PageName | undefined {
-  const normalized = `${path.replace(/\/index\.html$/, '').replace(/\/$/, '')}/`
+  const normalized =
+    path
+      .replace(/\/index\.html$/, '')
+      .replace(/\.html$/, '')
+      .replace(/\/+$/, '') || '/'
   return (Object.keys(pages) as PageName[]).find((name) => pages[name] === normalized)
+}
+export function pageFile(page: PageName): string {
+  return page === 'home' ? 'index.html' : `${pages[page].slice(1)}.html`
 }
 export function pageForPath(path: string): PageName {
   return knownPageForPath(path) ?? 'home'

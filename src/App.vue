@@ -11,7 +11,5 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
 <template>
   <a class="skip-link" href="#main">跳至内容</a>
   <SiteHeader v-if="personal" :home="route.name === 'home'" />
-  <RouterView v-slot="{ Component, route: currentRoute }">
-    <component :is="Component" :key="currentRoute.name" />
-  </RouterView>
+  <RouterView />
 </template>

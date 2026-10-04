@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import {
   ArrowDown,
   ArrowRight,
@@ -20,7 +19,6 @@ import agentPrompt from '../../../docs/rdp-agent-deploy.md?raw'
 import WikiCodeBlock from './WikiCodeBlock.vue'
 import '../wiki.css'
 const article = ref<HTMLElement>()
-const router = useRouter()
 const toc = ref<HTMLElement>()
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 const agentOpen = ref(false)
@@ -63,11 +61,6 @@ function updateSection() {
 function onWidth() {
   wide.value = desktop.matches
 }
-async function navigate(id: string) {
-  menuOpen.value = false
-  await nextTick()
-  await router.push({ hash: `#${id}` })
-}
 function closeMenu(event: KeyboardEvent) {
   if (event.key !== 'Escape') return
   if (query.value) query.value = ''
@@ -105,17 +98,17 @@ onBeforeUnmount(() => {
         /></a>
       </div>
       <div class="wiki-start-grid">
-        <a href="#section-3" @click.prevent="navigate('section-3')"
+        <a href="#section-3" @click="menuOpen = false"
           ><Server :size="21" />
           <div><b>部署前准备</b><span>Linux、域名与远程桌面</span></div>
           <ArrowRight :size="17"
         /></a>
-        <a href="#deployment" @click.prevent="navigate('deployment')"
+        <a href="#deployment" @click="menuOpen = false"
           ><Code2 :size="21" />
           <div><b>六步完成部署</b><span>直接从源码开始，无需发行版</span></div>
           <ArrowRight :size="17"
         /></a>
-        <a href="#section-11" @click.prevent="navigate('section-11')"
+        <a href="#section-11" @click="menuOpen = false"
           ><Wrench :size="21" />
           <div><b>遇到连接问题</b><span>日常维护与常见故障排查</span></div>
           <ArrowRight :size="17"
@@ -163,7 +156,7 @@ onBeforeUnmount(() => {
                   :href="`#${section.id}`"
                   :aria-current="active === section.id ? 'location' : undefined"
                   :class="{ 'wiki-step-link': section.step }"
-                  @click.prevent="navigate(section.id)"
+                  @click="menuOpen = false"
                   ><span v-if="section.step" class="wiki-nav-number">{{ section.step }}</span
                   >{{ section.step ? section.title.replace(/^\d+\. /, '') : section.title }}</a
                 ></template

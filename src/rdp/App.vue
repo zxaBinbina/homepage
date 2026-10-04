@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 import './style.css'
 import ProjectHeader from './components/ProjectHeader.vue'
 import ProjectFooter from './components/ProjectFooter.vue'
 import OverviewPage from './components/OverviewPage.vue'
 import WikiPage from './components/WikiPage.vue'
-defineProps<{ wiki: boolean }>()
+const props = defineProps<{ wiki: boolean }>()
 const motion = matchMedia('(prefers-reduced-motion: reduce)')
 let revealObserver: IntersectionObserver | undefined
 const animations = new Set<Animation>()
@@ -35,6 +35,7 @@ function observeReveals() {
   )
   document.querySelectorAll('.rdp-reveal').forEach((element) => revealObserver?.observe(element))
 }
+watch(() => props.wiki, observeReveals, { flush: 'post' })
 onMounted(() => {
   observeReveals()
   motion.addEventListener('change', observeReveals)

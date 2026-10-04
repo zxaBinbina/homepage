@@ -30,7 +30,8 @@ export const router = createRouter({
     ...(Object.keys(pages) as PageName[]).map((name) => ({
       name,
       path: pages[name],
-      alias: `${pages[name]}index.html`,
+      alias:
+        name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: components[name],
       props: name === 'rdp' || name === 'wiki' ? { wiki: name === 'wiki' } : undefined,
     })),
@@ -58,6 +59,13 @@ export const router = createRouter({
     if (changedPage || !to.hash) return { top: 0, left: 0, behavior: 'instant' }
     return false
   },
+})
+
+router.beforeEach((to) => {
+  const page = knownPageForPath(to.path)
+  if (page && to.path !== pages[page]) {
+    return { path: pages[page], query: to.query, hash: to.hash, replace: true }
+  }
 })
 
 router.afterEach((to, _from, failure) => {
@@ -102,9 +110,10 @@ export function navigateInternalLink(event: MouseEvent) {
     event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null
   if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return
   const url = new URL(link.href)
-  if (url.origin !== location.origin || !knownPageForPath(url.pathname)) return
+  const page = knownPageForPath(url.pathname)
+  if (url.origin !== location.origin || !page) return
   event.preventDefault()
-  void router.push(`${url.pathname}${url.search}${url.hash}`).catch(() => {
+  void router.push(`${pages[page]}${url.search}${url.hash}`).catch(() => {
     // A stale or unavailable lazy chunk can still be opened as a complete server-rendered shell.
     location.assign(url.href)
   })

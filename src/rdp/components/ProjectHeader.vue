@@ -5,12 +5,12 @@ defineProps<{ wiki: boolean }>()
 </script>
 <template>
   <header class="rdp-header shell">
-    <a class="rdp-brand" href="/projects/rdp-access-auth/"
+    <a class="rdp-brand" href="/projects/rdp-access-auth"
       ><img class="rdp-mark" src="/images/rdp-access-auth.png" alt="" width="38" height="38" />
       <span>RDP <b>Access Auth</b></span></a
     >
     <nav aria-label="项目导航">
-      <a href="/projects/rdp-access-auth/" :aria-current="wiki ? undefined : 'page'">概览</a
+      <a href="/projects/rdp-access-auth" :aria-current="wiki ? undefined : 'page'">概览</a
       ><a href="/projects/rdp-access-auth/wiki" :aria-current="wiki ? 'page' : undefined">Wiki</a>
       <div class="rdp-nav-tools">
         <ThemeToggle class="rdp-theme" />
