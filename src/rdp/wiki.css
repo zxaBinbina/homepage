@@ -480,6 +480,15 @@
   padding-block: 12px;
 }
 @media (prefers-reduced-motion: no-preference) {
+  .rdp-wiki-title > * {
+    animation: page-enter 0.75s var(--motion-ease) both;
+  }
+  .rdp-wiki-title > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .rdp-wiki-title > :nth-child(3) {
+    animation-delay: 120ms;
+  }
   .wiki-start-grid a {
     transition:
       border-color 0.2s,

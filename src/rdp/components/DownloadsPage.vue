@@ -94,7 +94,7 @@ onBeforeUnmount(() => controller.value?.abort())
 
 <template>
   <main id="main" class="rdp-page shell downloads-page">
-    <section class="downloads-hero">
+    <section class="downloads-hero downloads-entry">
       <div>
         <p class="rdp-eyebrow">RDP ACCESS AUTH / RELEASES</p>
         <h1>下载发行版<span>，马上部署。</span></h1>
@@ -112,7 +112,7 @@ onBeforeUnmount(() => controller.value?.abort())
       /></a>
     </section>
 
-    <section class="downloads-toolbar" aria-label="发行版状态">
+    <section class="downloads-toolbar downloads-entry" aria-label="发行版状态">
       <p v-if="!loading && !error" role="status">
         <GitBranch :size="16" />共 {{ visibleReleases.length }} 个发行版
       </p>
@@ -121,23 +121,32 @@ onBeforeUnmount(() => controller.value?.abort())
       </button>
     </section>
 
-    <div v-if="loading" class="downloads-state" role="status" aria-live="polite">
+    <div v-if="loading" class="downloads-state downloads-entry" role="status" aria-live="polite">
       <LoaderCircle :size="24" class="downloads-spinner" />
       <p>正在读取 GitHub Releases…</p>
     </div>
 
-    <div v-else-if="error" class="downloads-state downloads-state-error" role="alert">
+    <div
+      v-else-if="error"
+      class="downloads-state downloads-entry downloads-state-error"
+      role="alert"
+    >
       <AlertCircle :size="24" />
       <p>{{ error }}</p>
     </div>
 
-    <div v-else-if="!visibleReleases.length" class="downloads-state" role="status">
+    <div v-else-if="!visibleReleases.length" class="downloads-state downloads-entry" role="status">
       <Package :size="24" />
       <p>GitHub 暂时没有可用的公开发行版。</p>
     </div>
 
     <div v-else class="release-list">
-      <article v-for="release in visibleReleases" :key="release.id" class="release-card">
+      <article
+        v-for="(release, index) in visibleReleases"
+        :key="release.id"
+        class="release-card reveal"
+        :style="{ '--reveal-delay': `${Math.min(index, 5) * 60}ms` }"
+      >
         <header class="release-header">
           <div>
             <div class="release-title-line">

@@ -18,14 +18,14 @@ const matches = computed(() => {
 
 <template>
   <main id="main" class="directory-main shell">
-    <section class="directory-intro">
+    <section class="directory-intro directory-entry">
       <p class="overline">PROJECTS / {{ projects.length.toString().padStart(2, '0') }}</p>
       <h1>做出来，也分享出来。</h1>
       <p>
         从方块世界到日常工具，看看我已公开的项目。<br />在这里了解它们的用途，找到官网、源码与使用入口。
       </p>
     </section>
-    <div class="directory-toolbar">
+    <div class="directory-toolbar directory-entry">
       <p role="status" aria-live="polite">
         {{ query.trim() ? `找到 ${matches.length} 个项目` : `全部 ${projects.length} 个项目` }}
       </p>
@@ -43,8 +43,15 @@ const matches = computed(() => {
         </button>
       </div>
     </div>
-    <div v-if="matches.length" class="project-grid">
-      <ProjectCard v-for="project in matches" :key="project.id" :project="project" heading="h2" />
+    <div v-if="matches.length" class="project-grid directory-project-grid">
+      <ProjectCard
+        v-for="(project, index) in matches"
+        :key="project.id"
+        :project="project"
+        heading="h2"
+        class="reveal"
+        :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
+      />
     </div>
     <div v-else class="directory-empty">
       <h2>暂时没有匹配的项目</h2>

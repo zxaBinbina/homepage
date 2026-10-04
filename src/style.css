@@ -1879,6 +1879,12 @@ h1 > span {
   .landscape-wrap {
     animation: page-enter 0.75s var(--motion-ease) both;
   }
+  .directory-entry > * {
+    animation: page-enter 0.75s var(--motion-ease) both;
+  }
+  .directory-entry > :nth-child(2) {
+    animation-delay: 60ms;
+  }
   .hero-top > :nth-child(2) {
     animation-delay: 60ms;
   }
@@ -1944,6 +1950,9 @@ h1 > span {
 @media (max-width: 760px) {
   .project-card {
     --reveal-delay: 0ms !important;
+  }
+  .directory-project-grid > * {
+    animation-delay: 0ms;
   }
 }
 

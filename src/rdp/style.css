@@ -240,16 +240,13 @@
     animation: header-enter 0.55s var(--motion-ease) both;
   }
   .rdp-hero-copy > *,
-  .rdp-hero-demo,
-  .rdp-wiki-title > * {
+  .rdp-hero-demo {
     animation: page-enter 0.75s var(--motion-ease) both;
   }
-  .rdp-hero-copy > :nth-child(2),
-  .rdp-wiki-title > :nth-child(2) {
+  .rdp-hero-copy > :nth-child(2) {
     animation-delay: 60ms;
   }
-  .rdp-hero-copy > :nth-child(3),
-  .rdp-wiki-title > :nth-child(3) {
+  .rdp-hero-copy > :nth-child(3) {
     animation-delay: 120ms;
   }
   .rdp-hero-copy > :nth-child(4),
@@ -258,6 +255,15 @@
   }
   .rdp-hero-copy > :nth-child(5) {
     animation-delay: 240ms;
+  }
+  .downloads-entry > * {
+    animation: page-enter 0.75s var(--motion-ease) both;
+  }
+  .downloads-entry > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .downloads-entry > :nth-child(3) {
+    animation-delay: 120ms;
   }
   .rdp-button,
   .rdp-card {
