@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
       <div class="wiki-title-row">
         <div>
           <h1>部署与使用<span>指南。</span></h1>
-          <p class="rdp-lead">从第一条命令，到一次安心的远程连接。</p>
+          <p class="rdp-lead">安装、配置与排错。</p>
         </div>
         <a
           class="wiki-source"
@@ -98,14 +98,14 @@ onBeforeUnmount(() => {
         /></a>
       </div>
       <div class="wiki-start-grid">
-        <a href="#section-3" @click="menuOpen = false"
+        <a href="#section-2" @click="menuOpen = false"
           ><Server :size="21" />
           <div><b>部署前准备</b><span>Linux、域名与远程桌面</span></div>
           <ArrowRight :size="17"
         /></a>
         <a href="#deployment" @click="menuOpen = false"
           ><Code2 :size="21" />
-          <div><b>六步完成部署</b><span>直接从源码开始，无需发行版</span></div>
+          <div><b>六步完成部署</b><span>RPM / DEB 与浏览器向导</span></div>
           <ArrowRight :size="17"
         /></a>
         <a href="#section-11" @click="menuOpen = false"
@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
           <ShieldCheck :size="20" />
           <div>
             <b>在自己的主机上，搭建认证入口。</b>
-            <p>按顺序完成准备与六步部署。文中的域名、端口和隧道 ID 均为示例，请替换为自己的值。</p>
+            <p>按顺序完成准备和六步部署，示例值请替换为自己的配置。</p>
           </div>
         </div>
         <details
@@ -180,15 +180,11 @@ onBeforeUnmount(() => {
         >
           <summary>
             <Code2 :size="20" /><span
-              ><b>交给 Agent 部署</b
-              ><small>复制提示词，填写环境参数，让你的部署助手接着做。</small></span
+              ><b>交给 Agent 部署</b><small>复制提示词并填写环境参数。</small></span
             ><ChevronDown :size="18" />
           </summary>
           <div class="wiki-agent-body">
-            <p>
-              适用于有终端操作能力的 Agent 工具。先替换尖括号中的参数，密码与 Token
-              在服务器终端安全填写。
-            </p>
+            <p>替换尖括号中的参数，密码与 Token 在服务器终端填写。</p>
             <WikiCodeBlock :code="agentPrompt" language="text" copy-label="复制部署提示词" />
           </div>
         </details>
@@ -237,8 +233,8 @@ onBeforeUnmount(() => {
         <div class="wiki-bottom">
           <BookOpen :size="21" />
           <div>
-            <b>文档没能解决你的问题？</b>
-            <p>带上复现步骤与脱敏后的错误信息，到仓库反馈。</p>
+            <b>需要帮助？</b>
+            <p>提交复现步骤和脱敏后的错误信息。</p>
           </div>
           <a href="https://github.com/zxaBinbina/rdp-access-auth/issues"
             >反馈问题 <ArrowRight :size="16"

@@ -74,10 +74,10 @@ import AuthDemo from './AuthDemo.vue'
       <div class="rdp-deploy-card">
         <div>
           <p class="rdp-eyebrow">03 / SELF-HOSTED</p>
-          <h2>从源码开始，部署到自己的主机。</h2>
+          <h2>从安装包开始，部署到自己的主机。</h2>
           <p>
-            准备 Linux、可用的 RDP 服务、SakuraFrp TCP 隧道和 Cloudflare 域名。<br />Wiki
-            提供完整命令、配置说明与常见问题排查，无需等待发行版。
+            下载匹配的 RPM 或 DEB，再用浏览器向导或终端向导完成配置。<br />Wiki
+            提供安装、校验、Cloudflare / SakuraFrp 配置与常见问题排查。
           </p>
         </div>
         <a class="rdp-button primary" href="/projects/rdp-access-auth/wiki#deployment"

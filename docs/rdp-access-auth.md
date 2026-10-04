@@ -1,242 +1,203 @@
-# 项目概览
+# RDP Access Auth
 
-为通过 SakuraFrp 暴露的远程桌面增加一个 HTTPS 认证入口。访问者先完成网页认证，再使用原远程桌面客户端连接；未经授权的公网 IP 会在进入 RDP 登录环节之前被拦截。
+为通过 SakuraFrp 暴露的远程桌面增加 HTTPS 认证入口。访问者先在浏览器完成认证，再使用原生 RDP 客户端连接；没有通过认证的公网 IPv4 不会进入 SakuraFrp 的 RDP 准入规则。
 
-本项目适合个人远程桌面，后端为 Python、Flask、SQLite 和 WebAuthn，通过 Cloudflare Tunnel 提供 HTTPS 页面，通过 SakuraFrp API 为来源 IPv4 授权。
-
-## 功能
-
-| 认证方式     | 行为                                                                               |
-| ------------ | ---------------------------------------------------------------------------------- |
-| 固定访问密码 | 至少 16 位，包含大小写字母、数字和特殊符号；可重复使用                             |
-| 临时访问密码 | 3 个随机中文词，来自 Minecraft、原神与美食；该方式认证成功后立即轮换，并显示下一条 |
-| 通行密钥     | WebAuthn，要求设备完成用户验证；支持多个密钥、手机跨设备确认和删除密钥             |
-
-- 三种方式任选其一，固定密码和通行密钥认证不会轮换临时密码。
-- 当前临时密码加密保存在 SQLite 中；登录后可在 10 分钟内进入凭据管理页查看，查看不触发轮换。
-- 同一 IP 连续失败 5 次封禁 15 分钟；10 分钟内 5 个不同 IP 被封禁，全站锁定 15 分钟。
-- 原生 IP 授权期限为 6 小时，到期后的新连接需重新认证。
-- 保留 CSRF、来源校验、防重放的单次 WebAuthn 挑战、Secure/HttpOnly Cookie 和 no-store 页面策略。
-- 浏览器通过 IPv6 访问时，会检测用于远程桌面连接的公网 IPv4，也支持手动填写。
+当前推荐使用 RPM 或 DEB 安装包。安装包包含认证服务、浏览器管理页和运行依赖；首次部署由浏览器向导或终端向导完成，不需要创建 Python 虚拟环境，也不需要手动复制 systemd 文件。源码目录中的 `./rdp-auth` 仍适合开发、测试和前台运行。
 
 ## 架构与适用范围
 
 ```mermaid
 flowchart LR
-    Browser[个人设备浏览器] --> CF[Cloudflare HTTPS / Tunnel]
+    Browser[用户浏览器] --> CF[Cloudflare Tunnel HTTPS]
     CF --> Portal[本机认证服务 127.0.0.1:18089]
-    Portal --> API[SakuraFrp IP 授权 API]
-    RDP[远程桌面客户端] --> Gate[SakuraFrp TCP 隧道准入]
+    Portal --> Sakura[SakuraFrp 授权 API]
+    RDP[RDP 客户端] --> Gate[SakuraFrp TCP 准入]
     Gate --> Desktop[现有远程桌面服务]
 ```
 
-这是按公网 IP 放行的单用户入口：共享一个公网出口的设备会共享这次准入，远程桌面仍要求系统账户登录。浏览器的 IPv4 出口必须与 RDP 客户端一致。项目不安装或代替 RDP 服务，也不能阻止公网端口本身被扫描发现。
+认证服务只监听本机回环地址，Cloudflare Tunnel 是唯一的网页入口；原 RDP 域名保持“仅 DNS”，不要把原生 RDP 放到普通 Cloudflare 橙云代理后面。项目不会安装或代替远程桌面服务，也不会创建 SakuraFrp、Cloudflare 账户或 DNS 记录。
 
-6 小时由 SakuraFrp 的 `auth_time` 执行，不是浏览器 Cookie 的存活时间。到期后拦截新连接，不承诺强制断开已经建立的会话。重启 frpc 会清除 IP 授权缓存。启用全站锁定后，攻击者也可能通过多个 IP 暂时阻止正常用户认证，可使用本机管理工具解封。
+认证按公网 IPv4 放行。同一公网出口的设备会共享这次准入，RDP 客户端仍然必须通过操作系统账户登录。浏览器与 RDP 客户端应使用同一个公网 IPv4；SakuraFrp 的 `auth_time` 决定授权有效期，到期后拦截新连接，不保证断开已经建立的会话。
 
-## 运行要求
+支持固定访问密码、临时访问密码和 WebAuthn 通行密钥。固定密码为 16～128 位并包含大小写字母、数字和特殊符号；临时密码由三个随机中文词组成，成功使用后立即轮换；通行密钥要求设备完成用户验证。同一 IP 连续失败 5 次会封禁 15 分钟，多个 IP 的失败会触发临时全站锁定。
 
-- 一台持续联网的 Linux 主机；以下采用 systemd 部署，开发验证环境为 Python 3.14。
-- 已正常工作的远程桌面服务，以及指向它的 SakuraFrp TCP 隧道。
-- SakuraFrp API Token 和目标隧道 ID。
-- 托管到 Cloudflare 的域名，以及独立认证子域名，例如 `auth.example.com`。
-- 安装 [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)。模板默认路径 `/usr/bin/cloudflared`，请按实际安装位置调整。
+## 部署前准备
 
-下文的域名、端口、隧道 ID 均为示例，部署前替换为自己的值。
+- 带 systemd 的 Fedora、RHEL、Ubuntu 或其他 Linux；安装包必须匹配发行版、CPU 架构和 Python 次版本。
+- 已正常工作的 RDP 服务和 SakuraFrp TCP 隧道。
+- SakuraFrp API Token、隧道 ID，并能启用 `auth_mode = server` 和 `auth_time`。
+- 托管在 Cloudflare 的认证子域名，例如 `auth.example.com`。
+- 一个专用 Cloudflare Tunnel Token；Tunnel 只需要转发认证域名到本机认证端口。
 
-## 部署
+不要把访问密码、SakuraFrp Token、Cloudflare Tunnel Token 或 Turnstile Secret 粘贴到聊天、截图或 Git 仓库。向导会隐藏终端输入，浏览器提交后会清空敏感字段。
 
-无需生成或下载发行版。先克隆公开仓库，进入源码目录：
+## 六步完成部署
 
-```bash
-git clone https://github.com/zxaBinbina/rdp-access-auth.git
-cd rdp-access-auth
-```
+### 1. 安装匹配的软件包
 
-完成下方六步后，先验证认证页面，再连接远程桌面。不要将官网的 `/projects/rdp-access-auth` 地址用作认证域名；认证服务应使用你自己的独立子域名。
-
-### 1. 准备 Python 环境和词库
-
-在下载或克隆后的项目目录中执行：
+请先打开官网的[发行版下载页](/projects/rdp-access-auth/downloads)选择文件；也可以直接查看 [GitHub Releases](https://github.com/zxaBinbina/rdp-access-auth/releases)。下载与主机匹配的 RPM 或 DEB，不要混用发行版、架构或 Python 次版本不匹配的文件。
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python tools/build_wordlist.py --download
+set -euo pipefail
+release_json=$(mktemp)
+trap 'rm -f "$release_json"' EXIT
+curl -fsSL -H 'Accept: application/vnd.github+json' \
+  'https://api.github.com/repos/zxaBinbina/rdp-access-auth/releases?per_page=1' \
+  -o "$release_json"
+
+case "$(uname -m)" in
+  x86_64) asset_arch='x86_64|amd64' ;;
+  aarch64|arm64) asset_arch='aarch64|arm64' ;;
+  *) asset_arch='' ;;
+esac
+
+if command -v dnf >/dev/null 2>&1; then
+  asset_ext='.rpm'
+  package_manager='dnf'
+elif command -v apt >/dev/null 2>&1; then
+  asset_ext='.deb'
+  package_manager='apt'
+else
+  echo '未找到 dnf 或 apt，请从发行版下载页手动选择安装包。' >&2
+  exit 1
+fi
+
+package_url=$(jq -r --arg ext "$asset_ext" --arg arch "$asset_arch" \
+  '[.[0].assets[] | select(.name | endswith($ext)) | select($arch == "" or (.name | test($arch)))] | .[0].browser_download_url // empty' \
+  "$release_json")
+if [ -z "$package_url" ]; then
+  echo '最新 Release 没有匹配当前系统架构的安装包，请打开官网发行版下载页手动选择。' >&2
+  exit 1
+fi
+
+package_file=$(basename "$package_url")
+curl -fLO "$package_url"
+curl -fLO "$package_url.sha256"
+sha256sum -c "$package_file.sha256"
+sudo "$package_manager" install "./$package_file"
+
+rdp-auth --help
 ```
 
-首次构建会下载词库并生成 `wordlists/objects.json`。数据源包括 THUOCL 饮食词库、Minecraft 简体中文名称以及 genshin-db 原神中文名称；来源与 SHA-256 快照见 `wordlists/sources.json`。当前快照可生成 12,095 个词。
+如果没有匹配架构的文件，请打开[发行版下载页](/projects/rdp-access-auth/downloads)手动选择。不要把 Fedora RPM 安装到 Debian/Ubuntu，也不要把 amd64 DEB 安装到 ARM 主机。
 
-原神 API 会更新。如果下载数据与快照不同，程序会停止；确认接受更新后执行：
+### 2. 打开部署向导
 
 ```bash
-.venv/bin/python tools/build_wordlist.py --download --refresh-sources
+rdp-auth deploy --gui  # 浏览器表单
+rdp-auth deploy        # 终端交互
+rdp-auth deploy --dry-run
 ```
 
-原始下载内容保存在 `.cache/wordlists/`，生成文件和缓存均被 Git 忽略。更换词库不会重置已有临时密码；重新启动认证服务后，下一次正常轮换才使用新词库。
+向导只监听 `127.0.0.1`，终端会打印带一次性令牌的完整链接。浏览器无法自动打开时复制完整链接，不要只输入端口地址。首次部署需要管理员权限，程序会通过 `sudo` 请求系统密码。检测到 `/etc/rdp-access-auth`、`/etc/rdp-auth`、旧安装目录或已有 systemd 单元时会拒绝覆盖。
 
-### 2. 生成私密配置
+### 3. 填写连接与凭据
 
-```bash
-.venv/bin/python tools/init_config.py \
-  --hostname auth.example.com \
-  --rdp-address desktop.example.com:26869 \
-  --tunnel-id 12345
+填写认证域名、RDP 地址（例如 `desktop.example.com:26869`）、SakuraFrp 隧道 ID、SakuraFrp Token、固定访问密码、Cloudflare Tunnel Token 和本机认证端口（默认 `18089`）。Tunnel Token 只粘贴 Token，不要粘贴完整 shell 命令。
+
+Turnstile 和中文词库是可选项。Turnstile 必须同时填写 Site key 与 Secret key；两项都留空表示关闭。没有词库时向导会下载并校验项目锁定的公开来源，也可以填写已有词库的绝对路径。
+
+### 4. 配置 Cloudflare 与 SakuraFrp
+
+在 Cloudflare Tunnel 添加公开主机名路由：
+
+```text
+认证域名 → http://127.0.0.1:18089
 ```
 
-工具会在终端隐藏输入固定访问密码和 SakuraFrp API Token，生成随机密码盐与会话密钥，写入权限为 `0600` 的 `private/portal-settings.json`。不会覆盖现有配置。`portal-settings.example.json` 仅说明结构，不可直接部署。
-
-配置中的 `session_key` 还用于派生临时密码加密密钥和通行密钥账户标识，应与状态数据库一起备份；运行后不要随意重新生成。
-
-### 3. 安装认证服务
-
-以下命令仍在项目目录执行。应用代码放在 `/opt/rdp-access-auth`，凭据放在 `/etc/rdp-access-auth`，运行状态由 systemd 保存到 `/var/lib/rdp-access-auth`。
-
-```bash
-sudo install -d -m 755 /opt/rdp-access-auth/wordlists /opt/rdp-access-auth/tools
-sudo install -m 644 portal.py portal.html auth_credentials.py auth_guard.py \
-  requirements.txt requirements-runtime.txt /opt/rdp-access-auth/
-sudo install -m 644 wordlists/objects.json /opt/rdp-access-auth/wordlists/
-sudo install -m 644 tools/admin.py /opt/rdp-access-auth/tools/
-sudo python3 -m venv /opt/rdp-access-auth/.venv
-sudo /opt/rdp-access-auth/.venv/bin/python -m pip install -r /opt/rdp-access-auth/requirements.txt
-sudo install -d -m 700 /etc/rdp-access-auth
-sudo install -m 600 private/portal-settings.json /etc/rdp-access-auth/portal-settings.json
-sudo install -m 644 deployment/rdp-access-auth.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now rdp-access-auth.service
-curl -H 'Host: auth.example.com' http://127.0.0.1:18089/healthz
-```
-
-健康检查应返回 `ok`。如果使用启用 SELinux 的发行版，应按发行版策略恢复新文件的标签，例如执行 `restorecon -RF /opt/rdp-access-auth /etc/rdp-access-auth`。
-
-服务使用 `DynamicUser`、私有状态目录和只读系统保护。应用只接受来自 loopback 的 Cloudflare 转发请求，不应把 18089 端口直接开放到公网。
-
-### 4. 配置 Cloudflare Tunnel
-
-先以普通用户创建专用 Tunnel：
-
-```bash
-cloudflared tunnel login
-cloudflared tunnel create rdp-access-auth
-cloudflared tunnel route dns rdp-access-auth auth.example.com
-```
-
-创建命令会输出 Tunnel UUID 和凭据文件位置。将 `TUNNEL_UUID` 替换为实际 UUID，再执行：
-
-```bash
-TUNNEL_UUID=替换为实际UUID
-sudo install -m 600 "$HOME/.cloudflared/$TUNNEL_UUID.json" /etc/rdp-access-auth/cloudflare-tunnel.json
-sudo install -m 600 deployment/cloudflared.example.yml /etc/rdp-access-auth/cloudflared.yml
-sudoedit /etc/rdp-access-auth/cloudflared.yml
-```
-
-编辑配置中的 `tunnel`、`hostname` 和 `httpHostHeader`。认证域名必须与 `portal-settings.json` 一致。模板的 `credentials-file` 指向 systemd 注入的凭据路径，应与提供的服务单元配套使用。
-
-```bash
-sudo install -m 644 deployment/cloudflared-rdp-access.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now cloudflared-rdp-access.service
-```
-
-现在应能打开 `https://auth.example.com`。浏览器应允许 Cookie，通行密钥需要安全 HTTPS 上下文。Cloudflare 为认证域名管理 HTTPS 证书。
-
-### 5. 启用 SakuraFrp 准入规则
-
-在原 RDP TCP 隧道的额外配置中设置：
+如果向导使用其他端口，路由必须同步修改。本机认证端口不应开放到公网。原 RDP TCP 隧道确认：
 
 ```ini
 auth_mode = server
 auth_time = 6h
 ```
 
-保存后重启该隧道或 frpc。认证页面会调用 SakuraFrp 的 `/v4/tunnel/auth` 接口，为所填 IPv4 发放准入。固定密码、临时密码和通行密钥共同使用此规则。
+保存并重启该隧道或 frpc。认证域名只用于浏览器，原 RDP 域名只用于 RDP 客户端，两个域名不要混用。
 
-原 RDP 域名如 `desktop.example.com` 应保持“仅 DNS”。普通 Cloudflare 橙云代理不能直接承载原生 RDP。认证域名通过独立 Cloudflare Tunnel 提供 HTTPS。
+### 5. 核对计划并安装
 
-### 6. 首次登录与通行密钥绑定
+向导先在临时目录准备配置、词库和经过 SHA-256 校验的 Cloudflare 连接器，准备阶段不会写入系统。确认计划后才写入并启用服务。
 
-1. 在个人设备上打开认证域名，用固定访问密码登录。
-2. 成功页进入“绑定通行密钥 / 查看当前临时密码”。
-3. 绑定通行密钥并按设备提示使用指纹、面容、PIN、手机或安全密钥确认；也可保存当前临时密码作为备用方式。
-4. 用 RDP 客户端连接原域名和端口，再使用系统账户登录。
-
-临时密码成功使用一次后会作废，成功页显示下一条。固定密码或通行密钥登录不会改变它。忘记保存下一条时，可用固定密码或通行密钥登录管理页查看。
-
-浏览器与远程桌面应使用同一公网 IPv4 出口。开代理时，对认证域名、RDP 域名、`api.ipify.org` 和 `ipv4.icanhazip.com` 使用一致的路由策略。
-
-## 维护与排查
-
-```bash
-systemctl status rdp-access-auth.service cloudflared-rdp-access.service
-journalctl -u rdp-access-auth.service -u cloudflared-rdp-access.service --since '10 minutes ago'
-sudo python3 /opt/rdp-access-auth/tools/admin.py status
-sudo python3 /opt/rdp-access-auth/tools/admin.py unlock
-```
-
-`unlock` 只解除本机数据库中的认证封禁，不修改密码或通行密钥。其他部署路径可通过 `--state /path/to/state.sqlite3` 指定数据库。
-
-- 403：检查认证域名、转发 Host、HTTPS、Cookie 和 Cloudflare Tunnel 是否按模板连接 loopback。
-- 502：检查 Tunnel 是否能连接本机 18089，以及 SakuraFrp Token、隧道 ID 和 API 网络连通性。
-- 已授权但 RDP 不通：核对网页授权的 IPv4 与 RDP 出口一致，确认原桌面服务在线。
-- 通行密钥无法绑定：使用支持 WebAuthn 的现代浏览器；跨设备确认时按浏览器提示启用蓝牙。设备不支持本机保存时可用手机或安全密钥。
-- 笔记本休眠、断网或 frpc 重启：恢复联网后重新授权。
-
-备份应包含配置与 SQLite 数据库，并保持私密。可停止认证服务后备份数据库，或使用 SQLite 的在线备份功能。升级时保留这两者，更新源码、依赖后重启认证服务。
-
-## 开发与测试
-
-```bash
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m unittest -q test_auth_guard.py test_portal.py test_turnstile.py
-```
-
-单元测试使用临时数据库和合成词库，不需要真实密码、Token、域名、Cloudflare 或 SakuraFrp 账户。覆盖密码轮换、并发、封禁、CSRF、来源、IPv4 和 WebAuthn 签名/重放等行为。仓库提供 GitHub Actions 测试工作流。
-
-## 项目结构
+主要位置：
 
 ```text
-portal.py / portal.html        网页、接口与准入流程
-auth_credentials.py           临时密码与通行密钥
-auth_guard.py                 封禁、限流和并发控制
-tools/                        配置初始化、词库构建、本机管理
-deployment/                   systemd 与 Cloudflare Tunnel 模板
-wordlists/sources.json         公开词库来源快照
-test_*.py                     离线测试
+/etc/rdp-access-auth/portal-settings.json  私密配置，0600
+/etc/rdp-access-auth/objects.json          中文词库
+/etc/rdp-access-auth/cloudflare-token      Tunnel Token，0600
+/usr/local/libexec/rdp-access-auth/cloudflared
+/var/lib/rdp-access-auth/                  SQLite 状态目录
+/etc/systemd/system/rdp-access-auth.service
+/etc/systemd/system/cloudflared-rdp-access.service
 ```
 
-## 许可证与第三方数据
+向导会等待 `/healthz` 通过后再启动 Cloudflare 连接器。
 
-项目代码采用 [MIT License](LICENSE)。游戏和美食词库由部署者从公开来源下载，权利仍属于相应作者或权利人，详见 [词库来源说明](wordlists/readme.md)。本项目与 Cloudflare、SakuraFrp、Minecraft、原神及词库维护者没有从属或背书关系。
+### 6. 首次登录并连接 RDP
 
-## Cloudflare Turnstile（可选）
+1. 打开 `https://auth.example.com`，使用固定密码认证。
+2. 进入凭据管理，查看临时密码或绑定通行密钥，按设备提示完成用户验证。
+3. 使用原 RDP 地址和端口连接，再输入远程桌面系统账户。
+4. 确认浏览器与 RDP 客户端使用同一个公网 IPv4。
 
-在 Cloudflare Turnstile 创建或选用已有组件，允许的主机名需包含实际认证域名
-（例如 `auth.example.com`）。将 Site key 和 Secret key 分别写入服务器私有配置的
-`turnstile_site_key`、`turnstile_secret_key` 字段；初始化工具也会交互询问。
-两项都留空时不启用，只填写其中一项会拒绝启动。已有部署请编辑原配置，保留
-原密码哈希、会话密钥及其他字段，不要重新初始化。配置文件保持 root 所有、0600 权限，
-通过现有 systemd `LoadCredential` 提供给服务，然后重启认证服务。
-Secret key 不可放进 HTML、源码仓库或日志。示例配置不包含任何真实密钥。
+临时密码成功使用一次后失效，下一条会在成功页显示；固定密码和通行密钥不会轮换临时密码。通行密钥需要 HTTPS 安全上下文，浏览器需要允许 Secure / HttpOnly Cookie。
 
-三种登录均需要先通过人机验证，后端在原认证处理器中调用 Siteverify：
+## 安装后的管理
 
-| 登录方式 | 处理器                  | Turnstile action  |
-| -------- | ----------------------- | ----------------- |
-| 固定密码 | `/authorize`            | `login_password`  |
-| 临时密码 | `/authorize`            | `login_temporary` |
-| 通行密钥 | `/passkeys/auth/verify` | `login_passkey`   |
+```bash
+sudo rdp-auth --profile system status
+sudo rdp-auth --profile system gui
+sudo rdp-auth --profile system config show
+sudo rdp-auth --profile system config validate
+sudo rdp-auth --profile system unlock
+sudo rdp-auth --profile system service status
+sudo rdp-auth --profile system service logs
+sudo rdp-auth --profile system service restart
+```
 
-服务端要求 `success` 严格为 true、action 匹配且 hostname 等于配置的认证域名；
-生产环境不会接受 localhost。客户端 IP 取自可信本机 Cloudflare Tunnel 的
-`CF-Connecting-IP`，不使用用户填写的 IPv4 做人机校验。
-Siteverify 超时为 10 秒，错误时拒绝认证，但不计入密码失败次数、不轮换临时密码。
-有效的人机验证不能代替密码或通行密钥。管理页仍使用已认证的短期会话和 CSRF 校验。
+浏览器管理页只能从本机打开，支持修改认证域名、RDP 地址、SakuraFrp Token、固定密码、Turnstile 和词库路径，也能查看通行密钥数量、解除封禁、操作服务和查看日志。保存配置不会自动重启服务。
 
-令牌由 Cloudflare 限制为一次性、有效期 5 分钟；通行密钥流程每次尝试后重置组件，
-普通表单提交后由新页面生成组件。浏览器必须能访问 `challenges.cloudflare.com`，
-服务端必须能出站访问它的 Siteverify 接口；页面 CSP 已允许所需脚本和 iframe。
+`unlock` 只清除 IP 封禁、全站锁定和速率限制，不修改凭据。配置修改采用原子替换并保存上一版 `.bak`。升级 RPM / DEB 会保留配置和 SQLite 状态；升级后手动重启服务。卸载包会停止向导创建的服务，但保留私密配置、数据库和连接器。
 
-验证：`python -m unittest -q test_auth_guard.py test_portal.py test_turnstile.py`。
-上线时还应使用真实浏览器完成一次登录，并确认重放同一个 Turnstile 令牌被拒绝。
-测试中的模拟响应不代替真实组件的部署验证。
+## 排错
+
+### 403 或页面要求重新打开
+
+检查认证域名、Cloudflare Tunnel 的 Host 转发、HTTPS 和 Cookie。不要关闭 CSRF、来源检查或 Secure Cookie。
+
+### 502 或 Tunnel 连接失败
+
+```bash
+sudo rdp-auth --profile system service logs
+sudo systemctl status cloudflared-rdp-access.service
+```
+
+确认路由指向正确的 `127.0.0.1` 端口、Tunnel Token 未截断、认证服务健康检查通过且主机可以出站访问 Cloudflare。
+
+### 已授权但 RDP 不通
+
+确认浏览器与 RDP 客户端公网 IPv4 一致，SakuraFrp 隧道在线，`auth_mode` 为 `server`，`auth_time` 未过期，原远程桌面服务在线。重启 frpc 会清除授权缓存，需要重新认证。
+
+### 通行密钥失败或临时锁定
+
+使用 HTTPS 和现代浏览器，跨设备确认时按提示开启蓝牙。锁定时等待封禁结束，或确认安全后执行 `sudo rdp-auth --profile system unlock`，不要频繁重试。
+
+## 安全边界与备份
+
+这是按公网 IP 放行的单用户入口，不是 VPN，也不是远程桌面账户。共享公网出口的设备共享授权；RDP 系统账户仍是第二层登录。认证域名不应直接暴露本机端口，管理页不应通过 Cloudflare Tunnel 发布。
+
+备份至少包含 `/etc/rdp-access-auth/portal-settings.json` 和 `/var/lib/rdp-access-auth/state.sqlite3`，并保持原权限。`session_key` 同时用于临时密码加密和通行密钥账户标识，恢复时必须一起使用，不能随意重新生成。分享日志时移除 Token、Cookie、密码、临时密码和公网地址。
+
+## 源码与构建者入口
+
+源码目录中的 `./rdp-auth` 提供本地 GUI、配置查看、前台 `serve`、词库构建和测试。维护者可以在匹配的发行版中运行：
+
+```bash
+tools/build-package rpm
+tools/build-package deb
+```
+
+构建结果位于 `dist/` 并带有 `.sha256` 校验文件。生产部署优先使用匹配的 RPM / DEB；源码入口用于开发和测试。
+
+## 需要帮助
+
+反馈问题时提供发行版、架构、`rdp-auth status` 的脱敏输出、相关服务的脱敏日志和复现步骤。不要上传配置文件、Tunnel Token、SakuraFrp Token、密码、Cookie 或通行密钥数据。

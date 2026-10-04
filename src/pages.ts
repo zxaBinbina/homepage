@@ -4,6 +4,7 @@ export const pages = {
   directory: '/project',
   rdp: '/projects/rdp-access-auth',
   wiki: '/projects/rdp-access-auth/wiki',
+  downloads: '/projects/rdp-access-auth/downloads',
 } as const
 export type PageName = keyof typeof pages
 export function knownPageForPath(path: string): PageName | undefined {

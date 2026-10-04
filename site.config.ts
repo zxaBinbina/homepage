@@ -23,7 +23,12 @@ const projectPages = {
   wiki: {
     title: '部署与维护 Wiki · RDP Access Auth',
     description:
-      'RDP Access Auth 完整源码部署指南：Python 环境、systemd、Cloudflare Tunnel、SakuraFrp 准入、通行密钥与故障排查。',
+      'RDP Access Auth 安装包与浏览器部署向导：RPM / DEB、Cloudflare Tunnel、SakuraFrp 准入、通行密钥与故障排查。',
+  },
+  downloads: {
+    title: '下载发行版 · RDP Access Auth',
+    description:
+      '从 GitHub Releases 获取 RDP Access Auth 的 RPM、DEB 和其他发行版文件，查看每个版本的说明与校验资产。',
   },
 }
 

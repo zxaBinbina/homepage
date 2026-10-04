@@ -8,6 +8,7 @@ const components = {
   directory: () => import('./ProjectDirectory.vue'),
   rdp: () => import('./rdp/App.vue'),
   wiki: () => import('./rdp/App.vue'),
+  downloads: () => import('./rdp/App.vue'),
 }
 
 function hashTarget(hash: string) {
@@ -16,6 +17,26 @@ function hashTarget(hash: string) {
   } catch {
     return null
   }
+}
+
+async function waitForHashTarget(hash: string) {
+  for (let frame = 0; frame < 60; frame += 1) {
+    const target = hashTarget(hash)
+    if (target) {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+      const current = hashTarget(hash) || target
+      const page = current.closest<HTMLElement>('.rdp-page')
+      if (
+        !page ||
+        (!page.classList.contains('rdp-content-enter-from') &&
+          !page.classList.contains('rdp-content-enter-active'))
+      )
+        return current
+      continue
+    }
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  }
+  return null
 }
 
 function focusContent(element: HTMLElement | null) {
@@ -33,7 +54,7 @@ export const router = createRouter({
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: components[name],
-      props: name === 'rdp' || name === 'wiki' ? { wiki: name === 'wiki' } : undefined,
+      props: name === 'rdp' || name === 'wiki' || name === 'downloads' ? { view: name } : undefined,
     })),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
@@ -42,7 +63,7 @@ export const router = createRouter({
     const changedPage = to.name !== from.name
     if (changedPage && from.matched.length) focusContent(document.querySelector('main'))
     if (savedPosition) return { ...savedPosition, behavior: 'instant' }
-    const target = hashTarget(to.hash)
+    const target = to.hash ? await waitForHashTarget(to.hash) : null
     if (target) {
       focusContent(target)
       const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0
@@ -72,7 +93,7 @@ router.afterEach((to, _from, failure) => {
   if (failure) return
   const page = to.name as PageName
   const meta = createSiteMeta(import.meta.env.SITE_URL, page)
-  const project = page === 'rdp' || page === 'wiki'
+  const project = page === 'rdp' || page === 'wiki' || page === 'downloads'
   document.title = meta.title
   document.body.classList.toggle('rdp-site', project)
   const values = {

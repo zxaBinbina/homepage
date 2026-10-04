@@ -231,7 +231,7 @@ Wiki 使用紧凑标题、环境准备 / 六步部署 / 故障排查快捷入口
 
 子站导航使用与主页相同的 Lucide 线性图标：主题为 17px 的 Sun / Moon，GitHub 为 19px，品牌标记使用用户提供、去除外部白色背景后的 `public/images/rdp-access-auth.png`（512 × 394 透明 PNG）。导航以 38 × 38px 槽位、`object-fit: contain` 显示，认证演示以 43 × 43px 显示；官网与 Wiki 的浏览器图标也使用此素材。图标内部浅色窗口保持完整，不添加像素化渲染。工具按钮直接复用 `.icon-button` 的 34 × 36px 尺寸与悬停反馈；图标使用 `lucide-vue-next` 组件，主题按钮复用 `src/components/ThemeToggle.vue`。
 
-`src/rdp/App.vue` 组合导航、页脚与官网 / Wiki 组件；目录当前项通过 Vue 状态管理，滚动监听在组件卸载时清理。主题状态统一由 `src/composables/useTheme.ts` 管理。Wiki 正文在构建时转换为章节及内容块数据，运行时由 Vue 渲染；四个页面共用根目录 `index.html` 基础模板，仅负责挂载、首屏主题初始化和分享元信息；`build/pageTemplates.ts` 自动生成各 URL 的输出文件。
+`src/App.vue` 持久挂载主页导航或项目导航，跨站时保持导航容器可见并平滑变换内容；`src/rdp/App.vue` 组合页脚与官网 / Wiki 正文。目录当前项通过 Vue 状态管理，滚动监听在组件卸载时清理。主题状态统一由 `src/composables/useTheme.ts` 管理。Wiki 正文在构建时转换为章节及内容块数据，运行时由 Vue 渲染；四个页面共用根目录 `index.html` 基础模板，仅负责挂载、首屏主题初始化和分享元信息；`build/pageTemplates.ts` 自动生成各 URL 的输出文件。
 
 ### 子站动效与认证演示
 
@@ -245,7 +245,7 @@ Wiki 使用紧凑标题、环境准备 / 六步部署 / 故障排查快捷入口
 
 新版 Wiki 样式位于 `src/rdp/wiki.css`。`WikiCodeBlock.vue` 以 Vue 模板渲染命令、复制按钮和状态反馈；复制失败时保留手动选择入口。旧的 `#deployment`、`#architecture` 和 `#section-*` 锚点继续有效，导航跳转后将焦点移到对应标题。窄屏目录关闭时隐藏并设为 `inert`，Escape 可清空搜索或关闭目录并归还焦点。
 
-正文前的「交给 Agent 部署」可展开提示词，内容来自 [docs/rdp-agent-deploy.md](docs/rdp-agent-deploy.md)，支持一键复制。提示词包含环境参数、源码部署步骤、凭据处理、验收和回滚要求；命令块限制最大高度，避免展开后占满页面。运行 `python3 scripts/check-rdp-wiki.py` 检查搜索、代码与提示词复制、移动目录、旧链接与复制失败反馈。
+正文前的「交给 Agent 部署」可展开提示词，内容来自 [docs/rdp-agent-deploy.md](docs/rdp-agent-deploy.md)，支持一键复制。提示词包含环境参数、RPM / DEB 安装与向导部署、凭据处理、验收和回滚要求；命令块限制最大高度，避免展开后占满页面。运行 `python3 scripts/check-rdp-wiki.py` 检查搜索、代码与提示词复制、移动目录、旧链接与复制失败反馈。
 
 ### 站内路由
 

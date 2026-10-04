@@ -30,10 +30,12 @@ onBeforeUnmount(() => clearTimeout(timer))
           language === 'bash' ? '终端' : language === 'ini' ? '隧道配置' : '文本'
         }}</span
       ><button @click="copy(code)" :aria-label="copied ? '内容已复制' : copyLabel || '复制代码'">
-        <Check v-if="copied" :size="14" /><Copy v-else :size="14" />{{ copied ? '已复制' : '复制' }}
+        <Check v-if="copied" :size="14" /><Copy v-else :size="14" />{{
+          copied ? '内容已复制' : '复制'
+        }}
       </button>
     </div>
     <pre tabindex="0" :aria-label="`${language}代码`"><code>{{ code }}</code></pre>
-    <p v-if="message" class="wiki-copy-message" role="status">{{ message }}</p>
+    <p v-if="message && !copied" class="wiki-copy-message" role="status">{{ message }}</p>
   </div>
 </template>

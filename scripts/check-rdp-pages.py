@@ -37,8 +37,12 @@ with sync_playwright() as p:
                 page.locator('.rdp-toc a[href="#deployment"]').click()
                 page.wait_for_timeout(150)
                 assert page.locator('#deployment').evaluate('(e) => Math.abs(e.getBoundingClientRect().top - 110) < 3')
-                assert 'git clone https://github.com/zxaBinbina/rdp-access-auth.git' in page.locator('.rdp-doc').inner_text()
-                assert page.locator('.rdp-doc pre').count() >= 10
+                wiki_text = page.locator('.rdp-doc').inner_text()
+                assert 'rdp-auth deploy --gui' in wiki_text
+                assert 'rdp-access-auth-0.2.0-1.fc44.x86_64.rpm' in wiki_text
+                assert 'rdp-access-auth_0.2.0_py314_amd64.deb' in wiki_text
+                assert 'git clone https://github.com/zxaBinbina/rdp-access-auth.git' not in wiki_text
+                assert page.locator('.rdp-doc pre').count() >= 8
             page.get_by_role('button', name='切换浅色主题' if theme == 'dark' else '切换深色主题').click()
             page.reload(wait_until='networkidle')
             assert page.locator('html').get_attribute('data-theme') != theme

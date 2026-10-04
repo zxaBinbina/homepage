@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Github } from 'lucide-vue-next'
 import ThemeToggle from '../../components/ThemeToggle.vue'
-defineProps<{ wiki: boolean }>()
+defineProps<{ view: 'rdp' | 'wiki' | 'downloads' }>()
 </script>
 <template>
   <header class="rdp-header shell">
@@ -10,8 +10,15 @@ defineProps<{ wiki: boolean }>()
       <span>RDP <b>Access Auth</b></span></a
     >
     <nav aria-label="项目导航">
-      <a href="/projects/rdp-access-auth" :aria-current="wiki ? undefined : 'page'">概览</a
-      ><a href="/projects/rdp-access-auth/wiki" :aria-current="wiki ? 'page' : undefined">Wiki</a>
+      <a href="/projects/rdp-access-auth" :aria-current="view === 'rdp' ? 'page' : undefined"
+        >概览</a
+      ><a href="/projects/rdp-access-auth/wiki" :aria-current="view === 'wiki' ? 'page' : undefined"
+        >Wiki</a
+      ><a
+        href="/projects/rdp-access-auth/downloads"
+        :aria-current="view === 'downloads' ? 'page' : undefined"
+        >下载</a
+      >
       <div class="rdp-nav-tools">
         <ThemeToggle class="rdp-theme" />
         <a

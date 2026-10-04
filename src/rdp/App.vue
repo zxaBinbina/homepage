@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, watch } from 'vue'
 import './style.css'
-import ProjectHeader from './components/ProjectHeader.vue'
 import ProjectFooter from './components/ProjectFooter.vue'
 import OverviewPage from './components/OverviewPage.vue'
 import WikiPage from './components/WikiPage.vue'
-const props = defineProps<{ wiki: boolean }>()
+import DownloadsPage from './components/DownloadsPage.vue'
+const props = defineProps<{ view: 'rdp' | 'wiki' | 'downloads' }>()
 const motion = matchMedia('(prefers-reduced-motion: reduce)')
 let revealObserver: IntersectionObserver | undefined
 const animations = new Set<Animation>()
@@ -35,7 +35,7 @@ function observeReveals() {
   )
   document.querySelectorAll('.rdp-reveal').forEach((element) => revealObserver?.observe(element))
 }
-watch(() => props.wiki, observeReveals, { flush: 'post' })
+watch(() => props.view, observeReveals, { flush: 'post' })
 onMounted(() => {
   observeReveals()
   motion.addEventListener('change', observeReveals)
@@ -47,8 +47,10 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <ProjectHeader :wiki="wiki" />
-  <WikiPage v-if="wiki" />
-  <OverviewPage v-else />
+  <Transition name="rdp-content" mode="out-in">
+    <WikiPage v-if="view === 'wiki'" key="wiki-content" />
+    <DownloadsPage v-else-if="view === 'downloads'" key="downloads-content" />
+    <OverviewPage v-else key="overview-content" />
+  </Transition>
   <ProjectFooter />
 </template>
