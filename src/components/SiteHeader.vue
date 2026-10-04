@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { Github, Menu, X } from 'lucide-vue-next'
+import { Github, Menu, Rocket, X } from 'lucide-vue-next'
 import { profile } from '../content'
 import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
@@ -54,6 +54,18 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
       >
     </nav>
     <div class="header-actions">
+      <a
+        class="nav-travel"
+        href="https://travel.moe/go.html?travel=on"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="异次元之旅"
+        title="去萌友的星球逛逛"
+        @click="menuOpen = false"
+      >
+        <span class="nav-travel-icon" aria-hidden="true"><Rocket :size="16" /></span>
+        <span class="nav-travel-label">异次元之旅</span>
+      </a>
       <ThemeToggle />
       <button
         ref="musicTrigger"
