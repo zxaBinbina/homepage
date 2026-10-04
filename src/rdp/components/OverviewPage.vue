@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ShieldAlert } from 'lucide-vue-next'
 import AuthDemo from './AuthDemo.vue'
+import ExposureDemo from './ExposureDemo.vue'
 </script>
 <template>
   <main id="main" class="rdp-page">
@@ -20,8 +22,25 @@ import AuthDemo from './AuthDemo.vue'
       </div>
       <AuthDemo class="rdp-hero-demo" />
     </section>
+    <section class="rdp-section shell rdp-exposure-section rdp-reveal" id="exposure">
+      <div class="rdp-exposure-copy">
+        <p class="rdp-eyebrow">01 / WHEN THE PORT IS PUBLIC</p>
+        <h2>直接把系统暴露到公网，<br /><span>会发生什么？</span></h2>
+        <p class="rdp-lead">
+          端口能通，不代表连接是安全的。没有准入层时，互联网上的扫描器会反复尝试常见账户和密码；桌面可能不断弹出“远程控制会话已开始”的系统提示。
+        </p>
+        <div class="rdp-exposure-note">
+          <ShieldAlert :size="17" />
+          <p>
+            <b>提示来自系统，动作来自猜测。</b>
+            看到通知不等于对方已经控制桌面，但它说明你的系统正在承受持续的登录噪音。
+          </p>
+        </div>
+      </div>
+      <ExposureDemo class="rdp-exposure-demo" />
+    </section>
     <section class="rdp-section shell rdp-reveal" id="features">
-      <p class="rdp-eyebrow">01 / AUTHENTICATION</p>
+      <p class="rdp-eyebrow">02 / AUTHENTICATION</p>
       <h2>选择顺手的认证方式</h2>
       <div class="rdp-grid">
         <article class="rdp-card rdp-reveal">
@@ -43,7 +62,7 @@ import AuthDemo from './AuthDemo.vue'
     </section>
     <section class="rdp-section shell rdp-split rdp-reveal">
       <div>
-        <p class="rdp-eyebrow">02 / HOW IT WORKS</p>
+        <p class="rdp-eyebrow">03 / HOW IT WORKS</p>
         <h2>把入口留给<br />完成认证的人。</h2>
         <p class="rdp-lead">未经授权的公网 IP，在进入 RDP 登录环节前被拦截。</p>
         <a class="rdp-text-link" href="/projects/rdp-access-auth/wiki#architecture"
@@ -73,7 +92,7 @@ import AuthDemo from './AuthDemo.vue'
     <section class="rdp-section shell rdp-reveal">
       <div class="rdp-deploy-card">
         <div>
-          <p class="rdp-eyebrow">03 / SELF-HOSTED</p>
+          <p class="rdp-eyebrow">04 / SELF-HOSTED</p>
           <h2>从安装包开始，部署到自己的主机。</h2>
           <p>
             下载匹配的 RPM 或 DEB，再用浏览器向导或终端向导完成配置。<br />Wiki

@@ -56,7 +56,11 @@
   text-align: center;
 }
 .downloads-state-error {
+  flex-direction: column;
   color: var(--status-danger);
+}
+.downloads-state-error p {
+  margin: 0;
 }
 .downloads-spinner {
   animation: downloads-spin 0.9s linear infinite;

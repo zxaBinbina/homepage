@@ -116,9 +116,6 @@ onBeforeUnmount(() => controller.value?.abort())
       <p v-if="!loading && !error" role="status">
         <GitBranch :size="16" />共 {{ visibleReleases.length }} 个发行版
       </p>
-      <button v-if="error" class="downloads-retry" type="button" @click="loadReleases">
-        <RefreshCw :size="15" />重新加载
-      </button>
     </section>
 
     <div v-if="loading" class="downloads-state downloads-entry" role="status" aria-live="polite">
@@ -133,6 +130,9 @@ onBeforeUnmount(() => controller.value?.abort())
     >
       <AlertCircle :size="24" />
       <p>{{ error }}</p>
+      <button class="downloads-retry" type="button" @click="loadReleases">
+        <RefreshCw :size="15" />重新加载
+      </button>
     </div>
 
     <div v-else-if="!visibleReleases.length" class="downloads-state downloads-entry" role="status">

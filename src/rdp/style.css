@@ -184,6 +184,38 @@
   grid-template-columns: 1fr 1fr;
   gap: 90px;
 }
+.rdp-exposure-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(34px, 6vw, 92px);
+  align-items: center;
+}
+.rdp-exposure-copy h2 span {
+  color: var(--blue);
+}
+.rdp-exposure-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--status-danger);
+  border-radius: 0 12px 12px 0;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.rdp-exposure-note > svg {
+  color: var(--status-danger);
+  margin-top: 3px;
+}
+.rdp-exposure-note b {
+  color: var(--text);
+}
+.rdp-exposure-demo {
+  width: 100%;
+}
 .rdp-text-link {
   display: inline-block;
   color: var(--blue);
@@ -302,6 +334,9 @@
   .rdp-split {
     gap: 44px;
   }
+  .rdp-exposure-section {
+    gap: 42px;
+  }
   .rdp-card {
     padding: 22px;
   }
@@ -338,6 +373,10 @@
     margin-top: 18px;
   }
   .rdp-split {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .rdp-exposure-section {
     grid-template-columns: 1fr;
     gap: 34px;
   }
