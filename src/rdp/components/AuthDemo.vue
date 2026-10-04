@@ -287,13 +287,7 @@ onBeforeUnmount(() => {
     </div>
     <p class="demo-caption" :aria-live="manual ? 'polite' : 'off'" aria-atomic="true">
       {{ caption
-      }}<span>{{
-        reduced
-          ? '已减少动态效果 · 点击切换结果'
-          : paused
-            ? '演示已暂停'
-            : '仅作流程展示，不提交密码或发起认证'
-      }}</span>
+      }}<span>{{ reduced ? '已减少动态效果 · 点击切换结果' : paused ? '演示已暂停' : '' }}</span>
     </p>
   </section>
 </template>

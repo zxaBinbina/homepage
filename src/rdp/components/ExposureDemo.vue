@@ -24,22 +24,31 @@ const reduced = ref(motion.matches)
 const paused = ref(false)
 const inView = ref(false)
 const visible = ref(!document.hidden)
-const tick = ref(0)
-const noticeVisible = ref(true)
-const noticePhase = ref<'visible' | 'gap'>('visible')
-const noticeRemaining = ref(5000)
-const clockTime = ref('')
-const clockDate = ref('')
-const noticeIndex = computed(() => tick.value)
-const running = computed(() => !reduced.value && !paused.value && inView.value && visible.value)
-
-let timer: ReturnType<typeof setTimeout> | undefined
-let clockTimer: ReturnType<typeof setInterval> | undefined
-let observer: IntersectionObserver | undefined
-let phaseStartedAt = 0
+type ExposureNotice = {
+  id: number
+  remaining: number
+  startedAt: number
+}
 
 const noticeDuration = 5000
-const noticeGap = 420
+const noticeInterval = 1800
+const noticeGap = 500
+const notices = ref<ExposureNotice[]>([
+  {
+    id: 0,
+    remaining: noticeDuration,
+    startedAt: 0,
+  },
+])
+const clockTime = ref('')
+const clockDate = ref('')
+const orderedNotices = computed(() => [...notices.value].reverse())
+const running = computed(() => !reduced.value && !paused.value && inView.value && visible.value)
+
+let noticeTimer: ReturnType<typeof setTimeout> | undefined
+let clockTimer: ReturnType<typeof setInterval> | undefined
+let observer: IntersectionObserver | undefined
+let nextNoticeId = 1
 
 function pad(value: number) {
   return String(value).padStart(2, '0')
@@ -53,58 +62,85 @@ function updateClock() {
 }
 
 function clearSchedule() {
-  clearTimeout(timer)
-  timer = undefined
+  clearTimeout(noticeTimer)
+  noticeTimer = undefined
+}
+
+function addNotice() {
+  notices.value = [
+    ...notices.value,
+    {
+      id: nextNoticeId++,
+      remaining: noticeDuration,
+      startedAt: running.value ? performance.now() : 0,
+    },
+  ].slice(-2)
 }
 
 function pauseSchedule() {
-  if (phaseStartedAt) {
-    noticeRemaining.value = Math.max(
-      0,
-      noticeRemaining.value - (performance.now() - phaseStartedAt),
-    )
-    phaseStartedAt = 0
-  }
+  const now = performance.now()
+  notices.value = notices.value.map((notice) => ({
+    ...notice,
+    remaining: notice.startedAt
+      ? Math.max(0, notice.remaining - (now - notice.startedAt))
+      : notice.remaining,
+    startedAt: 0,
+  }))
   clearSchedule()
 }
 
-function advanceNotice() {
-  if (noticePhase.value === 'visible') {
-    noticeVisible.value = false
-    noticePhase.value = 'gap'
-    noticeRemaining.value = noticeGap
-  } else {
-    tick.value += 1
-    noticeVisible.value = true
-    noticePhase.value = 'visible'
-    noticeRemaining.value = noticeDuration
-  }
-  schedule()
+function removeNotice(id: number) {
+  notices.value = notices.value.filter((notice) => notice.id !== id)
 }
 
 function schedule() {
   clearSchedule()
-  if (!running.value || noticeRemaining.value <= 0) return
-  phaseStartedAt = performance.now()
-  timer = setTimeout(advanceNotice, noticeRemaining.value)
+  if (!running.value) return
+
+  const now = performance.now()
+  notices.value = notices.value.map((notice) =>
+    notice.startedAt ? notice : { ...notice, startedAt: now },
+  )
+  const expired = notices.value.find((notice) => notice.remaining - (now - notice.startedAt) <= 0)
+  if (expired) {
+    removeNotice(expired.id)
+    noticeTimer = setTimeout(() => {
+      if (running.value && notices.value.length < 2) addNotice()
+      schedule()
+    }, noticeGap)
+    return
+  }
+
+  if (notices.value.length < 2) {
+    const nextExpiry = notices.value.length
+      ? Math.max(0, notices.value[0].remaining - (now - notices.value[0].startedAt))
+      : Infinity
+    const nextAt = notices.value.length ? Math.min(noticeInterval, nextExpiry) : 0
+    noticeTimer = setTimeout(() => {
+      addNotice()
+      schedule()
+    }, nextAt)
+    return
+  }
+
+  const nextExpiry = Math.min(
+    ...notices.value.map((notice) => notice.remaining - (now - notice.startedAt)),
+  )
+  noticeTimer = setTimeout(schedule, Math.max(0, nextExpiry))
 }
 
 function replay() {
   clearSchedule()
-  tick.value = 0
-  noticeVisible.value = true
-  noticePhase.value = 'visible'
-  noticeRemaining.value = noticeDuration
+  nextNoticeId = 0
+  notices.value = []
   paused.value = false
+  addNotice()
   schedule()
 }
 
-function dismissNotice() {
-  if (!noticeVisible.value) return
-  pauseSchedule()
-  noticeVisible.value = false
-  noticePhase.value = 'gap'
-  noticeRemaining.value = noticeGap
+function dismissNotice(id: number) {
+  if (!notices.value.some((notice) => notice.id === id)) return
+  removeNotice(id)
   schedule()
 }
 
@@ -155,15 +191,11 @@ onBeforeUnmount(() => {
     ref="root"
     class="exposure-demo"
     :class="{ 'is-running': running, 'is-paused': !running }"
-    :data-notice="noticeIndex"
+    :data-notice-count="notices.length"
     aria-label="直接暴露远程桌面的风险动画"
   >
     <div class="exposure-toolbar">
       <span class="exposure-window-title"><TerminalSquare :size="14" /> KDE Desktop</span>
-      <span class="exposure-toolbar-label"><Wifi :size="13" /> 3389 / TCP 已公开</span>
-      <span class="exposure-window-actions" aria-hidden="true"
-        ><span></span><span></span><X :size="14"
-      /></span>
     </div>
 
     <div class="exposure-desktop">
@@ -175,29 +207,41 @@ onBeforeUnmount(() => {
         <span class="exposure-star star-three"></span>
       </div>
 
-      <div v-if="noticeVisible" :key="noticeIndex" class="exposure-notice" role="status">
-        <div class="exposure-notice-head">
-          <span class="exposure-notice-app"><Bell :size="13" /> KDE系统集成</span>
-          <span class="exposure-notice-actions">
-            <button type="button" aria-label="通知设置" title="通知设置">
-              <Settings2 :size="13" />
-            </button>
-            <button type="button" aria-label="关闭通知" title="关闭通知" @click="dismissNotice">
-              <X :size="13" />
-            </button>
-          </span>
-        </div>
-        <div class="exposure-notice-progress" aria-hidden="true"></div>
-        <div class="exposure-notice-body">
-          <div class="exposure-notice-icon"><Monitor :size="28" /></div>
-          <div>
-            <strong>远程控制会话已开始</strong>
-            <p>Krdp 正在行使特殊权限：</p>
-            <p>- 查看屏幕上的内容</p>
-            <p>- 控制输入设备</p>
+      <TransitionGroup name="exposure-notices" tag="div" class="exposure-notices">
+        <div
+          v-for="notice in orderedNotices"
+          :key="notice.id"
+          class="exposure-notice"
+          role="status"
+        >
+          <div class="exposure-notice-head">
+            <span class="exposure-notice-app"><Bell :size="13" /> KDE系统集成</span>
+            <span class="exposure-notice-actions">
+              <button type="button" aria-label="通知设置" title="通知设置">
+                <Settings2 :size="13" />
+              </button>
+              <button
+                type="button"
+                aria-label="关闭通知"
+                title="关闭通知"
+                @click="dismissNotice(notice.id)"
+              >
+                <X :size="13" />
+              </button>
+            </span>
+          </div>
+          <div class="exposure-notice-progress" aria-hidden="true"></div>
+          <div class="exposure-notice-body">
+            <div class="exposure-notice-icon"><Monitor :size="28" /></div>
+            <div>
+              <strong>远程控制会话已开始</strong>
+              <p>Krdp 正在行使特殊权限：</p>
+              <p>- 查看屏幕上的内容</p>
+              <p>- 控制输入设备</p>
+            </div>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
 
       <div class="exposure-taskbar">
         <div class="exposure-taskbar-launch">
@@ -229,29 +273,9 @@ onBeforeUnmount(() => {
         <span class="exposure-state-dot"></span><b>没有人在控制这台电脑</b
         ><span>只是有人一直在尝试账户密码</span>
       </div>
-      <div v-if="!reduced" class="exposure-controls">
-        <button
-          type="button"
-          :aria-label="paused ? '播放风险演示' : '暂停风险演示'"
-          :title="paused ? '播放风险演示' : '暂停风险演示'"
-          @click="paused = !paused"
-        >
-          <Play v-if="paused" :size="15" /><Pause v-else :size="15" />
-        </button>
-        <button type="button" aria-label="重播风险演示" title="重播风险演示" @click="replay">
-          <RotateCcw :size="15" />
-        </button>
-      </div>
     </div>
     <p class="exposure-caption">
       这不是“有人已经登录”的提示，而是暴露在公网后的噪音：系统不断收到新的猜测。
-      <span>{{
-        reduced
-          ? '已减少动态效果 · 通知内容保持可读'
-          : paused
-            ? '演示已暂停'
-            : '演示仅为说明风险，不连接真实系统'
-      }}</span>
     </p>
   </section>
 </template>
@@ -267,7 +291,7 @@ onBeforeUnmount(() => {
 }
 .exposure-toolbar {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 14px;
   min-height: 42px;
@@ -293,17 +317,6 @@ onBeforeUnmount(() => {
 .exposure-toolbar-label {
   color: var(--status-danger);
   white-space: nowrap;
-}
-.exposure-window-actions {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.exposure-window-actions span {
-  width: 11px;
-  height: 1px;
-  background: var(--muted);
-  opacity: 0.65;
 }
 .exposure-desktop {
   position: relative;
@@ -402,12 +415,19 @@ onBeforeUnmount(() => {
   width: 3px;
   height: 3px;
 }
-.exposure-notice {
+.exposure-notices {
   position: absolute;
   z-index: 4;
   right: calc((100% - min(92%, 620px)) / 2);
   bottom: 76px;
   width: min(250px, calc(100% - 34px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.exposure-notice {
+  position: relative;
+  width: 100%;
   padding: 8px 11px 9px;
   border: 1px solid rgba(228, 239, 255, 0.26);
   border-radius: 10px;
@@ -586,9 +606,75 @@ onBeforeUnmount(() => {
   color: var(--muted);
   font-size: 10px;
 }
+:global(html[data-theme='light'] .exposure-wallpaper) {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(255, 255, 255, 0.9) 0 3%, transparent 3.3%),
+    radial-gradient(circle at 22% 25%, rgba(255, 255, 255, 0.72) 0 2%, transparent 2.4%),
+    linear-gradient(155deg, #7caed4 0%, #a9cee5 53%, #dfeaf0 100%);
+}
+:global(html[data-theme='light'] .exposure-wallpaper::before) {
+  background: linear-gradient(145deg, rgba(53, 105, 140, 0.42), rgba(91, 155, 177, 0.18));
+}
+:global(html[data-theme='light'] .exposure-wallpaper::after) {
+  background: linear-gradient(145deg, rgba(31, 76, 112, 0.48), rgba(86, 145, 167, 0.16));
+}
+:global(html[data-theme='light'] .exposure-notice) {
+  border-color: rgba(40, 77, 112, 0.2);
+  background: rgba(248, 252, 255, 0.96);
+  color: #172a3d;
+  box-shadow: 0 12px 36px rgba(30, 67, 100, 0.22);
+}
+:global(html[data-theme='light'] .exposure-notice-head) {
+  color: rgba(23, 42, 61, 0.58);
+}
+:global(html[data-theme='light'] .exposure-notice-app),
+:global(html[data-theme='light'] .exposure-notice-body strong) {
+  color: #18334c;
+}
+:global(html[data-theme='light'] .exposure-notice-actions button) {
+  color: rgba(23, 42, 61, 0.58);
+}
+:global(html[data-theme='light'] .exposure-notice-actions button:hover),
+:global(html[data-theme='light'] .exposure-notice-actions button:focus-visible) {
+  background: rgba(23, 75, 117, 0.1);
+  color: #18334c;
+}
+:global(html[data-theme='light'] .exposure-notice-body p) {
+  color: rgba(23, 42, 61, 0.7);
+}
+:global(html[data-theme='light'] .exposure-taskbar) {
+  border-color: rgba(40, 77, 112, 0.2);
+  background: rgba(244, 250, 255, 0.78);
+  color: rgba(23, 52, 76, 0.82);
+  box-shadow: 0 10px 28px rgba(30, 67, 100, 0.2);
+}
+:global(html[data-theme='light'] .exposure-taskbar-time) {
+  color: #17344e;
+}
+:global(html[data-theme='light'] .exposure-taskbar-time small) {
+  color: rgba(23, 52, 76, 0.62);
+}
 @media (prefers-reduced-motion: no-preference) {
-  .is-running .exposure-notice {
-    animation: exposure-notice-enter 0.35s var(--motion-ease);
+  .exposure-notices-move {
+    transition: transform 0.35s var(--motion-ease) 0.35s;
+  }
+  .exposure-notices-enter-active,
+  .exposure-notices-leave-active {
+    transition:
+      transform 0.35s var(--motion-ease),
+      opacity 0.35s ease;
+  }
+  .exposure-notices-leave-active {
+    position: absolute;
+    width: 100%;
+  }
+  .exposure-notices-enter-from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  .exposure-notices-leave-to {
+    opacity: 0;
+    transform: translateY(8px);
   }
   .is-running .exposure-notice-icon {
     animation: exposure-notice-pulse 1.2s ease-in-out infinite alternate;
@@ -639,7 +725,7 @@ onBeforeUnmount(() => {
   .exposure-desktop {
     min-height: 325px;
   }
-  .exposure-notice {
+  .exposure-notices {
     width: min(250px, calc(100% - 34px));
     bottom: 72px;
   }
@@ -654,17 +740,47 @@ onBeforeUnmount(() => {
     margin-top: -6px;
     padding-left: 21px;
   }
-  .exposure-window-actions {
-    grid-column: 2;
-    grid-row: 1;
-  }
   .exposure-desktop {
     min-height: 310px;
   }
-  .exposure-notice {
+  .exposure-notices {
     right: 8px;
     bottom: 72px;
     width: min(210px, calc(100% - 34px));
+  }
+  .exposure-notice {
+    padding: 6px 8px 7px;
+    border-radius: 8px;
+  }
+  .exposure-notice-head {
+    gap: 6px;
+    padding-bottom: 3px;
+  }
+  .exposure-notice-app {
+    font-size: 9px;
+  }
+  .exposure-notice-actions button {
+    width: 18px;
+    height: 18px;
+  }
+  .exposure-notice-body {
+    gap: 8px;
+    padding-top: 7px;
+  }
+  .exposure-notice-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .exposure-notice-body strong {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .exposure-notice-body p {
+    font-size: 9px;
+    line-height: 1.35;
+  }
+  .exposure-notice-body strong + p {
+    margin-top: 3px;
   }
   .exposure-taskbar {
     width: calc(100% - 16px);
