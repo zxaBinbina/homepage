@@ -31,12 +31,15 @@ with sync_playwright() as p:
  for route in ['/project','/project/']:
   page.goto(base+route)
   expect(page).to_have_title('项目目录 · a彬彬a')
-  expect(page.locator('.project-card')).to_have_count(4)
+  expect(page.locator('.project-card')).to_have_count(9)
+ for term, count in [('zxaBinbina', 2), ('Youzai-World-Team', 7), ('YouzaiWorldWebNew', 1), ('YouzaiWorldDonaimEmailWorker', 1), ('.github', 0), ('自我介绍', 0), ('homepage', 0)]:
+  page.get_by_role('searchbox',name='搜索项目').fill(term)
+  expect(page.locator('.project-card')).to_have_count(count)
  page.get_by_role('searchbox',name='搜索项目').fill('webAuthn')
  expect(page.locator('.project-card')).to_have_count(1)
  assert 'RDP Access Auth' in page.locator('.project-card').inner_text()
  page.get_by_role('searchbox').fill('not-a-project');expect(page.locator('.directory-empty')).to_be_visible()
- page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(4)
+ page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(9)
  for theme in ['dark','light']:
   page.evaluate('(v)=>localStorage.setItem("homepage-theme",v)',theme);page.reload()
   for w in [320,390,768,1024,1440]:
@@ -47,7 +50,7 @@ with sync_playwright() as p:
    if w in [390,1440]:
     page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
     page.screenshot(path=f'artifacts/project-directory-{theme}-{w}.png',full_page=True)
- page.goto(base+'/');page.get_by_role('link',name='查看全部项目').click();expect(page).to_have_title('项目目录 · a彬彬a')
+ page.goto(base+'/');expect(page.locator('.project-card')).to_have_count(4);page.get_by_role('link',name='查看全部项目').click();expect(page).to_have_title('项目目录 · a彬彬a')
  assert not errors,errors
  b.close()
-print('Directory routes, title, four projects, search/empty/reset, images, both themes and five widths passed')
+print('Directory routes, title, 9 public projects and four featured projects, search/empty/reset, images, both themes and five widths passed')

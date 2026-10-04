@@ -2,13 +2,13 @@
 import { computed, ref } from 'vue'
 import { ArrowUpRight, Search, X } from 'lucide-vue-next'
 import ProjectCard from './components/ProjectCard.vue'
-import { profile, projects } from './content'
+import { profile, projects, projectCatalog } from './content'
 import SiteFooter from './components/SiteFooter.vue'
 const query = ref('')
 const matches = computed(() => {
   const term = query.value.trim().toLocaleLowerCase()
   return projects.filter((project) =>
-    [project.title, project.description, ...project.tags]
+    [project.title, project.description, project.repository, project.role, ...project.tags]
       .join(' ')
       .toLocaleLowerCase()
       .includes(term),
@@ -20,9 +20,9 @@ const matches = computed(() => {
   <main id="main" class="directory-main shell">
     <section class="directory-intro directory-entry">
       <p class="overline">PROJECTS / {{ projects.length.toString().padStart(2, '0') }}</p>
-      <h1>做出来，也分享出来。</h1>
+      <h1>做出来，<span>也分享出来。</span></h1>
       <p>
-        从方块世界到日常工具，看看我已公开的项目。<br />在这里了解它们的用途，找到官网、源码与使用入口。
+        从方块世界到日常工具，看看我和悠哉世界团队已公开的项目。<br />在这里了解它们的用途，找到官网、源码与使用入口。
       </p>
     </section>
     <div class="directory-toolbar directory-entry">
@@ -35,7 +35,7 @@ const matches = computed(() => {
           v-model="query"
           type="search"
           aria-label="搜索项目"
-          placeholder="搜索项目、用途或技术栈"
+          placeholder="搜索项目、账号或技术栈"
           @keydown.esc="query = ''"
         />
         <button v-if="query" type="button" aria-label="清空搜索" @click="query = ''">
@@ -59,9 +59,16 @@ const matches = computed(() => {
       <button type="button" @click="query = ''">查看全部项目</button>
     </div>
     <p class="directory-more">
-      更多代码与实验，放在
+      项目来自
       <a :href="`${profile.github}?tab=repositories`" target="_blank" rel="noopener noreferrer"
-        >GitHub 仓库 <ArrowUpRight :size="14" /></a
+        >个人 GitHub <ArrowUpRight :size="14"
+      /></a>
+      与
+      <a
+        :href="`${projectCatalog.organization}/repositories`"
+        target="_blank"
+        rel="noopener noreferrer"
+        >悠哉世界团队 <ArrowUpRight :size="14" /></a
       >。
     </p>
   </main>

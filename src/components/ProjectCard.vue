@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowUpRight, Blocks, Globe2, ScanFace, ShieldCheck } from 'lucide-vue-next'
+import { ArrowUpRight, Globe2, ScanFace, ShieldCheck } from 'lucide-vue-next'
 import type { projects } from '../content'
 
 withDefaults(
@@ -10,7 +10,7 @@ withDefaults(
   { heading: 'h3' },
 )
 
-const icons = { blocks: Blocks, globe: Globe2, scan: ScanFace, shield: ShieldCheck }
+const icons = { globe: Globe2, scan: ScanFace, shield: ShieldCheck }
 const asset = (name: string) => `/images/${name}`
 </script>
 
@@ -20,13 +20,13 @@ const asset = (name: string) => `/images/${name}`
     :target="project.url.startsWith('/') ? undefined : '_blank'"
     rel="noopener noreferrer"
     class="project-card"
-    :class="`project-${project.id}`"
+    :class="[`project-${project.id}`, { 'project-youzai': project.icon === 'youzai' }]"
   >
     <div class="project-top">
       <div class="project-icon">
         <img
-          v-if="project.id === 'gaze'"
-          :src="asset(project.image)"
+          v-if="project.icon === 'youzai' || project.id === 'gaze'"
+          :src="asset(project.icon === 'youzai' ? 'logocircle.webp' : project.image)"
           alt=""
           width="32"
           height="32"
@@ -48,6 +48,13 @@ const asset = (name: string) => `/images/${name}`
       <div><i></i><i></i><i></i><span>mcyzw.top</span></div>
       <img :src="asset(project.image)" alt="" loading="lazy" />
     </div>
+    <div
+      v-if="project.icon === 'youzai' && !['core', 'web'].includes(project.id)"
+      class="project-logo-art"
+      aria-hidden="true"
+    >
+      <img :src="asset('logocircle.webp')" alt="" width="160" height="160" loading="lazy" />
+    </div>
     <div v-if="project.id === 'rdp'" class="project-logo-art rdp-logo-art" aria-hidden="true">
       <img :src="asset(project.image)" alt="" width="512" height="394" loading="lazy" />
     </div>
@@ -55,7 +62,7 @@ const asset = (name: string) => `/images/${name}`
       <img :src="asset(project.image)" alt="" width="128" height="128" loading="lazy" />
     </div>
     <div class="project-content">
-      <span class="project-role">开发者 <span>·</span> {{ project.subtitle }}</span>
+      <span class="project-role">{{ project.role }} <span>·</span> {{ project.subtitle }}</span>
       <component :is="heading">{{ project.title }}</component>
       <p>{{ project.description }}</p>
       <div class="project-bottom">

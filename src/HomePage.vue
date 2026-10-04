@@ -14,7 +14,7 @@ import {
   Mountain,
   Sparkles,
 } from 'lucide-vue-next'
-import { profile, projects } from './content'
+import { profile, featuredProjects } from './content'
 import ProjectCard from './components/ProjectCard.vue'
 import SiteFooter from './components/SiteFooter.vue'
 
@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
         </div>
         <div class="project-grid">
           <ProjectCard
-            v-for="(project, index) in projects"
+            v-for="(project, index) in featuredProjects"
             :key="project.id"
             :project="project"
             class="reveal"

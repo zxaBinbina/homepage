@@ -757,6 +757,7 @@ h1 > span {
   color: var(--blue);
 }
 .project-content :is(h2, h3) {
+  overflow-wrap: anywhere;
   font-size: 24px;
   font-weight: 600;
   margin: 9px 0 13px;
@@ -798,13 +799,14 @@ h1 > span {
 .project-card:hover .project-link {
   color: var(--blue);
 }
-.project-core,
-.project-web,
+.project-youzai,
 .project-rdp,
 .project-gaze {
   min-height: 414px;
 }
-.project-core {
+.project-youzai,
+.project-rdp,
+.project-gaze {
   background:
     radial-gradient(ellipse at 70% 15%, rgba(45, 60, 129, 0.3), transparent 70%), var(--panel);
 }
@@ -812,13 +814,13 @@ h1 > span {
   background:
     radial-gradient(ellipse at 60% 5%, rgba(78, 164, 239, 0.12), transparent 70%), var(--panel);
 }
-.project-core .project-content,
-.project-web .project-content,
+.project-youzai .project-content,
 .project-rdp .project-content,
 .project-gaze .project-content {
   margin-top: auto;
   padding-top: 115px;
 }
+
 .voxel-art {
   --core-scale: 1;
   position: absolute;
@@ -1270,8 +1272,7 @@ h1 > span {
     flex-direction: column;
     gap: 14px;
   }
-  .project-core,
-  .project-web,
+  .project-youzai,
   .project-rdp,
   .project-gaze {
     min-height: 435px;
@@ -1470,8 +1471,7 @@ h1 > span {
   .project-top > span {
     gap: 8px;
   }
-  .project-core,
-  .project-web,
+  .project-youzai,
   .project-rdp,
   .project-gaze {
     min-height: 440px;
@@ -1503,6 +1503,7 @@ h1 > span {
   .gaze-logo-art {
     width: 94px;
   }
+
   .voxel-art {
     --core-scale: 0.7;
     right: 12px;
@@ -1521,8 +1522,7 @@ h1 > span {
   .project-bottom {
     margin-top: 20px;
   }
-  .project-core .project-content,
-  .project-web .project-content,
+  .project-youzai .project-content,
   .project-rdp .project-content,
   .project-gaze .project-content {
     padding-top: 110px;
@@ -1682,14 +1682,12 @@ h1 > span {
   .project-card {
     padding: 24px;
   }
-  .project-core,
-  .project-web,
+  .project-youzai,
   .project-rdp,
   .project-gaze {
     min-height: 365px;
   }
-  .project-core .project-content,
-  .project-web .project-content,
+  .project-youzai .project-content,
   .project-rdp .project-content,
   .project-gaze .project-content {
     padding-top: 93px;
@@ -1714,6 +1712,7 @@ h1 > span {
   .project-role {
     font-size: 9px;
   }
+
   .voxel-art {
     right: 66px;
     top: 48px;
