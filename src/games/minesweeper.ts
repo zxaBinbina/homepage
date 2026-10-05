@@ -9,9 +9,28 @@ export type MineGame = {
 export const mineLevels = [
   { name: '轻松 · 9 × 9', size: 9, mines: 10 },
   { name: '挑战 · 12 × 12', size: 12, mines: 24 },
+  { name: '高级 · 16 × 16', size: 16, mines: 40 },
+  { name: '专家 · 20 × 20', size: 20, mines: 80 },
+  { name: '极限 · 30 × 30', size: 30, mines: 200 },
 ] as const
+export const mineLimits = { minSize: 5, maxSize: 128 } as const
+
+// Reserve the first cell and all eight neighbors, even for a central first move.
+export function maxMineCount(size: number): number {
+  return size * size - 9
+}
+
+export function mineConfigErrors(size: number, mines: number): { size?: string; mines?: string } {
+  if (!Number.isInteger(size) || size < mineLimits.minSize || size > mineLimits.maxSize)
+    return { size: `边长请输入 ${mineLimits.minSize}–${mineLimits.maxSize} 之间的整数。` }
+  if (!Number.isInteger(mines) || mines < 1 || mines > maxMineCount(size))
+    return { mines: `地雷数量请输入 1–${maxMineCount(size)} 之间的整数。` }
+  return {}
+}
 
 export function newMineGame(size = 9, mines = 10): MineGame {
+  const errors = mineConfigErrors(size, mines)
+  if (errors.size || errors.mines) throw new RangeError(errors.size || errors.mines)
   return {
     size,
     mines,
@@ -40,8 +59,8 @@ export function flagMine(game: MineGame, index: number): MineGame {
   const cell = game.cells[index]
   if (!cell || cell.open || game.status === 'won' || game.status === 'lost') return game
   if (!cell.flag && game.cells.filter((item) => item.flag).length >= game.mines) return game
-  const cells = game.cells.map((item) => ({ ...item }))
-  cells[index]!.flag = !cell.flag
+  const cells = [...game.cells]
+  cells[index] = { ...cell, flag: !cell.flag }
   return { ...game, cells }
 }
 

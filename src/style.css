@@ -2839,6 +2839,31 @@ h1 > span {
 .is-fullscreen .game-guide {
   display: none;
 }
+.is-fullscreen .game-fit-content:has(.mine-layout) {
+  width: max-content;
+}
+.is-fullscreen .mine-layout {
+  width: max(clamp(440px, calc(100vw - 16px), 760px), calc(var(--mine-board-min) + 42px));
+  max-width: none;
+}
+.is-fullscreen:has(.mine-layout.is-large) .game-play-content {
+  overflow: auto;
+}
+.is-fullscreen .game-fit-content:has(.mine-layout.is-large) {
+  position: static;
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+.is-fullscreen .mine-layout.is-large {
+  width: 100%;
+  height: 100%;
+}
+.is-fullscreen .mine-layout.is-large .mine-surface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 .is-fullscreen .game-surface {
   border: 0;
   border-radius: 0;
@@ -2856,6 +2881,13 @@ h1 > span {
 .is-fullscreen .solitaire-scroll,
 .is-fullscreen .mine-board-scroll {
   overflow: visible;
+}
+.is-fullscreen .mine-layout.is-large .mine-board-scroll {
+  flex: 1 0 160px;
+  min-height: 160px;
+  max-height: none;
+  overflow: auto;
+  scrollbar-gutter: stable;
 }
 .game-layout {
   max-width: 760px;
@@ -3098,6 +3130,13 @@ h1 > span {
   padding: 0;
   border-radius: 15px;
 }
+.mine-layout {
+  --mine-cell-min: 28px;
+  --mine-gap: 4px;
+  --mine-board-min: calc(
+    var(--mine-size) * (var(--mine-cell-min) + var(--mine-gap)) - var(--mine-gap)
+  );
+}
 .mine-actions {
   justify-content: space-between;
   margin-bottom: 16px;
@@ -3110,7 +3149,8 @@ h1 > span {
   font-size: 12px;
   color: var(--muted);
 }
-.game-select select {
+.game-select select,
+.mine-custom-field input {
   max-width: 100%;
   min-height: 44px;
   padding: 8px 12px;
@@ -3120,9 +3160,76 @@ h1 > span {
   color: var(--text);
   background: var(--bg);
 }
-.game-select select:focus-visible {
+.game-select select:focus-visible,
+.mine-custom-field input:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 3px;
+}
+.mine-custom {
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--blue) 4%, var(--bg));
+}
+.mine-custom-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+.mine-custom-toggle:hover {
+  color: var(--blue);
+}
+.mine-custom-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+.mine-custom-form {
+  padding: 0 16px 16px;
+}
+.mine-custom-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+}
+.mine-custom-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.mine-custom-field input {
+  width: 100%;
+  min-width: 0;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.mine-custom-field input[aria-invalid='true'] {
+  border-color: var(--status-danger);
+}
+.mine-apply {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.mine-custom-hint,
+.mine-custom-error {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.mine-custom-error {
+  color: var(--status-danger);
 }
 .mine-mode {
   display: flex;
@@ -3136,13 +3243,16 @@ h1 > span {
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   border-radius: 8px;
 }
+.mine-board-scroll.is-large {
+  max-height: min(70dvh, 960px);
+}
 .mine-board {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(var(--mine-size), minmax(28px, 1fr));
-  gap: 4px;
-  width: max(100%, calc(var(--mine-size) * 32px - 4px));
-  max-width: 480px;
+  grid-template-columns: repeat(var(--mine-size), minmax(var(--mine-cell-min), 1fr));
+  gap: var(--mine-gap);
+  width: max(100%, var(--mine-board-min));
+  max-width: max(480px, var(--mine-board-min));
   margin-inline: auto;
   user-select: none;
 }
@@ -3647,10 +3757,21 @@ h1 > span {
   .number-face[data-level='11'] {
     font-size: 20px;
   }
-  .mine-board {
-    gap: 3px;
-    grid-template-columns: repeat(var(--mine-size), minmax(24px, 1fr));
-    width: max(100%, calc(var(--mine-size) * 27px - 3px));
+  .mine-layout {
+    --mine-cell-min: 24px;
+    --mine-gap: 3px;
+  }
+  .mine-custom-toggle {
+    padding-inline: 12px;
+  }
+  .mine-custom-form {
+    padding: 0 12px 12px;
+  }
+  .mine-custom-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mine-apply {
+    grid-column: 1 / -1;
   }
   .mine-cell {
     border-radius: 4px;

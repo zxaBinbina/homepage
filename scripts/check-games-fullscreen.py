@@ -16,6 +16,16 @@ with sync_playwright() as p:
     page.on('pageerror', lambda e: errors.append(str(e)))
 
     def fits_screen(page):
+        if page.locator('.mine-layout.is-large').count():
+            assert page.locator('.game-fit-content').evaluate('el => getComputedStyle(el).transform === "none"'), 'Large mines must not scale'
+            assert page.locator('.mine-cell').first.evaluate('el => el.getBoundingClientRect().width >= 23.9'), 'Keep usable cell sizes'
+            assert page.locator('.game-play-content').evaluate('el => el.scrollWidth <= el.clientWidth'), 'Only the board should scroll horizontally'
+            assert page.locator('.mine-board-scroll').evaluate('''el => {
+                el.scrollTo({left:100,top:100,behavior:'instant'});
+                return el.clientHeight >= 160 && el.scrollLeft > 0 && el.scrollTop > 0
+                    && getComputedStyle(el).overflowX === 'auto' && getComputedStyle(el).overflowY === 'auto';
+            }'''), 'Large mines need both scrollbars'
+            return
         page.wait_for_function("""() => {
             const r=document.querySelector('.game-surface').getBoundingClientRect();
             return r.left>=-0.5 && r.top>=-0.5 && r.right<=innerWidth+0.5 && r.bottom<=innerHeight+0.5;
@@ -84,11 +94,25 @@ with sync_playwright() as p:
                 if width in [390, 1440, 844]:
                     page.screenshot(path=str(out / f'game-fullscreen-{game}-{theme}-{width}.png'))
         if game == 'minesweeper':
-            page.get_by_label('难度', exact=True).select_option('1')
-            for width, height in [(320,568),(568,320),(844,390)]:
-                page.set_viewport_size({'width':width,'height':height})
-                page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
-                fits_screen(page)
+            for level, size in [('1',12), ('2',16), ('3',20), ('4',30), ('custom',32), ('custom',33), ('custom',128)]:
+                page.get_by_label('难度', exact=True).select_option(level)
+                if level == 'custom':
+                    page.get_by_label('棋盘边长', exact=True).fill(str(size))
+                    page.get_by_label('地雷数量', exact=True).fill('500')
+                    page.get_by_role('button', name='应用并开局', exact=True).click()
+                    expect(page.locator('.mine-cell')).to_have_count(size * size)
+                    expect(page.locator('.game-stats strong').first).to_have_text('500')
+                    expect(page.get_by_role('button', name='自定义设置', exact=True)).to_have_attribute('aria-expanded', 'false')
+                for width, height in [(320,568),(568,320),(844,390),(1440,1000)]:
+                    page.set_viewport_size({'width':width,'height':height})
+                    page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                    fits_screen(page)
+                if level == 'custom' and size == 128:
+                    page.screenshot(path=str(out / 'game-fullscreen-minesweeper-custom-128.png'))
+                    page.get_by_role('button', name='自定义设置', exact=True).click()
+                    page.set_viewport_size({'width':320,'height':568})
+                    fits_screen(page)
+                    page.get_by_role('button', name='自定义设置', exact=True).click()
         page.set_viewport_size({'width':1440,'height':1000})
         page.get_by_role('button', name='退出全屏', exact=True).click()
         expect(page.locator('dialog[open]')).to_have_count(0)

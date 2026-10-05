@@ -73,6 +73,45 @@ for (let seed = 0; seed < 30; seed++) {
     game = next
   }
 }
+for (const [size, count] of [
+  [4, 1],
+  [129, 1],
+  [5.5, 1],
+  [NaN, 1],
+  [Infinity, 1],
+  [9, 0],
+  [9, -1],
+  [9, 73],
+  [9, 1.5],
+  [9, NaN],
+  [9, Infinity],
+])
+  assert.throws(() => mines.newMineGame(size, count), RangeError)
+assert.equal(mines.maxMineCount(128), 16375)
+for (const [size, count] of [
+  [5, 1],
+  [5, 16],
+  [17, 53],
+  [128, 1],
+  [128, 16375],
+]) {
+  for (const first of [
+    0,
+    size - 1,
+    size * (size - 1),
+    size * size - 1,
+    Math.floor(size / 2) * size + Math.floor(size / 2),
+  ]) {
+    let game = mines.revealMine(mines.newMineGame(size, count), first, random(42))
+    assert.equal(game.cells.length, size * size)
+    assert.equal(game.cells.filter((cell) => cell.mine).length, count)
+    assert.ok([first, ...mines.neighbors(first, size)].every((i) => !game.cells[i].mine))
+    for (let i = 0; i < game.cells.length; i++) {
+      if (!game.cells[i].mine && !game.cells[i].open) game = mines.revealMine(game, i)
+    }
+    assert.equal(game.status, 'won', `Custom ${size} × ${size}, ${count} mines, start ${first}`)
+  }
+}
 for (const { size, mines: count } of mines.mineLevels) {
   for (let seed = 0; seed < 20; seed++) {
     for (const first of [0, size - 1, size * size - 1, Math.floor((size * size) / 2)]) {
@@ -87,14 +126,17 @@ for (const { size, mines: count } of mines.mineLevels) {
           game.cells[i].adjacent,
           mines.neighbors(i, size).filter((n) => game.cells[n].mine).length,
         )
-        if (!game.cells[i].mine) game = mines.revealMine(game, i)
+        if (!game.cells[i].mine && !game.cells[i].open) game = mines.revealMine(game, i)
       }
       assert.equal(game.status, 'won')
       assert.equal(mines.flagMine(game, 0), game)
     }
   }
 }
-let mineGame = mines.flagMine(mines.newMineGame(), 0)
+const unflaggedGame = mines.newMineGame()
+let mineGame = mines.flagMine(unflaggedGame, 0)
+assert.equal(unflaggedGame.cells[0].flag, false, 'Flags must not mutate the previous board')
+assert.equal(mineGame.cells[0].flag, true)
 assert.equal(mines.revealMine(mineGame, 0), mineGame)
 mineGame = mines.flagMine(mineGame, 0)
 assert.equal(mineGame.cells[0].flag, false)
@@ -105,16 +147,16 @@ assert.equal(lost.status, 'lost')
 assert.equal(lost.exploded, bomb)
 assert.equal(mines.revealMine(lost, 0), lost)
 assert.equal(mines.flagMine(lost, 0), lost)
-const chord = mines.newMineGame(3, 1)
+const chord = mines.newMineGame(5, 1)
 chord.status = 'playing'
 chord.cells[0].mine = true
 chord.cells.forEach(
-  (c, i) => (c.adjacent = mines.neighbors(i, 3).filter((n) => chord.cells[n].mine).length),
+  (c, i) => (c.adjacent = mines.neighbors(i, 5).filter((n) => chord.cells[n].mine).length),
 )
-chord.cells[4].open = true
-assert.equal(mines.revealMine(chord, 4), chord)
-assert.equal(mines.revealMine(mines.flagMine(chord, 0), 4).status, 'won')
-assert.equal(mines.revealMine(mines.flagMine(chord, 1), 4).status, 'lost')
+chord.cells[6].open = true
+assert.equal(mines.revealMine(chord, 6), chord)
+assert.equal(mines.revealMine(mines.flagMine(chord, 0), 6).status, 'won')
+assert.equal(mines.revealMine(mines.flagMine(chord, 1), 6).status, 'lost')
 let flags = mines.newMineGame()
 for (let i = 0; i < 10; i++) flags = mines.flagMine(flags, i)
 assert.equal(mines.flagMine(flags, 11), flags)

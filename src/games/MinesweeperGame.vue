@@ -1,15 +1,44 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
-import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
-import { Flag, MousePointer2, RotateCcw } from 'lucide-vue-next'
-import { flagMine, mineLevels, newMineGame, revealMine, type MineCell } from './minesweeper'
+import { ChevronDown, Flag, MousePointer2, RotateCcw } from 'lucide-vue-next'
+import {
+  flagMine,
+  maxMineCount,
+  mineConfigErrors,
+  mineLevels,
+  mineLimits,
+  newMineGame,
+  revealMine,
+  type MineCell,
+} from './minesweeper'
 
-const level = ref(0)
-const game = ref(newMineGame())
+const level = ref<number | 'custom'>(0)
+const game = shallowRef(newMineGame())
+const customSize = ref<number | string>(game.value.size)
+const customMines = ref<number | string>(game.value.mines)
+const customExpanded = ref(false)
+const customToggle = ref<HTMLButtonElement>()
+const sizeInput = ref<HTMLInputElement>()
+const minesInput = ref<HTMLInputElement>()
+const customErrors = computed(() =>
+  mineConfigErrors(Number(customSize.value), Number(customMines.value)),
+)
+const customMaxMines = computed(() =>
+  customErrors.value.size ? undefined : maxMineCount(Number(customSize.value)),
+)
 const fullscreen = inject(gameFullscreenKey)
 const flagMode = ref(false)
+const touchQuery = matchMedia('(pointer: coarse)')
+const touchControls = ref(touchQuery.matches)
+function updateTouchControls() {
+  touchControls.value = touchQuery.matches
+  if (!touchControls.value) flagMode.value = false
+}
+touchQuery.addEventListener('change', updateTouchControls)
+onBeforeUnmount(() => touchQuery.removeEventListener('change', updateTouchControls))
 function setMode(flag: boolean) {
   flagMode.value = flag
 }
@@ -32,7 +61,8 @@ async function animateReveal(previous: typeof game.value, index: number) {
   motion.cancel()
   const board = boardElement.value
   const next = game.value
-  scanning.value = next.status === 'won' && !motion.reduced.value && !document.hidden
+  scanning.value =
+    next.status === 'won' && next.size <= 32 && !motion.reduced.value && !document.hidden
   if (!board) {
     scanning.value = false
     return
@@ -40,6 +70,12 @@ async function animateReveal(previous: typeof game.value, index: number) {
   await nextTick()
   if (current !== effect) return
   fullscreen?.fit()
+  // Large custom boards can reveal thousands of cells at once. Paint the result directly.
+  if (next.size > 32 || motion.reduced.value || document.hidden) {
+    scanning.value = false
+    burst.value = null
+    return
+  }
   const cells = board.querySelectorAll<HTMLElement>('.mine-cell')
   const distance = (i: number) =>
     Math.max(
@@ -181,14 +217,41 @@ function stopTimer() {
   timer = undefined
 }
 onBeforeUnmount(stopTimer)
-function restart() {
+function startGame(size: number, mines: number) {
+  const next = newMineGame(size, mines)
   stopEffects()
   stopTimer()
-  const config = mineLevels[level.value]!
-  game.value = newMineGame(config.size, config.mines)
+  game.value = next
   elapsed.value = 0
   flagMode.value = false
   focused.value = 0
+  boardElement.value?.parentElement?.scrollTo({ left: 0, top: 0, behavior: 'instant' })
+}
+function restart() {
+  startGame(game.value.size, game.value.mines)
+}
+function changeLevel() {
+  if (level.value === 'custom') {
+    customSize.value = game.value.size
+    customMines.value = game.value.mines
+    customExpanded.value = true
+    return
+  }
+  const config = mineLevels[level.value]!
+  startGame(config.size, config.mines)
+}
+function applyCustom() {
+  if (customErrors.value.size) {
+    sizeInput.value?.focus()
+    return
+  }
+  if (customErrors.value.mines) {
+    minesInput.value?.focus()
+    return
+  }
+  startGame(Number(customSize.value), Number(customMines.value))
+  customExpanded.value = false
+  customToggle.value?.focus({ preventScroll: true })
 }
 function flag(index: number) {
   if (ended.value) return
@@ -244,7 +307,11 @@ function onKey(event: KeyboardEvent, index: number) {
 </script>
 
 <template>
-  <div class="game-layout">
+  <div
+    class="game-layout mine-layout"
+    :class="{ 'is-large': game.size > 32 }"
+    :style="{ '--mine-size': game.size }"
+  >
     <section class="game-surface mine-surface" aria-label="扫雷游戏">
       <div class="game-toolbar">
         <div class="game-stats">
@@ -265,10 +332,11 @@ function onKey(event: KeyboardEvent, index: number) {
       <div class="game-actions mine-actions">
         <label class="game-select"
           ><span id="mine-level-label">难度</span
-          ><select v-model="level" aria-labelledby="mine-level-label" @change="restart">
+          ><select v-model="level" aria-labelledby="mine-level-label" @change="changeLevel">
             <option v-for="(item, index) in mineLevels" :key="item.size" :value="index">
-              {{ item.name }}
+              {{ item.name }} · {{ item.mines }} 雷
             </option>
+            <option value="custom">自定义</option>
           </select></label
         >
         <p
@@ -285,7 +353,71 @@ function onKey(event: KeyboardEvent, index: number) {
           ><GameFullscreenButton />
         </div>
       </div>
-      <div class="mine-mode" role="group" aria-label="扫雷操作模式">
+      <div v-if="level === 'custom'" class="mine-custom">
+        <button
+          ref="customToggle"
+          type="button"
+          class="mine-custom-toggle"
+          :aria-expanded="customExpanded"
+          aria-controls="mine-custom-form"
+          @click="customExpanded = !customExpanded"
+        >
+          自定义设置<ChevronDown :size="16" aria-hidden="true" />
+        </button>
+        <form
+          v-show="customExpanded"
+          id="mine-custom-form"
+          class="mine-custom-form"
+          novalidate
+          @submit.prevent="applyCustom"
+        >
+          <div class="mine-custom-fields">
+            <label class="mine-custom-field">
+              <span>棋盘边长</span>
+              <input
+                ref="sizeInput"
+                v-model.number="customSize"
+                type="number"
+                inputmode="numeric"
+                :min="mineLimits.minSize"
+                :max="mineLimits.maxSize"
+                step="1"
+                required
+                :aria-invalid="!!customErrors.size"
+                :aria-describedby="customErrors.size ? 'mine-size-error' : 'mine-custom-hint'"
+              />
+            </label>
+            <label class="mine-custom-field">
+              <span>地雷数量</span>
+              <input
+                ref="minesInput"
+                v-model.number="customMines"
+                type="number"
+                inputmode="numeric"
+                min="1"
+                :max="customMaxMines"
+                step="1"
+                required
+                :aria-invalid="!!customErrors.mines"
+                :aria-describedby="customErrors.mines ? 'mine-count-error' : 'mine-custom-hint'"
+              />
+            </label>
+            <button type="submit" class="game-button mine-apply">应用并开局</button>
+          </div>
+          <p id="mine-custom-hint" class="mine-custom-hint">
+            边长 {{ mineLimits.minSize }}–{{ mineLimits.maxSize }} 格<span v-if="customMaxMines"
+              >，地雷 1–{{ customMaxMines }} 颗</span
+            >；首步及周围八格安全。应用后开始新的一局。
+          </p>
+          <p v-if="customErrors.size" id="mine-size-error" class="mine-custom-error" role="alert">
+            {{ customErrors.size }}
+          </p>
+          <p v-if="customErrors.mines" id="mine-count-error" class="mine-custom-error" role="alert">
+            {{ customErrors.mines }}
+          </p>
+        </form>
+      </div>
+      <div v-if="touchControls" class="mine-mode" role="group" aria-label="扫雷操作模式">
         <button class="game-button" :aria-pressed="!flagMode" @click="setMode(false)">
           <MousePointer2 :size="16" aria-hidden="true" />翻开</button
         ><button class="game-button" :aria-pressed="flagMode" @click="setMode(true)">
@@ -294,21 +426,22 @@ function onKey(event: KeyboardEvent, index: number) {
       </div>
       <div
         class="mine-board-scroll"
+        :class="{ 'is-large': game.size > 32 }"
         tabindex="0"
         role="region"
-        aria-label="扫雷棋盘，较大棋盘可左右滚动"
+        aria-label="扫雷棋盘，较大棋盘可滚动查看"
       >
         <div
           ref="boardElement"
           class="mine-board"
           :class="{ 'is-scanning': scanning }"
-          :style="{ '--mine-size': game.size }"
           role="group"
           aria-label="使用方向键选择格子，回车翻开，F 插旗"
         >
           <button
             v-for="(cell, index) in game.cells"
             :key="index"
+            v-memo="[cell, game.status, game.exploded, focused === index]"
             class="mine-cell"
             :class="{
               'is-open': cell.open,
