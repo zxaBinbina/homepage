@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="theme-color" content="#141521" />
+    <style>
+      :root {
+        background: var(--bg, #141521);
+        color-scheme: dark;
+      }
+      :root[data-theme='light'] {
+        background: var(--bg, #f4f6fa);
+        color-scheme: light;
+      }
+    </style>
     <script>
       // Set the theme before styles load to avoid a flash of the wrong color.
       let savedTheme

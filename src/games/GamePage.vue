@@ -16,6 +16,7 @@ const components = {
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
 const viewport = ref<HTMLElement>()
+const placeholderHeight = ref(0)
 const motion = useGameMotion()
 let previousScroll = { left: 0, top: 0 }
 let transition = 0
@@ -52,6 +53,8 @@ async function toggleFullscreen() {
     await fade(viewport.value, 0, 1, 120)
   } else {
     previousScroll = { left: window.scrollX, top: window.scrollY }
+    // Keep the document canvas and footer stationary while Teleport moves the game.
+    placeholderHeight.value = viewport.value?.getBoundingClientRect().height ?? 0
     fullscreenDialog.value?.showModal()
     fullscreen.value = true
     document.documentElement.classList.add('game-fullscreen-open')
@@ -84,18 +87,20 @@ onBeforeUnmount(() => {
         </div>
         <p>{{ game.controls }}</p>
       </header>
-      <Teleport :to="fullscreenDialog || 'body'" :disabled="!fullscreen">
-        <section
-          ref="viewport"
-          class="game-viewport"
-          :class="{ 'is-fullscreen': fullscreen }"
-          :aria-label="game.name"
-        >
-          <div class="game-play-content">
-            <component :is="components[id]" :key="id" />
-          </div>
-        </section>
-      </Teleport>
+      <div :style="{ minHeight: fullscreen ? `${placeholderHeight}px` : undefined }">
+        <Teleport :to="fullscreenDialog || 'body'" :disabled="!fullscreen">
+          <section
+            ref="viewport"
+            class="game-viewport"
+            :class="{ 'is-fullscreen': fullscreen }"
+            :aria-label="game.name"
+          >
+            <div class="game-play-content">
+              <component :is="components[id]" :key="id" />
+            </div>
+          </section>
+        </Teleport>
+      </div>
       <p class="games-note">游戏在当前页面中进行，离开或刷新会重新开局。</p>
     </main>
     <SiteFooter />
