@@ -193,7 +193,9 @@ with sync_playwright() as p:
     # A queen cannot enter an empty column; it returns without consuming a move.
     mouse_drag(page.locator('.tableau-card[data-card-id="3-12"]'), page.locator('.empty-column'))
     expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
-    expect(page.locator('.game-status')).to_contain_text('回到原处')
+    expect(page.locator('.game-status')).not_to_be_visible()
+    expect(page.locator('.solitaire-column').nth(1).locator('[data-card-id="3-12"]')).to_have_count(1)
+    expect(page.locator('.solitaire-column').first.locator('.tableau-card')).to_have_count(0)
     mouse_drag(page.locator('.tableau-card[data-card-id="3-12"]'), page.locator('.pile-target').nth(4))
     expect(page.locator('.tableau-card.card-back')).to_have_count(20)
     mouse_drag(page.locator('.tableau-card[data-card-id="2-13"]'), page.locator('.empty-column'), stack=2)

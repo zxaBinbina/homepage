@@ -39,7 +39,7 @@ export function useSolitaireDrag(options: {
   canStart: () => boolean
   select: (source: CardSource) => void
   drop: (source: CardSource, target: CardTarget, origins: Map<string, CardPosition>) => void
-  cancel: (message: string) => void
+  cancel: () => void
 }) {
   const drag = ref<Drag | null>(null)
   const target = ref<CardTarget | null>(null)
@@ -160,7 +160,7 @@ export function useSolitaireDrag(options: {
       findTarget(event.clientX, event.clientY)
     }
   }
-  async function returnHome(message: string) {
+  async function returnHome() {
     const current = ++generation
     const active = drag.value
     if (!active) return
@@ -182,7 +182,7 @@ export function useSolitaireDrag(options: {
       ])
     if (current !== generation) return
     drag.value = null
-    options.cancel(message)
+    options.cancel()
   }
   function up(event: PointerEvent) {
     if (!press || event.pointerId !== press.id) return
@@ -196,7 +196,7 @@ export function useSolitaireDrag(options: {
     const destination = target.value
     stopPress()
     if (!destination) {
-      void returnHome('这个位置不能放，纸牌已回到原处。')
+      void returnHome()
       return
     }
     const origins = new Map(
@@ -218,7 +218,7 @@ export function useSolitaireDrag(options: {
   function cancel() {
     if (drag.value) suppressClick = true
     stopPress()
-    void returnHome('已取消拖动，纸牌回到原处。')
+    void returnHome()
   }
   function pointerCancel(event: PointerEvent) {
     if (press?.id === event.pointerId) cancel()
@@ -245,7 +245,7 @@ export function useSolitaireDrag(options: {
   function interrupted() {
     if (drag.value || press) {
       reset()
-      options.cancel('拖动已取消。')
+      options.cancel()
     }
   }
   onMounted(() => {

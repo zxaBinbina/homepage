@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, provide, ref } from 'vue'
 import { ArrowLeft } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
+import GameGuide from './GameGuide.vue'
 import { gameCatalog, type GameId } from './catalog'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
@@ -85,7 +86,6 @@ onBeforeUnmount(() => {
           <p class="overline">{{ game.label }}</p>
           <h1>{{ game.name }}</h1>
         </div>
-        <p>{{ game.controls }}</p>
       </header>
       <div :style="{ minHeight: fullscreen ? `${placeholderHeight}px` : undefined }">
         <Teleport :to="fullscreenDialog || 'body'" :disabled="!fullscreen">
@@ -96,12 +96,12 @@ onBeforeUnmount(() => {
             :aria-label="game.name"
           >
             <div class="game-play-content">
+              <GameGuide :id="id" />
               <component :is="components[id]" :key="id" />
             </div>
           </section>
         </Teleport>
       </div>
-      <p class="games-note">离开或刷新页面会重新开局。</p>
     </main>
     <SiteFooter />
     <dialog

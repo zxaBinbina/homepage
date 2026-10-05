@@ -97,7 +97,9 @@ with sync_playwright() as p:
     expect(page.locator('.tableau-card.card-back')).to_have_count(21)
     page.get_by_role('button', name='第 2 列，方块 Q', exact=True).click()
     page.get_by_role('button', name='放到第 1 列', exact=True).click()
-    expect(page.locator('.game-status')).to_contain_text('空列只接受 K')
+    expect(page.locator('.game-status')).not_to_be_visible()
+    expect(page.locator('.solitaire-column').first.locator('.tableau-card')).to_have_count(0)
+    expect(page.get_by_role('button', name='第 2 列，方块 Q', exact=True)).to_be_visible()
     expect(page.get_by_role('button', name='第 2 列，方块 Q', exact=True)).to_have_attribute('aria-pressed', 'true')
     page.keyboard.press('Escape')
     expect(page.get_by_role('button', name='取消选牌', exact=True)).to_be_disabled()
@@ -127,6 +129,19 @@ with sync_playwright() as p:
                 page.set_viewport_size({'width': width, 'height': 1000})
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (path, theme, width)
                 assert page.locator('main').evaluate('(el) => el.getBoundingClientRect().width <= innerWidth')
+                if path.startswith('/games/'):
+                    expect(page.locator('.game-heading > p')).to_have_count(0)
+                    expect(page.locator('.game-status')).not_to_be_visible()
+                    expect(page.locator('.game-session-note')).to_have_text('离开或刷新页面会重新开局。')
+                    assert page.evaluate('''() => {
+                        const guide = document.querySelector('.game-guide');
+                        const game = document.querySelector('.game-surface');
+                        const note = document.querySelector('.game-session-note');
+                        const tips = document.querySelector('.game-guide-tips');
+                        return !!(guide.compareDocumentPosition(game) & Node.DOCUMENT_POSITION_FOLLOWING)
+                            && guide.getBoundingClientRect().bottom <= game.getBoundingClientRect().top
+                            && tips.getBoundingClientRect().bottom <= note.getBoundingClientRect().top;
+                    }'''), (path, theme, width, 'Tutorial and reminder must precede gameplay')
                 if width > 760:
                     # No wrapping or overlap between brand, navigation, and actions.
                     assert page.evaluate('''() => {

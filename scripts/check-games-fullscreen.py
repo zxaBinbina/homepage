@@ -28,6 +28,7 @@ with sync_playwright() as p:
         expect(page.locator('dialog[open]')).to_have_count(1)
         assert page.evaluate('savedSurface === document.querySelector(".game-surface")'), 'Fullscreen remounted the game'
         expect(page.locator('.game-guide')).not_to_be_visible()
+        expect(page.locator('.game-session-note')).not_to_be_visible()
         if game == '2048':
             expect(page.locator('.game-stats strong').first).to_have_text('4')
             page.get_by_role('button', name='向下移动').click()
@@ -70,6 +71,7 @@ with sync_playwright() as p:
         expect(page.locator('dialog[open]')).to_have_count(0)
         expect(page.get_by_role('button', name='网页全屏', exact=True)).to_be_focused()
         expect(page.locator('.game-guide')).to_be_visible()
+        expect(page.locator('.game-session-note')).to_be_visible()
         assert page.evaluate('savedSurface === document.querySelector(".game-surface")')
         page.get_by_role('button', name='网页全屏', exact=True).click()
         page.keyboard.press('Escape')

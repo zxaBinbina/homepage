@@ -10,7 +10,6 @@ const game = ref(newMineGame())
 const flagMode = ref(false)
 function setMode(flag: boolean) {
   flagMode.value = flag
-  notice.value = ''
 }
 const elapsed = ref(0)
 const focused = ref(0)
@@ -165,18 +164,12 @@ async function animateReveal(previous: typeof game.value, index: number) {
 const flagged = computed(() => game.value.cells.filter((cell) => cell.flag).length)
 const safe = computed(() => game.value.cells.filter((cell) => cell.open && !cell.mine).length)
 const ended = computed(() => game.value.status === 'won' || game.value.status === 'lost')
-const notice = ref('')
 const status = computed(() =>
   game.value.status === 'won'
     ? '所有安全格都找到了，恭喜过关！'
     : game.value.status === 'lost'
       ? '踩到地雷了。休息一下，再来一局吧。'
-      : notice.value ||
-        (game.value.status === 'ready'
-          ? '点击任意格子开始，首步及周围八格一定安全。'
-          : flagMode.value
-            ? '插旗模式：点击未翻开的格子，标记或取消地雷。'
-            : '数字表示周围八格中的地雷数，慢慢推理下一步。'),
+      : '',
 )
 let timer: ReturnType<typeof setInterval> | undefined
 let started = 0
@@ -193,15 +186,10 @@ function restart() {
   elapsed.value = 0
   flagMode.value = false
   focused.value = 0
-  notice.value = ''
 }
 function flag(index: number) {
   if (ended.value) return
   const next = flagMine(game.value, index)
-  notice.value =
-    next === game.value && !game.value.cells[index]!.open
-      ? '旗子已经用完了，可以先取消一个标记。'
-      : ''
   game.value = next
 }
 function reveal(index: number) {
@@ -210,7 +198,6 @@ function reveal(index: number) {
     flag(index)
     return
   }
-  notice.value = ''
   const previous = game.value
   game.value = revealMine(game.value, index)
   if (previous.status === 'ready' && game.value.status === 'playing') {
@@ -349,6 +336,7 @@ function onKey(event: KeyboardEvent, index: number) {
         </div>
       </div>
       <p
+        v-show="status"
         class="game-status"
         :class="{ 'is-success': game.status === 'won', 'is-ended': game.status === 'lost' }"
         role="status"
@@ -356,19 +344,5 @@ function onKey(event: KeyboardEvent, index: number) {
         {{ status }}
       </p>
     </section>
-    <aside class="game-guide">
-      <p class="overline">HOW TO PLAY</p>
-      <h2>每个数字，都是线索。</h2>
-      <ol>
-        <li>翻开格子，数字代表周围八格中的地雷数量。</li>
-        <li>确定是地雷时插旗。翻开所有非雷格即可获胜，不需要把旗子全部用完。</li>
-        <li>一个数字周围的旗子够了，再点它就会翻开周围剩余格子。标错旗也可能踩雷。</li>
-      </ol>
-      <p>电脑：左键翻开、右键插旗；也可用方向键移动焦点，回车或空格翻开，F 插旗。</p>
-      <p>
-        手机：用棋盘上方的「翻开 /
-        插旗」切换操作。挑战棋盘在窄屏内可左右滚动。更换难度会开始新的一局。
-      </p>
-    </aside>
   </div>
 </template>
