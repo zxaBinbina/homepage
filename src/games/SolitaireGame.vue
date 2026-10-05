@@ -20,6 +20,7 @@ import {
   type CardSource,
   type CardTarget,
   type SolitaireGame,
+  type Card,
 } from './solitaire'
 
 const game = ref(newSolitaire())
@@ -30,6 +31,7 @@ const scroll = ref<HTMLElement>()
 const stage = ref<HTMLElement>()
 const motion = useGameMotion()
 const moving = ref(false)
+const recyclingCard = ref<Card | null>(null)
 const celebrating = ref(false)
 const celebrationKey = ref(0)
 const celebrationOrigins = ref<{ x: number; y: number }[]>([])
@@ -37,7 +39,6 @@ const orientationDismissed = ref(false)
 const notice = ref('先翻一张牌，或选择桌面上的明牌开始。')
 const won = computed(() => solitaireWon(game.value))
 const collected = computed(() => game.value.foundations.reduce((sum, pile) => sum + pile.length, 0))
-const wasteTop = computed(() => game.value.waste.at(-1))
 const dragging = useSolitaireDrag({
   game,
   surface,
@@ -157,6 +158,7 @@ function stopMotion() {
     ?.querySelectorAll('.is-stack-moving')
     .forEach((element) => element.classList.remove('is-stack-moving'))
   moving.value = false
+  recyclingCard.value = null
   celebrating.value = false
 }
 function restart() {
@@ -174,11 +176,77 @@ function undo() {
     notice.value = '已撤销上一步。'
   }
 }
+async function recycleStock() {
+  const original = game.value
+  const result = drawCard(original)
+  if (result === original) return
+  if (motion.reduced.value || document.hidden) {
+    void commit(result)
+    return
+  }
+  const current = ++turn
+  history.value.push(original)
+  if (history.value.length > 100) history.value.shift()
+  selected.value = null
+  moving.value = true
+  notice.value = '正在逐张收回翻牌…'
+  while (game.value.waste.length) {
+    if (current !== turn) return
+    if (motion.reduced.value || document.hidden) {
+      game.value = result
+      break
+    }
+    const card = game.value.waste.at(-1)!
+    const from = surface
+      .value!.querySelector<HTMLElement>(`.waste-stack [data-card-id="${cardId(card)}"]`)!
+      .getBoundingClientRect()
+    recyclingCard.value = card
+    game.value = {
+      ...game.value,
+      stock: [...game.value.stock, { ...card, faceUp: false }],
+      waste: game.value.waste.slice(0, -1),
+      moves: result.moves,
+    }
+    await nextTick()
+    if (current !== turn) return
+    const stock = surface.value!.querySelector<HTMLElement>('.stock-card')!
+    const stack = stock.closest<HTMLElement>('.solitaire-slot')!
+    const to = stock.getBoundingClientRect()
+    stock.classList.add('is-card-moving')
+    stack.classList.add('is-stack-moving')
+    await motion.settle([
+      motion.animate(
+        stock,
+        [
+          { transform: `translate(${from.left - to.left}px,${from.top - to.top}px) rotateY(0deg)` },
+          {
+            transform: `translate(${(from.left - to.left) * 0.45}px,${(from.top - to.top) * 0.45}px) rotateY(90deg)`,
+            offset: 0.5,
+          },
+          { transform: 'translate(0,0) rotateY(180deg)' },
+        ],
+        { duration: 130, fill: 'both', easing: 'ease-in-out' },
+      ),
+    ])
+    stock.classList.remove('is-card-moving')
+    stack.classList.remove('is-stack-moving')
+    if (current !== turn) return
+    recyclingCard.value = null
+    await nextTick()
+  }
+  if (current !== turn) return
+  recyclingCard.value = null
+  moving.value = false
+  notice.value = '已收回翻牌，再点牌堆从头翻起。'
+}
 function draw() {
   if (locked.value) return
-  const recycling = !game.value.stock.length
+  if (!game.value.stock.length) {
+    void recycleStock()
+    return
+  }
   void commit(drawCard(game.value))
-  notice.value = recycling ? '已收回翻牌，再点牌堆从头翻起。' : '翻出一张新牌，看看能放在哪里。'
+  notice.value = '翻出一张新牌，看看能放在哪里。'
 }
 function select(source: CardSource) {
   if (locked.value || won.value || !sourceCards(game.value, source).length) return
@@ -301,50 +369,82 @@ onBeforeUnmount(() => {
         <div class="solitaire-table">
           <div class="solitaire-top">
             <div class="solitaire-slot">
-              <span class="pile-label">牌堆 · {{ game.stock.length }}</span
-              ><button
-                class="playing-card stock-card"
-                :class="{ 'card-back': game.stock.length }"
-                :disabled="locked || (!game.stock.length && !game.waste.length) || won"
-                :data-card-id="game.stock.length ? cardId(game.stock.at(-1)!) : undefined"
-                :aria-label="
-                  game.stock.length
-                    ? `翻一张牌，牌堆剩余 ${game.stock.length} 张`
-                    : game.waste.length
-                      ? '重新翻牌'
-                      : '牌堆已空'
-                "
-                @click="draw"
-              >
-                <span v-if="game.stock.length" class="stock-mark" aria-hidden="true">✦</span
-                ><span v-else class="stock-recycle"
-                  ><RotateCcw :size="22" aria-hidden="true" />{{
-                    game.waste.length ? '再翻一轮' : '空'
-                  }}</span
+              <span class="pile-label">牌堆 · {{ game.stock.length }}</span>
+              <div class="stock-stack">
+                <div
+                  v-if="game.stock.length > 1"
+                  class="playing-card card-back stock-underlay"
+                  aria-hidden="true"
                 >
-              </button>
+                  <span class="stock-mark">✦</span>
+                </div>
+                <button
+                  class="playing-card stock-card"
+                  :class="{
+                    'card-back': game.stock.length && !recyclingCard,
+                    'is-recycling-card': recyclingCard,
+                    'is-red': recyclingCard && redCard(recyclingCard),
+                  }"
+                  :disabled="locked || (!game.stock.length && !game.waste.length) || won"
+                  :data-card-id="game.stock.length ? cardId(game.stock.at(-1)!) : undefined"
+                  :aria-label="
+                    game.stock.length
+                      ? `翻一张牌，牌堆剩余 ${game.stock.length} 张`
+                      : game.waste.length
+                        ? '重新翻牌'
+                        : '牌堆已空'
+                  "
+                  @click="draw"
+                >
+                  <PlayingCard v-if="recyclingCard" :card="recyclingCard" /><span
+                    v-else-if="game.stock.length"
+                    class="stock-mark"
+                    aria-hidden="true"
+                    >✦</span
+                  ><span v-else class="stock-recycle"
+                    ><RotateCcw :size="22" aria-hidden="true" />{{
+                      game.waste.length ? '再翻一轮' : '空'
+                    }}</span
+                  >
+                </button>
+              </div>
             </div>
             <div class="solitaire-slot">
-              <span class="pile-label">翻牌 · {{ game.waste.length }}</span
-              ><button
-                v-if="wasteTop"
-                class="playing-card"
-                :class="{
-                  'is-red': redCard(wasteTop),
-                  'is-selected': selected?.kind === 'waste',
-                  'is-drag-origin': dragging.isOrigin(wasteTop),
-                }"
-                :data-card-id="cardId(wasteTop)"
-                :aria-label="`选择翻牌 ${cardName(wasteTop)}`"
-                :aria-pressed="selected?.kind === 'waste'"
-                @click="select({ kind: 'waste' })"
-                @pointerdown="dragging.down($event, { kind: 'waste' })"
-                @contextmenu.prevent
-                @dragstart.prevent
-              >
-                <PlayingCard :card="wasteTop" />
-              </button>
-              <div v-else class="card-placeholder" aria-label="翻牌区为空">翻牌</div>
+              <span class="pile-label">翻牌 · {{ game.waste.length }}</span>
+              <div class="waste-stack">
+                <template v-for="(card, index) in game.waste" :key="cardId(card)">
+                  <button
+                    v-if="index === game.waste.length - 1"
+                    class="playing-card"
+                    :class="{
+                      'is-red': redCard(card),
+                      'is-selected': selected?.kind === 'waste',
+                      'is-drag-origin': dragging.isOrigin(card),
+                    }"
+                    :data-card-id="cardId(card)"
+                    :aria-label="`选择翻牌 ${cardName(card)}`"
+                    :aria-pressed="selected?.kind === 'waste'"
+                    @click="select({ kind: 'waste' })"
+                    @pointerdown="dragging.down($event, { kind: 'waste' })"
+                    @contextmenu.prevent
+                    @dragstart.prevent
+                  >
+                    <PlayingCard :card="card" />
+                  </button>
+                  <div
+                    v-else
+                    class="playing-card waste-covered"
+                    :class="{ 'is-red': redCard(card) }"
+                    :data-card-id="cardId(card)"
+                    aria-hidden="true"
+                  >
+                    <PlayingCard :card="card" />
+                  </div>
+                </template>
+                <div v-if="!game.waste.length" class="card-placeholder" aria-label="翻牌区为空">
+                  翻牌
+                </div>
+              </div>
             </div>
             <div aria-hidden="true"></div>
             <div v-for="(pile, index) in game.foundations" :key="index" class="solitaire-slot">

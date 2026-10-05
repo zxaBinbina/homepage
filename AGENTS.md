@@ -40,7 +40,7 @@
 
 工具目录为 `/tool`，工具地址为 `/tools/*`。名称、分类和说明维护在 `src/tools/catalog.ts`，转换逻辑位于 `src/tools/transform.ts`，样式在 `src/style.css`。输入仅在本地处理，不上传、不持久保存；变更转换规则运行 `node scripts/check-tools.mjs`，交互或布局变更运行 `python3 scripts/check-tools-browser.py`。
 
-游戏目录为 `/game`，游戏地址为 `/games/*`。名称与说明维护在 `src/games/catalog.ts`，游戏组件及纯规则逻辑位于 `src/games/`，样式在 `src/style.css`。游戏状态仅在页面内保留；更改规则运行 `node scripts/check-games.mjs`，交互或布局修改后运行 `python3 scripts/check-games-browser.py`。游戏导航沿用共享播放器与主题；不要为方向键操作注册影响全站的监听。
+游戏目录为 `/game`，游戏地址为 `/games/*`。名称与说明维护在 `src/games/catalog.ts`，游戏组件及纯规则逻辑位于 `src/games/`，样式在 `src/style.css`。游戏状态仅在页面内保留；更改规则运行 `node scripts/check-games.mjs`，交互或布局修改后运行 `python3 scripts/check-games-browser.py`；动效或拖拽修改还需在开发服务器运行 `python3 scripts/check-games-motion.py`，验证输入锁、取消、手机长按与减少动态效果。游戏导航沿用共享播放器与主题；不要为方向键操作注册影响全站的监听。
 
 RDP 子站的 Vue 页面组件与样式位于 `src/rdp/`，部署正文位于 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，构建转换位于 [build/rdpWiki.ts](build/rdpWiki.ts)。子站修改后运行 `python3 scripts/check-rdp-pages.py`。Wiki 样式维护在 `src/rdp/wiki.css`，部署提示词维护在 `docs/rdp-agent-deploy.md`；修改 Wiki 搜索、目录或复制交互时执行 `python3 scripts/check-rdp-wiki.py`。
 

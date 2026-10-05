@@ -110,6 +110,35 @@ with sync_playwright() as p:
     page.screenshot(path=str(out / 'game-motion-solitaire-flip.png'), full_page=True)
     page.locator('.is-card-moving').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => a.finish()))')
     card_idle()
+    old_id = page.locator('.waste-stack > button').get_attribute('data-card-id')
+    old_bounds = page.locator(f'.waste-stack [data-card-id="{old_id}"]').bounding_box()
+    page.locator('.stock-card').click()
+    expect(page.locator('.waste-covered')).to_have_count(1)
+    assert page.locator(f'.waste-stack [data-card-id="{old_id}"]').evaluate('(el) => el.getAnimations().length') == 0
+    assert page.locator(f'.waste-stack [data-card-id="{old_id}"]').bounding_box() == old_bounds
+    assert page.locator('.stock-card').evaluate('(el) => getComputedStyle(el).backgroundColor') != 'rgba(0, 0, 0, 0)'
+    card_idle()
+    # A valid late-game fixture with three kings in the waste tests each returning card.
+    page.evaluate('''() => {
+      const state = document.querySelector('.solitaire-surface').__vueParentComponent.setupState;
+      const card = (suit,rank) => ({suit,rank,faceUp:true});
+      state.game = {stock:[], waste:[card(0,13),card(1,13),card(2,13)], moves:0,
+        foundations:Array.from({length:4},(_,suit)=>Array.from({length:suit===3?13:12},(_,i)=>card(suit,i+1))),
+        tableau:[[],[],[],[],[],[],[]]};
+      state.history = [];
+      window.recycleCounts = [];
+      new MutationObserver(() => recycleCounts.push(state.game.stock.length)).observe(document.querySelector('.pile-label'), {childList:true,subtree:true,characterData:true});
+    }''')
+    page.locator('.stock-card').click()
+    expect(page.locator('.is-recycling-card')).to_have_count(1)
+    card_idle()
+    assert page.evaluate('[1,2,3].every(n => recycleCounts.includes(n))')
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 3')
+    expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
+    page.get_by_role('button', name='撤销', exact=True).click()
+    card_idle()
+    expect(page.locator('.waste-stack .playing-card')).to_have_count(3)
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 0')
     page.get_by_role('button', name='重新开始', exact=True).click()
     mouse_drag(page.locator('.tableau-card[data-card-id="0-1"]'), page.locator('.foundation-card').first)
     expect(page.locator('.game-stats strong').first).to_have_text('1 / 52')
@@ -205,14 +234,17 @@ with sync_playwright() as p:
     assert phone.locator('.solitaire-scroll').evaluate('(el) => el.scrollLeft') > 10
     assert phone.locator('.game-stats strong').nth(1).inner_text() == '1'
     # Long press at the edge supports scrolling to offscreen columns and cancellation.
-    phone.locator('.solitaire-scroll').evaluate('(el) => el.scrollLeft = 0')
+    phone.wait_for_timeout(700)
+    phone.locator('.solitaire-scroll').evaluate('(el) => el.scrollTo({left:0,behavior:"instant"})')
+    source.scroll_into_view_if_needed()
     a = source.bounding_box()
     start = {'x':a['x']+20,'y':a['y']+18}
     cdp.send('Input.dispatchTouchEvent', {'type':'touchStart','touchPoints':[start]})
     phone.wait_for_timeout(350)
-    cdp.send('Input.dispatchTouchEvent', {'type':'touchMove','touchPoints':[{'x':365,'y':start['y']}]})
+    expect(phone.locator('.solitaire-drag-layer')).to_have_count(1)
+    cdp.send('Input.dispatchTouchEvent', {'type':'touchMove','touchPoints':[{'x':355,'y':start['y']}]})
     phone.wait_for_timeout(450)
-    assert phone.locator('.solitaire-scroll').evaluate('(el) => el.scrollLeft') > 40
+    assert phone.locator('.solitaire-scroll').evaluate('(el) => el.scrollLeft') > 40, phone.evaluate('({scroll: document.querySelector(".solitaire-scroll").scrollLeft, dragging:!!document.querySelector(".solitaire-drag-layer"), rect:document.querySelector(".solitaire-scroll").getBoundingClientRect().toJSON()})')
     cdp.send('Input.dispatchTouchEvent', {'type':'touchCancel','touchPoints':[]})
     expect(phone.locator('.solitaire-drag-layer')).to_have_count(0)
     phone.set_viewport_size({'width':844,'height':390})

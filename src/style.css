@@ -3207,6 +3207,24 @@ h1 > span {
     var(--game-card-back);
   color: var(--game-card-back-mark);
 }
+.stock-stack,
+.waste-stack {
+  position: relative;
+  height: var(--card-height);
+  transform-style: preserve-3d;
+}
+.stock-underlay,
+.waste-stack > .playing-card {
+  position: absolute;
+  inset: 0;
+}
+.stock-underlay {
+  display: grid;
+  place-items: center;
+}
+.waste-covered {
+  pointer-events: none;
+}
 .stock-card {
   display: grid;
   place-items: center;
@@ -3222,7 +3240,7 @@ h1 > span {
   text-align: center;
   font-size: 11px;
 }
-.stock-card:disabled,
+.stock-card:disabled:not(.card-back):not(.is-recycling-card),
 .card-placeholder,
 .foundation-card.is-empty {
   border: 1px dashed var(--border);
