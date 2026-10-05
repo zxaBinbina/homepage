@@ -66,7 +66,7 @@ const status = computed(() => {
   if (won.value) return '52 张牌全部归位，接龙成功！'
   if (!selected.value) return notice.value
   const cards = sourceCards(game.value, selected.value)
-  return `已选 ${cardName(cards[0]!)}${cards.length > 1 ? ` 起的 ${cards.length} 张牌` : ''}，点击目标列或上方收牌区。${notice.value}`
+  return `已选 ${cardName(cards[0]!)}${cards.length > 1 ? ` 起的 ${cards.length} 张牌` : ''}。${notice.value || '点击目标列或上方收牌区。'}`
 })
 function positions() {
   const result = new Map<string, CardPosition>()
@@ -435,9 +435,11 @@ onBeforeUnmount(() => {
                     <PlayingCard :card="card" />
                   </div>
                 </template>
-                <div v-if="!game.waste.length" class="card-placeholder" aria-label="翻牌区为空">
-                  翻牌
-                </div>
+                <div
+                  v-if="!game.waste.length"
+                  class="card-placeholder"
+                  aria-label="翻牌区为空"
+                ></div>
               </div>
             </div>
             <div aria-hidden="true"></div>
@@ -596,7 +598,7 @@ onBeforeUnmount(() => {
       <h2>一张一张，理出头绪。</h2>
     </div>
     <ol>
-      <li>经典 Klondike 接龙，每次翻一张，牌堆可无限循环。点击明牌选中，再点击目标列或收牌区。</li>
+      <li>每次翻一张，牌堆可无限循环。点击明牌选中，再点击目标列或收牌区。</li>
       <li>桌面按红黑交替、数字递减排列，可以整段移动。空列只接受 K 或以 K 开头的牌组。</li>
       <li>上方四个收牌区按同花色 A → K 排列。移开暗牌上方的牌后，暗牌会自动翻开。</li>
       <li>

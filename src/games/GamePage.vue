@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
           </section>
         </Teleport>
       </div>
-      <p class="games-note">游戏在当前页面中进行，离开或刷新会重新开局。</p>
+      <p class="games-note">离开或刷新页面会重新开局。</p>
     </main>
     <SiteFooter />
     <dialog

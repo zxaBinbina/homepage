@@ -15,7 +15,7 @@ import { gameCatalog, gameIds } from './catalog'
       </section>
       <div class="games-directory-meta">
         <span><Gamepad2 :size="18" aria-hidden="true" /> 随时开局，慢慢玩</span
-        ><span>{{ gameIds.length }} 款游戏 · 无需登录</span>
+        ><span>{{ gameIds.length }} 款游戏</span>
       </div>
       <div class="games-grid">
         <a v-for="(id, index) in gameIds" :key="id" :href="pages[id]" class="game-card">
