@@ -14,18 +14,25 @@ export function newNumberGame(random = Math.random): NumberGame {
 }
 
 /** Slide first, then spawn only when a move actually changes the board. */
-export function slide(board: number[], direction: Direction) {
+export function traceSlide(board: number[], direction: Direction) {
   const next = Array<number>(16).fill(0)
+  const movements: { from: number; to: number; value: number }[] = []
+  const merges: number[] = []
   let gained = 0
   for (let line = 0; line < 4; line++) {
     const indices = Array.from({ length: 4 }, (_, offset) => {
       const step = direction === 'right' || direction === 'down' ? 3 - offset : offset
       return direction === 'left' || direction === 'right' ? line * 4 + step : step * 4 + line
     })
-    const values = indices.map((index) => board[index]!).filter(Boolean)
+    const sources = indices.filter((index) => board[index])
+    const values = sources.map((index) => board[index]!)
     const merged: number[] = []
     for (let i = 0; i < values.length; i++) {
+      const to = indices[merged.length]!
+      movements.push({ from: sources[i]!, to, value: values[i]! })
       if (values[i] === values[i + 1]) {
+        movements.push({ from: sources[i + 1]!, to, value: values[i + 1]! })
+        merges.push(to)
         const value = values[i]! * 2
         merged.push(value)
         gained += value
@@ -34,7 +41,18 @@ export function slide(board: number[], direction: Direction) {
     }
     indices.forEach((index, offset) => (next[index] = merged[offset] ?? 0))
   }
-  return { board: next, gained, changed: next.some((value, index) => value !== board[index]) }
+  return {
+    board: next,
+    gained,
+    changed: next.some((value, index) => value !== board[index]),
+    movements,
+    merges,
+  }
+}
+
+export function slide(board: number[], direction: Direction) {
+  const { board: next, gained, changed } = traceSlide(board, direction)
+  return { board: next, gained, changed }
 }
 
 export function moveNumbers(game: NumberGame, direction: Direction, random = Math.random) {

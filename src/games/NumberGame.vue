@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { useGameMotion } from './useGameMotion'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Undo2 } from 'lucide-vue-next'
 import {
   moveNumbers,
   newNumberGame,
   numbersOver,
+  traceSlide,
   type Direction,
   type NumberGame,
 } from './twenty48'
@@ -12,6 +14,29 @@ import {
 const game = ref(newNumberGame())
 const history = ref<NumberGame[]>([])
 const boardElement = ref<HTMLElement>()
+const noAnimation = ref(false)
+const motion = useGameMotion(noAnimation)
+const animationsOff = computed({
+  get: () => noAnimation.value || motion.reduced.value,
+  set: (value: boolean) => {
+    noAnimation.value = value
+  },
+})
+const busy = ref(false)
+const sliding = ref(false)
+const flights = ref<
+  { from: number; value: number; x: number; y: number; size: number; dx: number; dy: number }[]
+>([])
+let turn = 0
+function stopMotion() {
+  turn++
+  motion.cancel()
+  busy.value = false
+  sliding.value = false
+  flights.value = []
+  gesture = null
+}
+onBeforeUnmount(stopMotion)
 const over = computed(() => numbersOver(game.value.board))
 const largest = computed(() => Math.max(...game.value.board))
 const feedback = ref('点击棋盘后使用方向键，或直接在棋盘上滑动。')
@@ -29,7 +54,9 @@ const directions = [
   { id: 'right', label: '向右移动', icon: ArrowRight },
 ] as const
 
-function move(direction: Direction) {
+async function move(direction: Direction) {
+  if (busy.value) return
+  const trace = traceSlide(game.value.board, direction)
   const next = moveNumbers(game.value, direction)
   if (next === game.value) {
     feedback.value = '这个方向暂时无法移动，换个方向试试。'
@@ -38,17 +65,86 @@ function move(direction: Direction) {
   history.value.push(game.value)
   if (history.value.length > 100) history.value.shift()
   const gained = next.score - game.value.score
+  const current = ++turn
+  busy.value = true
+  const board = boardElement.value
+  if (board && !animationsOff.value && !document.hidden) {
+    const origin = board.getBoundingClientRect()
+    const cells = Array.from(board.querySelectorAll<HTMLElement>('.number-tile')).map((cell) =>
+      cell.getBoundingClientRect(),
+    )
+    flights.value = trace.movements.map((tile) => {
+      const from = cells[tile.from]!,
+        to = cells[tile.to]!
+      return {
+        from: tile.from,
+        value: tile.value,
+        x: from.left - origin.left - board.clientLeft,
+        y: from.top - origin.top - board.clientTop,
+        size: from.width,
+        dx: to.left - from.left,
+        dy: to.top - from.top,
+      }
+    })
+    sliding.value = true
+    await nextTick()
+    if (current !== turn) return
+    await motion.settle(
+      Array.from(board.querySelectorAll('.number-flight')).map((element, index) => {
+        const tile = flights.value[index]!
+        return motion.animate(
+          element,
+          [
+            { transform: 'translate(0, 0)' },
+            { transform: `translate(${tile.dx}px, ${tile.dy}px)` },
+          ],
+          { duration: 140, fill: 'both' },
+        )
+      }),
+    )
+    if (current !== turn) return
+  }
   game.value = next
+  sliding.value = false
+  flights.value = []
   feedback.value = gained
     ? `合并成功，本步 +${gained} 分。`
     : '方块已移动，继续寻找可以合并的数字。'
+  await nextTick()
+  if (current !== turn) return
+  const cells = board?.querySelectorAll('.number-tile')
+  const spawned = next.board.findIndex((value, index) => value && !trace.board[index])
+  await motion.settle([
+    ...trace.merges.map((index) =>
+      motion.animate(
+        cells?.[index],
+        [
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.16)', offset: 0.45 },
+          { transform: 'scale(1)' },
+        ],
+        { duration: 90 },
+      ),
+    ),
+    motion.animate(
+      cells?.[spawned],
+      [
+        { transform: 'scale(.3)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1 },
+      ],
+      { duration: 90 },
+    ),
+  ])
+  if (current === turn) busy.value = false
 }
 function restart() {
+  stopMotion()
   game.value = newNumberGame()
   history.value = []
   feedback.value = '新的一局，出发吧。'
 }
 function undo() {
+  if (busy.value) return
   const previous = history.value.pop()
   if (previous) {
     game.value = previous
@@ -75,7 +171,7 @@ function onKey(event: KeyboardEvent) {
 }
 let gesture: { x: number; y: number; id: number } | null = null
 function pointerStart(event: PointerEvent) {
-  if (!event.isPrimary || event.button !== 0) return
+  if (busy.value || !event.isPrimary || event.button !== 0) return
   gesture = { x: event.clientX, y: event.clientY, id: event.pointerId }
   boardElement.value?.setPointerCapture(event.pointerId)
   boardElement.value?.focus({ preventScroll: true })
@@ -103,17 +199,26 @@ function pointerEnd(event: PointerEvent) {
           </div>
         </div>
         <div class="game-actions">
-          <button class="game-button" :disabled="!history.length" @click="undo">
+          <button class="game-button" :disabled="busy || !history.length" @click="undo">
             <Undo2 :size="16" aria-hidden="true" />撤销</button
           ><button class="game-button" @click="restart">
             <RotateCcw :size="16" aria-hidden="true" />重新开始
           </button>
+          <label class="number-motion-toggle"
+            ><input
+              v-model="animationsOff"
+              type="checkbox"
+              :disabled="motion.reduced.value"
+            />无动画<span v-if="motion.reduced.value">（系统设置）</span></label
+          >
         </div>
       </div>
       <div class="number-play" @keydown="onKey">
         <div
           ref="boardElement"
           class="number-board"
+          :class="{ 'is-sliding': sliding }"
+          :aria-busy="busy"
           tabindex="0"
           role="group"
           aria-label="2048 棋盘，使用方向键或 WASD 移动"
@@ -126,11 +231,27 @@ function pointerEnd(event: PointerEvent) {
           <div
             v-for="(value, index) in game.board"
             :key="index"
-            class="number-tile"
+            class="number-tile number-face"
             :data-level="value ? Math.min(11, Math.log2(value)) : 0"
             :aria-label="`第 ${Math.floor(index / 4) + 1} 行第 ${(index % 4) + 1} 列：${value || '空'}`"
           >
             <span :key="value">{{ value || '' }}</span>
+          </div>
+          <div v-if="sliding" class="number-flight-layer" aria-hidden="true">
+            <div
+              v-for="tile in flights"
+              :key="tile.from"
+              class="number-flight number-face"
+              :data-level="Math.min(11, Math.log2(tile.value))"
+              :style="{
+                left: `${tile.x}px`,
+                top: `${tile.y}px`,
+                width: `${tile.size}px`,
+                height: `${tile.size}px`,
+              }"
+            >
+              {{ tile.value }}
+            </div>
           </div>
         </div>
         <div class="number-directions" role="group" aria-label="移动方向">
@@ -140,6 +261,7 @@ function pointerEnd(event: PointerEvent) {
             class="game-button"
             :aria-label="direction.label"
             :title="direction.label"
+            :disabled="busy"
             @click="move(direction.id)"
           >
             <component :is="direction.icon" :size="20" aria-hidden="true" />

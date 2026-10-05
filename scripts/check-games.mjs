@@ -37,6 +37,22 @@ assert.deepEqual(
   number.slide([2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0], 'down').board,
   [0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0],
 )
+const trace = number.traceSlide(rowBoard([2, 2, 2, 2]), 'right')
+assert.deepEqual(trace.merges, [3, 2])
+assert.deepEqual(trace.movements, [
+  { from: 3, to: 3, value: 2 },
+  { from: 2, to: 3, value: 2 },
+  { from: 1, to: 2, value: 2 },
+  { from: 0, to: 2, value: 2 },
+])
+assert.deepEqual(
+  number.traceSlide([2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0], 'down').movements,
+  [
+    { from: 8, to: 12, value: 4 },
+    { from: 4, to: 8, value: 2 },
+    { from: 0, to: 8, value: 2 },
+  ],
+)
 const fixed = { board: rowBoard([2, 0, 0, 0]), score: 0 }
 assert.equal(number.moveNumbers(fixed, 'left'), fixed, 'Invalid move must not spawn')
 assert.deepEqual(number.moveNumbers(fixed, 'right', () => 0).board, rowBoard([2, 0, 0, 2]))

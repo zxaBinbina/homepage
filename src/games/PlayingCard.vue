@@ -8,4 +8,5 @@ defineProps<{ card: Card }>()
       >{{ rankName(card.rank) }}<span>{{ suits[card.suit] }}</span></span
     ><span class="card-center">{{ suits[card.suit] }}</span></span
   >
+  <span class="playing-card-reverse" aria-hidden="true">✦</span>
 </template>
