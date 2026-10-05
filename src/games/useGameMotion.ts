@@ -27,12 +27,15 @@ export function useGameMotion(disabled?: Ref<boolean>) {
           await animation.finished
         } catch {
           /* Cancellation also releases the input lock. */
-        } finally {
-          animation.cancel()
-          running.delete(animation)
         }
       }),
     )
+    // Keep completed cards at their destination until the whole sequence has settled.
+    animations.forEach((animation) => {
+      if (!animation) return
+      animation.cancel()
+      running.delete(animation)
+    })
   }
   function cancel() {
     running.forEach((animation) => animation.cancel())

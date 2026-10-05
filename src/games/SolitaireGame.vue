@@ -20,7 +20,6 @@ import {
   type CardSource,
   type CardTarget,
   type SolitaireGame,
-  type Card,
 } from './solitaire'
 
 const game = ref(newSolitaire())
@@ -31,7 +30,6 @@ const scroll = ref<HTMLElement>()
 const stage = ref<HTMLElement>()
 const motion = useGameMotion()
 const moving = ref(false)
-const recyclingCard = ref<Card | null>(null)
 const celebrating = ref(false)
 const celebrationKey = ref(0)
 const celebrationOrigins = ref<{ x: number; y: number }[]>([])
@@ -157,8 +155,10 @@ function stopMotion() {
   surface.value
     ?.querySelectorAll('.is-stack-moving')
     .forEach((element) => element.classList.remove('is-stack-moving'))
+  surface.value
+    ?.querySelectorAll('.is-recycling-card')
+    .forEach((element) => element.classList.remove('is-recycling-card'))
   moving.value = false
-  recyclingCard.value = null
   celebrating.value = false
 }
 function restart() {
@@ -182,6 +182,7 @@ async function recycleStock() {
   if (result === original) return
   if (motion.reduced.value || document.hidden) {
     void commit(result)
+    notice.value = '已收回翻牌，再点牌堆从头翻起。'
     return
   }
   const current = ++turn
@@ -190,52 +191,39 @@ async function recycleStock() {
   selected.value = null
   moving.value = true
   notice.value = '正在逐张收回翻牌…'
-  while (game.value.waste.length) {
-    if (current !== turn) return
-    if (motion.reduced.value || document.hidden) {
-      game.value = result
-      break
-    }
-    const card = game.value.waste.at(-1)!
-    const from = surface
-      .value!.querySelector<HTMLElement>(`.waste-stack [data-card-id="${cardId(card)}"]`)!
-      .getBoundingClientRect()
-    recyclingCard.value = card
-    game.value = {
-      ...game.value,
-      stock: [...game.value.stock, { ...card, faceUp: false }],
-      waste: game.value.waste.slice(0, -1),
-      moves: result.moves,
-    }
-    await nextTick()
-    if (current !== turn) return
-    const stock = surface.value!.querySelector<HTMLElement>('.stock-card')!
-    const stack = stock.closest<HTMLElement>('.solitaire-slot')!
-    const to = stock.getBoundingClientRect()
-    stock.classList.add('is-card-moving')
-    stack.classList.add('is-stack-moving')
-    await motion.settle([
-      motion.animate(
-        stock,
-        [
-          { transform: `translate(${from.left - to.left}px,${from.top - to.top}px) rotateY(0deg)` },
-          {
-            transform: `translate(${(from.left - to.left) * 0.45}px,${(from.top - to.top) * 0.45}px) rotateY(90deg)`,
-            offset: 0.5,
-          },
-          { transform: 'translate(0,0) rotateY(180deg)' },
-        ],
-        { duration: 130, fill: 'both', easing: 'ease-in-out' },
-      ),
-    ])
-    stock.classList.remove('is-card-moving')
-    stack.classList.remove('is-stack-moving')
-    if (current !== turn) return
-    recyclingCard.value = null
-    await nextTick()
-  }
+  const cards = Array.from(
+    surface.value!.querySelectorAll<HTMLElement>('.waste-stack [data-card-id]'),
+  ).reverse()
+  const stack = cards[0]!.closest<HTMLElement>('.solitaire-slot')!
+  const to = surface.value!.querySelector('.stock-card')!.getBoundingClientRect()
+  // One shared timeline avoids accumulating a new frame's delay for every card.
+  const duration = Math.min(130, 400 / cards.length)
+  stack.classList.add('is-stack-moving')
+  const animations = cards.map((element, index) => {
+    const from = element.getBoundingClientRect()
+    const dx = to.left - from.left,
+      dy = to.top - from.top
+    const zIndex = 130 + index
+    element.classList.add('is-recycling-card')
+    return motion.animate(
+      element,
+      [
+        { transform: 'translate(0,0) rotateY(0deg)', zIndex },
+        {
+          transform: `translate(${dx * 0.55}px,${dy * 0.55}px) rotateY(90deg)`,
+          offset: 0.5,
+          zIndex,
+        },
+        { transform: `translate(${dx}px,${dy}px) rotateY(180deg)`, zIndex },
+      ],
+      { duration, delay: index * duration, fill: 'forwards', easing: 'ease-in-out' },
+    )
+  })
+  await motion.settle(animations)
+  cards.forEach((element) => element.classList.remove('is-recycling-card'))
+  stack.classList.remove('is-stack-moving')
   if (current !== turn) return
-  recyclingCard.value = null
+  game.value = result
   moving.value = false
   notice.value = '已收回翻牌，再点牌堆从头翻起。'
 }
@@ -380,11 +368,7 @@ onBeforeUnmount(() => {
                 </div>
                 <button
                   class="playing-card stock-card"
-                  :class="{
-                    'card-back': game.stock.length && !recyclingCard,
-                    'is-recycling-card': recyclingCard,
-                    'is-red': recyclingCard && redCard(recyclingCard),
-                  }"
+                  :class="{ 'card-back': game.stock.length }"
                   :disabled="locked || (!game.stock.length && !game.waste.length) || won"
                   :data-card-id="game.stock.length ? cardId(game.stock.at(-1)!) : undefined"
                   :aria-label="
@@ -396,11 +380,7 @@ onBeforeUnmount(() => {
                   "
                   @click="draw"
                 >
-                  <PlayingCard v-if="recyclingCard" :card="recyclingCard" /><span
-                    v-else-if="game.stock.length"
-                    class="stock-mark"
-                    aria-hidden="true"
-                    >✦</span
+                  <span v-if="game.stock.length" class="stock-mark" aria-hidden="true">✦</span
                   ><span v-else class="stock-recycle"
                     ><RotateCcw :size="22" aria-hidden="true" />{{
                       game.waste.length ? '再翻一轮' : '空'

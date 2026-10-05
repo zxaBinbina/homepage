@@ -107,7 +107,7 @@ with sync_playwright() as p:
     expect(page.locator('.solitaire-surface')).to_have_attribute('aria-busy', 'true')
     page.wait_for_function('Array.from(document.querySelectorAll(".is-card-moving")).some(el => el.getAnimations().some(a => a.effect.getKeyframes().some(f => f.transform?.includes("rotateY(180deg)"))))')
     page.locator('.is-card-moving').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.pause(); a.currentTime=120}))')
-    page.screenshot(path=str(out / 'game-motion-solitaire-flip.png'), full_page=True)
+    page.screenshot(path=str(out / 'game-motion-solitaire-flip.png'))
     page.locator('.is-card-moving').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => a.finish()))')
     card_idle()
     old_id = page.locator('.waste-stack > button').get_attribute('data-card-id')
@@ -118,28 +118,65 @@ with sync_playwright() as p:
     assert page.locator(f'.waste-stack [data-card-id="{old_id}"]').bounding_box() == old_bounds
     assert page.locator('.stock-card').evaluate('(el) => getComputedStyle(el).backgroundColor') != 'rgba(0, 0, 0, 0)'
     card_idle()
-    # A valid late-game fixture with three kings in the waste tests each returning card.
-    page.evaluate('''() => {
-      const state = document.querySelector('.solitaire-surface').__vueParentComponent.setupState;
-      const card = (suit,rank) => ({suit,rank,faceUp:true});
-      state.game = {stock:[], waste:[card(0,13),card(1,13),card(2,13)], moves:0,
-        foundations:Array.from({length:4},(_,suit)=>Array.from({length:suit===3?13:12},(_,i)=>card(suit,i+1))),
-        tableau:[[],[],[],[],[],[],[]]};
-      state.history = [];
-      window.recycleCounts = [];
-      new MutationObserver(() => recycleCounts.push(state.game.stock.length)).observe(document.querySelector('.pile-label'), {childList:true,subtree:true,characterData:true});
-    }''')
+    # Valid late-game deals cover both a single card and a full stock's worth.
+    recycle_durations = []
+    single_card_durations = []
+    for count in [1, 3, 24]:
+        page.evaluate('''count => {
+          const surface = document.querySelector('.solitaire-surface');
+          const state = surface.__vueParentComponent.setupState;
+          const card = (suit,rank) => ({suit,rank,faceUp:true});
+          state.game = {stock:[], moves:0,
+            waste:Array.from({length:count},(_,i)=>card(Math.floor(i/13),13-i%13)),
+            foundations:Array.from({length:4},(_,suit)=>Array.from({length:13-Math.min(13,Math.max(0,count-suit*13))},(_,i)=>card(suit,i+1))),
+            tableau:[[],[],[],[],[],[],[]]};
+          state.history = [];
+          window.recycleTimes = [];
+          window.recycleObserver?.disconnect();
+          window.recycleObserver = new MutationObserver(() => recycleTimes.push({busy:surface.getAttribute('aria-busy'),time:performance.now()}));
+          recycleObserver.observe(surface, {attributes:true,attributeFilter:['aria-busy']});
+        }''', count)
+        page.locator('.stock-card').click()
+        expect(page.locator('.is-recycling-card')).to_have_count(count)
+        timing = page.locator('.is-recycling-card').evaluate_all('els => els.map(el => el.getAnimations()[0].effect.getTiming()).sort((a,b) => a.delay-b.delay)')
+        assert len({t['delay'] for t in timing}) == count, 'Cards must leave individually'
+        assert max(t['delay'] + t['duration'] for t in timing) <= 401
+        single_card_durations.append(timing[0]['duration'])
+        card_idle()
+        elapsed = page.evaluate('recycleTimes.find(t=>t.busy==="false").time-recycleTimes.find(t=>t.busy==="true").time')
+        assert 0 < elapsed <= 500, (count, elapsed)
+        recycle_durations.append(f'{count} cards: {elapsed:.0f}ms')
+        expected_stock = [[i // 13, 13-i % 13, False] for i in reversed(range(count))]
+        assert page.evaluate('''() => document.querySelector('.solitaire-surface').__vueParentComponent.setupState.game.stock.map(c => [c.suit,c.rank,c.faceUp])''') == expected_stock
+        expect(page.locator('.pile-label').first).to_have_text(f'牌堆 · {count}')
+        expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
+        page.get_by_role('button', name='撤销', exact=True).click()
+        card_idle()
+        expect(page.locator('.waste-stack .playing-card')).to_have_count(count)
+        expect(page.locator('.pile-label').first).to_have_text('牌堆 · 0')
+    assert single_card_durations[0] > single_card_durations[-1], 'More cards must flip faster'
+    print('Solitaire recycle timing: ' + ', '.join(recycle_durations), flush=True)
+    # Disabling motion during recycling completes every remaining card and unlocks input.
     page.locator('.stock-card').click()
-    expect(page.locator('.is-recycling-card')).to_have_count(1)
+    expect(page.locator('.is-recycling-card')).to_have_count(24)
+    page.locator('.is-recycling-card').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.pause(); a.currentTime=180}))')
+    page.screenshot(path=str(out / 'game-motion-solitaire-recycle.png'))
+    page.emulate_media(reduced_motion='reduce')
     card_idle()
-    assert page.evaluate('[1,2,3].every(n => recycleCounts.includes(n))')
-    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 3')
-    expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 24')
+    expect(page.locator('.is-recycling-card, .is-card-moving')).to_have_count(0)
     page.get_by_role('button', name='撤销', exact=True).click()
     card_idle()
-    expect(page.locator('.waste-stack .playing-card')).to_have_count(3)
-    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 0')
+    page.emulate_media(reduced_motion='no-preference')
+    # Restart cancels the sequence without allowing an old card to reappear.
+    page.locator('.stock-card').click()
+    expect(page.locator('.is-recycling-card')).to_have_count(24)
     page.get_by_role('button', name='重新开始', exact=True).click()
+    page.wait_for_timeout(500)
+    card_idle()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 24')
+    expect(page.locator('.waste-stack .playing-card')).to_have_count(0)
+    expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
     mouse_drag(page.locator('.tableau-card[data-card-id="0-1"]'), page.locator('.foundation-card').first)
     expect(page.locator('.game-stats strong').first).to_have_text('1 / 52')
     # A queen cannot enter an empty column; it returns without consuming a move.
@@ -162,7 +199,7 @@ with sync_playwright() as p:
     page.keyboard.press('Escape')
     page.mouse.up()
     expect(page.locator('.solitaire-drag-layer')).to_have_count(0)
-    print('Solitaire: stock flip, mouse drag, invalid return, stack drag, undo and Escape passed.', flush=True)
+    print('Solitaire: draw overlay, individual recycle, card order, cancellation, reduced motion, mouse/stack drag, undo and Escape passed.', flush=True)
 
     # Only the dev build exposes Vue component state; no fixture hooks ship to visitors.
     # Start one move from completion so the real commit path triggers the celebration.
@@ -253,9 +290,10 @@ with sync_playwright() as p:
     colors = []
     for theme in ['dark','light']:
         phone.evaluate('(theme) => document.documentElement.dataset.theme=theme',theme)
-        colors.append(phone.locator('.tableau-card:not(.card-back)').first.evaluate('(el) => getComputedStyle(el).backgroundColor'))
+        phone.wait_for_timeout(350)
+        colors.append([phone.locator(selector).first.evaluate('(el) => getComputedStyle(el).backgroundColor') for selector in ['.tableau-card:not(.card-back)', '.tableau-card.card-back']])
         phone.screenshot(path=str(out / f'game-motion-cards-{theme}-landscape.png'), full_page=True)
-    assert colors[0] != colors[1]
+    assert all(dark != light for dark, light in zip(colors[0], colors[1]))
     assert phone.evaluate('document.documentElement.scrollWidth <= innerWidth')
     print('Touch: hold-to-drag, ordinary scrolling, edge scrolling, cancellation, landscape hint and card themes passed.', flush=True)
     assert not errors, errors

@@ -3240,7 +3240,7 @@ h1 > span {
   text-align: center;
   font-size: 11px;
 }
-.stock-card:disabled:not(.card-back):not(.is-recycling-card),
+.stock-card:disabled:not(.card-back),
 .card-placeholder,
 .foundation-card.is-empty {
   border: 1px dashed var(--border);
