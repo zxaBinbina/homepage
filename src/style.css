@@ -3199,6 +3199,9 @@ h1 > span {
     ),
     var(--panel);
 }
+.solitaire-result {
+  margin-top: 0;
+}
 .solitaire-scroll {
   overflow-x: auto;
   padding: 6px;
@@ -3389,9 +3392,6 @@ h1 > span {
   outline-offset: 2px;
   background: color-mix(in srgb, var(--blue) 10%, var(--panel));
   color: var(--blue);
-}
-.solitaire-bottom {
-  margin-top: 24px;
 }
 /* Moving layers are decorative; the underlying game remains the source of state. */
 .number-flight-layer {

@@ -315,8 +315,25 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="game-actions">
+        <p v-show="won" class="game-status solitaire-result is-success" role="status">
+          {{ won ? '52 张牌全部归位，接龙成功！' : '' }}
+        </p>
         <button class="game-button" :disabled="locked || !history.length" @click="undo">
           <Undo2 :size="16" aria-hidden="true" />撤销
+        </button>
+        <button class="game-button" :disabled="!selected || moving" @click="cancel">
+          取消选牌
+        </button>
+        <button v-if="celebrating" class="game-button" @click="celebrating = false">
+          跳过庆祝
+        </button>
+        <button
+          v-else-if="won && !motion.reduced.value"
+          class="game-button"
+          :disabled="moving"
+          @click="celebrate"
+        >
+          重播庆祝
         </button>
         <div class="game-restart-actions">
           <button class="game-button" @click="restart">
@@ -523,21 +540,6 @@ onBeforeUnmount(() => {
         @finished="celebrating = false"
       />
     </div>
-    <div class="game-actions solitaire-bottom">
-      <button class="game-button" :disabled="!selected || moving" @click="cancel">取消选牌</button>
-      <button v-if="celebrating" class="game-button" @click="celebrating = false">跳过庆祝</button>
-      <button
-        v-else-if="won && !motion.reduced.value"
-        class="game-button"
-        :disabled="moving"
-        @click="celebrate"
-      >
-        重播庆祝
-      </button>
-    </div>
-    <p v-show="won" class="game-status is-success" role="status">
-      {{ won ? '52 张牌全部归位，接龙成功！' : '' }}
-    </p>
   </section>
   <Teleport :to="(fullscreen?.active.value ? fullscreen.overlay.value : surface) || 'body'"
     ><div v-if="dragState" class="solitaire-drag-layer" aria-hidden="true">
