@@ -244,12 +244,12 @@ function onKey(event: KeyboardEvent) {
             aria-hidden="true"
           ></span>
           <div
-            v-if="!started || paused || game.status !== 'playing'"
+            v-if="game.status === 'playing' && (!started || paused)"
             class="tetris-curtain"
             role="status"
           >
-            <strong>{{ status || (paused ? '已暂停' : '准备好了吗？') }}</strong
-            ><span v-if="game.status === 'playing'">{{
+            <strong>{{ paused ? '已暂停' : '准备好了吗？' }}</strong
+            ><span>{{
               paused ? '点击继续，接着这一局。' : '点击开始，让方块落下。'
             }}</span>
           </div>

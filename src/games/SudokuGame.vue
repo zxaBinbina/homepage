@@ -13,7 +13,6 @@ const notes = ref<number[][]>(Array.from({ length: 81 }, () => [])),
   selected = ref(board.value.findIndex((v) => !v))
 const noteMode = ref(false),
   hints = ref(0),
-  checked = ref(false),
   boardElement = ref<HTMLElement>()
 type Snapshot = { board: number[]; notes: number[][] }
 const history = ref<Snapshot[]>([]),
@@ -22,17 +21,7 @@ const onArrow = useBoardKeyboard(boardElement, selected, 9, 81)
 const conflicts = computed(() => sudokuConflicts(board.value))
 const won = computed(() => board.value.every(Boolean) && !conflicts.value.some(Boolean))
 const filled = computed(() => board.value.filter(Boolean).length)
-const message = computed(() =>
-  won.value
-    ? '全部填对了，这一局解开了！'
-    : conflicts.value.some(Boolean)
-      ? '有数字在行、列或宫内重复，请检查标记的格子。'
-      : checked.value
-        ? board.value.some((v, i) => v && v !== puzzle.value.solution[i])
-          ? '标记的数字还需要再想一想。'
-          : '已填数字都正确，继续吧。'
-        : '',
-)
+const message = computed(() => (won.value ? '全部填对了，这一局解开了！' : ''))
 function remember() {
   history.value.push({ board: [...board.value], notes: notes.value.map((v) => [...v]) })
   if (history.value.length > 100) history.value.shift()
@@ -56,7 +45,6 @@ async function enter(value: number, hint = false) {
         peers(at, i) ? set.filter((n) => n !== value) : set,
       )
   }
-  checked.value = false
   await nextTick()
   void motion.settle([
     motion.animate(
@@ -85,7 +73,6 @@ function undo() {
   if (previous) {
     board.value = previous.board
     notes.value = previous.notes
-    checked.value = false
     motion.cancel()
   }
 }
@@ -96,7 +83,6 @@ function restart() {
   notes.value = Array.from({ length: 81 }, () => [])
   selected.value = board.value.findIndex((v) => !v)
   history.value = []
-  checked.value = false
   hints.value = 0
 }
 function onKey(event: KeyboardEvent) {
@@ -142,12 +128,7 @@ function onKey(event: KeyboardEvent) {
               <RotateCcw :size="16" aria-hidden="true" />重新开始</button
             ><GameFullscreenButton />
           </div>
-          <p
-            v-show="message"
-            class="game-status"
-            :class="{ 'is-success': won, 'is-ended': conflicts.some(Boolean) }"
-            role="status"
-          >
+          <p v-show="message" class="game-status is-success" role="status">
             {{ message }}
           </p>
         </div>
@@ -169,7 +150,7 @@ function onKey(event: KeyboardEvent) {
               'is-selected': i === selected,
               'is-peer': i !== selected && peers(i, selected),
               'is-matching': value && value === board[selected],
-              'is-conflict': conflicts[i] || (checked && value && value !== puzzle.solution[i]),
+              'is-conflict': conflicts[i],
               'is-box-right': i % 9 === 2 || i % 9 === 5,
               'is-box-bottom': Math.floor(i / 9) === 2 || Math.floor(i / 9) === 5,
             }"
@@ -198,7 +179,12 @@ function onKey(event: KeyboardEvent) {
           </button>
         </div>
         <div class="game-actions sudoku-actions">
-          <button class="game-button" :aria-pressed="noteMode" @click="noteMode = !noteMode">
+          <button
+            class="game-button"
+            :aria-pressed="noteMode"
+            title="记录候选数字，不会填入正式答案"
+            @click="noteMode = !noteMode"
+          >
             <Pencil :size="16" aria-hidden="true" />笔记
           </button>
           <button
@@ -211,7 +197,6 @@ function onKey(event: KeyboardEvent) {
           <button class="game-button" :disabled="won" @click="hint">
             <Lightbulb :size="16" aria-hidden="true" />提示一格
           </button>
-          <button class="game-button" :disabled="won" @click="checked = true">检查</button>
         </div>
       </div>
     </section>
