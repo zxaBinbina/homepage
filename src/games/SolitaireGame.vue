@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="game-actions">
-        <p v-show="won" class="game-status solitaire-result is-success" role="status">
+        <p v-show="won" class="game-status is-success" role="status">
           {{ won ? '52 张牌全部归位，接龙成功！' : '' }}
         </p>
         <button class="game-button" :disabled="locked || !history.length" @click="undo">

@@ -194,6 +194,15 @@ function pointerEnd(event: PointerEvent) {
           </div>
         </div>
         <div class="game-actions">
+          <p
+            id="number-status"
+            v-show="status"
+            class="game-status"
+            :class="{ 'is-success': largest >= 2048, 'is-ended': over }"
+            role="status"
+          >
+            {{ status }}
+          </p>
           <button class="game-button" :disabled="busy || !history.length" @click="undo">
             <Undo2 :size="16" aria-hidden="true" />撤销
           </button>
@@ -266,15 +275,6 @@ function pointerEnd(event: PointerEvent) {
           </button>
         </div>
       </div>
-      <p
-        id="number-status"
-        v-show="status"
-        class="game-status"
-        :class="{ 'is-success': largest >= 2048, 'is-ended': over }"
-        role="status"
-      >
-        {{ status }}
-      </p>
     </section>
   </div>
 </template>

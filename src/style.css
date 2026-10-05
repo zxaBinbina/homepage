@@ -2933,7 +2933,7 @@ h1 > span {
   opacity: 0.45;
 }
 .game-status {
-  margin-top: 20px;
+  margin: 0;
   font-size: 13px;
   line-height: 1.8;
   color: var(--muted);
@@ -3198,9 +3198,6 @@ h1 > span {
       transparent 70%
     ),
     var(--panel);
-}
-.solitaire-result {
-  margin-top: 0;
 }
 .solitaire-scroll {
   overflow-x: auto;

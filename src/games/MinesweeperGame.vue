@@ -271,6 +271,14 @@ function onKey(event: KeyboardEvent, index: number) {
             </option>
           </select></label
         >
+        <p
+          v-show="status"
+          class="game-status"
+          :class="{ 'is-success': game.status === 'won', 'is-ended': game.status === 'lost' }"
+          role="status"
+        >
+          {{ status }}
+        </p>
         <div class="game-restart-actions">
           <button class="game-button" @click="restart">
             <RotateCcw :size="16" aria-hidden="true" />重新开始</button
@@ -338,14 +346,6 @@ function onKey(event: KeyboardEvent, index: number) {
           </div>
         </div>
       </div>
-      <p
-        v-show="status"
-        class="game-status"
-        :class="{ 'is-success': game.status === 'won', 'is-ended': game.status === 'lost' }"
-        role="status"
-      >
-        {{ status }}
-      </p>
     </section>
   </div>
 </template>
