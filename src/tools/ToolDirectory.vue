@@ -3,10 +3,16 @@ import { computed, ref } from 'vue'
 import {
   ArrowUpRight,
   Braces,
+  Binary,
+  CodeXml,
   Clock3,
   Fingerprint,
+  Hash,
+  KeyRound,
   Link2,
   ScanText,
+  Palette,
+  FileKey2,
   Search,
   TextCursorInput,
   X,
@@ -22,10 +28,16 @@ const icons = {
   timestamp: Clock3,
   uuid: Fingerprint,
   text: TextCursorInput,
+  radix: Binary,
+  hash: Hash,
+  jwt: FileKey2,
+  password: KeyRound,
+  html: CodeXml,
+  color: Palette,
 }
 const query = ref('')
 const category = ref('全部')
-const categories = ['全部', '开发', '编码', '文本']
+const categories = ['全部', ...new Set(toolIds.map((id) => toolCatalog[id].category))]
 const matches = computed(() =>
   toolIds.filter((id) => {
     const tool = toolCatalog[id]

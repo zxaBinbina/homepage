@@ -6,6 +6,8 @@ import { toolCatalog, type ToolId } from './catalog'
 import TextTools from './components/TextTools.vue'
 import TimestampTool from './components/TimestampTool.vue'
 import UuidTool from './components/UuidTool.vue'
+import PasswordTool from './components/PasswordTool.vue'
+import ColorTool from './components/ColorTool.vue'
 
 const props = defineProps<{ id: ToolId }>()
 const tool = computed(() => toolCatalog[props.id])
@@ -21,6 +23,8 @@ const tool = computed(() => toolCatalog[props.id])
       </header>
       <TimestampTool v-if="id === 'timestamp'" />
       <UuidTool v-else-if="id === 'uuid'" />
+      <PasswordTool v-else-if="id === 'password'" />
+      <ColorTool v-else-if="id === 'color'" />
       <TextTools v-else :id="id" />
       <p v-if="tool.hint" class="tool-hint">{{ tool.hint }}</p>
     </main>

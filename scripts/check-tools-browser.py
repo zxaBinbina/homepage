@@ -1,13 +1,15 @@
 """Check tools against a running build preview; no external APIs are needed."""
 import os
 import re
+import hashlib
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:5173').rstrip('/')
 out = Path('artifacts')
 out.mkdir(exist_ok=True)
-routes = ['tool', 'tools/json', 'tools/base64', 'tools/url', 'tools/timestamp', 'tools/uuid', 'tools/text']
+text_tools = ['json', 'base64', 'url', 'text', 'radix', 'hash', 'jwt', 'html']
+routes = ['tool'] + ['tools/' + tool for tool in text_tools + ['timestamp', 'uuid', 'password', 'color']]
 
 def check_resized_editors(page, capture=False):
     # Native resizing writes an inline height. Exercise either side independently,
@@ -41,11 +43,14 @@ with sync_playwright() as p:
     page.evaluate('window.toolProbe = {header: document.querySelector(".header")}')
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='工具', exact=True).click()
     expect(page).to_have_url(base + '/tool')
-    expect(page.locator('.tool-card')).to_have_count(6)
+    expect(page.locator('.tool-card')).to_have_count(12)
     assert page.evaluate('toolProbe.header === document.querySelector(".header")')
     expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('工具')
     page.get_by_role('button', name='编码', exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(2)
+    expect(page.locator('.tool-card')).to_have_count(3)
+    page.get_by_role('button', name='设计', exact=True).click()
+    expect(page.locator('.tool-card')).to_have_count(1)
+    expect(page.locator('.tool-card')).to_contain_text('颜色转换')
     page.get_by_role('searchbox', name='搜索工具').fill('not-a-tool')
     expect(page.locator('.directory-empty')).to_be_visible()
     page.get_by_role('button', name='查看全部工具').click()
@@ -158,6 +163,115 @@ with sync_playwright() as p:
     expect(page.locator('.tool-output [role="status"]')).to_contain_text('结果为空文本')
     expect(page.get_by_role('button', name='复制', exact=True)).to_be_enabled()
 
+    page.goto(base + '/tools/radix', wait_until='networkidle')
+    input_box.fill('123456789012345678901234567890')
+    page.get_by_role('button', name='转换进制').click()
+    expect(output).to_have_value(format(123456789012345678901234567890, 'X'))
+    page.get_by_label('输入进制', exact=True).select_option('16')
+    expect(output).to_have_value('')
+    input_box.fill('-0xFF')
+    page.get_by_label('输出进制', exact=True).select_option('10')
+    page.get_by_role('button', name='转换进制').click()
+    expect(output).to_have_value('-255')
+    input_box.fill('XYZ')
+    page.get_by_role('button', name='转换进制').click()
+    expect(page.get_by_role('alert')).to_be_visible()
+
+    page.goto(base + '/tools/hash', wait_until='networkidle')
+    page.get_by_role('button', name='计算哈希').click()
+    expect(output).to_have_value(hashlib.sha256(b'').hexdigest())
+    input_box.fill('你好 🌍')
+    page.get_by_label('哈希算法').select_option('SHA-512')
+    page.get_by_label('输出大写').check()
+    page.get_by_role('button', name='计算哈希').click()
+    expect(output).to_have_value(hashlib.sha512('你好 🌍'.encode()).hexdigest().upper())
+    # Hold the digest promise, then edit input or options before it resolves.
+    page.evaluate('''() => {
+        const digest = crypto.subtle.digest.bind(crypto.subtle);
+        crypto.subtle.digest = (...args) => new Promise((resolve, reject) => {
+            window.finishDigest = () => digest(...args).then(resolve, reject);
+        });
+    }''')
+    for change in ['input', 'algorithm']:
+        page.get_by_role('button', name='计算哈希').click()
+        expect(page.get_by_role('button', name='计算中…')).to_be_disabled()
+        if change == 'input':
+            input_box.fill('changed')
+        else:
+            page.get_by_label('哈希算法').select_option('SHA-256')
+        page.evaluate('async () => { await window.finishDigest(); await new Promise(requestAnimationFrame); }')
+        expect(output).to_have_value('')
+        expect(page.get_by_role('button', name='复制', exact=True)).to_be_disabled()
+
+    page.goto(base + '/tools/jwt', wait_until='networkidle')
+    page.get_by_role('button', name='示例', exact=True).click()
+    page.get_by_role('button', name='解析 JWT').click()
+    assert 'a彬彬a' in output.input_value()
+    assert '签名：未验证' in output.input_value()
+    assert '2030-01-01T00:00:00.000Z' in output.input_value()
+    input_box.fill('bad.token')
+    page.get_by_role('button', name='解析 JWT').click()
+    expect(page.get_by_role('alert')).to_be_visible()
+    expect(output).to_have_value('')
+
+    page.goto(base + '/tools/html', wait_until='networkidle')
+    source = '<p title="中文">a & b</p>'
+    input_box.fill(source)
+    page.get_by_role('button', name='转义', exact=True).click()
+    expect(output).to_have_value('&lt;p title=&quot;中文&quot;&gt;a &amp; b&lt;/p&gt;')
+    page.get_by_role('button', name='将结果用作输入').click()
+    page.get_by_role('button', name='还原', exact=True).click()
+    expect(output).to_have_value(source)
+    input_box.fill('&copy; &#65; &#x1F30D; &amp;lt; &unknown;')
+    page.get_by_role('button', name='还原', exact=True).click()
+    expect(output).to_have_value('© A 🌍 &lt; &unknown;')
+    source = '</textarea><img src="/tool-html-probe" onerror="window.htmlExecuted=true">&lt;script&gt;'
+    probe_requests = []
+    page.on('request', lambda request: probe_requests.append(request.url) if '/tool-html-probe' in request.url else None)
+    input_box.fill(source)
+    page.get_by_role('button', name='还原', exact=True).click()
+    expect(output).to_have_value(source.replace('&lt;script&gt;', '<script>'))
+    assert page.evaluate('window.htmlExecuted === undefined')
+    assert not probe_requests
+
+    page.goto(base + '/tools/password', wait_until='networkidle')
+    page.get_by_label('密码长度', exact=True).fill('24')
+    page.get_by_label('生成数量', exact=True).fill('10')
+    page.get_by_role('button', name='生成密码').click()
+    passwords = output.input_value().splitlines()
+    assert len(passwords) == 10
+    assert all(len(value) == 24 and not re.search(r'[0Oo1Il|]', value) for value in passwords)
+    page.get_by_role('button', name='复制', exact=True).click()
+    assert page.evaluate('navigator.clipboard.readText()') == output.input_value()
+    with page.expect_download() as info:
+        page.get_by_role('button', name='下载', exact=True).click()
+    assert info.value.suggested_filename == 'passwords.txt'
+    assert Path(info.value.path()).read_text() == output.input_value()
+    for label in ['小写字母', '大写字母', '数字', '符号']:
+        page.get_by_label(label, exact=True).uncheck()
+    expect(output).to_have_value('')
+    page.get_by_role('button', name='生成密码').click()
+    expect(page.get_by_role('alert')).to_contain_text('至少选择')
+    page.get_by_label('数字', exact=True).check()
+    page.get_by_role('button', name='生成密码').click()
+    assert all(re.fullmatch(r'[2-9]{24}', value) for value in output.input_value().splitlines())
+    page.get_by_label('密码长度', exact=True).fill('7')
+    page.get_by_role('button', name='生成密码').click()
+    expect(output).to_have_value('')
+
+    page.goto(base + '/tools/color', wait_until='networkidle')
+    page.get_by_label('输入颜色', exact=True).fill('hsl(120, 100%, 50%)')
+    page.get_by_role('button', name='转换颜色').click()
+    assert '#00FF00' in output.input_value()
+    expect(page.get_by_role('img', name='颜色预览：#00FF00')).to_have_css('background-color', 'rgb(0, 255, 0)')
+    page.get_by_label('取色器').fill('#ff0000')
+    assert '#FF0000' in output.input_value()
+    expect(page.get_by_label('输入颜色', exact=True)).to_have_value('#ff0000')
+    page.get_by_label('输入颜色', exact=True).fill('rgb(256, 0, 0)')
+    expect(output).to_have_value('')
+    page.get_by_role('button', name='转换颜色').click()
+    expect(page.get_by_role('alert')).to_be_visible()
+
     # Every address loads its own metadata directly and after refresh.
     for route in routes:
         response = context.request.get(base + '/' + route)
@@ -181,14 +295,18 @@ with sync_playwright() as p:
                 page.set_viewport_size({'width': width, 'height': 1000})
                 page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (route, theme, width)
-                if route in ['tools/json', 'tools/base64', 'tools/url', 'tools/text'] and width in [390, 768, 1440]:
+                if route in ['tools/' + tool for tool in text_tools] and width in [390, 768, 1440]:
                     check_resized_editors(page)
                 assert page.locator('.tool-workspace button').evaluate_all('buttons => buttons.every(button => button.getBoundingClientRect().height >= 44)'), ('small touch target', route, width)
                 assert page.locator('.header').evaluate('el => [...el.querySelectorAll("a,button")].filter(e => e.getBoundingClientRect().width).every(e => e.getBoundingClientRect().right <= el.getBoundingClientRect().right + 1)'), ('header overflow', route, theme, width, page.locator('.header').evaluate('el => ({header:el.getBoundingClientRect().toJSON(), children:[...el.querySelectorAll("a,button")].filter(e=>e.getBoundingClientRect().width).map(e=>({text:e.textContent, label:e.getAttribute("aria-label"),rect:e.getBoundingClientRect().toJSON()}))})'))
-                if route in ['tool', 'tools/json', 'tools/timestamp'] and width in [390, 1440]:
+                if route in ['tool', 'tools/json', 'tools/timestamp', 'tools/password', 'tools/color'] and width in [390, 1440]:
                     if route == 'tools/json':
                         page.get_by_role('button', name='示例', exact=True).click()
                         page.get_by_role('button', name='格式化 / 校验', exact=True).click()
+                    elif route == 'tools/password':
+                        page.get_by_role('button', name='生成密码').click()
+                    elif route == 'tools/color':
+                        page.get_by_role('button', name='示例', exact=True).click()
                     page.evaluate('scrollTo({top:0,behavior:"instant"})')
                     page.screenshot(path=str(out / f'{route.replace("/", "-")}-{theme}-{width}.png'), full_page=True)
         page.set_viewport_size({'width': 1440, 'height': 1000})
@@ -214,4 +332,4 @@ with sync_playwright() as p:
     assert not data_requests, data_requests
     assert not media, media
     browser.close()
-print('Tools UI: all six tools, errors, clipboard/download, local processing, navigation, direct URLs, themes, keyboard and 11 responsive widths passed. Fresh screenshots saved in artifacts/.')
+print('Tools UI: all 12 tools, errors, stale async results, clipboard/download, local processing, navigation, direct URLs, themes, independent editor resizing, keyboard and 11 responsive widths passed. Fresh screenshots saved in artifacts/.')

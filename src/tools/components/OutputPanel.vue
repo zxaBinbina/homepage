@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Copy, Download } from 'lucide-vue-next'
-const props = withDefaults(defineProps<{ value: string; ready: boolean; filename?: string }>(), {
-  filename: 'result.txt',
-})
+const props = withDefaults(
+  defineProps<{ value: string; ready: boolean; busy?: boolean; filename?: string }>(),
+  {
+    filename: 'result.txt',
+  },
+)
 const message = ref('')
 const output = ref<HTMLTextAreaElement>()
 watch(
@@ -48,7 +51,7 @@ function download() {
 </script>
 
 <template>
-  <section class="tool-editor tool-output" aria-label="处理结果">
+  <section class="tool-editor tool-output" aria-label="处理结果" :aria-busy="busy">
     <div class="tool-editor-header">
       <label for="tool-output">处理结果</label>
       <div class="tool-inline-actions">
@@ -69,7 +72,9 @@ function download() {
       placeholder="处理结果显示在这里"
     />
     <p class="tool-editor-meta" role="status">
-      {{ message || (ready ? (value ? '处理完成' : '结果为空文本') : '等待处理') }}
+      {{
+        message || (busy ? '计算中…' : ready ? (value ? '处理完成' : '结果为空文本') : '等待处理')
+      }}
     </p>
   </section>
 </template>

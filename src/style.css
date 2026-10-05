@@ -2504,6 +2504,24 @@ h1 > span {
 .tool-time-note {
   margin-top: 16px;
 }
+.tool-color-preview {
+  width: 100%;
+  min-height: 160px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+}
+.tool-color-controls {
+  margin-bottom: 0;
+}
+.tool-color-controls input[type='color'] {
+  width: 56px;
+  padding: 4px;
+  cursor: pointer;
+}
+.tool-color-output {
+  margin-top: 0;
+}
 @media (max-width: 1050px) {
   .tools-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

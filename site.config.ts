@@ -17,7 +17,7 @@ const projectPages = {
   tools: {
     title: '网页工具 · a彬彬a',
     description:
-      '一些顺手的网页小工具：JSON 格式化、Base64 与 URL 编解码、时间戳转换、UUID 生成和文本整理，全部在浏览器本地处理。',
+      '浏览器本地处理的网页工具：JSON 格式化、编解码、时间戳与进制转换、哈希计算、JWT 解析、密码与 UUID 生成、文本整理和颜色转换。',
   },
   directory: {
     title: '项目目录 · a彬彬a',

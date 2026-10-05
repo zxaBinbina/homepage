@@ -30,7 +30,7 @@
 
 ## 搜索引擎收录
 
-构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 12 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
+构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 18 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
 
 构建同时生成带 `noindex` 的 `404.html`，让 Cloudflare Pages 对未知路径返回真实 404，避免把不存在的地址当作首页收录。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
 
@@ -52,4 +52,4 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 
 ## 网页工具
 
-工具目录 `/tool` 的元信息由 `site.config.ts` 提供；`/tools/json`、`/tools/base64`、`/tools/url`、`/tools/timestamp`、`/tools/uuid` 和 `/tools/text` 的标题、简介来自 `src/tools/catalog.ts`。这些页面使用主页 favicon 与头像分享图片，构建生成 `tool.html` 和 `tools/*.html`，同样支持无刷新切换、原始 HTML 分享标签与规范地址重定向。`scripts/check-sharing.py` 覆盖所有工具页面。
+工具目录 `/tool` 的元信息由 `site.config.ts` 提供；十二个 `/tools/*` 页面（JSON、Base64、URL、时间戳、UUID、文本、进制、哈希、JWT、密码、HTML 实体、颜色）的标题、简介来自 `src/tools/catalog.ts`。这些页面使用主页 favicon 与头像分享图片，构建生成 `tool.html` 和 `tools/*.html`，同样支持无刷新切换、原始 HTML 分享标签与规范地址重定向。`scripts/check-sharing.py` 覆盖所有工具页面。
