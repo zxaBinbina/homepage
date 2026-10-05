@@ -2822,12 +2822,19 @@ h1 > span {
   min-width: 0;
 }
 .is-fullscreen .game-play-content {
+  position: relative;
   flex: 1;
   min-height: 0;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: clip;
   padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
     max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+.is-fullscreen .game-fit-content {
+  position: absolute;
+  top: var(--game-fit-top, 50%);
+  left: var(--game-fit-left, 50%);
+  width: clamp(var(--game-fit-min), calc(100vw - 16px), var(--game-fit-max));
+  transform: translate(-50%, -50%) scale(var(--game-fit-scale, 1));
 }
 .is-fullscreen .game-guide {
   display: none;
@@ -2835,53 +2842,20 @@ h1 > span {
 .is-fullscreen .game-surface {
   border: 0;
   border-radius: 0;
-  padding: clamp(8px, 2vw, 24px);
+  padding: 16px;
 }
 .is-fullscreen .game-toolbar {
   margin-bottom: 16px;
 }
-.is-fullscreen :is(.number-surface, .solitaire-surface) > .game-toolbar,
-.is-fullscreen .mine-actions {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding-block: 6px;
-  background: var(--panel);
-}
 .is-fullscreen .number-play {
-  max-width: min(580px, calc(100dvh - 260px));
+  max-width: 480px;
 }
 .is-fullscreen .solitaire-table {
   max-width: 1050px;
 }
-@media (min-aspect-ratio: 4/3) and (max-height: 600px) {
-  .is-fullscreen .number-surface,
-  .is-fullscreen .mine-surface {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 20px;
-    align-items: start;
-  }
-  .is-fullscreen .number-play,
-  .is-fullscreen .mine-board-scroll {
-    grid-column: 2;
-    grid-row: 1 / span 4;
-    width: 100%;
-    max-width: min(100%, calc(100dvh - 128px));
-    margin-inline: auto;
-  }
-  .is-fullscreen .mine-board-scroll {
-    max-width: min(100%, calc(100dvh - 64px));
-  }
-  .is-fullscreen .game-status {
-    grid-column: 1;
-    min-height: 0;
-    margin-top: 8px;
-  }
-  .is-fullscreen .mine-board {
-    grid-template-columns: repeat(var(--mine-size), minmax(20px, 1fr));
-    width: max(100%, calc(var(--mine-size) * 24px - 4px));
-  }
+.is-fullscreen .solitaire-scroll,
+.is-fullscreen .mine-board-scroll {
+  overflow: visible;
 }
 .game-layout {
   max-width: 760px;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { gameFullscreenKey } from './fullscreen'
 import { RotateCcw, Smartphone, Undo2, X } from 'lucide-vue-next'
 import PlayingCard from './PlayingCard.vue'
 import GameFullscreenButton from './GameFullscreenButton.vue'
@@ -24,6 +25,7 @@ import {
 } from './solitaire'
 
 const game = ref(newSolitaire())
+const fullscreen = inject(gameFullscreenKey)
 const selected = ref<CardSource | null>(null)
 const history = ref<SolitaireGame[]>([])
 const surface = ref<HTMLElement>()
@@ -42,6 +44,7 @@ const dragging = useSolitaireDrag({
   surface,
   scroll,
   canStart: () => !moving.value && !won.value,
+  scale: () => fullscreen?.scale.value ?? 1,
   select: (source) => {
     selected.value = source
   },
@@ -101,6 +104,8 @@ async function commit(next: SolitaireGame, origins?: Map<string, CardPosition>, 
   selected.value = null
   await nextTick()
   if (current !== turn) return
+  fullscreen?.fit()
+  const scale = fullscreen?.scale.value ?? 1
   const animated: HTMLElement[] = []
   const stacks = new Set<HTMLElement>()
   const animations: (Animation | null)[] = []
@@ -108,8 +113,8 @@ async function commit(next: SolitaireGame, origins?: Map<string, CardPosition>, 
     const old = before.get(element.dataset.cardId!)
     if (!old) return
     const rect = element.getBoundingClientRect()
-    const dx = old.x - rect.left,
-      dy = old.y - rect.top
+    const dx = (old.x - rect.left) / scale,
+      dy = (old.y - rect.top) / scale
     const flip = old.faceUp !== !element.classList.contains('card-back')
     if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && !flip) return
     element.classList.add('is-card-moving')
@@ -192,6 +197,7 @@ async function recycleStock() {
   ).reverse()
   const stack = cards[0]!.closest<HTMLElement>('.solitaire-slot')!
   const to = surface.value!.querySelector('.stock-card')!.getBoundingClientRect()
+  const scale = fullscreen?.scale.value ?? 1
   // Stagger readable flips on a shared timeline; the whole sequence stays below 500ms.
   const duration = Math.max(160, 260 - cards.length * 5)
   const total = Math.min(400, duration + (cards.length - 1) * 70)
@@ -199,8 +205,8 @@ async function recycleStock() {
   stack.classList.add('is-stack-moving')
   const animations = cards.map((element, index) => {
     const from = element.getBoundingClientRect()
-    const dx = to.left - from.left,
-      dy = to.top - from.top
+    const dx = (to.left - from.left) / scale,
+      dy = (to.top - from.top) / scale
     const zIndex = 130 + index
     element.classList.add('is-recycling-card')
     return motion.animate(
@@ -325,7 +331,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div v-if="!orientationDismissed" class="solitaire-orientation-hint">
-      <Smartphone :size="18" aria-hidden="true" /><span>横屏游玩体验更好，可以看到更多列。</span
+      <Smartphone :size="18" aria-hidden="true" /><span>横屏游玩体验更好。</span
       ><button class="game-button" aria-label="关闭横屏提示" @click="orientationDismissed = true">
         <X :size="16" aria-hidden="true" />
       </button>
@@ -541,7 +547,7 @@ onBeforeUnmount(() => {
       {{ won ? '52 张牌全部归位，接龙成功！' : '' }}
     </p>
   </section>
-  <Teleport :to="surface || 'body'"
+  <Teleport :to="(fullscreen?.active.value ? fullscreen.overlay.value : surface) || 'body'"
     ><div v-if="dragState" class="solitaire-drag-layer" aria-hidden="true">
       <div
         ref="dragGhost"

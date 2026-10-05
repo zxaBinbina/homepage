@@ -6,6 +6,7 @@ import GameGuide from './GameGuide.vue'
 import { gameCatalog, type GameId } from './catalog'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
+import { useGameFit } from './useGameFit'
 
 const props = defineProps<{ id: GameId }>()
 const game = computed(() => gameCatalog[props.id])
@@ -17,6 +18,9 @@ const components = {
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
 const viewport = ref<HTMLElement>()
+const fitFrame = ref<HTMLElement>()
+const fitContent = ref<HTMLElement>()
+const { scale, fit } = useGameFit(fullscreen, fitFrame, fitContent)
 const placeholderHeight = ref(0)
 const motion = useGameMotion()
 let previousScroll = { left: 0, top: 0 }
@@ -61,11 +65,18 @@ async function toggleFullscreen() {
     document.documentElement.classList.add('game-fullscreen-open')
     await nextTick()
     if (current !== transition) return
+    fit()
     focusToggle()
     await fade(fullscreenDialog.value, 0, 1, 180)
   }
 }
-provide(gameFullscreenKey, { active: fullscreen, toggle: toggleFullscreen })
+provide(gameFullscreenKey, {
+  active: fullscreen,
+  toggle: toggleFullscreen,
+  scale,
+  fit,
+  overlay: fullscreenDialog,
+})
 function closeFullscreen() {
   if (fullscreen.value) void toggleFullscreen()
 }
@@ -93,11 +104,18 @@ onBeforeUnmount(() => {
             ref="viewport"
             class="game-viewport"
             :class="{ 'is-fullscreen': fullscreen }"
+            :style="{
+              '--game-fit-min':
+                id === 'solitaire' ? '560px' : id === 'minesweeper' ? '440px' : '360px',
+              '--game-fit-max': id === 'solitaire' ? '1100px' : '760px',
+            }"
             :aria-label="game.name"
           >
-            <div class="game-play-content">
-              <GameGuide :id="id" />
-              <component :is="components[id]" :key="id" />
+            <div ref="fitFrame" class="game-play-content">
+              <div ref="fitContent" class="game-fit-content">
+                <GameGuide :id="id" />
+                <component :is="components[id]" :key="id" />
+              </div>
             </div>
           </section>
         </Teleport>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import { Flag, MousePointer2, RotateCcw } from 'lucide-vue-next'
 import { flagMine, mineLevels, newMineGame, revealMine, type MineCell } from './minesweeper'
 
 const level = ref(0)
 const game = ref(newMineGame())
+const fullscreen = inject(gameFullscreenKey)
 const flagMode = ref(false)
 function setMode(flag: boolean) {
   flagMode.value = flag
@@ -37,6 +39,7 @@ async function animateReveal(previous: typeof game.value, index: number) {
   }
   await nextTick()
   if (current !== effect) return
+  fullscreen?.fit()
   const cells = board.querySelectorAll<HTMLElement>('.mine-cell')
   const distance = (i: number) =>
     Math.max(
@@ -66,8 +69,8 @@ async function animateReveal(previous: typeof game.value, index: number) {
     const cell = cells[next.exploded]!.getBoundingClientRect(),
       area = board.getBoundingClientRect()
     burst.value = {
-      x: cell.left - area.left + cell.width / 2,
-      y: cell.top - area.top + cell.height / 2,
+      x: (cell.left - area.left + cell.width / 2) / (fullscreen?.scale.value ?? 1),
+      y: (cell.top - area.top + cell.height / 2) / (fullscreen?.scale.value ?? 1),
     }
     await nextTick()
     if (current !== effect) return

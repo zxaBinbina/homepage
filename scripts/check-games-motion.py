@@ -310,6 +310,61 @@ with sync_playwright() as p:
     assert all(dark != light for dark, light in zip(colors[0], colors[1]))
     assert phone.evaluate('document.documentElement.scrollWidth <= innerWidth')
     print('Touch: hold-to-drag, ordinary scrolling, edge scrolling, cancellation, landscape hint and card themes passed.', flush=True)
+    # Fullscreen uses a uniform fit transform: animation and pointer coordinates must agree.
+    page.set_viewport_size({'width':320,'height':568})
+    page.emulate_media(reduced_motion='reduce')
+    visit('2048')
+    page.get_by_role('button', name='网页全屏', exact=True).click()
+    page.emulate_media(reduced_motion='no-preference')
+    page.locator('.number-board').focus()
+    page.keyboard.press('ArrowLeft')
+    expect(page.locator('.number-flight')).to_have_count(2)
+    page.locator('.number-flight').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.pause();a.currentTime=0}))')
+    starts = page.locator('.number-flight').evaluate_all('els => els.map(el => el.getBoundingClientRect().toJSON())')
+    cells = page.locator('.number-tile').evaluate_all('els => els.map(el => el.getBoundingClientRect().toJSON())')
+    for i, flight in enumerate(starts):
+        assert all(abs(flight[key]-cells[i][key])<1 for key in ['x','y','width','height']), (flight, cells[i])
+    page.locator('.number-flight').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.currentTime=140}))')
+    ends = page.locator('.number-flight').evaluate_all('els => els.map(el => el.getBoundingClientRect().toJSON())')
+    assert all(abs(flight['x']-cells[0]['x'])<1 for flight in ends)
+    page.locator('.number-flight').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => a.finish()))')
+    expect(page.locator('.number-board')).to_have_attribute('aria-busy','false')
+    expect(page.locator('.game-stats strong').first).to_have_text('4')
+    page.emulate_media(reduced_motion='reduce')
+    visit('solitaire')
+    page.get_by_role('button', name='网页全屏', exact=True).click()
+    page.emulate_media(reduced_motion='no-preference')
+    stock = page.locator('.stock-card').bounding_box()
+    page.locator('.stock-card').click()
+    expect(page.locator('.is-card-moving')).to_have_count(1)
+    page.locator('.is-card-moving').evaluate('el => el.getAnimations().forEach(a => {a.pause();a.currentTime=0})')
+    drawn = page.locator('.is-card-moving').bounding_box()
+    assert all(abs(drawn[key]-stock[key])<1 for key in ['x','y','width','height']), (drawn, stock)
+    page.locator('.is-card-moving').evaluate('el => el.getAnimations().forEach(a => a.finish())')
+    card_idle()
+    mouse_drag(page.locator('.tableau-card[data-card-id="0-1"]'), page.locator('.foundation-card').first)
+    expect(page.locator('.game-stats strong').first).to_have_text('1 / 52')
+    # A long column changes the natural game height; fit must update without scrolling.
+    page.set_viewport_size({'width':844,'height':390})
+    page.wait_for_timeout(100)
+    before = page.locator('.game-fit-content').evaluate('el => new DOMMatrix(getComputedStyle(el).transform).a')
+    page.evaluate("""() => {
+        const state=document.querySelector('.solitaire-surface').__vueParentComponent.setupState;
+        const cards=[...state.game.stock,...state.game.waste,...state.game.tableau.flat(),...state.game.foundations.flat()];
+        state.game={stock:cards.slice(19),waste:[],foundations:[[],[],[],[]],moves:0,
+            tableau:[cards.slice(0,19).map((c,i)=>({...c,faceUp:i>=6})),[],[],[],[],[],[]]};
+    }""")
+    page.wait_for_function("""previous => {
+        const el=document.querySelector('.game-fit-content');
+        return new DOMMatrix(getComputedStyle(el).transform).a < previous;
+    }""", arg=before)
+    assert page.locator('.tableau-card, .game-surface').evaluate_all('''els => els.every(el => {
+        const r=el.getBoundingClientRect();return r.left>=0 && r.top>=0 && r.right<=innerWidth && r.bottom<=innerHeight;
+    })'''), 'Long columns must remain fully visible'
+    page.screenshot(path=str(out / 'game-motion-fullscreen-long-column.png'))
+    page.get_by_role('button', name='重新开始', exact=True).click()
+    page.wait_for_function('previous => new DOMMatrix(getComputedStyle(document.querySelector(".game-fit-content")).transform).a >= previous', arg=before-0.01)
+    print('Fullscreen fit: scaled 2048 motion, card draw, mouse drop and live long-column resizing passed.', flush=True)
     assert not errors, errors
     touch.close()
     browser.close()

@@ -14,6 +14,21 @@ with sync_playwright() as p:
     page = context.new_page()
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
+
+    def fits_screen(page):
+        page.wait_for_function("""() => {
+            const r=document.querySelector('.game-surface').getBoundingClientRect();
+            return r.left>=-0.5 && r.top>=-0.5 && r.right<=innerWidth+0.5 && r.bottom<=innerHeight+0.5;
+        }""", timeout=2000)
+        assert page.locator('.game-surface .playing-card, .game-surface .mine-cell, .game-surface .number-tile, .game-surface .game-button').evaluate_all('''els => els.every(el => {
+            const r=el.getBoundingClientRect();
+            return !r.width || !r.height || (r.left>=-0.5 && r.top>=-0.5 && r.right<=innerWidth+0.5 && r.bottom<=innerHeight+0.5);
+        })'''), 'Cards, tiles and controls must all be visible'
+        assert page.locator('.game-play-content, .solitaire-scroll, .mine-board-scroll').evaluate_all('''els => els.every(el => {
+            el.scrollTo({left:100,top:100,behavior:'instant'});
+            return el.scrollLeft===0 && el.scrollTop===0;
+        })'''), 'Fullscreen must not require internal scrolling'
+
     for game in ['2048', 'minesweeper', 'solitaire']:
         page.goto(base + '/games/' + game, wait_until='networkidle')
         if game == '2048':
@@ -46,7 +61,7 @@ with sync_playwright() as p:
             assert page.evaluate('document.activeElement === document.body || !!document.activeElement.closest("dialog[open]")')
         for theme in ['dark', 'light']:
             page.evaluate('theme => document.documentElement.dataset.theme=theme', theme)
-            for width, height in [(320,844),(390,844),(768,1000),(1024,1000),(1440,1000),(844,390)]:
+            for width, height in [(320,568),(320,844),(390,844),(768,1000),(1024,600),(1024,1000),(1440,900),(1440,1000),(568,320),(844,390)]:
                 page.set_viewport_size({'width':width,'height':height})
                 page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
                 page.locator('.game-play-content').evaluate('el => el.scrollTo({top:0,behavior:"instant"})')
@@ -55,7 +70,7 @@ with sync_playwright() as p:
                   const box=el.getBoundingClientRect();
                   return box.x===0 && box.y===0 && Math.abs(box.width-innerWidth)<1 && Math.abs(box.height-innerHeight)<1;
                 }''', timeout=4000)
-                assert page.locator('.game-play-content').evaluate('el => el.scrollWidth <= el.clientWidth'), (game, theme, width, height)
+                fits_screen(page)
                 bounds = page.get_by_role('button', name='退出全屏', exact=True).bounding_box()
                 assert bounds['x'] >= 0 and bounds['y'] >= 0 and bounds['x']+bounds['width'] <= width
                 restart = page.get_by_role('button', name='重新开始', exact=True).bounding_box()
@@ -68,6 +83,12 @@ with sync_playwright() as p:
                     assert board_end['y'] + board_end['height'] <= height, (game, 'Landscape board/controls clipped')
                 if width in [390, 1440, 844]:
                     page.screenshot(path=str(out / f'game-fullscreen-{game}-{theme}-{width}.png'))
+        if game == 'minesweeper':
+            page.get_by_label('难度', exact=True).select_option('1')
+            for width, height in [(320,568),(568,320),(844,390)]:
+                page.set_viewport_size({'width':width,'height':height})
+                page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                fits_screen(page)
         page.set_viewport_size({'width':1440,'height':1000})
         page.get_by_role('button', name='退出全屏', exact=True).click()
         expect(page.locator('dialog[open]')).to_have_count(0)

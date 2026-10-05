@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Undo2 } from 'lucide-vue-next'
 import {
@@ -13,6 +14,7 @@ import {
 } from './twenty48'
 
 const game = ref(newNumberGame())
+const fullscreen = inject(gameFullscreenKey)
 const history = ref<NumberGame[]>([])
 const boardElement = ref<HTMLElement>()
 const noAnimation = ref(false)
@@ -65,6 +67,7 @@ async function move(direction: Direction) {
   busy.value = true
   const board = boardElement.value
   if (board && !animationsOff.value && !document.hidden) {
+    const scale = fullscreen?.scale.value ?? 1
     const origin = board.getBoundingClientRect()
     const cells = Array.from(board.querySelectorAll<HTMLElement>('.number-tile')).map((cell) =>
       cell.getBoundingClientRect(),
@@ -75,11 +78,11 @@ async function move(direction: Direction) {
       return {
         from: tile.from,
         value: tile.value,
-        x: from.left - origin.left - board.clientLeft,
-        y: from.top - origin.top - board.clientTop,
-        size: from.width,
-        dx: to.left - from.left,
-        dy: to.top - from.top,
+        x: (from.left - origin.left) / scale - board.clientLeft,
+        y: (from.top - origin.top) / scale - board.clientTop,
+        size: from.width / scale,
+        dx: (to.left - from.left) / scale,
+        dy: (to.top - from.top) / scale,
       }
     })
     sliding.value = true
@@ -105,6 +108,7 @@ async function move(direction: Direction) {
   flights.value = []
   await nextTick()
   if (current !== turn) return
+  fullscreen?.fit()
   const cells = board?.querySelectorAll('.number-tile')
   const spawned = next.board.findIndex((value, index) => value && !trace.board[index])
   await motion.settle([

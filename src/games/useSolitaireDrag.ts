@@ -37,6 +37,7 @@ export function useSolitaireDrag(options: {
   surface: Ref<HTMLElement | undefined>
   scroll: Ref<HTMLElement | undefined>
   canStart: () => boolean
+  scale: () => number
   select: (source: CardSource) => void
   drop: (source: CardSource, target: CardTarget, origins: Map<string, CardPosition>) => void
   cancel: () => void
@@ -118,7 +119,7 @@ export function useSolitaireDrag(options: {
       y: press.rect.top + press.lastY - press.y,
       width: press.rect.width,
       height: press.rect.height,
-      step,
+      step: step * options.scale(),
     }
     options.select(press.source)
     frame = requestAnimationFrame(autoScroll)
