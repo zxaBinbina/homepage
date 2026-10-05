@@ -25,10 +25,18 @@ class Head(HTMLParser):
         if self.in_title: self.title += data
 
 pages = {
+    '网页工具 · a彬彬a': 'tool',
+    'JSON 格式化 · 网页工具 · a彬彬a': 'tools/json',
+    'Base64 编解码 · 网页工具 · a彬彬a': 'tools/base64',
+    'URL 编解码 · 网页工具 · a彬彬a': 'tools/url',
+    '时间戳转换 · 网页工具 · a彬彬a': 'tools/timestamp',
+    'UUID 生成 · 网页工具 · a彬彬a': 'tools/uuid',
+    '文本整理 · 网页工具 · a彬彬a': 'tools/text',
     '项目目录 · a彬彬a': 'project',
     'a彬彬a · 在代码与方块之间': '',
     'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth',
     '部署与维护 Wiki · RDP Access Auth': 'projects/rdp-access-auth/wiki',
+    '下载发行版 · RDP Access Auth': 'projects/rdp-access-auth/downloads',
 }
 paths = [Path(sys.argv[1])] if len(sys.argv) > 1 else [Path('dist') / (f'{route}.html' if route else 'index.html') for route in pages.values()]
 for path in paths:

@@ -274,7 +274,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: 36px;
+  margin-left: 12px;
 }
 .desktop-nav a {
   padding: 10px 17px;
@@ -1293,10 +1293,17 @@ h1 > span {
     margin-left: 0;
   }
   .desktop-nav a {
-    padding: 10px 12px;
+    padding: 10px 10px;
   }
   .header {
     gap: 12px;
+  }
+  .header .nav-travel {
+    width: 44px;
+    padding: 9px;
+  }
+  .header .nav-travel-label {
+    display: none;
   }
   .shell {
     width: calc(100% - 56px);
@@ -2174,6 +2181,334 @@ h1 > span {
   border-radius: 24px;
   min-height: 44px;
 }
+
+/* Browser tools use the shared surfaces, pills and typography. */
+.tools-accent {
+  color: var(--blue);
+}
+.tool-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tool-filters button {
+  min-height: 44px;
+  padding: 10px 19px;
+  border: 1px solid var(--border);
+  border-radius: 25px;
+  background: transparent;
+  color: var(--muted);
+}
+.tool-filters button[aria-pressed='true'] {
+  background: var(--panel-hover);
+  border-color: var(--blue);
+  color: var(--text);
+}
+.tools-count {
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      ellipse at 100% 0,
+      color-mix(in srgb, var(--blue) 7%, transparent),
+      transparent 65%
+    ),
+    var(--panel);
+  transition:
+    transform 0.25s var(--motion-ease),
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.tool-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--blue) 50%, transparent);
+  box-shadow: 0 12px 32px var(--shadow);
+}
+.tool-card-top,
+.tool-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.tool-card-top > .overline {
+  color: var(--muted);
+  font-size: 10px;
+}
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--blue) 18%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--blue) 8%, transparent);
+  color: var(--blue);
+}
+.tool-card h2 {
+  margin-top: 28px;
+  font-size: 21px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.tool-card > p {
+  flex: 1;
+  margin-block: 12px 26px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.tool-card-bottom {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.tool-card-bottom > :first-child {
+  color: var(--muted);
+}
+.tool-card-bottom > :last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--blue);
+}
+.tools-note {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.tool-main {
+  padding-block: 136px 60px;
+}
+.tool-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+.tool-back:hover {
+  color: var(--blue);
+}
+.tool-heading h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -1px;
+  margin: 14px 0 0;
+}
+.tool-workspace {
+  margin-top: 32px;
+}
+.tool-controls,
+.tool-after-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.tool-controls .button,
+.tool-form-panel .button,
+.tool-after-actions .button {
+  min-height: 44px;
+  padding: 11px 18px;
+  gap: 8px;
+}
+.tool-field-inline,
+.tool-checkbox {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  gap: 10px;
+  font-size: 13px;
+}
+.tool-field-inline input[type='number'] {
+  width: 88px;
+}
+.tool-workspace :is(input:not([type='checkbox']), select) {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+.tool-workspace :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.tool-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--blue);
+}
+.tool-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.tool-editor {
+  align-self: start;
+}
+.tool-editor,
+.tool-form-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+}
+.tool-editor-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.tool-editor-header > label {
+  padding-block: 10px;
+  font-weight: 600;
+}
+.tool-inline-actions {
+  display: flex;
+  gap: 4px;
+}
+.tool-inline-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding-inline: 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+}
+.tool-inline-actions button:not(:disabled):hover {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+.tool-workspace button:disabled {
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+.tool-editor textarea {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  padding: 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  font:
+    13px/1.8 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    'Liberation Mono',
+    monospace;
+  tab-size: 2;
+  overflow-wrap: anywhere;
+}
+.tool-editor textarea::placeholder {
+  color: var(--muted);
+}
+.tool-editor-meta {
+  min-height: 43px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.tool-after-actions {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+.tool-muted {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.tool-error {
+  margin-block: 16px;
+  padding: 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--status-danger) 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--status-danger) 6%, transparent);
+  color: var(--status-danger);
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.tool-hint {
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.tool-form-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+}
+.tool-form-panel h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.tool-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+}
+.tool-field :is(input, select) {
+  width: 100%;
+}
+.tool-compact-output {
+  margin-top: 20px;
+}
+.tool-compact-output textarea {
+  min-height: 170px;
+}
+.tool-time-note {
+  margin-top: 16px;
+}
+@media (max-width: 1050px) {
+  .tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 760px) {
   .directory-main {
     padding-block: 126px 48px;
@@ -2182,5 +2517,39 @@ h1 > span {
     align-items: flex-start;
     flex-direction: column;
     gap: 14px;
+  }
+  .tool-main {
+    padding-block: 106px 48px;
+  }
+  .tool-editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tool-editor textarea {
+    min-height: 260px;
+  }
+  .tool-compact-output textarea {
+    min-height: 190px;
+  }
+  .tool-card {
+    padding: 22px;
+  }
+}
+@media (max-width: 480px) {
+  .tools-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tool-form-panel {
+    padding: 20px;
+  }
+  .tool-editor-header {
+    padding-inline: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-card {
+    transition: none;
+  }
+  .tool-card:hover {
+    transform: none;
   }
 }

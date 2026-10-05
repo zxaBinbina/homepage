@@ -2,11 +2,21 @@
 export const pages = {
   home: '/',
   directory: '/project',
+  tools: '/tool',
+  json: '/tools/json',
+  base64: '/tools/base64',
+  url: '/tools/url',
+  timestamp: '/tools/timestamp',
+  uuid: '/tools/uuid',
+  text: '/tools/text',
   rdp: '/projects/rdp-access-auth',
   wiki: '/projects/rdp-access-auth/wiki',
   downloads: '/projects/rdp-access-auth/downloads',
 } as const
 export type PageName = keyof typeof pages
+export function isProjectPage(page: unknown) {
+  return page === 'rdp' || page === 'wiki' || page === 'downloads'
+}
 export function knownPageForPath(path: string): PageName | undefined {
   const normalized =
     path

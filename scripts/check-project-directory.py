@@ -12,7 +12,8 @@ with sync_playwright() as p:
   expect(nav.get_by_role('link',name='悠哉世界',exact=True)).to_have_attribute('href','https://mcyzw.top')
   expect(nav.get_by_role('link',name='关于',exact=True)).to_have_count(0)
   expect(nav.locator('[aria-current="page"]')).to_have_text('首页' if route=='/' else '项目')
-  assert nav.get_by_role('link').count()==3
+  expect(nav.get_by_role('link',name='工具',exact=True)).to_have_attribute('href','/tool')
+  assert nav.get_by_role('link').count()==4
   assert page.get_by_role('button',name='打开网易云音乐播放器').count()==1
   page.set_viewport_size(dict(width=390,height=844))
   page.get_by_role('button',name='打开菜单').click()

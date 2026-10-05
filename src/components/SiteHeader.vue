@@ -5,9 +5,13 @@ import { profile } from '../content'
 import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
-const props = withDefaults(defineProps<{ home?: boolean }>(), {
-  home: false,
-})
+const props = withDefaults(
+  defineProps<{ home?: boolean; active?: 'home' | 'projects' | 'tools' }>(),
+  {
+    home: false,
+    active: 'home',
+  },
+)
 const asset = (name: string) => `/images/${name}`
 const menuOpen = ref(false)
 const musicTrigger = ref<HTMLButtonElement>()
@@ -17,15 +21,17 @@ const musicTrack = ref('')
 const nav = [
   { id: 'home', label: '首页' },
   { id: 'projects', label: '项目' },
+  { id: 'tools', label: '工具' },
   { id: 'world', label: '悠哉世界' },
 ]
 function navHref(id: string) {
   if (id === 'home') return '/'
   if (id === 'world') return profile.server
+  if (id === 'tools') return '/tool'
   return id === 'projects' ? '/project' : `${props.home ? '' : '/'}#${id}`
 }
 function isActive(id: string) {
-  return id === (props.home ? 'home' : 'projects')
+  return id === props.active
 }
 function openMusic() {
   menuOpen.value = false

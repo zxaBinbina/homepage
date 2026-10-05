@@ -1,4 +1,5 @@
 import { pages, type PageName } from './src/pages'
+import { isToolId, toolCatalog } from './src/tools/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -10,6 +11,11 @@ export const siteContent = {
 }
 
 const projectPages = {
+  tools: {
+    title: '网页工具 · a彬彬a',
+    description:
+      '一些顺手的网页小工具：JSON 格式化、Base64 与 URL 编解码、时间戳转换、UUID 生成和文本整理，全部在浏览器本地处理。',
+  },
   directory: {
     title: '项目目录 · a彬彬a',
     description:
@@ -38,7 +44,15 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
     throw new Error('SITE_URL 必须是不包含登录信息、查询参数和锚点的 HTTPS 网站地址')
   }
   if (!url.pathname.endsWith('/')) url.pathname += '/'
-  const content = page === 'home' ? siteContent : projectPages[page]
+  const content =
+    page === 'home'
+      ? siteContent
+      : isToolId(page)
+        ? {
+            title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
+            description: toolCatalog[page].description,
+          }
+        : projectPages[page]
   return {
     ...siteContent,
     title: content.title,

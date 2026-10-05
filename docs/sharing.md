@@ -1,8 +1,8 @@
 # 微信与 QQ 分享元信息
 
-`site.config.ts` 是个人主页、项目目录、RDP 官网与 Wiki 的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
+`site.config.ts` 是个人主页、项目目录、网页工具与 RDP 子站 的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
 
-`vite.config.ts` 注册 `build/pageTemplates.ts` 插件，使用 EJS 渲染唯一的 `index.html` 基础模板。开发时按请求地址注入元信息，构建时根据 `src/pages.ts` 自动生成四个 URL 的 HTML；页面结构由 `.vue` 模板维护。标签在开发服务器返回 HTML、生产构建生成 HTML 时注入，直接出现在页面源码中，不依赖 Vue 挂载或浏览器执行 JavaScript。`<%= … %>` 会转义属性中的特殊字符。
+`vite.config.ts` 注册 `build/pageTemplates.ts` 插件，使用 EJS 渲染唯一的 `index.html` 基础模板。开发时按请求地址注入元信息，构建时根据 `src/pages.ts` 自动生成所有已注册 URL 的 HTML；页面结构由 `.vue` 模板维护。标签在开发服务器返回 HTML、生产构建生成 HTML 时注入，直接出现在页面源码中，不依赖 Vue 挂载或浏览器执行 JavaScript。`<%= … %>` 会转义属性中的特殊字符。
 
 已包含：
 
@@ -21,11 +21,11 @@ https://zxabinbina.cc.cd/images/share-cover.jpg
 
 微信和 QQ 的实际卡片呈现还取决于平台的抓取、缓存与分享入口；这些标签提供抓取信息，不等同于微信 JS-SDK 的自定义分享接口。
 
-运行 `python3 scripts/check-sharing.py` 检查四个页面的构建输出；也可传入保存的开发服务器 HTML 文件路径。
+运行 `python3 scripts/check-sharing.py` 检查所有页面的构建输出；也可传入保存的开发服务器 HTML 文件路径。
 
 ## 项目子页
 
-RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `projectPages` 配置提供，通过 `createSiteMeta` 与主页共用生成逻辑，canonical 和 `og:url` 根据 `site.config.ts` 的基础域名生成，分别指向 `/projects/rdp-access-auth` 和 `/projects/rdp-access-auth/wiki`。目前复用个人主页分享封面。元信息在构建时写入 HTML，不依赖 JavaScript；Wiki 正文在构建时转换为模块数据，由 Vue 组件在浏览器中渲染，与主页的客户端渲染架构保持一致。项目页面的浏览器检查使用 `scripts/check-rdp-pages.py`，四个页面的原始 HTML 分享检查均使用 `scripts/check-sharing.py`。
+RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `projectPages` 配置提供，通过 `createSiteMeta` 与主页共用生成逻辑，canonical 和 `og:url` 根据 `site.config.ts` 的基础域名生成，分别指向 `/projects/rdp-access-auth` 和 `/projects/rdp-access-auth/wiki`。目前复用个人主页分享封面。元信息在构建时写入 HTML，不依赖 JavaScript；Wiki 正文在构建时转换为模块数据，由 Vue 组件在浏览器中渲染，与主页的客户端渲染架构保持一致。项目页面的浏览器检查使用 `scripts/check-rdp-pages.py`，所有页面的原始 HTML 分享检查均使用 `scripts/check-sharing.py`。
 
 个人主页浏览器图标沿用 `public/favicon.svg`；RDP 官网与 Wiki 使用透明的 `public/images/rdp-access-auth.png`。图标按页面由同一 EJS 模板选择，分享封面配置独立于浏览器图标。
 
@@ -34,3 +34,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 站内无刷新切换时，`src/router.ts` 复用 `createSiteMeta` 更新浏览器标题、description、canonical、Open Graph、QQ 标签及 favicon。`vite.config.ts` 将同一 `SITE_URL` 注入客户端，确保运行时与 EJS 构建结果一致。分享平台直接请求各页面时仍可从 HTML 源码获取完整标签。
 
 页面路径统一不带末尾斜线，canonical 与 `og:url` 直接复用 `src/pages.ts` 的路径。构建输出为根 `index.html`、`project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html`；Cloudflare Pages 以无 `.html` 的地址提供页面，自动生成的 `_redirects` 将旧的带斜线与 `/index.html` 地址转到规范地址。部署时保留该文件。
+
+## 网页工具
+
+工具目录 `/tool` 的元信息由 `site.config.ts` 提供；`/tools/json`、`/tools/base64`、`/tools/url`、`/tools/timestamp`、`/tools/uuid` 和 `/tools/text` 的标题、简介来自 `src/tools/catalog.ts`。这些页面使用主页 favicon 与分享封面，构建生成 `tool.html` 和 `tools/*.html`，同样支持无刷新切换、原始 HTML 分享标签与规范地址重定向。`scripts/check-sharing.py` 覆盖所有工具页面。

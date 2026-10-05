@@ -50,13 +50,24 @@ with sync_playwright() as p:
     page.evaluate('window.navigationProbe.audio = document.querySelector("audio")')
     page.get_by_role('button', name='关闭音乐播放器').click()
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(4)
+    expect(page.locator('.project-card')).to_have_count(9)
     expect(page).to_have_title('项目目录 · a彬彬a')
     metadata('/project')
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
     assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
     page.wait_for_function('document.activeElement === document.querySelector("main")')
     page.wait_for_function('scrollY === 0')
+
+    page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='工具', exact=True).click()
+    expect(page.locator('.tool-card')).to_have_count(6)
+    metadata('/tool')
+    page.locator('.tool-card[href="/tools/json"]').click()
+    expect(page.locator('.tool-main')).to_be_visible()
+    metadata('/tools/json')
+    assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
+    assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
+    page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
+    expect(page.locator('.project-card')).to_have_count(9)
 
     card = page.locator('.project-rdp')
     card.scroll_into_view_if_needed()
@@ -87,7 +98,7 @@ with sync_playwright() as p:
     expect(page.locator('.wiki-page')).to_be_visible()
     metadata('/projects/rdp-access-auth/wiki', True)
 
-    page.locator('.rdp-footer a[href="/"]').click()
+    page.locator('.footer a[href="/"]').click()
     expect(page.locator('.hero')).to_be_visible()
     metadata('/')
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
@@ -161,16 +172,17 @@ with sync_playwright() as p:
         page.evaluate('''window.rdpHeaderProbe = {
             header: document.querySelector('.rdp-header'),
             logo: document.querySelector('.rdp-mark'),
-            footer: document.querySelector('.rdp-footer'),
+            footer: document.querySelector('.footer'),
             animation: document.querySelector('.rdp-header').getAnimations()[0]
         }''')
         for label, selector in [('Wiki', '.wiki-page'), ('概览', '.auth-demo'), ('Wiki', '.wiki-page')]:
             page.get_by_role('navigation', name='项目导航').get_by_role('link', name=label, exact=True).click()
             expect(page.locator(selector)).to_be_visible()
+            expect(page.locator('main')).to_be_focused()
             expect(page.locator('.rdp-header [aria-current="page"]')).to_have_text(label)
             assert page.evaluate('''rdpHeaderProbe.header === document.querySelector('.rdp-header') &&
                 rdpHeaderProbe.logo === document.querySelector('.rdp-mark') &&
-                rdpHeaderProbe.footer === document.querySelector('.rdp-footer')'''), 'RDP header/footer remounted'
+                rdpHeaderProbe.footer === document.querySelector('.footer')'''), 'RDP header/footer remounted'
             assert page.evaluate('''rdpHeaderProbe.header.getAnimations()[0] === rdpHeaderProbe.animation &&
                 rdpHeaderProbe.header.getAnimations().every(a => a.playState === 'finished') &&
                 Number(getComputedStyle(rdpHeaderProbe.header).opacity) === 1'''), 'RDP header replayed its entrance'

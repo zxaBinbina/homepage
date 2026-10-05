@@ -1,11 +1,19 @@
 import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { knownPageForPath, pages, type PageName } from './pages'
+import { isProjectPage, knownPageForPath, pages, type PageName } from './pages'
+import { isToolId } from './tools/catalog'
 import { createSiteMeta } from '../site.config'
 
 const components = {
   home: () => import('./HomePage.vue'),
   directory: () => import('./ProjectDirectory.vue'),
+  tools: () => import('./tools/ToolDirectory.vue'),
+  json: () => import('./tools/ToolPage.vue'),
+  base64: () => import('./tools/ToolPage.vue'),
+  url: () => import('./tools/ToolPage.vue'),
+  timestamp: () => import('./tools/ToolPage.vue'),
+  uuid: () => import('./tools/ToolPage.vue'),
+  text: () => import('./tools/ToolPage.vue'),
   rdp: () => import('./rdp/App.vue'),
   wiki: () => import('./rdp/App.vue'),
   downloads: () => import('./rdp/App.vue'),
@@ -45,6 +53,18 @@ function focusContent(element: HTMLElement | null) {
   element.focus({ preventScroll: true })
 }
 
+async function waitForMain() {
+  // An out-in transition can temporarily leave only the outgoing main in the DOM.
+  for (let frame = 0; frame < 60; frame += 1) {
+    const main = Array.from(document.querySelectorAll('main')).find(
+      (element) => !element.closest('.page-swap-leave-active, .rdp-content-leave-active'),
+    )
+    if (main) return main
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  }
+  return null
+}
+
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -54,14 +74,18 @@ export const router = createRouter({
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: components[name],
-      props: name === 'rdp' || name === 'wiki' || name === 'downloads' ? { view: name } : undefined,
+      props: isProjectPage(name) ? { view: name } : isToolId(name) ? { id: name } : undefined,
     })),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   async scrollBehavior(to, from, savedPosition) {
     await nextTick()
     const changedPage = to.name !== from.name
-    if (changedPage && from.matched.length) focusContent(document.querySelector('main'))
+    if (changedPage && from.matched.length) {
+      const main = await waitForMain()
+      if (router.currentRoute.value.fullPath !== to.fullPath) return false
+      focusContent(main)
+    }
     if (savedPosition) return { ...savedPosition, behavior: 'instant' }
     const target = to.hash ? await waitForHashTarget(to.hash) : null
     if (target) {
@@ -93,7 +117,7 @@ router.afterEach((to, _from, failure) => {
   if (failure) return
   const page = to.name as PageName
   const meta = createSiteMeta(import.meta.env.SITE_URL, page)
-  const project = page === 'rdp' || page === 'wiki' || page === 'downloads'
+  const project = isProjectPage(page)
   document.title = meta.title
   document.body.classList.toggle('rdp-site', project)
   const values = {

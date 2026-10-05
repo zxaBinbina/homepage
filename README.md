@@ -39,13 +39,32 @@
 
 主页、项目目录与 RDP 子站共用完全一致的 `src/components/SiteFooter.vue` 页脚。
 
-访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记保留四个精选项目。当前列表于 2026-10-04 从 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories) 核对，核对了 12 个公开仓库，目录收录其中 9 个项目（个人 2 个、组织 7 个），保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）和「悠哉世界」（`https://mcyzw.top`），联系入口保留主页锚点。发布完整构建产物即可上线。运行 `python3 scripts/check-project-directory.py` 检查目录访问、搜索、图片和响应式，可用 `HOMEPAGE_TEST_URL` 指定开发服务器地址。
+访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记保留四个精选项目。当前列表于 2026-10-04 从 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories) 核对，核对了 12 个公开仓库，目录收录其中 9 个项目（个人 2 个、组织 7 个），保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）、「工具」（`/tool`）和「悠哉世界」（`https://mcyzw.top`），联系入口保留主页锚点。发布完整构建产物即可上线。运行 `python3 scripts/check-project-directory.py` 检查目录访问、搜索、图片和响应式，可用 `HOMEPAGE_TEST_URL` 指定开发服务器地址。
+
+## 网页工具
+
+访问 `https://zxabinbina.cc.cd/tool`，或点击桌面 / 移动导航中的「工具」，可按分类与关键词查找六个网页工具。工具页沿用主页的深浅主题、胶囊导航、圆角卡片和共用页脚；主页、项目目录与工具之间切换时保留播放器实例。
+
+| 工具          | 地址               | 功能                                                              |
+| ------------- | ------------------ | ----------------------------------------------------------------- |
+| JSON 格式化   | `/tools/json`      | 语法校验、2 / 4 空格或 Tab 缩进、压缩；保留长整数、键顺序和重复键 |
+| Base64 编解码 | `/tools/base64`    | UTF-8 文本与标准 / URL 安全 Base64 双向转换，支持中文和 Emoji     |
+| URL 编解码    | `/tools/url`       | 参数值或完整网址转换，可将参数中的 `+` 解码为空格                 |
+| 时间戳转换    | `/tools/timestamp` | 秒 / 毫秒与日期双向转换，显示 UTC 和本地时区，支持当前时间        |
+| UUID 生成     | `/tools/uuid`      | 浏览器安全随机数生成 UUID v4，每批 1–100 个，可选大写和连字符     |
+| 文本整理      | `/tools/text`      | 按行去重、移除空行、清理行首尾空格、大小写转换和字符 / 行数统计   |
+
+所有输入仅在浏览器内处理，不发送到接口、不持久保存，离开页面后清空。结果支持复制和下载；文本转换工具还提供示例、清空与「将结果用作输入」。修改输入或转换选项后旧结果立即失效，避免误复制。文本输入处理上限为 100 万个 UTF-16 字符，JSON 支持最多 64 层嵌套，格式化结果上限为 400 万字符。Base64 工具用于 UTF-8 文本，不用于二进制文件。
+
+工具目录与工作页位于 `src/tools/`，名称、说明与分类统一维护在 `src/tools/catalog.ts`，转换逻辑位于 `src/tools/transform.ts`，样式位于 `src/style.css`。新增工具时同时登记 `src/pages.ts`、`src/router.ts` 和分享检查断言；`site.config.ts` 根据目录文案生成工具元信息。构建自动生成 `tool.html` 和 `tools/*.html`，随完整构建产物部署到现有 Cloudflare Pages 即可。
+
+运行 `node scripts/check-tools.mjs` 检查转换规则和边界；预览服务启动后运行 `python3 scripts/check-tools-browser.py` 检查工具操作、复制下载、地址刷新、主题、移动菜单和响应式。浏览器脚本支持 `HOMEPAGE_TEST_URL` 与 `HOMEPAGE_BROWSER`，本次截图写入 `artifacts/tool*.png`。
 
 ## 站内页面切换
 
-主页、项目目录、RDP 官网与 Wiki 之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
+主页、项目目录、网页工具与 RDP 子站之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project`、`/tool`、`/tools/json` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
 
-共享导航由 `src/App.vue` 挂载，主页与项目目录切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。运行 `python3 scripts/check-navigation.py` 验证导航，推荐用 `HOMEPAGE_TEST_URL` 指向构建预览服务。
+共享导航由 `src/App.vue` 挂载，主页、项目目录与工具页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。运行 `python3 scripts/check-navigation.py` 验证导航，推荐用 `HOMEPAGE_TEST_URL` 指向构建预览服务。
 
 ## RDP Access Auth 官网与 Wiki
 
@@ -55,7 +74,7 @@
 
 主页的 RDP 项目卡片进入官网。项目导航提供自动读取 GitHub Releases 的下载页；Wiki 提供 RPM / DEB 安装、浏览器或终端部署向导、Turnstile 配置、维护与排错；源码入口保留给开发和构建发行版的维护者。
 
-页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，通过 `src/router.ts` 和 Vue Router 根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合正文和页脚；项目导航由根 `src/App.vue` 持久挂载。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站通用样式位于 `src/rdp/style.css`，Wiki 阅读布局位于 `src/rdp/wiki.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为章节、内容块和搜索数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成四个地址的 HTML，可直接访问、刷新并抓取分享元信息。与主页一起发布完整 `dist/` 到现有 Cloudflare Pages 即可，无需新建站点或 DNS 记录。
+页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，通过 `src/router.ts` 和 Vue Router 根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合正文和页脚；项目导航由根 `src/App.vue` 持久挂载。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站通用样式位于 `src/rdp/style.css`，Wiki 阅读布局位于 `src/rdp/wiki.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为章节、内容块和搜索数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成各页面地址的 HTML，可直接访问、刷新并抓取分享元信息。与主页一起发布完整 `dist/` 到现有 Cloudflare Pages 即可，无需新建站点或 DNS 记录。
 
 Wiki 按「开始部署、使用与维护、了解项目」组织内容，提供全文范围的章节搜索、可收起的移动目录、六步安装包部署编号和命令复制。页面中的「交给 Agent 部署」提供可一键复制的 [部署提示词](docs/rdp-agent-deploy.md)，填写主机、认证域名、RDP 地址与隧道 ID 后即可交给具备终端能力的 Agent 使用。提示词要求凭据在服务器终端安全输入，并区分实际验收与待人工验证。
 
