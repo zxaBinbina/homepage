@@ -84,6 +84,22 @@ with sync_playwright() as p:
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
     expect(page.locator('.project-card')).to_have_count(9)
 
+    page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='游戏', exact=True).click()
+    expect(page.locator('.game-card')).to_have_count(3)
+    metadata('/game')
+    for path, title in [('2048', '2048'), ('minesweeper', '扫雷'), ('solitaire', '纸牌接龙')]:
+        page.locator(f'.game-card[href="/games/{path}"]').click()
+        expect(page.locator('.game-heading h1')).to_have_text(title)
+        expect(page.locator('.game-surface')).to_be_visible()
+        metadata('/games/' + path)
+        expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('游戏')
+        assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
+        assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
+        page.get_by_role('link', name='全部游戏', exact=True).click()
+        expect(page.locator('.game-card')).to_have_count(3)
+    page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
+    expect(page.locator('.project-card')).to_have_count(9)
+
     card = page.locator('.project-rdp')
     card.scroll_into_view_if_needed()
     before = page.evaluate('scrollY')

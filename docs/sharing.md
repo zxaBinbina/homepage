@@ -1,6 +1,6 @@
 # 微信与 QQ 分享元信息
 
-`site.config.ts` 是个人主页、项目目录、网页工具与 RDP 子站 的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
+`site.config.ts` 是个人主页、项目目录、网页工具、小游戏与 RDP 子站 的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
 
 `vite.config.ts` 注册 `build/pageTemplates.ts` 插件，使用 EJS 渲染唯一的 `index.html` 基础模板。开发时按请求地址注入元信息，构建时根据 `src/pages.ts` 自动生成所有已注册 URL 的 HTML；页面结构由 `.vue` 模板维护。标签在开发服务器返回 HTML、生产构建生成 HTML 时注入，直接出现在页面源码中，不依赖 Vue 挂载或浏览器执行 JavaScript。`<%= … %>` 会转义属性中的特殊字符。
 
@@ -11,14 +11,14 @@
 - `og:image`、HTTPS 地址、类型、尺寸和替代文字。
 - QQ 的 `itemprop="name"`、`itemprop="image"`，以及复用同一个 description 标签的 `itemprop="description"`。
 - `robots` 索引指令与 `max-image-preview:large`，允许搜索结果使用大图预览。
-- JSON-LD `WebSite` 与 `WebPage`（项目 / 工具目录为 `CollectionPage`），标记页面名称、描述、规范地址及所属网站。
+- JSON-LD `WebSite` 与 `WebPage`（项目 / 工具 / 游戏目录为 `CollectionPage`），标记页面名称、描述、规范地址及所属网站。
 
 分享图片按页面分组：
 
-| 页面范围                             | 分享图片                                         | 格式与尺寸      |
-| ------------------------------------ | ------------------------------------------------ | --------------- |
-| 个人主页、项目目录、工具目录与工具页 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
-| RDP 官网、Wiki 与下载页              | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
+| 页面范围                           | 分享图片                                         | 格式与尺寸      |
+| ---------------------------------- | ------------------------------------------------ | --------------- |
+| 个人主页、项目目录、工具与游戏页面 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
+| RDP 官网、Wiki 与下载页            | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
 
 头像原文件 `avatar.png` 实际为 JPEG；分享专用的 `share-avatar.jpg` 是它的原样副本，使用正确扩展名以匹配服务器响应格式。更新头像时同步更新该副本。OG 图片地址、格式、尺寸和替代文字统一由 `site.config.ts` 提供，QQ 图片与 JSON-LD 同步使用相同图片，站内切换时也同步更新。原 Minecraft `share-cover.jpg` 继续用于 README 展示。
 
@@ -30,7 +30,7 @@
 
 ## 搜索引擎收录
 
-构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 18 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
+构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 22 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
 
 构建同时生成带 `noindex` 的 `404.html`，让 Cloudflare Pages 对未知路径返回真实 404，避免把不存在的地址当作首页收录。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
 
@@ -53,3 +53,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 ## 网页工具
 
 工具目录 `/tool` 的元信息由 `site.config.ts` 提供；十二个 `/tools/*` 页面（JSON、Base64、URL、时间戳、UUID、文本、进制、哈希、JWT、密码、HTML 实体、颜色）的标题、简介来自 `src/tools/catalog.ts`。这些页面使用主页 favicon 与头像分享图片，构建生成 `tool.html` 和 `tools/*.html`，同样支持无刷新切换、原始 HTML 分享标签与规范地址重定向。`scripts/check-sharing.py` 覆盖所有工具页面。
+
+## 小游戏
+
+游戏目录 `/game` 的元信息由 `site.config.ts` 提供；三个 `/games/*` 页面（2048、扫雷、纸牌接龙）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。

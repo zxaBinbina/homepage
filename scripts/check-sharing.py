@@ -25,6 +25,10 @@ class Head(HTMLParser):
         if self.in_title: self.title += data
 
 pages = {
+    '小游戏 · a彬彬a': 'game',
+    '2048 · 小游戏 · a彬彬a': 'games/2048',
+    '扫雷 · 小游戏 · a彬彬a': 'games/minesweeper',
+    '纸牌接龙 · 小游戏 · a彬彬a': 'games/solitaire',
     '网页工具 · a彬彬a': 'tool',
     'JSON 格式化 · 网页工具 · a彬彬a': 'tools/json',
     'Base64 编解码 · 网页工具 · a彬彬a': 'tools/base64',

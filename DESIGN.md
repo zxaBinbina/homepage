@@ -214,22 +214,22 @@
 | [public/images/share-cover.jpg](public/images/share-cover.jpg)                                           | `1200 × 630` Minecraft 图片，用于 README 展示 |
 | [public/favicon.svg](public/favicon.svg)                                                                 | 浏览器站点图标                                |
 
-个人主页、项目目录与工具页面的 OG 分享图片使用 `public/images/share-avatar.jpg`（256 × 256，个人头像）；RDP 子站使用 `public/images/rdp-access-auth.png`（512 × 394，软件 Logo）。图片格式、尺寸和替代文字由 `site.config.ts` 按页面提供，详情见 [分享配置](docs/sharing.md)。
+个人主页、项目目录、工具与游戏页面的 OG 分享图片使用 `public/images/share-avatar.jpg`（256 × 256，个人头像）；RDP 子站使用 `public/images/rdp-access-auth.png`（512 × 394，软件 Logo）。图片格式、尺寸和替代文字由 `site.config.ts` 按页面提供，详情见 [分享配置](docs/sharing.md)。
 
 首屏主图通过 `srcset` 选择分辨率并优先加载；下方主要图片延迟加载。更换素材时保留尺寸信息与合适的裁切方式，避免加载后改变布局。像素化渲染仅用于核心模组图标，景观与网页预览保持常规图像渲染。
 
-| 文件                                                             | 维护职责                                     |
-| ---------------------------------------------------------------- | -------------------------------------------- |
-| [src/style.css](src/style.css)                                   | 主题变量、页面布局、通用组件、断点、全局动效 |
-| [src/HomePage.vue](src/HomePage.vue)                             | 页面结构、滚动显现、复制反馈                 |
-| [src/router.ts](src/router.ts)                                   | 站内导航、历史滚动、运行时元信息             |
-| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)   | 主页、目录与工具共用导航、音乐入口、移动菜单 |
-| [src/content.ts](src/content.ts)                                 | 个人资料、项目文案与链接                     |
-| [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、宽度、开合与外观               |
-| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 音乐控制、歌词、列表与组件局部样式           |
-| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue) | 网易云 SVG 图标                              |
-| [index.html](index.html)                                         | 首次绘制前的主题设置，避免主题闪烁           |
-| [site.config.ts](site.config.ts)                                 | 站点标题、描述及分享视觉配置                 |
+| 文件                                                             | 维护职责                                           |
+| ---------------------------------------------------------------- | -------------------------------------------------- |
+| [src/style.css](src/style.css)                                   | 主题变量、页面布局、通用组件、断点、全局动效       |
+| [src/HomePage.vue](src/HomePage.vue)                             | 页面结构、滚动显现、复制反馈                       |
+| [src/router.ts](src/router.ts)                                   | 站内导航、历史滚动、运行时元信息                   |
+| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)   | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
+| [src/content.ts](src/content.ts)                                 | 个人资料、项目文案与链接                           |
+| [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、宽度、开合与外观                     |
+| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 音乐控制、歌词、列表与组件局部样式                 |
+| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue) | 网易云 SVG 图标                                    |
+| [index.html](index.html)                                         | 首次绘制前的主题设置，避免主题闪烁                 |
+| [site.config.ts](site.config.ts)                                 | 站点标题、描述及分享视觉配置                       |
 
 修改设计时同步更新本文对应部分。视觉调整完成后，应检查深浅主题、桌面与窄屏、键盘焦点、减少动态效果模式，以及涉及组件的加载和失败状态。
 
@@ -263,7 +263,7 @@ Wiki 使用紧凑标题、环境准备 / 六步部署 / 故障排查快捷入口
 
 ## 12. 项目目录
 
-`/project` 使用 `src/ProjectDirectory.vue`，与个人主页共享 `src/content.ts` 项目数据、`src/components/ProjectCard.vue` 卡片组件和全局 `.project-*` 样式。桌面两列卡片，480px 及以下单列；卡片沿用主页的编号图标、透视服务器 Logo、透明软件 Logo、角色短句、名称、用途、技术标签与悬停效果。主页卡片标题为三级，目录页为二级，视觉样式一致。目录展示个人与组织的公开项目，排除自我介绍与 `.github` 等资料仓库，首页仅展示 `featured` 标记的精选项目；卡片标明个人项目、团队项目或分支维护。长项目名允许在卡片内换行。顶部提供关键词搜索（含仓库原名与所属账号）、结果计数与空结果恢复按钮，主题沿用共享 `ThemeToggle`，页脚保留萌备。个人主页导航「项目」和项目区「查看全部项目」均进入目录。主页与目录页共用 `SiteHeader.vue` 完整固定导航、音乐入口和移动菜单；目录页为导航保留顶部间距。桌面与移动导航均移除「关于」入口，「首页」指向 `/`，「项目」指向 `/project`，「工具」指向 `/tool`，「悠哉世界」指向 `https://mcyzw.top`，联系入口保留主页锚点。元信息由现有 EJS 模板构建生成，页面内容在 Vue 中维护。
+`/project` 使用 `src/ProjectDirectory.vue`，与个人主页共享 `src/content.ts` 项目数据、`src/components/ProjectCard.vue` 卡片组件和全局 `.project-*` 样式。桌面两列卡片，480px 及以下单列；卡片沿用主页的编号图标、透视服务器 Logo、透明软件 Logo、角色短句、名称、用途、技术标签与悬停效果。主页卡片标题为三级，目录页为二级，视觉样式一致。目录展示个人与组织的公开项目，排除自我介绍与 `.github` 等资料仓库，首页仅展示 `featured` 标记的精选项目；卡片标明个人项目、团队项目或分支维护。长项目名允许在卡片内换行。顶部提供关键词搜索（含仓库原名与所属账号）、结果计数与空结果恢复按钮，主题沿用共享 `ThemeToggle`，页脚保留萌备。个人主页导航「项目」和项目区「查看全部项目」均进入目录。主页与目录页共用 `SiteHeader.vue` 完整固定导航、音乐入口和移动菜单；目录页为导航保留顶部间距。桌面与移动导航均移除「关于」入口，「首页」指向 `/`，「项目」指向 `/project`，「工具」指向 `/tool`，「游戏」指向 `/game`，「悠哉世界」指向 `https://mcyzw.top`，联系入口保留主页锚点。元信息由现有 EJS 模板构建生成，页面内容在 Vue 中维护。
 
 ## 13. 网页工具
 
@@ -272,3 +272,19 @@ Wiki 使用紧凑标题、环境准备 / 六步部署 / 故障排查快捷入口
 工作页以返回目录链接、英文栏目标签、标题和操作区组织内容，保留指导操作的格式、模式、数量限制等说明，不展示其他工具推荐区域。文本工具桌面双列输入 / 结果，760px 及以下单列；等宽文本框可独立纵向调整高度，双列外框顶部对齐，各自随文本框高度变化，状态栏始终贴合各自底部；结果可以选择、复制和下载。时间工具使用两个转换表单与统一结果区，UUID 与密码使用批量选项与结果区；密码可选择字符类型。颜色工具使用色值输入、原生取色器、预览色块与结果区。哈希计算提供等待状态，输入或算法变化后丢弃过期的异步结果。控件触摸区域至少 44px，错误显示可读文字并使用 `role="alert"`，复制与处理状态使用 `role="status"`，复制失败自动选中结果供手动复制。输入或选项变更会清空旧结果；空结果与尚未处理的状态分开显示。工具之间不自动传递或保存输入。
 
 样式集中在 `src/style.css` 的 `.tool-*` / `.tools-*` 规则，工具文案与分类在 `src/tools/catalog.ts`，组件位于 `src/tools/`。共享导航增加「工具」，工具目录及详情页均标记当前项；1050px 及以下收起「异次元之旅」文字，760px 及以下继续使用原有移动菜单。减少动态效果时关闭卡片位移与过渡，正文不依赖动画显现。
+
+## 14. 小游戏
+
+游戏目录 `/game` 与 `/games/2048`、`/games/minesweeper`、`/games/solitaire` 复用 `.shell`、共享导航、主题和页脚。导航的「游戏」在目录与具体游戏页均标记为当前项；1050px 及以下缩小桌面导航链接的水平内边距到 8px，760px 及以下沿用移动菜单。
+
+目录标题为「不赶时间，来玩一会儿。」，配英文栏目标签、中文介绍和整卡入口。卡片使用 CSS 数字方块、雷区与扇形纸牌预览，无额外图片请求。卡片圆角 22px，上半部为主题背景与淡蓝高光，下半部为游戏名称、玩法描述和开始入口；桌面三列，760px 及以下两列，480px 及以下单列。
+
+游戏页由返回目录、标题、操作区和玩法说明组成。2048 与扫雷在桌面使用棋盘 / 说明双列，760px 及以下单列；纸牌占满主容器，说明在下方。游戏表面圆角 24px，480px 及以下为 18px；操作按钮为至少 44px 的胶囊按钮。状态提示保留多行空间，并通过 `role="status"` 播报，成功与失败沿用语义状态颜色。
+
+2048 使用四列方格，低数字方块随主题混合蓝色，高数字使用固定蓝、紫、暖棕底与白字。棋盘支持方向键 / WASD、滑动与可见方向按钮，键盘事件仅在游戏操作区域内处理，只有棋盘区域使用 `touch-action: none`。新数字以 160ms 淡入和轻微缩放反馈；减少动态效果时关闭此动画及目录悬停位移。
+
+扫雷提供 9 × 9 与 12 × 12 棋盘，数字、旗子、地雷与错误标记同时区分状态。密集方格按可用宽度缩放；窄屏挑战棋盘在自身容器滚动，不扩大页面。键盘使用单一 Tab 入口与方向键移动格子焦点，回车 / 空格翻开，F 插旗；手机提供明确的翻开 / 插旗模式按钮。首次翻开及周围八格安全；计时从首次翻开开始，结束、重开或卸载时清理计时器。
+
+纸牌桌面为七列，牌面使用 `--game-card-paper`（深色主题 `#edf2fa` / 浅色主题 `#fff`）、`--game-card-ink`（`#22304b`）与 `--game-card-red`（`#ad2d48`），以保持实际纸牌的红黑辨识度。选牌显示边框与文字反馈，可放置目标显示虚线与方向提示；移动通过点击完成，支持键盘按钮操作和 Escape 取消选牌。牌桌最小宽度为 532px，窄屏仅牌桌内部横向滚动，保留可辨认的牌面与列操作按钮。撤销保留最近 100 次操作，自动完成仅用于所有暗牌已翻开且牌堆 / 翻牌区清空的残局。
+
+规则与组件位于 `src/games/`，说明位于 `catalog.ts`，样式集中在 `src/style.css` 的 `.game-*`、`.games-*`、`.number-*`、`.mine-*`、`.solitaire-*` 与纸牌相关规则。游戏状态不持久保存，页面离开或刷新后重新开局；游戏页面切换保留共用播放器实例。规则检查使用 `scripts/check-games.mjs`，浏览器验收使用 `scripts/check-games-browser.py`。

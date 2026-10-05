@@ -6,6 +6,7 @@ import ProjectHeader from './rdp/components/ProjectHeader.vue'
 import './rdp/style.css'
 import { navigateInternalLink } from './router'
 import { isProjectPage } from './pages'
+import { isGameId } from './games/catalog'
 const route = useRoute()
 const project = computed(() => isProjectPage(route.name))
 const personal = computed(() => !project.value)
@@ -20,7 +21,13 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
         <SiteHeader
           :home="route.name === 'home'"
           :active="
-            route.name === 'home' ? 'home' : route.name === 'directory' ? 'projects' : 'tools'
+            route.name === 'home'
+              ? 'home'
+              : route.name === 'directory'
+                ? 'projects'
+                : route.name === 'games' || isGameId(route.name)
+                  ? 'games'
+                  : 'tools'
           "
         />
       </div>

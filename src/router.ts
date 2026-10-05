@@ -2,12 +2,17 @@ import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { isProjectPage, knownPageForPath, pages, type PageName } from './pages'
 import { isToolId } from './tools/catalog'
+import { isGameId } from './games/catalog'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 
 const components = {
   home: () => import('./HomePage.vue'),
   directory: () => import('./ProjectDirectory.vue'),
   tools: () => import('./tools/ToolDirectory.vue'),
+  games: () => import('./games/GameDirectory.vue'),
+  twenty48: () => import('./games/GamePage.vue'),
+  minesweeper: () => import('./games/GamePage.vue'),
+  solitaire: () => import('./games/GamePage.vue'),
   json: () => import('./tools/ToolPage.vue'),
   base64: () => import('./tools/ToolPage.vue'),
   url: () => import('./tools/ToolPage.vue'),
@@ -80,7 +85,11 @@ export const router = createRouter({
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: components[name],
-      props: isProjectPage(name) ? { view: name } : isToolId(name) ? { id: name } : undefined,
+      props: isProjectPage(name)
+        ? { view: name }
+        : isToolId(name) || isGameId(name)
+          ? { id: name }
+          : undefined,
     })),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

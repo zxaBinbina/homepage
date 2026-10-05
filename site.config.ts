@@ -1,5 +1,6 @@
 import { isProjectPage, pages, type PageName } from './src/pages'
 import { isToolId, toolCatalog } from './src/tools/catalog'
+import { isGameId, gameCatalog } from './src/games/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -14,6 +15,11 @@ export const siteContent = {
 }
 
 const projectPages = {
+  games: {
+    title: '小游戏 · a彬彬a',
+    description:
+      '不赶时间，来玩一会儿。打开就能玩的 2048、扫雷与经典纸牌接龙，支持电脑和手机，无需登录。',
+  },
   tools: {
     title: '网页工具 · a彬彬a',
     description:
@@ -55,7 +61,12 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
             title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
             description: toolCatalog[page].description,
           }
-        : projectPages[page]
+        : isGameId(page)
+          ? {
+              title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
+              description: gameCatalog[page].description,
+            }
+          : projectPages[page]
   const image = isProjectPage(page)
     ? {
         image: 'images/rdp-access-auth.png',
@@ -92,7 +103,10 @@ export function createStructuredData(baseUrl = siteContent.url, page: PageName =
         inLanguage: 'zh-CN',
       },
       {
-        '@type': page === 'directory' || page === 'tools' ? 'CollectionPage' : 'WebPage',
+        '@type':
+          page === 'directory' || page === 'tools' || page === 'games'
+            ? 'CollectionPage'
+            : 'WebPage',
         '@id': `${meta.url}#webpage`,
         url: meta.url,
         name: meta.title,

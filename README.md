@@ -39,11 +39,11 @@
 
 主页、项目目录与 RDP 子站共用完全一致的 `src/components/SiteFooter.vue` 页脚。
 
-访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记保留四个精选项目。当前列表于 2026-10-04 从 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories) 核对，核对了 12 个公开仓库，目录收录其中 9 个项目（个人 2 个、组织 7 个），保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）、「工具」（`/tool`）和「悠哉世界」（`https://mcyzw.top`），联系入口保留主页锚点。发布完整构建产物即可上线。运行 `python3 scripts/check-project-directory.py` 检查目录访问、搜索、图片和响应式，可用 `HOMEPAGE_TEST_URL` 指定开发服务器地址。
+访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记保留四个精选项目。当前列表于 2026-10-04 从 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories) 核对，核对了 12 个公开仓库，目录收录其中 9 个项目（个人 2 个、组织 7 个），保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）、「工具」（`/tool`）、「游戏」（`/game`）和「悠哉世界」（`https://mcyzw.top`），联系入口保留主页锚点。发布完整构建产物即可上线。运行 `python3 scripts/check-project-directory.py` 检查目录访问、搜索、图片和响应式，可用 `HOMEPAGE_TEST_URL` 指定开发服务器地址。
 
 ## 网页工具
 
-访问 `https://zxabinbina.cc.cd/tool`，或点击桌面 / 移动导航中的「工具」，可按分类与关键词查找十二个网页工具。工具页沿用主页的深浅主题、胶囊导航、圆角卡片和共用页脚；主页、项目目录与工具之间切换时保留播放器实例。
+访问 `https://zxabinbina.cc.cd/tool`，或点击桌面 / 移动导航中的「工具」，可按分类与关键词查找十二个网页工具。工具页沿用主页的深浅主题、胶囊导航、圆角卡片和共用页脚；主页、项目目录、工具与游戏之间切换时保留播放器实例。
 
 | 工具          | 地址               | 功能                                                              |
 | ------------- | ------------------ | ----------------------------------------------------------------- |
@@ -66,11 +66,27 @@
 
 运行 `node scripts/check-tools.mjs` 检查转换规则和边界；预览服务启动后运行 `python3 scripts/check-tools-browser.py` 检查工具操作、复制下载、地址刷新、主题、移动菜单和响应式。浏览器脚本支持 `HOMEPAGE_TEST_URL` 与 `HOMEPAGE_BROWSER`，本次截图写入 `artifacts/tool*.png`。
 
+## 小游戏
+
+访问 `https://zxabinbina.cc.cd/game`，或点击桌面 / 移动导航中的「游戏」，进入小游戏目录。游戏沿用本站深浅主题与共用导航、页脚，无需登录或安装。
+
+| 游戏     | 地址                 | 玩法与操作                                                                                       |
+| -------- | -------------------- | ------------------------------------------------------------------------------------------------ |
+| 2048     | `/games/2048`        | 方向键 / WASD、棋盘滑动与方向按钮；合并计分、达到 2048 后继续挑战、最多撤销 100 步               |
+| 扫雷     | `/games/minesweeper` | 9 × 9 / 10 雷、12 × 12 / 24 雷；首步及周围安全、空白展开、插旗、数字周围快速翻开、计时与胜负提示 |
+| 纸牌接龙 | `/games/solitaire`   | 经典 Klondike，翻一张、无限循环；红黑交替、整段移动、同花色 A → K 收牌、撤销与残局自动完成       |
+
+2048 的键盘操作仅在棋盘与方向按钮内生效。扫雷可右键或按 F 插旗，方向键移动焦点，回车 / 空格翻开；手机用「翻开 / 插旗」切换操作。纸牌通过点击选牌、再点击目标列或收牌区移动，不依赖拖拽；窄屏可在牌桌内部横向滚动查看七列。纸牌随机发牌，不保证每局可解；「自动完成」仅在全部暗牌翻开、牌堆与翻牌区清空时可用。
+
+游戏状态只保留在当前页面内，不上传、不持久保存；离开或刷新会重新开局。站内导航继续保留音乐播放器实例。名称和说明位于 `src/games/catalog.ts`，目录与游戏组件、独立规则逻辑均位于 `src/games/`，样式集中在 `src/style.css`。新增游戏时登记 `src/pages.ts`、`src/router.ts`、目录及 `GamePage.vue` 的游戏组件，并更新分享与站点地图检查断言。构建自动生成 `game.html` 和 `games/*.html`，随完整 `dist/` 部署即可。
+
+运行 `node scripts/check-games.mjs` 验证合并规则、扫雷首步安全与胜负、接龙合法移动与发牌完整性。构建预览服务启动后，运行 `HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-games-browser.py` 检查游戏交互、键盘 / 触摸、路由刷新、主题和响应式；截图写入 `artifacts/game-*.png`。共享导航与音乐实例由 `scripts/check-navigation.py` 一并检查。
+
 ## 站内页面切换
 
-主页、项目目录、网页工具与 RDP 子站之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project`、`/tool`、`/tools/json` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
+主页、项目目录、网页工具、小游戏与 RDP 子站之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project`、`/tool`、`/tools/json` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
 
-共享导航由 `src/App.vue` 挂载，主页、项目目录与工具页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。运行 `python3 scripts/check-navigation.py` 验证导航，推荐用 `HOMEPAGE_TEST_URL` 指向构建预览服务。
+共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。运行 `python3 scripts/check-navigation.py` 验证导航，推荐用 `HOMEPAGE_TEST_URL` 指向构建预览服务。
 
 ## RDP Access Auth 官网与 Wiki
 
