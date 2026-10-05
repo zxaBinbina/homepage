@@ -11,7 +11,7 @@ import { gameCatalog, gameIds } from './catalog'
       <section class="directory-intro directory-entry">
         <p class="overline">PLAYGROUND / {{ String(gameIds.length).padStart(2, '0') }}</p>
         <h1>不赶时间，<span class="games-accent">来玩一会儿。</span></h1>
-        <p>在代码与方块之间，给自己留一点放空的时间。<br />几款熟悉的小游戏，打开就能玩。</p>
+        <p>给自己留一点放空的时间。<br />几款熟悉的小游戏，打开就能玩。</p>
       </section>
       <div class="games-directory-meta">
         <span><Gamepad2 :size="18" aria-hidden="true" /> 随时开局，慢慢玩</span

@@ -15,13 +15,16 @@ const components = {
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
 const viewport = ref<HTMLElement>()
+let previousScroll = { left: 0, top: 0 }
 async function toggleFullscreen() {
   if (fullscreen.value) {
     fullscreen.value = false
     await nextTick()
     fullscreenDialog.value?.close()
     document.documentElement.classList.remove('game-fullscreen-open')
+    window.scrollTo({ ...previousScroll, behavior: 'instant' })
   } else {
+    previousScroll = { left: window.scrollX, top: window.scrollY }
     fullscreenDialog.value?.showModal()
     fullscreen.value = true
     document.documentElement.classList.add('game-fullscreen-open')

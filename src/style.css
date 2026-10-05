@@ -2879,11 +2879,11 @@ h1 > span {
     grid-column: 2;
     grid-row: 1 / span 4;
     width: 100%;
-    max-width: min(100%, calc(100dvh - 80px));
+    max-width: min(100%, calc(100dvh - 128px));
     margin-inline: auto;
   }
   .is-fullscreen .mine-board-scroll {
-    max-width: min(100%, calc(100dvh - 32px));
+    max-width: min(100%, calc(100dvh - 64px));
   }
   .is-fullscreen .game-status {
     grid-column: 1;
@@ -3317,7 +3317,7 @@ h1 > span {
 .waste-stack {
   position: relative;
   height: var(--card-height);
-  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 .stock-underlay,
 .waste-stack > .playing-card {

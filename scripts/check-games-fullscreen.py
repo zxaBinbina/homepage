@@ -37,8 +37,9 @@ with sync_playwright() as p:
             expect(page.locator('.pile-label').first).to_have_text('牌堆 · 23')
             page.get_by_role('button', name='撤销', exact=True).click()
             expect(page.locator('.pile-label').first).to_have_text('牌堆 · 24')
+        page.get_by_role('button', name='退出全屏', exact=True).focus()
         page.locator('.header .brand').evaluate('el => el.focus()')
-        assert page.evaluate('!!document.activeElement.closest("dialog[open]")'), 'Background must be inert'
+        assert page.evaluate('!!document.activeElement.closest("dialog[open]")'), (game, 'Background must be inert')
         for _ in range(12):
             page.keyboard.press('Tab')
             assert page.evaluate('document.activeElement === document.body || !!document.activeElement.closest("dialog[open]")')
@@ -47,16 +48,21 @@ with sync_playwright() as p:
             for width, height in [(320,844),(390,844),(768,1000),(1024,1000),(1440,1000),(844,390)]:
                 page.set_viewport_size({'width':width,'height':height})
                 page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
-                assert page.locator('dialog[open]').evaluate('''el => {
+                page.locator('.game-play-content').evaluate('el => el.scrollTo({top:0,behavior:"instant"})')
+                page.wait_for_function('''() => {
+                  const el=document.querySelector('dialog[open]');
                   const box=el.getBoundingClientRect();
                   return box.x===0 && box.y===0 && Math.abs(box.width-innerWidth)<1 && Math.abs(box.height-innerHeight)<1;
-                }'''), (game, theme, width, height, page.locator('dialog[open]').evaluate('el => el.getBoundingClientRect().toJSON()'))
+                }''', timeout=4000)
                 assert page.locator('.game-play-content').evaluate('el => el.scrollWidth <= el.clientWidth'), (game, theme, width, height)
                 bounds = page.get_by_role('button', name='退出全屏', exact=True).bounding_box()
                 assert bounds['x'] >= 0 and bounds['y'] >= 0 and bounds['x']+bounds['width'] <= width
                 restart = page.get_by_role('button', name='重新开始', exact=True).bounding_box()
                 assert bounds['x'] > restart['x'] + restart['width'] and abs(bounds['y'] - restart['y']) < 1
                 assert page.get_by_role('button', name='退出全屏', exact=True).inner_text() == ''
+                if width == 844 and game != 'solitaire':
+                    board_end = page.locator('.number-directions' if game == '2048' else '.mine-board-scroll').bounding_box()
+                    assert board_end['y'] + board_end['height'] <= height, (game, 'Landscape board/controls clipped')
                 if width in [390, 1440, 844]:
                     page.screenshot(path=str(out / f'game-fullscreen-{game}-{theme}-{width}.png'))
         page.set_viewport_size({'width':1440,'height':1000})
@@ -94,6 +100,8 @@ with sync_playwright() as p:
     phone = touch.new_page()
     phone.on('pageerror', lambda e: errors.append(str(e)))
     phone.goto(base + '/games/solitaire', wait_until='networkidle')
+    phone.get_by_role('button', name='网页全屏', exact=True).scroll_into_view_if_needed()
+    previous_scroll = phone.evaluate('scrollY')
     phone.get_by_role('button', name='网页全屏', exact=True).tap()
     source = phone.locator('.tableau-card[data-card-id="0-1"]')
     source.scroll_into_view_if_needed()
@@ -107,6 +115,7 @@ with sync_playwright() as p:
     expect(phone.locator('.game-stats strong').first).to_have_text('1 / 52')
     phone.get_by_role('button', name='退出全屏', exact=True).tap()
     expect(phone.locator('dialog[open]')).to_have_count(0)
+    assert abs(phone.evaluate('scrollY') - previous_scroll) < 2
     assert not errors, errors
     browser.close()
 print('Web fullscreen: games/history preserved, modal focus, exit/Escape/navigation cleanup, mouse/touch drag, themes and responsive layouts passed.')
