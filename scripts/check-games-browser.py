@@ -147,7 +147,7 @@ with sync_playwright() as p:
             assert page.locator('.mine-board-scroll').evaluate('el => el.clientHeight <= innerHeight * .7 + 1')
             if width in [320, 390, 1440]:
                 page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
-                page.screenshot(path=str(out / f'game-minesweeper-custom-{theme}-{width}.png'), full_page=True)
+                page.screenshot(path=str(out / f'game-minesweeper-custom-{theme}-{width}.png'), full_page=True, timeout=30000)
     page.get_by_role('button', name='重新开始', exact=True).click()
     assert page.locator('.mine-board-scroll').evaluate('el => el.scrollLeft === 0 && el.scrollTop === 0')
     # Large blank floods remain immediate even with motion enabled.
@@ -161,7 +161,7 @@ with sync_playwright() as p:
     page.get_by_label('难度', exact=True).select_option('0')
     page.locator('.mine-cell').nth(40).click()
     for i in range(10, 81):
-        if '恭喜过关' in page.locator('.game-status').inner_text():
+        if page.locator('.game-result').count():
             break
         page.locator('.mine-cell').nth(i).click()
     expect(page.locator('.game-status')).to_contain_text('恭喜过关')

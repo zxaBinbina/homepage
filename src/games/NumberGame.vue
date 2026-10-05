@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import GameResult from './GameResult.vue'
 import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
@@ -42,10 +43,11 @@ function stopMotion() {
 onBeforeUnmount(stopMotion)
 const over = computed(() => numbersOver(game.value.board))
 const largest = computed(() => Math.max(...game.value.board))
+const continued = ref(false)
 const status = computed(() =>
   over.value
     ? '没有可移动的方块了。试试撤销，或重新开一局。'
-    : largest.value >= 2048
+    : largest.value >= 2048 && !continued.value
       ? '合成 2048 了！你也可以继续挑战更大的数字。'
       : '',
 )
@@ -57,7 +59,7 @@ const directions = [
 ] as const
 
 async function move(direction: Direction) {
-  if (busy.value) return
+  if (busy.value || status.value) return
   const trace = traceSlide(game.value.board, direction)
   const next = moveNumbers(game.value, direction)
   if (next === game.value) return
@@ -138,12 +140,19 @@ function restart() {
   stopMotion()
   game.value = newNumberGame()
   history.value = []
+  continued.value = false
+}
+async function continueGame() {
+  continued.value = true
+  await nextTick()
+  boardElement.value?.focus({ preventScroll: true })
 }
 function undo() {
   if (busy.value) return
   const previous = history.value.pop()
   if (previous) {
     game.value = previous
+    if (largest.value < 2048) continued.value = false
   }
 }
 function onKey(event: KeyboardEvent) {
@@ -166,7 +175,7 @@ function onKey(event: KeyboardEvent) {
 }
 let gesture: { x: number; y: number; id: number } | null = null
 function pointerStart(event: PointerEvent) {
-  if (busy.value || !event.isPrimary || event.button !== 0) return
+  if (busy.value || status.value || !event.isPrimary || event.button !== 0) return
   gesture = { x: event.clientX, y: event.clientY, id: event.pointerId }
   boardElement.value?.setPointerCapture(event.pointerId)
   boardElement.value?.focus({ preventScroll: true })
@@ -194,15 +203,6 @@ function pointerEnd(event: PointerEvent) {
           </div>
         </div>
         <div class="game-actions">
-          <p
-            id="number-status"
-            v-show="status"
-            class="game-status"
-            :class="{ 'is-success': largest >= 2048, 'is-ended': over }"
-            role="status"
-          >
-            {{ status }}
-          </p>
           <button class="game-button" :disabled="busy || !history.length" @click="undo">
             <Undo2 :size="16" aria-hidden="true" />撤销
           </button>
@@ -229,7 +229,7 @@ function pointerEnd(event: PointerEvent) {
           tabindex="0"
           role="group"
           aria-label="2048 棋盘，使用方向键或 WASD 移动"
-          :aria-describedby="status ? 'number-status' : undefined"
+          :aria-describedby="status && !busy ? 'number-status' : undefined"
           @pointerdown="pointerStart"
           @pointerup="pointerEnd"
           @pointercancel="gesture = null"
@@ -260,6 +260,17 @@ function pointerEnd(event: PointerEvent) {
               {{ tile.value }}
             </div>
           </div>
+          <GameResult
+            v-if="status && !busy"
+            id="number-status"
+            :message="status"
+            :tone="over ? 'ended' : 'success'"
+            :no-animation="animationsOff"
+            @pointerdown.stop
+            @pointerup.stop
+          >
+            <button v-if="!over" class="game-button" @click="continueGame">继续挑战</button>
+          </GameResult>
         </div>
         <div class="number-directions" role="group" aria-label="移动方向">
           <button
@@ -268,7 +279,7 @@ function pointerEnd(event: PointerEvent) {
             class="game-button"
             :aria-label="direction.label"
             :title="direction.label"
-            :disabled="busy"
+            :disabled="busy || !!status"
             @click="move(direction.id)"
           >
             <component :is="direction.icon" :size="20" aria-hidden="true" />

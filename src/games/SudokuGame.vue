@@ -2,6 +2,7 @@
 import { computed, nextTick, ref } from 'vue'
 import { Eraser, Lightbulb, Pencil, RotateCcw, Undo2 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import GameResult from './GameResult.vue'
 import { newSudoku, peers, sudokuConflicts } from './sudoku'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useGameMotion } from './useGameMotion'
@@ -86,7 +87,7 @@ function restart() {
   hints.value = 0
 }
 function onKey(event: KeyboardEvent) {
-  if (event.ctrlKey || event.metaKey || event.altKey) return
+  if (won.value || event.ctrlKey || event.metaKey || event.altKey) return
   if (/^[1-9]$/.test(event.key)) {
     event.preventDefault()
     void enter(Number(event.key))
@@ -128,9 +129,6 @@ function onKey(event: KeyboardEvent) {
               <RotateCcw :size="16" aria-hidden="true" />重新开始</button
             ><GameFullscreenButton />
           </div>
-          <p v-show="message" class="game-status is-success" role="status">
-            {{ message }}
-          </p>
         </div>
       </div>
       <div class="sudoku-play">
@@ -154,7 +152,7 @@ function onKey(event: KeyboardEvent) {
               'is-box-right': i % 9 === 2 || i % 9 === 5,
               'is-box-bottom': Math.floor(i / 9) === 2 || Math.floor(i / 9) === 5,
             }"
-            :tabindex="i === selected ? 0 : -1"
+            :tabindex="!won && i === selected ? 0 : -1"
             :aria-label="`第 ${Math.floor(i / 9) + 1} 行第 ${(i % 9) + 1} 列：${value || (notes[i]!.length ? '笔记 ' + notes[i]!.join('、') : '空格')}${puzzle.puzzle[i] ? '，题目数字' : ''}${conflicts[i] ? '，重复' : ''}`"
             :aria-pressed="i === selected"
             @click="selected = i"
@@ -165,6 +163,7 @@ function onKey(event: KeyboardEvent) {
               ><small v-for="n in 9" :key="n">{{ notes[i]!.includes(n) ? n : '' }}</small></span
             >
           </button>
+          <GameResult v-if="won" :message="message" tone="success" />
         </div>
         <div class="sudoku-pad" role="group" aria-label="填写数字">
           <button

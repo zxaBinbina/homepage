@@ -152,11 +152,12 @@ with sync_playwright() as p:
                 for width in [320, 390, 768, 1024, 1440]:
                     page.set_viewport_size({'width':width, 'height':1000})
                     page.evaluate('() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))')
-                    assert page.locator('.strategy-board').evaluate('''board => {
+                    page.wait_for_function('''() => {
+                      const board=document.querySelector('.strategy-board');
                       const b=board.getBoundingClientRect(), m=board.querySelector('.strategy-result').getBoundingClientRect(), t=board.querySelector('.strategy-result-message').getBoundingClientRect();
                       return Math.abs(m.x+m.width/2-b.x-b.width/2)<1 && Math.abs(m.y+m.height/2-b.y-b.height/2)<1
                         && Math.abs(t.y+t.height/2-b.y-b.height/2)<1 && t.width<=m.width && t.height<=m.height;
-                    }'''), (game, result, theme, width)
+                    }''', timeout=4000)
                     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
                     if result == 'loss' and width in [390, 1440]:
                         page.locator('.strategy-surface').screenshot(path=str(out / f'game-classics-{game}-result-{theme}-{width}.png'))
@@ -165,7 +166,10 @@ with sync_playwright() as p:
                 page.set_viewport_size({'width':844,'height':390})
                 page.evaluate('() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))')
                 expect(page.locator('dialog .strategy-result')).to_contain_text('和棋')
-                assert page.locator('.strategy-result').evaluate('el => { const b=el.getBoundingClientRect(); return b.x>=0 && b.y>=0 && b.right<=innerWidth && b.bottom<=innerHeight; }')
+                page.wait_for_function('''() => {
+                  const b=document.querySelector('.strategy-result').getBoundingClientRect();
+                  return b.x>=0 && b.y>=0 && b.right<=innerWidth && b.bottom<=innerHeight;
+                }''')
                 page.keyboard.press('Escape')
             page.get_by_role('button', name='重新开始').click()
             expect(page.locator('.strategy-result')).to_have_count(0)

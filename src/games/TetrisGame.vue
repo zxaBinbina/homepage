@@ -11,6 +11,7 @@ import {
   RotateCw,
 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import GameResult from './GameResult.vue'
 import { useGameMotion } from './useGameMotion'
 import {
   blocks,
@@ -213,14 +214,6 @@ function onKey(event: KeyboardEvent) {
               <RotateCcw :size="16" aria-hidden="true" />重新开始</button
             ><GameFullscreenButton />
           </div>
-          <p
-            v-show="status"
-            class="game-status"
-            :class="{ 'is-success': game.status === 'won', 'is-ended': game.status === 'lost' }"
-            role="status"
-          >
-            {{ status }}
-          </p>
         </div>
       </div>
       <div class="tetris-play">
@@ -251,6 +244,11 @@ function onKey(event: KeyboardEvent) {
             <strong>{{ paused ? '已暂停' : '准备好了吗？' }}</strong
             ><span>{{ paused ? '点击继续，接着这一局。' : '点击开始，让方块落下。' }}</span>
           </div>
+          <GameResult
+            v-if="status"
+            :message="status"
+            :tone="game.status === 'won' ? 'success' : 'ended'"
+          />
         </div>
         <aside class="tetris-side" aria-label="下一块">
           <span class="overline">NEXT</span><span>下一块</span>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import GameResult from './GameResult.vue'
 import { computed, inject, nextTick, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
@@ -47,24 +48,28 @@ const focused = ref(0)
 const boardElement = ref<HTMLElement>()
 const motion = useGameMotion()
 const scanning = ref(false)
+const revealing = ref(false)
 const burst = ref<{ x: number; y: number } | null>(null)
 let effect = 0
 function stopEffects() {
   effect++
   motion.cancel()
   scanning.value = false
+  revealing.value = false
   burst.value = null
 }
 onBeforeUnmount(stopEffects)
 async function animateReveal(previous: typeof game.value, index: number) {
   const current = ++effect
   motion.cancel()
+  revealing.value = true
   const board = boardElement.value
   const next = game.value
   scanning.value =
     next.status === 'won' && next.size <= 32 && !motion.reduced.value && !document.hidden
   if (!board) {
     scanning.value = false
+    revealing.value = false
     return
   }
   await nextTick()
@@ -74,6 +79,7 @@ async function animateReveal(previous: typeof game.value, index: number) {
   if (next.size > 32 || motion.reduced.value || document.hidden) {
     scanning.value = false
     burst.value = null
+    revealing.value = false
     return
   }
   const cells = board.querySelectorAll<HTMLElement>('.mine-cell')
@@ -199,6 +205,7 @@ async function animateReveal(previous: typeof game.value, index: number) {
     ])
     if (current === effect) scanning.value = false
   }
+  if (current === effect) revealing.value = false
 }
 const flagged = computed(() => game.value.cells.filter((cell) => cell.flag).length)
 const safe = computed(() => game.value.cells.filter((cell) => cell.open && !cell.mine).length)
@@ -280,7 +287,7 @@ function label(cell: MineCell, index: number) {
   return `${position}：${ended.value && cell.mine ? (game.value.status === 'won' ? '已排除地雷' : '地雷') : cell.flag ? (ended.value ? '标记错误' : '已插旗') : cell.open ? (cell.adjacent ? `周围 ${cell.adjacent} 颗地雷` : '空白') : '未翻开'}`
 }
 function onKey(event: KeyboardEvent, index: number) {
-  if (event.ctrlKey || event.metaKey || event.altKey) return
+  if (ended.value || event.ctrlKey || event.metaKey || event.altKey) return
   if (event.key.toLowerCase() === 'f') {
     event.preventDefault()
     flag(index)
@@ -339,14 +346,6 @@ function onKey(event: KeyboardEvent, index: number) {
             <option value="custom">自定义</option>
           </select></label
         >
-        <p
-          v-show="status"
-          class="game-status"
-          :class="{ 'is-success': game.status === 'won', 'is-ended': game.status === 'lost' }"
-          role="status"
-        >
-          {{ status }}
-        </p>
         <div class="game-restart-actions">
           <button class="game-button" @click="restart">
             <RotateCcw :size="16" aria-hidden="true" />重新开始</button
@@ -424,60 +423,67 @@ function onKey(event: KeyboardEvent, index: number) {
           <Flag :size="16" aria-hidden="true" />插旗
         </button>
       </div>
-      <div
-        class="mine-board-scroll"
-        :class="{ 'is-large': game.size > 32 }"
-        tabindex="0"
-        role="region"
-        aria-label="扫雷棋盘，较大棋盘可滚动查看"
-      >
+      <div class="mine-stage">
         <div
-          ref="boardElement"
-          class="mine-board"
-          :class="{ 'is-scanning': scanning }"
-          role="group"
-          aria-label="使用方向键选择格子，回车翻开，F 插旗"
+          class="mine-board-scroll"
+          :class="{ 'is-large': game.size > 32 }"
+          tabindex="0"
+          role="region"
+          aria-label="扫雷棋盘，较大棋盘可滚动查看"
         >
-          <button
-            v-for="(cell, index) in game.cells"
-            :key="index"
-            v-memo="[cell, game.status, game.exploded, focused === index]"
-            class="mine-cell"
-            :class="{
-              'is-open': cell.open,
-              'is-flag': cell.flag,
-              'is-mine': ended && cell.mine,
-              'is-exploded': game.exploded === index,
-              'is-wrong': ended && cell.flag && !cell.mine,
-              'is-found': game.status === 'won' && cell.mine,
-            }"
-            :data-number="cell.open ? cell.adjacent : 0"
-            :aria-label="label(cell, index)"
-            :aria-disabled="ended"
-            :tabindex="focused === index ? 0 : -1"
-            @focus="focused = index"
-            @click="reveal(index)"
-            @contextmenu.prevent="flag(index)"
-            @keydown="onKey($event, index)"
+          <div
+            ref="boardElement"
+            class="mine-board"
+            :class="{ 'is-scanning': scanning }"
+            role="group"
+            aria-label="使用方向键选择格子，回车翻开，F 插旗"
           >
-            <span v-if="ended && cell.flag && !cell.mine" aria-hidden="true">×</span
-            ><span v-else-if="ended && cell.mine" class="mine-symbol" aria-hidden="true">✹</span
-            ><span v-else-if="cell.flag" aria-hidden="true">⚑</span
-            ><span v-else-if="cell.open && cell.adjacent" aria-hidden="true">{{
-              cell.adjacent
-            }}</span>
-          </button>
-          <div class="mine-effects" aria-hidden="true">
-            <div
-              v-if="burst"
-              class="mine-burst"
-              :style="{ left: `${burst.x}px`, top: `${burst.y}px` }"
+            <button
+              v-for="(cell, index) in game.cells"
+              :key="index"
+              v-memo="[cell, game.status, game.exploded, focused === index]"
+              class="mine-cell"
+              :class="{
+                'is-open': cell.open,
+                'is-flag': cell.flag,
+                'is-mine': ended && cell.mine,
+                'is-exploded': game.exploded === index,
+                'is-wrong': ended && cell.flag && !cell.mine,
+                'is-found': game.status === 'won' && cell.mine,
+              }"
+              :data-number="cell.open ? cell.adjacent : 0"
+              :aria-label="label(cell, index)"
+              :aria-disabled="ended"
+              :tabindex="!ended && focused === index ? 0 : -1"
+              @focus="focused = index"
+              @click="reveal(index)"
+              @contextmenu.prevent="flag(index)"
+              @keydown="onKey($event, index)"
             >
-              <i class="mine-shockwave"></i><i v-for="i in 10" :key="i" class="mine-spark"></i>
+              <span v-if="ended && cell.flag && !cell.mine" aria-hidden="true">×</span
+              ><span v-else-if="ended && cell.mine" class="mine-symbol" aria-hidden="true">✹</span
+              ><span v-else-if="cell.flag" aria-hidden="true">⚑</span
+              ><span v-else-if="cell.open && cell.adjacent" aria-hidden="true">{{
+                cell.adjacent
+              }}</span>
+            </button>
+            <div class="mine-effects" aria-hidden="true">
+              <div
+                v-if="burst"
+                class="mine-burst"
+                :style="{ left: `${burst.x}px`, top: `${burst.y}px` }"
+              >
+                <i class="mine-shockwave"></i><i v-for="i in 10" :key="i" class="mine-spark"></i>
+              </div>
+              <div v-if="scanning" class="mine-scanner"></div>
             </div>
-            <div v-if="scanning" class="mine-scanner"></div>
           </div>
         </div>
+        <GameResult
+          v-if="status && !revealing"
+          :message="status"
+          :tone="game.status === 'won' ? 'success' : 'ended'"
+        />
       </div>
     </section>
   </div>

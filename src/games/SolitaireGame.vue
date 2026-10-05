@@ -4,6 +4,7 @@ import { gameFullscreenKey } from './fullscreen'
 import { RotateCcw, Smartphone, Undo2, X } from 'lucide-vue-next'
 import PlayingCard from './PlayingCard.vue'
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import GameResult from './GameResult.vue'
 import SolitaireCelebration from './SolitaireCelebration.vue'
 import { useGameMotion } from './useGameMotion'
 import { cardId, useSolitaireDrag, type CardPosition } from './useSolitaireDrag'
@@ -315,9 +316,6 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="game-actions">
-        <p v-show="won" class="game-status is-success" role="status">
-          {{ won ? '52 张牌全部归位，接龙成功！' : '' }}
-        </p>
         <button class="game-button" :disabled="locked || !history.length" @click="undo">
           <Undo2 :size="16" aria-hidden="true" />撤销
         </button>
@@ -326,14 +324,6 @@ onBeforeUnmount(() => {
         </button>
         <button v-if="celebrating" class="game-button" @click="celebrating = false">
           跳过庆祝
-        </button>
-        <button
-          v-else-if="won && !motion.reduced.value"
-          class="game-button"
-          :disabled="moving"
-          @click="celebrate"
-        >
-          重播庆祝
         </button>
         <div class="game-restart-actions">
           <button class="game-button" @click="restart">
@@ -352,6 +342,7 @@ onBeforeUnmount(() => {
       <div
         ref="scroll"
         class="solitaire-scroll"
+        :inert="won"
         tabindex="0"
         role="region"
         aria-label="纸牌桌面，窄屏可左右滚动查看七列"
@@ -538,6 +529,11 @@ onBeforeUnmount(() => {
         :key="celebrationKey"
         :origins="celebrationOrigins"
         @finished="celebrating = false"
+      />
+      <GameResult
+        v-if="won && !moving && !celebrating"
+        message="52 张牌全部归位，接龙成功！"
+        tone="success"
       />
     </div>
   </section>

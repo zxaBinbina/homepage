@@ -2982,9 +2982,16 @@ h1 > span {
 .is-fullscreen .mine-board-scroll {
   overflow: visible;
 }
-.is-fullscreen .mine-layout.is-large .mine-board-scroll {
+.is-fullscreen .mine-layout.is-large .mine-stage {
+  display: flex;
   flex: 1 0 160px;
   min-height: 160px;
+  max-width: none;
+}
+.is-fullscreen .mine-layout.is-large .mine-board-scroll {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   max-height: none;
   overflow: auto;
   scrollbar-gutter: stable;
@@ -3321,6 +3328,7 @@ h1 > span {
   margin-inline: auto;
 }
 .sudoku-board {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(9, minmax(0, 1fr));
   border: 2px solid var(--blue);
@@ -3549,6 +3557,7 @@ h1 > span {
   outline: 3px solid var(--status-danger);
   outline-offset: 1px;
 }
+.game-result,
 .strategy-result {
   position: absolute;
   inset: 0;
@@ -3560,6 +3569,13 @@ h1 > span {
   background: color-mix(in srgb, var(--panel) 84%, transparent);
   text-align: center;
 }
+.game-result-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.game-result-message,
 .strategy-result-message {
   max-width: 20em;
   color: var(--text);
@@ -3693,6 +3709,13 @@ h1 > span {
   justify-content: center;
   gap: 8px;
   margin-bottom: 18px;
+}
+.mine-stage {
+  position: relative;
+  width: 100%;
+  max-width: max(490px, calc(var(--mine-board-min) + 10px));
+  margin-inline: auto;
+  border-radius: 8px;
 }
 .mine-board-scroll {
   overflow-x: auto;
@@ -4059,6 +4082,7 @@ h1 > span {
 }
 .solitaire-stage {
   position: relative;
+  border-radius: 12px;
 }
 .solitaire-celebration {
   position: absolute;
