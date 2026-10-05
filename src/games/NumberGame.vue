@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameFullscreenButton from './GameFullscreenButton.vue'
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import { useGameMotion } from './useGameMotion'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Undo2 } from 'lucide-vue-next'
@@ -200,10 +201,13 @@ function pointerEnd(event: PointerEvent) {
         </div>
         <div class="game-actions">
           <button class="game-button" :disabled="busy || !history.length" @click="undo">
-            <Undo2 :size="16" aria-hidden="true" />撤销</button
-          ><button class="game-button" @click="restart">
-            <RotateCcw :size="16" aria-hidden="true" />重新开始
+            <Undo2 :size="16" aria-hidden="true" />撤销
           </button>
+          <div class="game-restart-actions">
+            <button class="game-button" @click="restart">
+              <RotateCcw :size="16" aria-hidden="true" />重新开始</button
+            ><GameFullscreenButton />
+          </div>
           <label class="number-motion-toggle"
             ><input
               v-model="animationsOff"

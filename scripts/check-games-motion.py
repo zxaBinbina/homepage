@@ -107,6 +107,10 @@ with sync_playwright() as p:
     expect(page.locator('.solitaire-surface')).to_have_attribute('aria-busy', 'true')
     page.wait_for_function('Array.from(document.querySelectorAll(".is-card-moving")).some(el => el.getAnimations().some(a => a.effect.getKeyframes().some(f => f.transform?.includes("rotateY(180deg)"))))')
     page.locator('.is-card-moving').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.pause(); a.currentTime=120}))')
+    assert page.locator('.is-card-moving').first.evaluate('''el => {
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+      return Math.abs(matrix.m13) > 0.45 && matrix.m43 > 10;
+    }'''), 'The drawn card flattened before its flip could be seen'
     page.screenshot(path=str(out / 'game-motion-solitaire-flip.png'))
     page.locator('.is-card-moving').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => a.finish()))')
     card_idle()
@@ -141,6 +145,7 @@ with sync_playwright() as p:
         timing = page.locator('.is-recycling-card').evaluate_all('els => els.map(el => el.getAnimations()[0].effect.getTiming()).sort((a,b) => a.delay-b.delay)')
         assert len({t['delay'] for t in timing}) == count, 'Cards must leave individually'
         assert max(t['delay'] + t['duration'] for t in timing) <= 401
+        assert min(t['duration'] for t in timing) >= 150, 'Each flip needs multiple visible frames'
         single_card_durations.append(timing[0]['duration'])
         card_idle()
         elapsed = page.evaluate('recycleTimes.find(t=>t.busy==="false").time-recycleTimes.find(t=>t.busy==="true").time')
@@ -160,6 +165,12 @@ with sync_playwright() as p:
     page.locator('.stock-card').click()
     expect(page.locator('.is-recycling-card')).to_have_count(24)
     page.locator('.is-recycling-card').evaluate_all('els => els.forEach(el => el.getAnimations().forEach(a => {a.pause(); a.currentTime=180}))')
+    assert page.locator('.is-recycling-card').evaluate_all('''els => els.filter(el => {
+      const transform = getComputedStyle(el).transform;
+      if (transform === 'none') return false;
+      const matrix = new DOMMatrixReadOnly(transform);
+      return Math.abs(matrix.m13) > 0.3 && matrix.m43 > 10;
+    }).length''') >= 3, 'The recycle should show a wave of visible 3D flips'
     page.screenshot(path=str(out / 'game-motion-solitaire-recycle.png'))
     page.emulate_media(reduced_motion='reduce')
     card_idle()

@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RotateCcw, Smartphone, Undo2, X } from 'lucide-vue-next'
 import PlayingCard from './PlayingCard.vue'
+import GameFullscreenButton from './GameFullscreenButton.vue'
 import SolitaireCelebration from './SolitaireCelebration.vue'
 import { useGameMotion } from './useGameMotion'
 import { cardId, useSolitaireDrag, type CardPosition } from './useSolitaireDrag'
@@ -130,13 +131,21 @@ async function commit(next: SolitaireGame, origins?: Map<string, CardPosition>, 
     animated.push(element)
     const frames: Keyframe[] = flip
       ? [
-          { transform: `translate(${dx}px,${dy}px) rotateY(180deg)` },
-          { transform: `translate(${dx * 0.85}px,${dy * 0.85}px) rotateY(90deg)`, offset: 0.38 },
-          { transform: `translate(${dx * 0.35}px,${dy * 0.35}px) rotateY(0deg)`, offset: 0.68 },
-          { transform: 'translate(0,0) rotateY(0deg)' },
+          { transform: `translate3d(${dx}px,${dy}px,0) rotateY(180deg) rotateZ(0deg)` },
+          {
+            transform: `translate3d(${dx * 0.5}px,${dy * 0.5 - 18}px,42px) rotateY(90deg) rotateZ(-6deg)`,
+            offset: 0.5,
+          },
+          { transform: 'translate3d(0,0,0) rotateY(0deg) rotateZ(0deg)' },
         ]
       : [{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'translate(0,0)' }]
-    animations.push(motion.animate(element, frames, { duration: flip ? 340 : 260, fill: 'both' }))
+    animations.push(
+      motion.animate(element, frames, {
+        duration: flip ? 340 : 260,
+        fill: 'both',
+        ...(flip ? { easing: 'ease-in-out' } : {}),
+      }),
+    )
   })
   await motion.settle(animations)
   animated.forEach((element) => element.classList.remove('is-card-moving'))
@@ -196,8 +205,10 @@ async function recycleStock() {
   ).reverse()
   const stack = cards[0]!.closest<HTMLElement>('.solitaire-slot')!
   const to = surface.value!.querySelector('.stock-card')!.getBoundingClientRect()
-  // One shared timeline avoids accumulating a new frame's delay for every card.
-  const duration = Math.min(130, 400 / cards.length)
+  // Stagger readable flips on a shared timeline; the whole sequence stays below 500ms.
+  const duration = Math.max(160, 260 - cards.length * 5)
+  const total = Math.min(400, duration + (cards.length - 1) * 70)
+  const stagger = cards.length > 1 ? (total - duration) / (cards.length - 1) : 0
   stack.classList.add('is-stack-moving')
   const animations = cards.map((element, index) => {
     const from = element.getBoundingClientRect()
@@ -208,15 +219,15 @@ async function recycleStock() {
     return motion.animate(
       element,
       [
-        { transform: 'translate(0,0) rotateY(0deg)', zIndex },
+        { transform: 'translate3d(0,0,0) rotateY(0deg) rotateZ(0deg)', zIndex },
         {
-          transform: `translate(${dx * 0.55}px,${dy * 0.55}px) rotateY(90deg)`,
+          transform: `translate3d(${dx * 0.5}px,${dy * 0.5 - 18}px,42px) rotateY(90deg) rotateZ(6deg)`,
           offset: 0.5,
           zIndex,
         },
-        { transform: `translate(${dx}px,${dy}px) rotateY(180deg)`, zIndex },
+        { transform: `translate3d(${dx}px,${dy}px,0) rotateY(180deg) rotateZ(0deg)`, zIndex },
       ],
-      { duration, delay: index * duration, fill: 'forwards', easing: 'ease-in-out' },
+      { duration, delay: index * stagger, fill: 'forwards', easing: 'ease-in-out' },
     )
   })
   await motion.settle(animations)
@@ -331,10 +342,13 @@ onBeforeUnmount(() => {
       </div>
       <div class="game-actions">
         <button class="game-button" :disabled="locked || !history.length" @click="undo">
-          <Undo2 :size="16" aria-hidden="true" />撤销</button
-        ><button class="game-button" @click="restart">
-          <RotateCcw :size="16" aria-hidden="true" />重新开始
+          <Undo2 :size="16" aria-hidden="true" />撤销
         </button>
+        <div class="game-restart-actions">
+          <button class="game-button" @click="restart">
+            <RotateCcw :size="16" aria-hidden="true" />重新开始</button
+          ><GameFullscreenButton />
+        </div>
       </div>
     </div>
     <p class="game-status solitaire-status" :class="{ 'is-success': won }" role="status">
@@ -552,7 +566,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
   </section>
-  <Teleport to="body"
+  <Teleport :to="surface || 'body'"
     ><div v-if="dragState" class="solitaire-drag-layer" aria-hidden="true">
       <div
         ref="dragGhost"

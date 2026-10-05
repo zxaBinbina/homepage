@@ -89,10 +89,19 @@ export function useSolitaireDrag(options: {
         if (left || right) scroll.scrollLeft += Math.max(-12, Math.min(12, (right - left) / 3))
       }
     }
-    const top = Math.max(0, 85 - press.lastY),
+    const viewport = options.surface.value?.closest<HTMLElement>(
+      '.is-fullscreen .game-play-content',
+    )
+    const top = Math.max(
+        0,
+        (viewport ? viewport.getBoundingClientRect().top + 45 : 85) - press.lastY,
+      ),
       bottom = Math.max(0, press.lastY - innerHeight + 65)
     if (top || bottom)
-      window.scrollBy({ top: Math.max(-10, Math.min(10, (bottom - top) / 5)), behavior: 'instant' })
+      (viewport || window).scrollBy({
+        top: Math.max(-10, Math.min(10, (bottom - top) / 5)),
+        behavior: 'instant',
+      })
     findTarget(press.lastX, press.lastY)
     frame = requestAnimationFrame(autoScroll)
   }

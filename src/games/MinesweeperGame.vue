@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameFullscreenButton from './GameFullscreenButton.vue'
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import { useGameMotion } from './useGameMotion'
 import { Flag, MousePointer2, RotateCcw } from 'lucide-vue-next'
@@ -279,9 +280,12 @@ function onKey(event: KeyboardEvent, index: number) {
               {{ item.name }}
             </option>
           </select></label
-        ><button class="game-button" @click="restart">
-          <RotateCcw :size="16" aria-hidden="true" />重新开始
-        </button>
+        >
+        <div class="game-restart-actions">
+          <button class="game-button" @click="restart">
+            <RotateCcw :size="16" aria-hidden="true" />重新开始</button
+          ><GameFullscreenButton />
+        </div>
       </div>
       <div class="mine-mode" role="group" aria-label="扫雷操作模式">
         <button class="game-button" :aria-pressed="!flagMode" @click="setMode(false)">

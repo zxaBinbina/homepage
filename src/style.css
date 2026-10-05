@@ -2792,6 +2792,109 @@ h1 > span {
   line-height: 1.8;
   color: var(--muted);
 }
+.game-restart-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.game-button.game-fullscreen-toggle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.game-fullscreen-open {
+  overflow: hidden;
+}
+.game-fullscreen-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--text);
+  background: var(--panel);
+  overflow: hidden;
+}
+.game-fullscreen-dialog::backdrop {
+  background: var(--bg);
+}
+.game-viewport.is-fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+.is-fullscreen .game-play-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+.is-fullscreen .game-guide {
+  display: none;
+}
+.is-fullscreen .game-layout {
+  display: block;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.is-fullscreen .game-surface {
+  border: 0;
+  border-radius: 0;
+  padding: clamp(8px, 2vw, 24px);
+}
+.is-fullscreen .game-toolbar {
+  margin-bottom: 16px;
+}
+.is-fullscreen :is(.number-surface, .solitaire-surface) > .game-toolbar,
+.is-fullscreen .mine-actions {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-block: 6px;
+  background: var(--panel);
+}
+.is-fullscreen .number-play {
+  max-width: min(580px, calc(100dvh - 260px));
+}
+.is-fullscreen .solitaire-table {
+  max-width: 1050px;
+}
+@media (min-aspect-ratio: 4/3) and (max-height: 600px) {
+  .is-fullscreen .number-surface,
+  .is-fullscreen .mine-surface {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 20px;
+    align-items: start;
+  }
+  .is-fullscreen .number-play,
+  .is-fullscreen .mine-board-scroll {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    width: 100%;
+    max-width: min(100%, calc(100dvh - 80px));
+    margin-inline: auto;
+  }
+  .is-fullscreen .mine-board-scroll {
+    max-width: min(100%, calc(100dvh - 32px));
+  }
+  .is-fullscreen .game-status {
+    grid-column: 1;
+    min-height: 0;
+    margin-top: 8px;
+  }
+  .is-fullscreen .mine-board {
+    grid-template-columns: repeat(var(--mine-size), minmax(20px, 1fr));
+    width: max(100%, calc(var(--mine-size) * 24px - 4px));
+  }
+}
 .game-layout {
   display: grid;
   grid-template-columns: minmax(0, 680px) minmax(0, 1fr);
@@ -3177,6 +3280,9 @@ h1 > span {
   backface-visibility: hidden;
   position: absolute;
   inset: 0;
+  border-radius: inherit;
+  background: var(--game-card-paper);
+  transform: translateZ(0.5px);
   pointer-events: none;
 }
 .card-corner {
@@ -3403,7 +3509,7 @@ h1 > span {
     var(--game-card-back);
   color: var(--game-card-back-mark);
   font-size: 38px;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0.5px);
   backface-visibility: hidden;
   pointer-events: none;
 }
