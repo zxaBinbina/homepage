@@ -1,5 +1,6 @@
 """Four new classics: real interactions, workers, offline play, fit, touch and motion."""
 import os
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
@@ -67,8 +68,14 @@ with sync_playwright() as p:
     expect(blank.locator('.sudoku-notes')).to_contain_text('3')
     page.get_by_role('button', name='提示一格').click()
     expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
-    page.get_by_role('button', name='检查', exact=True).click()
-    expect(page.locator('.game-status')).to_contain_text('正确')
+    expect(page.get_by_role('button', name='检查', exact=True)).to_have_count(0)
+    expect(page.locator('.game-status')).not_to_be_visible()
+    # Duplicate clues stay visibly marked without a redundant status message.
+    page.get_by_role('button', name='填写 3', exact=True).click()
+    expect(blank).to_have_class(re.compile(r'.*is-conflict.*'))
+    expect(page.locator('.game-status')).not_to_be_visible()
+    expect(page.get_by_text('有数字在行、列或宫内重复，请检查标记的格子。')).to_have_count(0)
+    page.get_by_role('button', name='撤销', exact=True).click()
     page.locator('.sudoku-cell').first.focus()
     page.keyboard.press('ArrowRight')
     expect(page.locator('.sudoku-cell').nth(1)).to_be_focused()
@@ -83,6 +90,11 @@ with sync_playwright() as p:
 
     for game in ['gomoku', 'xiangqi']:
         visit(game)
+        # Escape must cancel a selection without breaking component compilation.
+        page.locator('.board-cell').nth(54 if game == 'xiangqi' else 112).click()
+        expect(page.locator('.strategy-cell.is-selected')).to_have_count(1)
+        page.keyboard.press('Escape')
+        expect(page.locator('.strategy-cell.is-selected')).to_have_count(0)
         context.set_offline(True)
         if game == 'gomoku':
             page.locator('.board-cell').nth(112).click()

@@ -249,9 +249,7 @@ function onKey(event: KeyboardEvent) {
             role="status"
           >
             <strong>{{ paused ? '已暂停' : '准备好了吗？' }}</strong
-            ><span>{{
-              paused ? '点击继续，接着这一局。' : '点击开始，让方块落下。'
-            }}</span>
+            ><span>{{ paused ? '点击继续，接着这一局。' : '点击开始，让方块落下。' }}</span>
           </div>
         </div>
         <aside class="tetris-side" aria-label="下一块">

@@ -53,9 +53,19 @@ with sync_playwright() as p:
     expect(page.locator('.tetris-board')).to_have_attribute('aria-busy', 'true')
     page.emulate_media(reduced_motion='reduce')
     expect(page.locator('.game-status')).to_contain_text('挑战完成')
+    expect(page.get_by_text('30 行挑战完成！漂亮的一局。', exact=True)).to_have_count(1)
+    expect(page.locator('.tetris-curtain')).to_have_count(0)
     expect(page.locator('.tetris-board')).to_have_attribute('aria-busy', 'false')
     expect(page.get_by_role('button', name='直接落下')).to_be_disabled()
     page.locator('.game-surface').screenshot(path=str(out / 'game-classics-tetris-win.png'))
+
+    page.evaluate('''() => {
+      const s = document.querySelector('.tetris-surface').__vueParentComponent.setupState;
+      s.restart(); s.game.status = 'lost';
+    }''')
+    expect(page.get_by_text('方块堆到顶了，再来一局吧。', exact=True)).to_have_count(1)
+    expect(page.locator('.tetris-curtain')).to_have_count(0)
+    page.locator('.game-surface').screenshot(path=str(out / 'game-classics-tetris-lost.png'))
 
     visit('xiangqi')
     page.emulate_media(reduced_motion='no-preference')

@@ -183,14 +183,17 @@ function confirmStone() {
   remember()
   void commit({ from: -1, to: at })
 }
+function clearSelection() {
+  source.value = null
+  pending.value = null
+}
 function cancelTurn() {
   revision++
   computer.cancel()
   computer.error.value = ''
   motion.cancel()
   busy.value = false
-  source.value = null
-  pending.value = null
+  clearSelection()
 }
 function undo() {
   const previous = history.value.pop()
@@ -292,10 +295,7 @@ function label(value: number, i: number) {
             : '五子棋棋盘，方向键选格，回车预览，再次回车落子'
         "
         @keydown="onKey"
-        @keydown.esc="
-          source = null
-          pending = null
-        "
+        @keydown.esc="clearSelection"
       >
         <svg v-if="chess" class="strategy-lines" viewBox="0 0 900 1000" aria-hidden="true">
           <path v-for="y in 10" :key="`h${y}`" :d="`M 50 ${y * 100 - 50} H 850`" />
