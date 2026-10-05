@@ -13,7 +13,8 @@ with sync_playwright() as p:
   expect(nav.get_by_role('link',name='关于',exact=True)).to_have_count(0)
   expect(nav.locator('[aria-current="page"]')).to_have_text('首页' if route=='/' else '项目')
   expect(nav.get_by_role('link',name='工具',exact=True)).to_have_attribute('href','/tool')
-  assert nav.get_by_role('link').count()==4
+  expect(nav.get_by_role('link',name='游戏',exact=True)).to_have_attribute('href','/game')
+  assert nav.get_by_role('link').count()==5
   assert page.get_by_role('button',name='打开网易云音乐播放器').count()==1
   page.set_viewport_size(dict(width=390,height=844))
   page.get_by_role('button',name='打开菜单').click()
@@ -53,5 +54,69 @@ with sync_playwright() as p:
     page.screenshot(path=f'artifacts/project-directory-{theme}-{w}.png',full_page=True)
  page.goto(base+'/');expect(page.locator('.project-card')).to_have_count(4);page.get_by_role('link',name='查看全部项目').click();expect(page).to_have_title('项目目录 · a彬彬a')
  assert not errors,errors
+ # Capture actual card animations, including cards mounted again after searching.
+ motion_page=b.new_page(viewport=dict(width=1440,height=1000))
+ motion_page.on('pageerror',lambda e:errors.append(str(e)))
+ motion_page.add_init_script("""
+ window.cardReveals = [];
+ window.cardFlashes = [];
+ const previousOpacity = new WeakMap();
+ function sampleCards() {
+   document.querySelectorAll('.directory-project-grid .project-card').forEach(card => {
+     const opacity = Number(getComputedStyle(card).opacity);
+     const previous = previousOpacity.get(card);
+     if (previous !== undefined && opacity < previous - 0.03)
+       window.cardFlashes.push({ previous, opacity });
+     previousOpacity.set(card, opacity);
+   });
+   requestAnimationFrame(sampleCards);
+ }
+ requestAnimationFrame(sampleCards);
+ // Expose the gap between first paint and observer delivery deterministically.
+ const Observer = window.IntersectionObserver;
+ window.IntersectionObserver = class extends Observer {
+   constructor(callback, options) {
+     super((entries, observer) => setTimeout(() => callback(entries, observer), 120), options);
+   }
+ };
+ const animate = Element.prototype.animate;
+ Element.prototype.animate = function(frames, options) {
+   if (this.matches('.project-card')) window.cardReveals.push({
+     title: this.querySelector('h2').textContent, frames, options
+   });
+   return animate.call(this, frames, options);
+ };
+ """)
+ for width in [1440,390]:
+  motion_page.set_viewport_size(dict(width=width,height=1000))
+  motion_page.goto(base+'/project')
+  motion_page.wait_for_function('window.cardReveals.length > 0')
+  motion_page.wait_for_timeout(1000)
+  assert motion_page.evaluate('window.cardFlashes')==[], 'Cards flashed after first paint'
+  for card in motion_page.locator('.project-card').all():
+   card.scroll_into_view_if_needed()
+   expect(card).to_have_css('opacity','1')
+  motion_page.wait_for_function('window.cardReveals.length === 9')
+  records=motion_page.evaluate('window.cardReveals')
+  assert all(r['options']['duration']==650 and r['frames'][0]['translate']=='0 20px' for r in records)
+  assert [r['options']['delay'] for r in records]==([0,90,0,90,0,90,0,90,0] if width==1440 else [0]*9)
+  motion_page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
+  motion_page.wait_for_timeout(800)
+  assert motion_page.evaluate('window.cardReveals.length')==9
+  motion_page.get_by_role('searchbox').fill('not-a-project')
+  expect(motion_page.locator('.project-card')).to_have_count(0)
+  motion_page.get_by_role('button',name='查看全部项目').click()
+  motion_page.wait_for_function('window.cardReveals.length > 9')
+  motion_page.wait_for_timeout(1000)
+  assert motion_page.evaluate('window.cardFlashes')==[], 'Cards flashed after scrolling or search'
+  motion_page.emulate_media(reduced_motion='reduce')
+  motion_page.wait_for_function("[...document.querySelectorAll('.project-card')].every(e => e.getAnimations().length === 0)")
+  motion_page.reload()
+  for card in motion_page.locator('.project-card').all():
+   card.scroll_into_view_if_needed()
+   assert card.evaluate('e => getComputedStyle(e).opacity')=='1'
+  assert motion_page.evaluate('window.cardReveals.length')==0
+  motion_page.emulate_media(reduced_motion='no-preference')
+ assert not errors,errors
  b.close()
-print('Directory routes, title, 9 public projects and four featured projects, search/empty/reset, images, both themes and five widths passed')
+print('Directory routes, title, 9 public projects and four featured projects, search/empty/reset, images, both themes, five widths, scroll/search reveals and reduced motion passed')

@@ -1,9 +1,69 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, type ObjectDirective } from 'vue'
 import { ArrowUpRight, Search, X } from 'lucide-vue-next'
 import ProjectCard from './components/ProjectCard.vue'
 import { profile, projects, projectCatalog } from './content'
 import SiteFooter from './components/SiteFooter.vue'
+
+const motion = matchMedia('(prefers-reduced-motion: reduce)')
+const animations = new Map<Element, Animation>()
+const revealObserver: IntersectionObserver | undefined =
+  'IntersectionObserver' in window && 'animate' in Element.prototype
+    ? new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue
+            revealObserver?.unobserve(entry.target)
+            const animation = animations.get(entry.target)
+            if (motion.matches) animation?.cancel()
+            else animation?.play()
+          }
+        },
+        { threshold: 0.08 },
+      )
+    : undefined
+
+// Vue mounts new cards after filtering, so each new result is observed as well.
+const vReveal: ObjectDirective<HTMLElement> = {
+  mounted(element) {
+    if (!revealObserver || motion.matches) return
+    const style = getComputedStyle(element)
+    // Hold the first animation frame before paint, including while waiting for the observer.
+    const animation = element.animate(
+      [
+        { opacity: 0, translate: '0 20px' },
+        { opacity: 1, translate: '0 0' },
+      ],
+      {
+        duration: 650,
+        delay: parseFloat(style.getPropertyValue('--reveal-delay')) || 0,
+        easing: style.getPropertyValue('--motion-ease').trim(),
+        fill: 'backwards',
+      },
+    )
+    animation.pause()
+    animation.currentTime = 0
+    animations.set(element, animation)
+    animation.finished.catch(() => {}).finally(() => animations.delete(element))
+    revealObserver.observe(element)
+  },
+  unmounted(element) {
+    revealObserver?.unobserve(element)
+    animations.get(element)?.cancel()
+    animations.delete(element)
+  },
+}
+function stopAnimations() {
+  for (const animation of animations.values()) animation.cancel()
+  animations.clear()
+}
+onMounted(() => motion.addEventListener('change', stopAnimations))
+onBeforeUnmount(() => {
+  revealObserver?.disconnect()
+  stopAnimations()
+  motion.removeEventListener('change', stopAnimations)
+})
+
 const query = ref('')
 const matches = computed(() => {
   const term = query.value.trim().toLocaleLowerCase()
@@ -47,18 +107,19 @@ const matches = computed(() => {
       <ProjectCard
         v-for="(project, index) in matches"
         :key="project.id"
+        v-reveal
         :project="project"
         heading="h2"
         class="reveal"
         :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
       />
     </div>
-    <div v-else class="directory-empty">
+    <div v-else v-reveal class="directory-empty">
       <h2>暂时没有匹配的项目</h2>
       <p>换个名称或技术关键词试试。</p>
       <button type="button" @click="query = ''">查看全部项目</button>
     </div>
-    <p class="directory-more">
+    <p v-reveal class="directory-more">
       项目来自
       <a :href="`${profile.github}?tab=repositories`" target="_blank" rel="noopener noreferrer"
         >个人 GitHub <ArrowUpRight :size="14"
