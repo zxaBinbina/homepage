@@ -41,6 +41,18 @@ export const gameCatalog = {
     category: '休闲对弈',
     description: '黑白交错，把五颗棋子连成一线。随时与电脑开一局，简单的规则也有巧妙的变化。',
   },
+  snake: {
+    name: '贪吃蛇',
+    label: 'ONE MORE BITE',
+    category: '敏捷挑战',
+    description: '吃一颗果子，长大一点点。在转弯之间找准节奏，留好下一步的空间。',
+  },
+  popstar: {
+    name: '消灭星星经典版',
+    label: 'A SKY FULL OF STARS',
+    category: '经典消除',
+    description: '让相邻的同色星星一起消失。多攒一颗，多一点分数，慢慢点亮下一关。',
+  },
 } as const
 
 export type GameId = keyof typeof gameCatalog

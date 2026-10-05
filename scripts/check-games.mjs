@@ -261,3 +261,5 @@ console.log(
 )
 
 await import('./check-games-classics.mjs')
+
+await import('./check-games-arcade.mjs')

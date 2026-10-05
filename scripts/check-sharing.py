@@ -33,6 +33,8 @@ pages = {
     '数独经典版 · 小游戏 · a彬彬a': 'games/sudoku',
     '中国象棋单机版 · 小游戏 · a彬彬a': 'games/xiangqi',
     '五子棋单机版 · 小游戏 · a彬彬a': 'games/gomoku',
+    '贪吃蛇 · 小游戏 · a彬彬a': 'games/snake',
+    '消灭星星经典版 · 小游戏 · a彬彬a': 'games/popstar',
     '网页工具 · a彬彬a': 'tool',
     'JSON 格式化 · 网页工具 · a彬彬a': 'tools/json',
     'Base64 编解码 · 网页工具 · a彬彬a': 'tools/base64',

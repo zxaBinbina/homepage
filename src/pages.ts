@@ -11,6 +11,8 @@ export const pages = {
   sudoku: '/games/sudoku',
   xiangqi: '/games/xiangqi',
   gomoku: '/games/gomoku',
+  snake: '/games/snake',
+  popstar: '/games/popstar',
   json: '/tools/json',
   base64: '/tools/base64',
   url: '/tools/url',

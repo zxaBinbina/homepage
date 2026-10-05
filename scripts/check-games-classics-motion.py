@@ -122,7 +122,7 @@ with sync_playwright() as p:
     page.locator('.board-cell').nth(112).click()
     page.get_by_role('button', name='确认落子').click()
     page.get_by_role('link', name='全部游戏', exact=True).click()
-    expect(page.locator('.game-card')).to_have_count(7)
+    expect(page.locator('.game-card')).to_have_count(9)
     page.wait_for_timeout(1000)
     # Both strategy games keep all results centered over the board, including fullscreen.
     page.emulate_media(reduced_motion='reduce')

@@ -79,7 +79,7 @@ import { gameCatalog, gameIds } from './catalog'
             <div v-else-if="id === 'xiangqi'" class="preview-xiangqi">
               <span>马</span><span>帅</span><span>炮</span>
             </div>
-            <div v-else class="preview-gomoku">
+            <div v-else-if="id === 'gomoku'" class="preview-gomoku">
               <span
                 v-for="i in 25"
                 :key="i"
@@ -88,6 +88,27 @@ import { gameCatalog, gameIds } from './catalog'
                   'is-white': [8, 12, 18].includes(i),
                 }"
               ></span>
+            </div>
+            <div v-else-if="id === 'snake'" class="preview-snake">
+              <span
+                v-for="i in 36"
+                :key="i"
+                :class="{
+                  'is-body': [14, 20, 26, 27, 28, 22, 16, 10].includes(i),
+                  'is-head': i === 10,
+                  'is-food': i === 12,
+                }"
+                >{{ i === 10 ? '••' : i === 12 ? '●' : '' }}</span
+              >
+            </div>
+            <div v-else-if="id === 'popstar'" class="preview-popstar">
+              <span
+                v-for="(color, i) in [0, 1, 1, 2, 0, 3, 1, 2, 3, 3, 4, 4, 0, 2, 4, 4]"
+                :key="i"
+                class="star-gem"
+                :data-color="color"
+                >★</span
+              >
             </div>
             <span class="game-preview-index">0{{ index + 1 }}</span>
           </div>
