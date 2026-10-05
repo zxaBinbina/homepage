@@ -3549,6 +3549,25 @@ h1 > span {
   outline: 3px solid var(--status-danger);
   outline-offset: 1px;
 }
+.strategy-result {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 32px);
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--panel) 84%, transparent);
+  text-align: center;
+}
+.strategy-result-message {
+  max-width: 20em;
+  color: var(--text);
+  font-size: clamp(17px, 2.6vw, 24px);
+  font-weight: 650;
+  line-height: 1.8;
+  text-wrap: balance;
+}
 .gomoku-confirm {
   display: flex;
   align-items: center;

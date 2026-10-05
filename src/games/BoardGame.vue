@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { RotateCcw, Undo2 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import { gameFullscreenKey } from './fullscreen'
@@ -34,6 +34,7 @@ const quiet = ref(0),
   positions = ref<string[]>([board.value.join(',') + ':1']),
   busy = ref(false)
 const boardElement = ref<HTMLElement>(),
+  resultElement = ref<HTMLElement>(),
   motion = useGameMotion(),
   fullscreen = inject(gameFullscreenKey)
 const onKey = useBoardKeyboard(boardElement, selected, columns, chess ? 90 : 225)
@@ -72,6 +73,16 @@ const outcome = computed(() =>
           ? '本局和棋，可以重新开一局。'
           : '棋盘已满，本局和棋。'
         : '',
+)
+watch(
+  outcome,
+  (message) => {
+    if (message)
+      void motion.settle([
+        motion.animate(resultElement.value, [{ opacity: 0 }, { opacity: 1 }], { duration: 180 }),
+      ])
+  },
+  { flush: 'post' },
 )
 const computer = useComputer<number | ChessMove>(props.kind, (move) => {
   if (turn.value !== -1 || ended.value) return
@@ -270,14 +281,6 @@ function label(value: number, i: number) {
               <RotateCcw :size="16" aria-hidden="true" />重新开始</button
             ><GameFullscreenButton />
           </div>
-          <p
-            v-show="outcome"
-            class="game-status"
-            :class="{ 'is-success': winner === 1, 'is-ended': winner === -1 }"
-            role="status"
-          >
-            {{ outcome }}
-          </p>
         </div>
       </div>
       <div v-if="computer.error.value" class="strategy-error" role="alert">
@@ -344,7 +347,7 @@ function label(value: number, i: number) {
             'is-winning': line.includes(i),
             'is-check': chess && checked && piece === turn,
           }"
-          :tabindex="i === selected ? 0 : -1"
+          :tabindex="!ended && i === selected ? 0 : -1"
           :aria-label="label(piece, i)"
           :aria-disabled="ended || turn !== 1 || busy"
           :aria-pressed="source === i || pending === i"
@@ -364,6 +367,14 @@ function label(value: number, i: number) {
             >{{ chess ? (piece > 0 ? chessNames : blackNames)[Math.abs(piece)] : '' }}</span
           >
         </button>
+        <div v-if="outcome" ref="resultElement" class="strategy-result" role="status">
+          <p
+            class="game-status strategy-result-message"
+            :class="{ 'is-success': winner === 1, 'is-ended': winner === -1 }"
+          >
+            {{ outcome }}
+          </p>
+        </div>
       </div>
       <div v-if="!chess" class="gomoku-confirm">
         <span>{{
