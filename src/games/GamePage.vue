@@ -14,6 +14,10 @@ const components = {
   twenty48: defineAsyncComponent(() => import('./NumberGame.vue')),
   minesweeper: defineAsyncComponent(() => import('./MinesweeperGame.vue')),
   solitaire: defineAsyncComponent(() => import('./SolitaireGame.vue')),
+  tetris: defineAsyncComponent(() => import('./TetrisGame.vue')),
+  sudoku: defineAsyncComponent(() => import('./SudokuGame.vue')),
+  xiangqi: defineAsyncComponent(() => import('./BoardGame.vue')),
+  gomoku: defineAsyncComponent(() => import('./BoardGame.vue')),
 }
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
@@ -114,7 +118,11 @@ onBeforeUnmount(() => {
             <div ref="fitFrame" class="game-play-content">
               <div ref="fitContent" class="game-fit-content">
                 <GameGuide :id="id" />
-                <component :is="components[id]" :key="id" />
+                <component
+                  :is="components[id]"
+                  :key="id"
+                  v-bind="id === 'xiangqi' || id === 'gomoku' ? { kind: id } : {}"
+                />
               </div>
             </div>
           </section>

@@ -57,10 +57,37 @@ import { gameCatalog, gameIds } from './catalog'
                 >{{ n }}</span
               >
             </div>
-            <div v-else class="preview-cards">
+            <div v-else-if="id === 'solitaire'" class="preview-cards">
               <span>J<small>♠</small></span
               ><span>Q<small>♥</small></span
               ><span>K<small>♣</small></span>
+            </div>
+            <div v-else-if="id === 'tetris'" class="preview-tetris">
+              <span
+                v-for="i in 48"
+                :key="i"
+                :class="{
+                  'is-filled': [
+                    9, 10, 16, 17, 25, 31, 32, 37, 38, 39, 40, 43, 44, 45, 46, 47, 48,
+                  ].includes(i),
+                }"
+              ></span>
+            </div>
+            <div v-else-if="id === 'sudoku'" class="preview-sudoku">
+              <span v-for="(n, i) in [1, '', 9, '', 5, '', 7, '', 3]" :key="i">{{ n }}</span>
+            </div>
+            <div v-else-if="id === 'xiangqi'" class="preview-xiangqi">
+              <span>马</span><span>帅</span><span>炮</span>
+            </div>
+            <div v-else class="preview-gomoku">
+              <span
+                v-for="i in 25"
+                :key="i"
+                :class="{
+                  'is-black': [7, 13, 19].includes(i),
+                  'is-white': [8, 12, 18].includes(i),
+                }"
+              ></span>
             </div>
             <span class="game-preview-index">0{{ index + 1 }}</span>
           </div>

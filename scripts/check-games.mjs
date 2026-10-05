@@ -259,3 +259,5 @@ assert.equal(cards.finishSolitaire(game), game)
 console.log(
   'Games passed: 2048 rules and terminal boards; mines safe starts, flood/chord and win/loss; solitaire deals, legal moves, immutable undo and completion.',
 )
+
+await import('./check-games-classics.mjs')

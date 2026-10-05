@@ -57,7 +57,7 @@ for file in root.rglob('*.html'):
     assert page['url'] == expected and page['name'] and page['description']
     assert page['isPartOf']['@id'] == website['@id']
     canonical_urls.append(expected)
-assert len(canonical_urls) == 22, canonical_urls
+assert len(canonical_urls) == 26, canonical_urls
 assert set(urls) == set(canonical_urls), 'Sitemap must contain all canonical pages only'
 robots = (root / 'robots.txt').read_text()
 assert 'User-agent: *\nAllow: /' in robots

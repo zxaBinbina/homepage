@@ -30,7 +30,7 @@
 
 ## 搜索引擎收录
 
-构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 22 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
+构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 26 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
 
 构建同时生成带 `noindex` 的 `404.html`，让 Cloudflare Pages 对未知路径返回真实 404，避免把不存在的地址当作首页收录。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
 
@@ -56,4 +56,4 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 
 ## 小游戏
 
-游戏目录 `/game` 的元信息由 `site.config.ts` 提供；三个 `/games/*` 页面（2048、扫雷、纸牌接龙）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。
+游戏目录 `/game` 的元信息由 `site.config.ts` 提供；七个 `/games/*` 页面（2048、扫雷、纸牌接龙、俄罗斯方块、数独、中国象棋、五子棋）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。

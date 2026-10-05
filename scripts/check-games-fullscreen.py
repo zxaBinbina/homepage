@@ -20,11 +20,13 @@ with sync_playwright() as p:
             assert page.locator('.game-fit-content').evaluate('el => getComputedStyle(el).transform === "none"'), 'Large mines must not scale'
             assert page.locator('.mine-cell').first.evaluate('el => el.getBoundingClientRect().width >= 23.9'), 'Keep usable cell sizes'
             assert page.locator('.game-play-content').evaluate('el => el.scrollWidth <= el.clientWidth'), 'Only the board should scroll horizontally'
-            assert page.locator('.mine-board-scroll').evaluate('''el => {
+            scroll = page.locator('.mine-board-scroll').evaluate('''el => {
                 el.scrollTo({left:100,top:100,behavior:'instant'});
-                return el.clientHeight >= 160 && el.scrollLeft > 0 && el.scrollTop > 0
-                    && getComputedStyle(el).overflowX === 'auto' && getComputedStyle(el).overflowY === 'auto';
-            }'''), 'Large mines need both scrollbars'
+                return {height:el.clientHeight, left:el.scrollLeft, top:el.scrollTop,
+                    maxLeft:el.scrollWidth-el.clientWidth, x:getComputedStyle(el).overflowX,
+                    y:getComputedStyle(el).overflowY, viewport:[innerWidth,innerHeight]};
+            }''')
+            assert scroll['height'] >= 160 and scroll['top'] > 0 and scroll['left'] == min(100, scroll['maxLeft']) and scroll['x'] == scroll['y'] == 'auto', scroll
             return
         page.wait_for_function("""() => {
             const r=document.querySelector('.game-surface').getBoundingClientRect();
