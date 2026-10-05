@@ -202,17 +202,19 @@
 
 ## 10. 素材与源码位置
 
-| 资源                                                                                                     | 用途                                           |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [public/images/avatar.png](public/images/avatar.png)                                                     | 导航与个人介绍头像                             |
-| [public/images/world.webp](public/images/world.webp)、[world-small.webp](public/images/world-small.webp) | 首屏主图及响应式小图                           |
-| [public/images/show_1.webp](public/images/show_1.webp)                                                   | 悠哉世界服务器景观                             |
-| [public/images/logocircle.webp](public/images/logocircle.webp)                                           | 悠哉世界标志                                   |
-| [public/images/youzaiworld-core.png](public/images/youzaiworld-core.png)                                 | 核心模组项目图标，保留像素边缘                 |
-| [public/images/youzaiworld-web.webp](public/images/youzaiworld-web.webp)                                 | 官网项目预览                                   |
-| [public/images/music-cover.webp](public/images/music-cover.webp)                                         | 默认音乐封面                                   |
-| [public/images/share-cover.jpg](public/images/share-cover.jpg)                                           | `1200 × 630` 分享封面，延续首屏 Minecraft 主图 |
-| [public/favicon.svg](public/favicon.svg)                                                                 | 浏览器站点图标                                 |
+| 资源                                                                                                     | 用途                                          |
+| -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| [public/images/avatar.png](public/images/avatar.png)                                                     | 导航与个人介绍头像                            |
+| [public/images/world.webp](public/images/world.webp)、[world-small.webp](public/images/world-small.webp) | 首屏主图及响应式小图                          |
+| [public/images/show_1.webp](public/images/show_1.webp)                                                   | 悠哉世界服务器景观                            |
+| [public/images/logocircle.webp](public/images/logocircle.webp)                                           | 悠哉世界标志                                  |
+| [public/images/youzaiworld-core.png](public/images/youzaiworld-core.png)                                 | 核心模组项目图标，保留像素边缘                |
+| [public/images/youzaiworld-web.webp](public/images/youzaiworld-web.webp)                                 | 官网项目预览                                  |
+| [public/images/music-cover.webp](public/images/music-cover.webp)                                         | 默认音乐封面                                  |
+| [public/images/share-cover.jpg](public/images/share-cover.jpg)                                           | `1200 × 630` Minecraft 图片，用于 README 展示 |
+| [public/favicon.svg](public/favicon.svg)                                                                 | 浏览器站点图标                                |
+
+个人主页、项目目录与工具页面的 OG 分享图片使用 `public/images/share-avatar.jpg`（256 × 256，个人头像）；RDP 子站使用 `public/images/rdp-access-auth.png`（512 × 394，软件 Logo）。图片格式、尺寸和替代文字由 `site.config.ts` 按页面提供，详情见 [分享配置](docs/sharing.md)。
 
 首屏主图通过 `srcset` 选择分辨率并优先加载；下方主要图片延迟加载。更换素材时保留尺寸信息与合适的裁切方式，避免加载后改变布局。像素化渲染仅用于核心模组图标，景观与网页预览保持常规图像渲染。
 

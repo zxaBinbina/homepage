@@ -58,13 +58,16 @@ for path in paths:
     assert meta('property', 'og:description') == meta('itemprop', 'description') == description
     image = meta('property', 'og:image')
     assert image == meta('itemprop', 'image') == meta('property', 'og:image:secure_url')
-    assert image == 'https://zxabinbina.cc.cd/images/share-cover.jpg'
+    project = pages[title].startswith('projects/rdp-access-auth')
+    image_path = 'images/rdp-access-auth.png' if project else 'images/share-avatar.jpg'
+    assert image == 'https://zxabinbina.cc.cd/' + image_path
     assert urlparse(image).scheme == 'https' and urlparse(image).netloc
-    assert meta('property', 'og:image:type') == 'image/jpeg'
-    assert meta('property', 'og:image:width') == '1200'
-    assert meta('property', 'og:image:height') == '630'
+    assert meta('property', 'og:image:type') == ('image/png' if project else 'image/jpeg')
+    assert meta('property', 'og:image:width') == ('512' if project else '256')
+    assert meta('property', 'og:image:height') == ('394' if project else '256')
+    assert meta('property', 'og:image:alt') == ('RDP Access Auth 软件 Logo' if project else 'a彬彬a 的头像')
     canonical = 'https://zxabinbina.cc.cd/' + pages[title]
     assert meta('property', 'og:url') == canonical
     assert [link['href'] for link in head.links if link.get('rel') == 'canonical'] == [canonical]
-    assert Path('dist/images/share-cover.jpg').is_file()
+    assert (Path('dist') / image_path).is_file()
     print(f'{path}: title/description reuse, absolute image URL, Open Graph, QQ tags and template rendering passed.')

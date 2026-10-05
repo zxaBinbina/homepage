@@ -148,6 +148,8 @@ Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出�
 
 站点分享配置和 `SITE_URL` 用法见 [docs/sharing.md](docs/sharing.md)。
 
+构建自动生成搜索引擎使用的 `sitemap.xml`、`robots.txt`、页面 JSON-LD 结构化数据及 `noindex` 错误页；保持原有 Vue 正文加载与动画。部署后可向搜索引擎站长平台提交 `/sitemap.xml`。运行 `python3 scripts/check-seo.py` 检查构建输出，收录说明见 [搜索引擎收录](docs/sharing.md#搜索引擎收录)。
+
 ## 许可证
 
 仓库代码采用 [Apache License 2.0](LICENSE)。

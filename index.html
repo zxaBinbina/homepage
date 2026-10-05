@@ -24,6 +24,10 @@
         initialTheme === 'light' ? '#f4f6fa' : '#141521'
     </script>
     <meta name="description" itemprop="description" content="<%= site.description %>" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <script id="site-structured-data" type="application/ld+json">
+      <%- structuredData %>
+    </script>
     <meta property="og:title" content="<%= site.title %>" />
     <meta property="og:description" content="<%= site.description %>" />
     <meta property="og:type" content="website" />
@@ -32,9 +36,9 @@
     <meta property="og:url" content="<%= site.url %>" />
     <meta property="og:image" content="<%= site.image %>" />
     <meta property="og:image:secure_url" content="<%= site.image %>" />
-    <meta property="og:image:type" content="image/jpeg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="<%= site.imageType %>" />
+    <meta property="og:image:width" content="<%= site.imageWidth %>" />
+    <meta property="og:image:height" content="<%= site.imageHeight %>" />
     <meta property="og:image:alt" content="<%= site.imageAlt %>" />
     <meta itemprop="name" content="<%= site.title %>" />
     <meta itemprop="image" content="<%= site.image %>" />

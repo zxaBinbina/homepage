@@ -2,7 +2,7 @@ import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { isProjectPage, knownPageForPath, pages, type PageName } from './pages'
 import { isToolId } from './tools/catalog'
-import { createSiteMeta } from '../site.config'
+import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 
 const components = {
   home: () => import('./HomePage.vue'),
@@ -119,6 +119,11 @@ router.afterEach((to, _from, failure) => {
   const meta = createSiteMeta(import.meta.env.SITE_URL, page)
   const project = isProjectPage(page)
   document.title = meta.title
+  const structuredData = document.getElementById('site-structured-data')
+  if (structuredData)
+    structuredData.textContent = serializeStructuredData(
+      createStructuredData(import.meta.env.SITE_URL, page),
+    )
   document.body.classList.toggle('rdp-site', project)
   const values = {
     'meta[name="description"]': meta.description,
@@ -128,6 +133,9 @@ router.afterEach((to, _from, failure) => {
     'meta[property="og:image"]': meta.image,
     'meta[property="og:image:secure_url"]': meta.image,
     'meta[property="og:image:alt"]': meta.imageAlt,
+    'meta[property="og:image:type"]': meta.imageType,
+    'meta[property="og:image:width"]': String(meta.imageWidth),
+    'meta[property="og:image:height"]': String(meta.imageHeight),
     'meta[itemprop="name"]': meta.title,
     'meta[itemprop="image"]': meta.image,
   }

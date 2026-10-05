@@ -1,4 +1,4 @@
-import { pages, type PageName } from './src/pages'
+import { isProjectPage, pages, type PageName } from './src/pages'
 import { isToolId, toolCatalog } from './src/tools/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
@@ -6,8 +6,11 @@ export const siteContent = {
     '你好，我是 a彬彬a（zxabinbina）。在代码与方块之间，创造一点不一样。探索我的开发项目与 Minecraft 悠哉世界服务器。',
   name: 'a彬彬a · 个人主页',
   url: 'https://zxabinbina.cc.cd/',
-  image: 'images/share-cover.jpg',
-  imageAlt: '蓝天下的 Minecraft 方块雕像，a彬彬a 的方块世界',
+  image: 'images/share-avatar.jpg',
+  imageAlt: 'a彬彬a 的头像',
+  imageType: 'image/jpeg',
+  imageWidth: 256,
+  imageHeight: 256,
 }
 
 const projectPages = {
@@ -53,11 +56,55 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
             description: toolCatalog[page].description,
           }
         : projectPages[page]
+  const image = isProjectPage(page)
+    ? {
+        image: 'images/rdp-access-auth.png',
+        imageAlt: 'RDP Access Auth 软件 Logo',
+        imageType: 'image/png',
+        imageWidth: 512,
+        imageHeight: 394,
+      }
+    : siteContent
   return {
     ...siteContent,
+    imageAlt: image.imageAlt,
+    imageType: image.imageType,
+    imageWidth: image.imageWidth,
+    imageHeight: image.imageHeight,
     title: content.title,
     description: content.description,
     url: page === 'home' ? url.href : new URL(pages[page].slice(1), url).href,
-    image: new URL(siteContent.image, url).href,
+    image: new URL(image.image, url).href,
   }
+}
+
+export function createStructuredData(baseUrl = siteContent.url, page: PageName = 'home') {
+  const home = createSiteMeta(baseUrl)
+  const meta = createSiteMeta(baseUrl, page)
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${home.url}#website`,
+        url: home.url,
+        name: home.name,
+        inLanguage: 'zh-CN',
+      },
+      {
+        '@type': page === 'directory' || page === 'tools' ? 'CollectionPage' : 'WebPage',
+        '@id': `${meta.url}#webpage`,
+        url: meta.url,
+        name: meta.title,
+        description: meta.description,
+        inLanguage: 'zh-CN',
+        isPartOf: { '@id': `${home.url}#website` },
+        primaryImageOfPage: { '@type': 'ImageObject', url: meta.image },
+      },
+    ],
+  }
+}
+
+export function serializeStructuredData(data: ReturnType<typeof createStructuredData>) {
+  return JSON.stringify(data).replace(/</g, '\\u003c')
 }
