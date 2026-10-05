@@ -8,10 +8,8 @@ import SolitaireCelebration from './SolitaireCelebration.vue'
 import { useGameMotion } from './useGameMotion'
 import { cardId, useSolitaireDrag, type CardPosition } from './useSolitaireDrag'
 import {
-  canFinish,
   cardName,
   drawCard,
-  finishSolitaire,
   moveCard,
   newSolitaire,
   redCard,
@@ -281,9 +279,6 @@ function selectedCard(pile: number, index: number) {
     index >= selected.value.index
   )
 }
-function finish() {
-  void commit(finishSolitaire(game.value))
-}
 watch(motion.reduced, (value) => {
   if (value) celebrating.value = false
 })
@@ -529,10 +524,7 @@ onBeforeUnmount(() => {
       />
     </div>
     <div class="game-actions solitaire-bottom">
-      <button class="game-button" :disabled="!selected || moving" @click="cancel">取消选牌</button
-      ><button class="game-button" :disabled="locked || !canFinish(game)" @click="finish">
-        自动完成</button
-      ><span>所有暗牌翻开且牌堆与翻牌区清空后，可自动完成。</span>
+      <button class="game-button" :disabled="!selected || moving" @click="cancel">取消选牌</button>
       <button v-if="celebrating" class="game-button" @click="celebrating = false">跳过庆祝</button>
       <button
         v-else-if="won && !motion.reduced.value"

@@ -3393,11 +3393,6 @@ h1 > span {
 .solitaire-bottom {
   margin-top: 24px;
 }
-.solitaire-bottom > span {
-  font-size: 11px;
-  line-height: 1.8;
-  color: var(--muted);
-}
 /* Moving layers are decorative; the underlying game remains the source of state. */
 .number-flight-layer {
   position: absolute;
