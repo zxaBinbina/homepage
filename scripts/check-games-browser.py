@@ -142,6 +142,13 @@ with sync_playwright() as p:
                             && guide.getBoundingClientRect().bottom <= game.getBoundingClientRect().top
                             && tips.getBoundingClientRect().bottom <= note.getBoundingClientRect().top;
                     }'''), (path, theme, width, 'Tutorial and reminder must precede gameplay')
+                if path == '/games/solitaire':
+                    sizes = page.locator('.solitaire-table .playing-card, .card-placeholder').evaluate_all('els => els.map(el => {const r=el.getBoundingClientRect(); return {width:r.width,height:r.height}})')
+                    assert all(abs(size['height'] - size['width'] * 1.4) < 0.1 for size in sizes), (theme, width, 'Card proportions', sizes)
+                    assert page.locator('.tableau-stack').evaluate_all('''stacks => stacks.every(stack => {
+                        const cards = Array.from(stack.querySelectorAll('.tableau-card'));
+                        return cards.every(card => card.getBoundingClientRect().bottom <= stack.getBoundingClientRect().bottom + 1);
+                    })'''), (theme, width, 'Tableau stack must contain its last card')
                 if width > 760:
                     # No wrapping or overlap between brand, navigation, and actions.
                     assert page.evaluate('''() => {

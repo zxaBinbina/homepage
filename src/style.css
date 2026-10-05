@@ -3232,7 +3232,6 @@ h1 > span {
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 .solitaire-table {
-  --card-height: 128px;
   --card-step: 36px;
   min-width: 532px;
   max-width: 900px;
@@ -3259,7 +3258,7 @@ h1 > span {
   position: relative;
   display: block;
   width: 100%;
-  height: var(--card-height);
+  aspect-ratio: 5 / 7;
   border-radius: 9px;
   border: 1px solid color-mix(in srgb, var(--game-card-ink) 22%, var(--game-card-paper));
   padding: 0;
@@ -3316,7 +3315,7 @@ h1 > span {
 .stock-stack,
 .waste-stack {
   position: relative;
-  height: var(--card-height);
+  aspect-ratio: 5 / 7;
   perspective: 1000px;
 }
 .stock-underlay,
@@ -3387,7 +3386,16 @@ h1 > span {
 }
 .tableau-stack {
   position: relative;
-  min-height: var(--card-height);
+}
+.tableau-stack::before {
+  content: '';
+  display: block;
+  aspect-ratio: 5 / 7;
+}
+.tableau-stack > .card-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .tableau-card {
   position: absolute;
@@ -3602,9 +3610,6 @@ h1 > span {
   .game-surface {
     padding: 22px;
   }
-  .solitaire-table {
-    --card-height: 110px;
-  }
   .game-guide {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
     gap: 20px 30px;
@@ -3638,7 +3643,6 @@ h1 > span {
     gap: 8px;
   }
   .solitaire-table {
-    --card-height: 98px;
     --card-step: 34px;
   }
 }

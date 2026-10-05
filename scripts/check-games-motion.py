@@ -29,6 +29,7 @@ with sync_playwright() as p:
         page.mouse.down()
         page.mouse.move(b['x'] + b['width'] / 2, b['y'] + min(30, b['height'] / 2), steps=8)
         expect(page.locator('.solitaire-drag-stack > .playing-card')).to_have_count(stack)
+        assert page.locator('.solitaire-drag-stack > .playing-card').evaluate_all('els => els.every(el => {const r=el.getBoundingClientRect(); return Math.abs(r.height-r.width*1.4)<0.1})'), 'Dragged cards must retain their proportions'
         page.mouse.up()
         expect(page.locator('.solitaire-drag-layer')).to_have_count(0)
         card_idle()

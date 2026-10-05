@@ -61,6 +61,8 @@ with sync_playwright() as p:
                 restart = page.get_by_role('button', name='重新开始', exact=True).bounding_box()
                 assert bounds['x'] > restart['x'] + restart['width'] and abs(bounds['y'] - restart['y']) < 1
                 assert page.get_by_role('button', name='退出全屏', exact=True).inner_text() == ''
+                if game == 'solitaire':
+                    assert page.locator('.solitaire-table .playing-card, .card-placeholder').evaluate_all('els => els.every(el => {const r=el.getBoundingClientRect(); return Math.abs(r.height - r.width * 1.4) < 0.1})'), (theme, width, height, 'Fullscreen card proportions')
                 if width == 844 and game != 'solitaire':
                     board_end = page.locator('.number-directions' if game == '2048' else '.mine-board-scroll').bounding_box()
                     assert board_end['y'] + board_end['height'] <= height, (game, 'Landscape board/controls clipped')

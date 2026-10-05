@@ -470,7 +470,7 @@ onBeforeUnmount(() => {
               <div
                 class="tableau-stack"
                 :style="{
-                  height: `calc(var(--card-height) + ${Math.max(0, pile.length - 1)} * var(--card-step))`,
+                  paddingBottom: `calc(${Math.max(0, pile.length - 1)} * var(--card-step))`,
                 }"
               >
                 <button
@@ -551,7 +551,6 @@ onBeforeUnmount(() => {
           top: `${dragState.y}px`,
           width: `${dragState.width}px`,
           height: `${dragState.height + (dragState.cards.length - 1) * dragState.step}px`,
-          '--card-height': `${dragState.height}px`,
         }"
       >
         <div
