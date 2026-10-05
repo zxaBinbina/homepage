@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
 import { gameCatalog, type GameId } from './catalog'
 import { gameFullscreenKey } from './fullscreen'
+import { useGameMotion } from './useGameMotion'
 
 const props = defineProps<{ id: GameId }>()
 const game = computed(() => gameCatalog[props.id])
@@ -15,31 +16,58 @@ const components = {
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
 const viewport = ref<HTMLElement>()
+const motion = useGameMotion()
 let previousScroll = { left: 0, top: 0 }
+let transition = 0
+let leaving = false
+function focusToggle() {
+  viewport.value
+    ?.querySelector<HTMLButtonElement>('.game-fullscreen-toggle')
+    ?.focus({ preventScroll: true })
+}
+async function fade(element: HTMLElement | undefined, from: number, to: number, duration: number) {
+  await motion.settle([
+    motion.animate(element, [{ opacity: from }, { opacity: to }], { duration, fill: 'both' }),
+  ])
+}
 async function toggleFullscreen() {
+  if (leaving) return
+  const current = ++transition
+  const opacity = fullscreenDialog.value
+    ? Number(getComputedStyle(fullscreenDialog.value).opacity)
+    : 1
+  motion.cancel()
   if (fullscreen.value) {
+    leaving = true
+    await fade(fullscreenDialog.value, opacity, 0, 140)
+    if (current !== transition) return
     fullscreen.value = false
     await nextTick()
+    if (current !== transition) return
     fullscreenDialog.value?.close()
     document.documentElement.classList.remove('game-fullscreen-open')
     window.scrollTo({ ...previousScroll, behavior: 'instant' })
+    leaving = false
+    focusToggle()
+    await fade(viewport.value, 0, 1, 120)
   } else {
     previousScroll = { left: window.scrollX, top: window.scrollY }
     fullscreenDialog.value?.showModal()
     fullscreen.value = true
     document.documentElement.classList.add('game-fullscreen-open')
     await nextTick()
+    if (current !== transition) return
+    focusToggle()
+    await fade(fullscreenDialog.value, 0, 1, 180)
   }
-  // Existing game instances move with Teleport, preserving the current game and undo history.
-  viewport.value
-    ?.querySelector<HTMLButtonElement>('.game-fullscreen-toggle')
-    ?.focus({ preventScroll: true })
 }
 provide(gameFullscreenKey, { active: fullscreen, toggle: toggleFullscreen })
 function closeFullscreen() {
   if (fullscreen.value) void toggleFullscreen()
 }
 onBeforeUnmount(() => {
+  transition++
+  fullscreen.value = false
   fullscreenDialog.value?.close()
   document.documentElement.classList.remove('game-fullscreen-open')
 })
