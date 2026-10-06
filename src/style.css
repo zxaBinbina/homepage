@@ -4333,6 +4333,20 @@ h1 > span {
   position: absolute;
   inset: 0;
 }
+.waste-stack.is-draw-three > .playing-card {
+  left: calc(var(--waste-offset) * 44%);
+  right: auto;
+}
+.waste-stack.is-draw-three .waste-covered .card-corner {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  top: 6px;
+  left: 6px;
+}
+.waste-stack.is-draw-three .waste-covered .card-center {
+  visibility: hidden;
+}
 .stock-underlay {
   display: grid;
   place-items: center;

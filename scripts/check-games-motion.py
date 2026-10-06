@@ -455,6 +455,7 @@ with sync_playwright() as p:
 print('Game motion and drag checks passed. Screenshots: artifacts/game-motion-*.png')
 
 import runpy
+runpy.run_path('scripts/check-games-options-motion.py', run_name='__main__')
 runpy.run_path('scripts/check-games-classics-motion.py', run_name='__main__')
 
 runpy.run_path('scripts/check-games-arcade-motion.py', run_name='__main__')

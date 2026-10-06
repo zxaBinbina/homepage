@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { RotateCcw, Undo2 } from 'lucide-vue-next'
+import { Check, RotateCcw, Undo2 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import { gameFullscreenKey } from './fullscreen'
 import { useBoardKeyboard } from './useBoardKeyboard'
@@ -23,6 +23,9 @@ const props = defineProps<{ kind: 'gomoku' | 'xiangqi' }>()
 const chess = props.kind === 'xiangqi',
   columns = chess ? 9 : 15
 const makeBoard = () => (chess ? newXiangqi() : Array<number>(225).fill(0))
+const computerFirst = ref(false)
+const playerSide = computed(() => (computerFirst.value ? -1 : 1))
+const computerSide = computed(() => -playerSide.value)
 const board = ref(makeBoard()),
   turn = ref(1),
   difficulty = ref(0),
@@ -59,14 +62,16 @@ const draw = computed(
 )
 const ended = computed(() => !!winner.value || draw.value)
 const legal = computed(() =>
-  chess && turn.value === 1 && !ended.value ? legalChessMoves(board.value, 1) : [],
+  chess && turn.value === playerSide.value && !ended.value
+    ? legalChessMoves(board.value, playerSide.value)
+    : [],
 )
 const targets = computed(() => legal.value.filter((m) => m.from === source.value).map((m) => m.to))
 const checked = computed(() => chess && !ended.value && inCheck(board.value, turn.value))
 const outcome = computed(() =>
-  winner.value === 1
+  winner.value === playerSide.value
     ? '你赢了！这一局走得漂亮。'
-    : winner.value === -1
+    : winner.value === computerSide.value
       ? '电脑赢了，再试试另一种走法吧。'
       : draw.value
         ? chess
@@ -85,14 +90,16 @@ watch(
   { flush: 'post' },
 )
 const computer = useComputer<number | ChessMove>(props.kind, (move) => {
-  if (turn.value !== -1 || ended.value) return
+  if (turn.value !== computerSide.value || ended.value) return
   if (move === null) {
     computer.error.value = '电脑暂时没能完成思考，请重试或悔棋。'
     return
   }
   const valid = chess
     ? typeof move !== 'number' &&
-      legalChessMoves(board.value, -1).some((m) => m.from === move.from && m.to === move.to)
+      legalChessMoves(board.value, computerSide.value).some(
+        (m) => m.from === move.from && m.to === move.to,
+      )
     : typeof move === 'number' &&
       Number.isInteger(move) &&
       move >= 0 &&
@@ -111,14 +118,15 @@ const turnText = computed(() =>
       ? '等待重试'
       : busy.value
         ? '落子中'
-        : turn.value === -1
+        : turn.value === computerSide.value
           ? '电脑思考中…'
           : checked.value
             ? '你被将军了，请应将'
             : '轮到你了',
 )
 function requestComputer() {
-  if (turn.value === -1 && !ended.value) computer.run(board.value, difficulty.value)
+  if (turn.value === computerSide.value && !ended.value)
+    computer.run(board.value, difficulty.value, computerSide.value)
 }
 async function commit(move: ChessMove) {
   const current = ++revision
@@ -171,9 +179,9 @@ function remember() {
 }
 function play(at: number) {
   selected.value = at
-  if (turn.value !== 1 || busy.value || ended.value) return
+  if (turn.value !== playerSide.value || busy.value || ended.value) return
   if (chess) {
-    if (board.value[at]! > 0) {
+    if (board.value[at]! * playerSide.value > 0) {
       source.value = source.value === at ? null : at
       return
     }
@@ -188,7 +196,7 @@ function play(at: number) {
   }
 }
 function confirmStone() {
-  if (pending.value === null || turn.value !== 1 || busy.value || ended.value) return
+  if (pending.value === null || turn.value !== playerSide.value || busy.value || ended.value) return
   const at = pending.value
   if (board.value[at]) return
   remember()
@@ -214,7 +222,11 @@ function undo() {
   last.value = previous.last
   quiet.value = previous.quiet
   positions.value = previous.positions
-  turn.value = 1
+  turn.value = playerSide.value
+}
+function toggleFirst() {
+  computerFirst.value = !computerFirst.value
+  restart()
 }
 function restart() {
   cancelTurn()
@@ -224,7 +236,8 @@ function restart() {
   last.value = null
   quiet.value = 0
   positions.value = [board.value.join(',') + ':1']
-  selected.value = chess ? 58 : 112
+  selected.value = chess ? (computerFirst.value ? 31 : 58) : 112
+  requestComputer()
 }
 onBeforeUnmount(() => {
   revision++
@@ -259,11 +272,20 @@ function label(value: number, i: number) {
       <div class="game-toolbar">
         <div class="game-stats">
           <div>
-            <span>{{ chess ? '你执红棋 · 电脑执黑棋' : '你执黑棋 · 电脑执白棋' }}</span
+            <span>{{
+              chess
+                ? computerFirst
+                  ? '你执黑棋 · 电脑执红棋'
+                  : '你执红棋 · 电脑执黑棋'
+                : computerFirst
+                  ? '你执白棋 · 电脑执黑棋'
+                  : '你执黑棋 · 电脑执白棋'
+            }}</span
             ><strong class="strategy-turn" role="status">{{ turnText }}</strong>
           </div>
           <div>
-            <span>你的步数</span><strong>{{ Math.ceil((positions.length - 1) / 2) }}</strong>
+            <span>你的步数</span
+            ><strong>{{ Math.floor((positions.length - (computerFirst ? 1 : 0)) / 2) }}</strong>
           </div>
         </div>
         <div class="game-actions">
@@ -273,6 +295,14 @@ function label(value: number, i: number) {
               <option :value="1">挑战</option>
             </select></label
           >
+          <button
+            class="game-button"
+            :aria-pressed="computerFirst"
+            title="切换先手会重新开局"
+            @click="toggleFirst"
+          >
+            <Check v-if="computerFirst" :size="16" aria-hidden="true" />机器先手
+          </button>
           <button class="game-button" :disabled="!history.length" @click="undo">
             <Undo2 :size="16" aria-hidden="true" />悔棋
           </button>
@@ -349,7 +379,7 @@ function label(value: number, i: number) {
           }"
           :tabindex="!ended && i === selected ? 0 : -1"
           :aria-label="label(piece, i)"
-          :aria-disabled="ended || turn !== 1 || busy"
+          :aria-disabled="ended || turn !== playerSide || busy"
           :aria-pressed="source === i || pending === i"
           @click="play(i)"
           @focus="selected = i"
@@ -359,8 +389,8 @@ function label(value: number, i: number) {
             class="strategy-piece"
             :class="{
               'is-red': chess && piece > 0,
-              'is-black': chess ? piece < 0 : piece === 1 || pending === i,
-              'is-white': !chess && piece === -1,
+              'is-black': chess ? piece < 0 : piece === 1 || (pending === i && playerSide === 1),
+              'is-white': !chess && (piece === -1 || (pending === i && playerSide === -1)),
               'is-preview': pending === i,
             }"
             aria-hidden="true"
@@ -370,7 +400,7 @@ function label(value: number, i: number) {
         <div v-if="outcome" ref="resultElement" class="strategy-result" role="status">
           <p
             class="game-status strategy-result-message"
-            :class="{ 'is-success': winner === 1, 'is-ended': winner === -1 }"
+            :class="{ 'is-success': winner === playerSide, 'is-ended': winner === computerSide }"
           >
             {{ outcome }}
           </p>
@@ -384,7 +414,7 @@ function label(value: number, i: number) {
         }}</span
         ><button
           class="game-button"
-          :disabled="pending === null || turn !== 1 || busy || ended"
+          :disabled="pending === null || turn !== playerSide || busy || ended"
           @click="confirmStone"
         >
           确认落子

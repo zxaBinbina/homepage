@@ -135,6 +135,39 @@ with sync_playwright() as p:
         expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
         expect(page.locator('.strategy-piece')).to_have_count(32 if game == 'xiangqi' else 0)
 
+        # The computer takes the traditional first side; undo keeps its opening move.
+        page.get_by_label('电脑难度').select_option('0')
+        context.set_offline(True)
+        page.get_by_role('button', name='机器先手', exact=True).click()
+        idle()
+        expect(page.get_by_role('button', name='机器先手', exact=True)).to_have_attribute('aria-pressed', 'true')
+        expect(page.locator('.game-stats')).to_contain_text('你执黑棋 · 电脑执红棋' if game == 'xiangqi' else '你执白棋 · 电脑执黑棋')
+        expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
+        expect(page.get_by_role('button', name='悔棋', exact=True)).to_be_disabled()
+        opening = page.locator('.strategy-cell').evaluate_all('els => els.map(el => el.getAttribute("aria-label"))')
+        if game == 'gomoku':
+            expect(page.locator('.strategy-piece.is-black')).to_have_count(1)
+            page.locator('.board-cell').nth(0).click()
+            expect(page.locator('.strategy-piece.is-preview.is-white')).to_have_count(1)
+            page.get_by_role('button', name='确认落子').click()
+        else:
+            page.locator('.board-cell').nth(27).click()
+            expect(page.locator('.board-cell.is-target').first).to_be_visible()
+            page.locator('.board-cell.is-target').first.click()
+        idle()
+        expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
+        page.get_by_role('button', name='悔棋', exact=True).click()
+        assert page.locator('.strategy-cell').evaluate_all('els => els.map(el => el.getAttribute("aria-label"))') == opening
+        expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
+        page.get_by_role('button', name='重新开始', exact=True).click()
+        idle()
+        expect(page.get_by_role('button', name='机器先手', exact=True)).to_have_attribute('aria-pressed', 'true')
+        page.get_by_role('button', name='机器先手', exact=True).click()
+        idle()
+        expect(page.get_by_role('button', name='机器先手', exact=True)).to_have_attribute('aria-pressed', 'false')
+        expect(page.locator('.strategy-piece')).to_have_count(32 if game == 'xiangqi' else 0)
+        context.set_offline(False)
+
     # Direct loading/refresh, tutorial order, themes, all prescribed widths + breakpoints.
     for game in routes:
         visit(game)
@@ -179,6 +212,10 @@ with sync_playwright() as p:
     phone.locator('.board-cell').nth(112).tap()
     phone.get_by_role('button', name='确认落子').tap()
     expect(phone.locator('.strategy-piece.is-white')).to_have_count(1)
+    phone.get_by_role('button', name='机器先手', exact=True).tap()
+    expect(phone.locator('.strategy-turn')).to_have_text('轮到你了')
+    expect(phone.locator('.strategy-piece.is-black')).to_have_count(1)
+    expect(phone.locator('.strategy-piece.is-white')).to_have_count(0)
     phone.goto(base + '/games/xiangqi', wait_until='networkidle')
     phone.locator('.board-cell').nth(54).tap()
     phone.locator('.board-cell').nth(45).tap()

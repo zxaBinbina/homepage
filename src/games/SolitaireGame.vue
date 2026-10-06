@@ -24,6 +24,7 @@ import {
 } from './solitaire'
 
 const game = ref(newSolitaire())
+const drawCount = ref<1 | 3>(1)
 const fullscreen = inject(gameFullscreenKey)
 const selected = ref<CardSource | null>(null)
 const history = ref<SolitaireGame[]>([])
@@ -87,7 +88,12 @@ function celebrate() {
   celebrationKey.value++
   celebrating.value = true
 }
-async function commit(next: SolitaireGame, origins?: Map<string, CardPosition>, remember = true) {
+async function commit(
+  next: SolitaireGame,
+  origins?: Map<string, CardPosition>,
+  remember = true,
+  drawn: string[] = [],
+) {
   if (locked.value || next === game.value) return
   const current = ++turn
   const before = positions()
@@ -136,6 +142,7 @@ async function commit(next: SolitaireGame, origins?: Map<string, CardPosition>, 
     animations.push(
       motion.animate(element, frames, {
         duration: flip ? 340 : 260,
+        delay: Math.max(0, drawn.indexOf(element.dataset.cardId!)) * 50,
         fill: 'both',
         ...(flip ? { easing: 'ease-in-out' } : {}),
       }),
@@ -179,7 +186,7 @@ function undo() {
 }
 async function recycleStock() {
   const original = game.value
-  const result = drawCard(original)
+  const result = drawCard(original, drawCount.value)
   if (result === original) return
   if (motion.reduced.value || document.hidden) {
     void commit(result)
@@ -235,7 +242,20 @@ function draw() {
     void recycleStock()
     return
   }
-  void commit(drawCard(game.value))
+  const drawn = game.value.stock.slice(-drawCount.value).reverse().map(cardId)
+  const rect = surface.value?.querySelector('.stock-card')?.getBoundingClientRect()
+  const origins = rect
+    ? new Map(
+        drawn.map((id) => [
+          id,
+          { x: rect.x, y: rect.y, width: rect.width, height: rect.height, faceUp: false },
+        ]),
+      )
+    : undefined
+  void commit(drawCard(game.value, drawCount.value), origins, true, drawn)
+}
+function wasteOffset(index: number) {
+  return drawCount.value === 3 ? Math.max(0, index - Math.max(0, game.value.waste.length - 3)) : 0
 }
 function select(source: CardSource) {
   if (locked.value || won.value || !sourceCards(game.value, source).length) return
@@ -316,6 +336,12 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="game-actions">
+        <label class="game-select"
+          >纸牌难度<select v-model.number="drawCount" @change="restart">
+            <option :value="1">经典 · 翻一张</option>
+            <option :value="3">挑战 · 翻三张</option>
+          </select></label
+        >
         <button class="game-button" :disabled="locked || !history.length" @click="undo">
           <Undo2 :size="16" aria-hidden="true" />撤销
         </button>
@@ -366,7 +392,7 @@ onBeforeUnmount(() => {
                   :data-card-id="game.stock.length ? cardId(game.stock.at(-1)!) : undefined"
                   :aria-label="
                     game.stock.length
-                      ? `翻一张牌，牌堆剩余 ${game.stock.length} 张`
+                      ? `翻${drawCount === 3 ? '三' : '一'}张牌，牌堆剩余 ${game.stock.length} 张`
                       : game.waste.length
                         ? '重新翻牌'
                         : '牌堆已空'
@@ -384,7 +410,7 @@ onBeforeUnmount(() => {
             </div>
             <div class="solitaire-slot">
               <span class="pile-label">翻牌 · {{ game.waste.length }}</span>
-              <div class="waste-stack">
+              <div class="waste-stack" :class="{ 'is-draw-three': drawCount === 3 }">
                 <template v-for="(card, index) in game.waste" :key="cardId(card)">
                   <button
                     v-if="index === game.waste.length - 1"
@@ -395,6 +421,7 @@ onBeforeUnmount(() => {
                       'is-drag-origin': dragging.isOrigin(card),
                     }"
                     :data-card-id="cardId(card)"
+                    :style="{ '--waste-offset': wasteOffset(index) }"
                     :aria-label="`选择翻牌 ${cardName(card)}`"
                     :aria-pressed="selected?.kind === 'waste'"
                     @click="select({ kind: 'waste' })"
@@ -409,7 +436,10 @@ onBeforeUnmount(() => {
                     class="playing-card waste-covered"
                     :class="{ 'is-red': redCard(card) }"
                     :data-card-id="cardId(card)"
-                    aria-hidden="true"
+                    :style="{ '--waste-offset': wasteOffset(index) }"
+                    role="img"
+                    :aria-hidden="drawCount !== 3 || index < game.waste.length - 3"
+                    :aria-label="`${cardName(card)}，被上方的牌覆盖`"
                   >
                     <PlayingCard :card="card" />
                   </div>

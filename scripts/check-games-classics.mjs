@@ -98,6 +98,7 @@ const six = Array(225).fill(0)
 for (let i = 0; i < 6; i++) six[90 + i] = 1
 assert.equal(g.winningLine(six, 92).length, 6, 'Freestyle accepts overlines')
 assert.equal(g.chooseGomoku(Array(225).fill(0)), 112)
+assert.equal(g.chooseGomoku(Array(225).fill(0), 1), 112)
 for (const side of [-1, 1]) {
   const board = Array(225).fill(0)
   board[104] = -side
@@ -160,12 +161,13 @@ assert.equal(x.chessOutcome(mate, 1), -1)
 const stalemate = fixture([49, 0], [40, -7], [66, -5], [68, -5], [72, -5])
 assert.ok(!x.inCheck(stalemate, 1))
 assert.equal(x.chessOutcome(stalemate, 1), -1)
-for (const difficulty of [0, 1]) {
-  const before = JSON.stringify(start),
-    move = x.chooseXiangqi(start, -1, difficulty, 120)
-  assert.ok(x.legalChessMoves(start, -1).some((m) => m.from === move.from && m.to === move.to))
-  assert.equal(JSON.stringify(start), before)
-}
+for (const side of [-1, 1])
+  for (const difficulty of [0, 1]) {
+    const before = JSON.stringify(start),
+      move = x.chooseXiangqi(start, side, difficulty, 120)
+    assert.ok(x.legalChessMoves(start, side).some((m) => m.from === move.from && m.to === move.to))
+    assert.equal(JSON.stringify(start), before)
+  }
 console.log(
   'Classics: Tetris bags/rotation/collision/clears, Sudoku uniqueness/variants, Gomoku wins/tactics, Xiangqi legal moves/check/mate/stalemate and bounded AI passed.',
 )

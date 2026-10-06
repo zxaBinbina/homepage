@@ -12,7 +12,7 @@ export function useComputer<T>(kind: 'gomoku' | 'xiangqi', accept: (move: T | nu
     worker = undefined
     thinking.value = false
   }
-  function run(board: number[], difficulty: number) {
+  function run(board: number[], difficulty: number, side: number) {
     cancel()
     error.value = ''
     thinking.value = true
@@ -32,9 +32,11 @@ export function useComputer<T>(kind: 'gomoku' | 'xiangqi', accept: (move: T | nu
         event.preventDefault()
         if (worker === current) fail()
       }
-      current.onmessageerror = fail
+      current.onmessageerror = () => {
+        if (worker === current) fail()
+      }
       watchdog = setTimeout(fail, 8000)
-      current.postMessage({ kind, board: [...board], difficulty })
+      current.postMessage({ kind, board: [...board], difficulty, side })
     } catch {
       fail()
     }

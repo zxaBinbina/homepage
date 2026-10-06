@@ -199,6 +199,34 @@ with sync_playwright() as p:
     page.get_by_role('button', name='重新开始').click()
     expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
 
+    page.get_by_label('纸牌难度').select_option('3')
+    page.get_by_role('button', name='翻三张牌，牌堆剩余 24 张', exact=True).click()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 21')
+    expect(page.locator('.waste-stack .playing-card')).to_have_count(3)
+    expect(page.locator('.waste-stack button')).to_have_count(1)
+    expect(page.locator('.game-stats strong').nth(1)).to_have_text('1')
+    first_three = page.locator('.waste-stack [data-card-id]').evaluate_all('els => els.map(el => el.dataset.cardId)')
+    bounds = page.locator('.waste-stack .playing-card').evaluate_all('els => els.map(el => el.getBoundingClientRect().toJSON())')
+    assert bounds[0]['x'] < bounds[1]['x'] < bounds[2]['x']
+    assert all(abs(b['height'] - b['width'] * 1.4) < .1 for b in bounds)
+    page.get_by_role('button', name='撤销', exact=True).click()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 24')
+    expect(page.locator('.waste-stack .playing-card')).to_have_count(0)
+    for _ in range(8):
+        page.locator('.stock-card').click()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 0')
+    expect(page.locator('.game-stats strong').nth(1)).to_have_text('8')
+    page.locator('.stock-card').click()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 24')
+    page.locator('.stock-card').click()
+    assert page.locator('.waste-stack [data-card-id]').evaluate_all('els => els.map(el => el.dataset.cardId)') == first_three
+    page.get_by_role('button', name='重新开始').click()
+    expect(page.get_by_label('纸牌难度')).to_have_value('3')
+    expect(page.locator('.game-stats strong').nth(1)).to_have_text('0')
+    page.get_by_label('纸牌难度').select_option('1')
+    page.locator('.stock-card').click()
+    expect(page.locator('.pile-label').first).to_have_text('牌堆 · 23')
+
     routes = [('/game', '.games-grid'), ('/games/2048', '.number-board'), ('/games/minesweeper', '.mine-board'), ('/games/solitaire', '.solitaire-table')]
     for path, marker in routes:
         response = context.request.get(base + path)

@@ -45,11 +45,13 @@ function clone(game: SolitaireGame): SolitaireGame {
   }
 }
 
-export function drawCard(game: SolitaireGame): SolitaireGame {
+export function drawCard(game: SolitaireGame, count: 1 | 3 = 1): SolitaireGame {
   if (!game.stock.length && !game.waste.length) return game
   const next = clone(game)
-  if (next.stock.length) next.waste.push({ ...next.stock.pop()!, faceUp: true })
-  else {
+  if (next.stock.length) {
+    for (let i = 0; i < count && next.stock.length; i++)
+      next.waste.push({ ...next.stock.pop()!, faceUp: true })
+  } else {
     next.stock = next.waste.reverse().map((card) => ({ ...card, faceUp: false }))
     next.waste = []
   }

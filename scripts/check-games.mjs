@@ -198,7 +198,48 @@ for (let seed = 0; seed < 40; seed++) {
     assert.equal(cards.cardName(next.waste.at(-1)), name)
   }
   assert.equal(JSON.stringify(game), original)
+  // Three-card turns preserve order, count as one move, and recycle the same deck.
+  let triple = game
+  const order = game.stock.toReversed().map(cards.cardName)
+  for (let turn = 0; turn < 8; turn++) {
+    triple = cards.drawCard(triple, 3)
+    assert.equal(triple.moves, turn + 1)
+    assert.equal(triple.stock.length, 24 - (turn + 1) * 3)
+    assert.deepEqual(triple.waste.map(cards.cardName), order.slice(0, (turn + 1) * 3))
+    deckIntact(triple)
+  }
+  const recycled = cards.drawCard(triple, 3)
+  assert.equal(recycled.moves, 9)
+  assert.equal(recycled.waste.length, 0)
+  assert.deepEqual(recycled.stock, game.stock)
+  assert.deepEqual(cards.drawCard(recycled, 3).waste.map(cards.cardName), order.slice(0, 3))
+  assert.equal(JSON.stringify(game), original)
 }
+for (const remaining of [1, 2]) {
+  const short = {
+    ...emptyCards(),
+    stock: [face(0, 1, false), face(1, 1, false)].slice(0, remaining),
+  }
+  const before = JSON.stringify(short)
+  const next = cards.drawCard(short, 3)
+  assert.equal(next.stock.length, 0)
+  assert.equal(next.waste.length, remaining)
+  assert.equal(next.moves, 1)
+  assert.ok(next.waste.every((card) => card.faceUp))
+  assert.equal(JSON.stringify(short), before)
+}
+const tripleAces = cards.drawCard(
+  { ...emptyCards(), stock: [face(0, 1, false), face(1, 1, false), face(2, 1, false)] },
+  3,
+)
+assert.equal(cards.moveCard(tripleAces, { kind: 'waste' }, { kind: 'foundation', pile: 1 }), null)
+let exposed = tripleAces
+for (const pile of [0, 1, 2]) {
+  assert.equal(cards.sourceCards(exposed, { kind: 'waste' })[0].suit, pile)
+  exposed = cards.moveCard(exposed, { kind: 'waste' }, { kind: 'foundation', pile })
+  assert.ok(exposed)
+}
+assert.equal(exposed.waste.length, 0)
 let game = emptyCards()
 game.tableau[0] = [face(0, 4, false), face(1, 12), face(0, 11)]
 game.tableau[1] = [face(2, 13)]
