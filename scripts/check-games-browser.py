@@ -309,3 +309,5 @@ import runpy
 runpy.run_path('scripts/check-games-classics.py', run_name='__main__')
 
 runpy.run_path('scripts/check-games-arcade.py', run_name='__main__')
+
+runpy.run_path('scripts/check-games-sliding-jump.py', run_name='__main__')

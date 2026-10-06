@@ -58,6 +58,7 @@ with sync_playwright() as p:
     page.get_by_role('button', name='撤销', exact=True).click()
     expect(page.locator('.game-result')).to_have_count(0)
     page.emulate_media(reduced_motion='no-preference')
+    page.wait_for_function('!document.querySelector(".game-surface").__vueParentComponent.setupState.motion.reduced.value')
     page.locator('[data-tile="15"]').click()
     page.get_by_role('button', name='重新开始', exact=True).click()
     expect(page.locator('.sliding-surface')).to_have_attribute('aria-busy', 'false')
@@ -75,6 +76,7 @@ with sync_playwright() as p:
 
     page.set_viewport_size({'width':1440,'height':1000})
     page.emulate_media(reduced_motion='no-preference')
+    page.wait_for_function('!document.querySelector(".game-surface").__vueParentComponent.setupState.motion.reduced.value')
     visit('jump')
     jump_fixture()
     expect(page.locator('.jump-surface')).to_have_attribute('aria-busy','true')
@@ -102,6 +104,7 @@ with sync_playwright() as p:
     page.keyboard.press('Escape')
     page.set_viewport_size({'width':320,'height':740})
     page.emulate_media(reduced_motion='no-preference')
+    page.wait_for_function('!document.querySelector(".game-surface").__vueParentComponent.setupState.motion.reduced.value')
     page.evaluate('''() => {
       const s = document.querySelector('.jump-surface').__vueParentComponent.setupState;
       s.restart(); s.phase='charging'; newAnimations=[]; s.jump(300);
@@ -113,6 +116,7 @@ with sync_playwright() as p:
     page.locator('.game-surface').screenshot(path=str(out / 'game-new-jump-lost-320.png'))
     assert page.locator('.game-result').evaluate('e => e.scrollHeight <= e.clientHeight'), 'Result fits narrow scene'
     page.emulate_media(reduced_motion='no-preference')
+    page.wait_for_function('!document.querySelector(".game-surface").__vueParentComponent.setupState.motion.reduced.value')
     jump_fixture()
     page.locator('.tool-back').click()
     expect(page.locator('.game-card')).to_have_count(11)
