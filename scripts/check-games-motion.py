@@ -389,6 +389,17 @@ with sync_playwright() as p:
     visit('2048')
     page.get_by_role('button', name='网页全屏', exact=True).click()
     page.emulate_media(reduced_motion='no-preference')
+    expect(page.locator('.number-motion-toggle input')).to_be_enabled()
+    expect(page.locator('.number-motion-toggle input')).not_to_be_checked()
+    # Capture the short flight before it finishes; timing itself is checked above.
+    page.evaluate('''() => {
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function(...args) {
+        const animation = animate.apply(this, args);
+        if (this.matches('.number-flight')) animation.pause();
+        return animation;
+      };
+    }''')
     page.locator('.number-board').focus()
     page.keyboard.press('ArrowLeft')
     expect(page.locator('.number-flight')).to_have_count(2)
