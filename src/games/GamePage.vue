@@ -20,6 +20,8 @@ const components = {
   gomoku: defineAsyncComponent(() => import('./BoardGame.vue')),
   snake: defineAsyncComponent(() => import('./SnakeGame.vue')),
   popstar: defineAsyncComponent(() => import('./PopstarGame.vue')),
+  huarongdao: defineAsyncComponent(() => import('./HuarongdaoGame.vue')),
+  jump: defineAsyncComponent(() => import('./JumpGame.vue')),
 }
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()

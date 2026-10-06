@@ -110,7 +110,19 @@ import { gameCatalog, gameIds } from './catalog'
                 >★</span
               >
             </div>
-            <span class="game-preview-index">0{{ index + 1 }}</span>
+            <div v-else-if="id === 'huarongdao'" class="preview-sliding">
+              <span
+                v-for="(tile, i) in [1, 2, 3, 4, 0, 6, 7, 5, 8]"
+                :key="i"
+                :class="{ 'is-empty': !tile }"
+                >{{ tile || '' }}</span
+              >
+            </div>
+            <div v-else-if="id === 'jump'" class="preview-jump">
+              <span class="preview-jump-platform"></span><span class="preview-jump-platform"></span>
+              <span class="preview-jump-path"></span><span class="preview-jump-person"></span>
+            </div>
+            <span class="game-preview-index">{{ String(index + 1).padStart(2, '0') }}</span>
           </div>
           <div class="game-card-content">
             <p class="overline">{{ gameCatalog[id].label }}</p>

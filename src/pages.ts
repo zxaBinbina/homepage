@@ -13,6 +13,8 @@ export const pages = {
   gomoku: '/games/gomoku',
   snake: '/games/snake',
   popstar: '/games/popstar',
+  huarongdao: '/games/huarongdao',
+  jump: '/games/jump',
   json: '/tools/json',
   base64: '/tools/base64',
   url: '/tools/url',

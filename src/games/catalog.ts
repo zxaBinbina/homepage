@@ -53,6 +53,18 @@ export const gameCatalog = {
     category: '经典消除',
     description: '让相邻的同色星星一起消失。多攒一颗，多一点分数，慢慢点亮下一关。',
   },
+  huarongdao: {
+    name: '华容道',
+    label: 'EVERY PIECE IN PLACE',
+    category: '数字滑块',
+    description: '借一格空白，让数字慢慢归位。点一下、挪一步，把打乱的顺序重新理好。',
+  },
+  jump: {
+    name: '跳一跳',
+    label: 'TAKE A LITTLE LEAP',
+    category: '节奏挑战',
+    description: '按住积攒一点力量，松开跨过方块间的空隙。找准距离，让每一跳稳稳落下。',
+  },
 } as const
 
 export type GameId = keyof typeof gameCatalog

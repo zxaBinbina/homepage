@@ -35,6 +35,8 @@ pages = {
     '五子棋单机版 · 小游戏 · a彬彬a': 'games/gomoku',
     '贪吃蛇 · 小游戏 · a彬彬a': 'games/snake',
     '消灭星星经典版 · 小游戏 · a彬彬a': 'games/popstar',
+    '华容道 · 小游戏 · a彬彬a': 'games/huarongdao',
+    '跳一跳 · 小游戏 · a彬彬a': 'games/jump',
     '网页工具 · a彬彬a': 'tool',
     'JSON 格式化 · 网页工具 · a彬彬a': 'tools/json',
     'Base64 编解码 · 网页工具 · a彬彬a': 'tools/base64',
