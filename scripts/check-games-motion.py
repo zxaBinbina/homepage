@@ -461,3 +461,5 @@ runpy.run_path('scripts/check-games-classics-motion.py', run_name='__main__')
 runpy.run_path('scripts/check-games-arcade-motion.py', run_name='__main__')
 
 runpy.run_path('scripts/check-games-sliding-jump-motion.py', run_name='__main__')
+
+runpy.run_path('scripts/check-games-chess-go-motion.py', run_name='__main__')

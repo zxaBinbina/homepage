@@ -306,3 +306,5 @@ await import('./check-games-classics.mjs')
 await import('./check-games-arcade.mjs')
 
 await import('./check-games-sliding-jump.mjs')
+
+await import('./check-games-chess-go.mjs')

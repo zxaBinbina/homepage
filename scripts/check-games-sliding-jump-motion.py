@@ -121,7 +121,7 @@ with sync_playwright() as p:
     page.wait_for_function('!document.querySelector(".game-surface").__vueParentComponent.setupState.motion.reduced.value')
     jump_fixture()
     page.locator('.tool-back').click()
-    expect(page.locator('.game-card')).to_have_count(11)
+    expect(page.locator('.game-card')).to_have_count(13)
     page.locator('.game-card[href="/games/jump"]').click()
     expect(page.locator('.jump-surface')).to_have_attribute('aria-busy','false')
     expect(page.locator('.game-stats strong').first).to_have_text('0')

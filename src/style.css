@@ -40,6 +40,8 @@
   --block-grid: #2d2d2d;
   --strategy-paper: #242e3c;
   --strategy-line: #768498;
+  --chess-light: #8091a5;
+  --chess-dark: #3b4e66;
   --star-blue: #70b8f4;
   --star-green: #78cbb2;
   --star-yellow: #ecc573;
@@ -74,6 +76,8 @@
   --block-grid: #e3e3e3;
   --strategy-paper: #f2eadf;
   --strategy-line: #a59a87;
+  --chess-light: #e8dfcf;
+  --chess-dark: #97acc2;
   --star-blue: #276bab;
   --star-green: #227956;
   --star-yellow: #966300;
@@ -3882,6 +3886,157 @@ h1 > span {
   grid-template-columns: repeat(15, minmax(0, 1fr));
   aspect-ratio: 1;
 }
+.chess-board {
+  max-width: 560px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  aspect-ratio: 1;
+  overflow: clip;
+}
+.chess-board .chess-cell {
+  background: var(--chess-light);
+}
+.chess-cell.is-dark {
+  background: var(--chess-dark);
+}
+.chess-cell.is-selected {
+  border-radius: 0;
+  background: color-mix(in srgb, var(--blue) 60%, var(--chess-light));
+}
+.chess-cell:has(.strategy-piece) {
+  z-index: 1;
+}
+.chess-cell .strategy-piece {
+  width: 86%;
+  height: 86%;
+}
+.chess-piece-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 1px #0003);
+}
+.chess-piece-art.is-white {
+  fill: #fff5e6;
+  stroke: #303e50;
+}
+.chess-piece-art.is-black {
+  fill: #253245;
+  stroke: #e6eaf0;
+}
+.chess-piece-eye {
+  fill: currentColor;
+  stroke: none;
+}
+.chess-coordinate {
+  position: absolute;
+  z-index: 0;
+  font-size: clamp(8px, 1.3vw, 11px);
+  line-height: 1;
+  color: #253245;
+}
+.chess-cell.is-dark .chess-coordinate {
+  color: #fff;
+}
+.chess-rank {
+  top: 3px;
+  left: 3px;
+}
+.chess-file {
+  bottom: 3px;
+  right: 3px;
+}
+.chess-promotion {
+  margin-top: 18px;
+}
+.chess-promotion p {
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.chess-promotion .chess-piece-art {
+  width: 26px;
+  height: 26px;
+}
+.board-hint {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+}
+.go-board {
+  max-width: 560px;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  aspect-ratio: 1;
+}
+.go-captured {
+  position: absolute;
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.go-board .is-dead .strategy-piece {
+  opacity: 0.4;
+}
+.go-dead-mark {
+  color: var(--status-danger);
+  font-size: clamp(18px, 4vw, 30px);
+  line-height: 1;
+}
+.go-territory {
+  position: absolute;
+  width: 20%;
+  height: 20%;
+  border: 1px solid #777;
+  z-index: 2;
+}
+.go-territory.is-black {
+  background: #171717;
+}
+.go-territory.is-white {
+  background: #fff;
+}
+.go-scoring {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+}
+.go-scoring .game-actions {
+  justify-content: center;
+  margin-top: 12px;
+}
+.go-final-score {
+  color: var(--muted);
+  font-size: 13px;
+}
+.go-notice {
+  min-height: 1.8em;
+}
+.preview-chess {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 152px;
+  height: 152px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transform: rotate(-7deg);
+  box-shadow: 0 8px 18px #0002;
+}
+.preview-chess > span {
+  display: grid;
+  place-items: center;
+  background: var(--chess-light);
+}
+.preview-chess > .is-dark {
+  background: var(--chess-dark);
+}
+.preview-chess .chess-piece-art {
+  width: 34px;
+  height: 34px;
+}
+
 .strategy-lines {
   position: absolute;
   inset: 0;
@@ -3943,14 +4098,17 @@ h1 > span {
 .xiangqi-board .is-black {
   color: var(--game-card-ink);
 }
-.gomoku-board .strategy-piece {
+.gomoku-board .strategy-piece,
+.go-board .strategy-piece {
   border: 1px solid #777;
   box-shadow: 0 2px 3px #0004;
 }
-.gomoku-board .is-black {
+.gomoku-board .is-black,
+.go-board .strategy-piece.is-black {
   background: radial-gradient(circle at 35% 25%, #4a4a4a, #171717 75%);
 }
-.gomoku-board .is-white {
+.gomoku-board .is-white,
+.go-board .strategy-piece.is-white {
   background: radial-gradient(circle at 35% 25%, #fff, #d9d9d6 85%);
 }
 .strategy-piece.is-preview {

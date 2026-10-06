@@ -16,7 +16,7 @@ with sync_playwright() as p:
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(base + '/game', wait_until='networkidle')
-    expect(page.locator('.game-card')).to_have_count(11)
+    expect(page.locator('.game-card')).to_have_count(13)
     expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('游戏')
     assert page.locator('audio').count() == 0
     page.evaluate('window.gameProbe = document.querySelector(".header")')
@@ -339,3 +339,5 @@ runpy.run_path('scripts/check-games-classics.py', run_name='__main__')
 runpy.run_path('scripts/check-games-arcade.py', run_name='__main__')
 
 runpy.run_path('scripts/check-games-sliding-jump.py', run_name='__main__')
+
+runpy.run_path('scripts/check-games-chess-go.py', run_name='__main__')

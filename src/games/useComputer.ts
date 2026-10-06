@@ -2,7 +2,10 @@ import { onBeforeUnmount, ref } from 'vue'
 import ComputerWorker from './computer.worker?worker&inline'
 
 /** A worker belongs to one turn; undo/restart/navigation terminate stale searches. */
-export function useComputer<T>(kind: 'gomoku' | 'xiangqi', accept: (move: T | null) => void) {
+export function useComputer<T, State = number[]>(
+  kind: 'gomoku' | 'xiangqi' | 'chess' | 'go',
+  accept: (move: T | null) => void,
+) {
   const thinking = ref(false),
     error = ref('')
   let worker: Worker | undefined, watchdog: ReturnType<typeof setTimeout> | undefined
@@ -12,7 +15,7 @@ export function useComputer<T>(kind: 'gomoku' | 'xiangqi', accept: (move: T | nu
     worker = undefined
     thinking.value = false
   }
-  function run(board: number[], difficulty: number, side: number) {
+  function run(board: State, difficulty: number, side: number) {
     cancel()
     error.value = ''
     thinking.value = true
@@ -36,7 +39,8 @@ export function useComputer<T>(kind: 'gomoku' | 'xiangqi', accept: (move: T | nu
         if (worker === current) fail()
       }
       watchdog = setTimeout(fail, 8000)
-      current.postMessage({ kind, board: [...board], difficulty, side })
+      // Vue state may contain proxies; send a detached, serializable turn snapshot.
+      current.postMessage({ kind, board: JSON.parse(JSON.stringify(board)), difficulty, side })
     } catch {
       fail()
     }

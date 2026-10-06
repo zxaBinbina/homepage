@@ -3,6 +3,7 @@ import { ArrowUpRight, Gamepad2 } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
 import { pages } from '../pages'
 import { gameCatalog, gameIds } from './catalog'
+import ChessPiece from './ChessPiece.vue'
 </script>
 
 <template>
@@ -79,13 +80,13 @@ import { gameCatalog, gameIds } from './catalog'
             <div v-else-if="id === 'xiangqi'" class="preview-xiangqi">
               <span>马</span><span>帅</span><span>炮</span>
             </div>
-            <div v-else-if="id === 'gomoku'" class="preview-gomoku">
+            <div v-else-if="id === 'gomoku' || id === 'go'" class="preview-gomoku">
               <span
                 v-for="i in 25"
                 :key="i"
                 :class="{
-                  'is-black': [7, 13, 19].includes(i),
-                  'is-white': [8, 12, 18].includes(i),
+                  'is-black': (id === 'go' ? [7, 11, 17, 13] : [7, 13, 19]).includes(i),
+                  'is-white': (id === 'go' ? [12, 18, 19] : [8, 12, 18]).includes(i),
                 }"
               ></span>
             </div>
@@ -121,6 +122,17 @@ import { gameCatalog, gameIds } from './catalog'
             <div v-else-if="id === 'jump'" class="preview-jump">
               <span class="preview-jump-platform"></span><span class="preview-jump-platform"></span>
               <span class="preview-jump-path"></span><span class="preview-jump-person"></span>
+            </div>
+            <div v-else-if="id === 'chess'" class="preview-chess">
+              <span
+                v-for="i in 16"
+                :key="i"
+                :class="{ 'is-dark': (Math.floor((i - 1) / 4) + ((i - 1) % 4)) % 2 === 1 }"
+                ><ChessPiece v-if="i === 6" piece="k" side="b" /><ChessPiece
+                  v-if="i === 11"
+                  piece="n"
+                  side="w"
+              /></span>
             </div>
             <span class="game-preview-index">{{ String(index + 1).padStart(2, '0') }}</span>
           </div>

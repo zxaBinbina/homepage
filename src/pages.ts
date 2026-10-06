@@ -15,6 +15,8 @@ export const pages = {
   popstar: '/games/popstar',
   huarongdao: '/games/huarongdao',
   jump: '/games/jump',
+  chess: '/games/chess',
+  go: '/games/go',
   json: '/tools/json',
   base64: '/tools/base64',
   url: '/tools/url',

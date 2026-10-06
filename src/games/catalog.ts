@@ -18,7 +18,7 @@ export const gameCatalog = {
     description: '红黑交替，慢慢理顺。把一副打乱的牌，收成四叠完整的花色。',
   },
   tetris: {
-    name: '经典俄罗斯方块黑白版',
+    name: '俄罗斯方块',
     label: 'ROOM FOR ONE MORE',
     category: '方块挑战',
     description: '在极简黑白之间，旋转、堆叠、消除。用一局 30 行的小挑战，找回专注的节奏。',
@@ -64,6 +64,18 @@ export const gameCatalog = {
     label: 'TAKE A LITTLE LEAP',
     category: '节奏挑战',
     description: '按住积攒一点力量，松开跨过方块间的空隙。找准距离，让每一跳稳稳落下。',
+  },
+  chess: {
+    name: '国际象棋单机版',
+    label: 'THINK ONE MOVE AHEAD',
+    category: '棋艺策略',
+    description: '在黑白方格之间，调动每一枚棋子。与电脑开一局，从第一步布局到最后的将军。',
+  },
+  go: {
+    name: '围棋',
+    label: 'A LITTLE SPACE TO GROW',
+    category: '棋艺策略',
+    description: '一子落下，围出一片天地。在九路棋盘上与电脑对弈，慢慢体会连接、取舍与留白。',
   },
 } as const
 
