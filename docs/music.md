@@ -51,7 +51,7 @@ HTML 中的 `upgrade-insecure-requests` 策略将网易云外链的 HTTP CDN 重
 
 支持滚动歌词、播放高亮、点击歌词跳转和已有翻译。纯音乐显示“纯音乐，请欣赏”，没有歌词或请求失败时分别显示空状态或重试入口。各歌词状态保持相同高度，避免切换时窗口跳动。切歌会取消旧请求，避免错配；关闭弹窗不再请求歌词。
 
-Cloudflare Pages 的项目根目录保持仓库根目录，构建命令 `npm run build`，输出目录 `dist`。Git 集成部署会同时编译根目录 `functions/`。`public/_routes.json` 将函数执行限制在歌词接口。
+Cloudflare Pages 的项目根目录保持仓库根目录，构建命令 `npm run build`，输出目录 `dist`。Git 集成部署会同时编译根目录 `functions/`。`public/_routes.json` 将函数执行限制在歌词与棋类经验接口；棋类接口还需在 Pages 项目配置 `GAME_EXPERIENCE` KV binding，配置 ID 见仓库 `wrangler.toml`。
 
 如使用命令行直接上传，应从仓库根目录执行 `npx wrangler pages deploy dist --project-name 你的项目名`，让 Wrangler 同时发现 `functions/`。仅在控制台拖拽上传 `dist` 不会部署歌词函数。无需网易云账号、Token 或额外密钥。
 

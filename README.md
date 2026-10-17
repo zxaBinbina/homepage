@@ -134,7 +134,7 @@
 
 十三个游戏均可通过「重新开始」右侧的全屏图标进入网页全屏，只显示游戏画面与操作区，隐藏站点导航、标题、玩法说明和页脚。进入与退出使用短暂淡入淡出，减少动态效果时立即切换。点击同一位置的退出图标或按 Esc 返回，当前牌局、得分、撤销记录与原页面滚动位置继续保留；桌面和手机横竖屏默认将整个游戏等比例缩放至可用屏幕内，居中留白；扫雷边长超过 32 时保留正常格子大小，棋盘在全屏区域内滚动，矮屏操作区也可滚动查看。纸牌保持 5:7 宽高比，竖屏保留横屏游玩提示。
 
-各游戏页先展示完整玩法教程，再显示游戏界面；教程末尾提醒离开或刷新会重新开局。游戏内保留胜负结果、必要操作与手机横屏提示，不再显示重复的操作摘要或每步文字反馈。游戏状态只保留在当前页面内，不上传、不持久保存。站内导航继续保留音乐播放器实例。名称和说明位于 `src/games/catalog.ts`，目录与游戏组件、独立规则逻辑均位于 `src/games/`，样式集中在 `src/style.css`。新增游戏时登记 `src/pages.ts`、`src/router.ts`、目录及 `GamePage.vue` 的游戏组件，并更新分享与站点地图检查断言。构建自动生成 `game.html` 和 `games/*.html`，随完整 `dist/` 部署即可。
+各游戏页先展示完整玩法教程，再显示游戏界面；教程末尾提醒离开或刷新会重新开局。游戏内保留胜负结果、必要操作与手机横屏提示，不再显示重复的操作摘要或每步文字反馈。游戏状态只保留在当前页面；四种棋类对局结束后会上传不含访客身份的走法与胜负聚合计数，详情见上文。站内导航继续保留音乐播放器实例。名称和说明位于 `src/games/catalog.ts`，目录与游戏组件、独立规则逻辑均位于 `src/games/`，样式集中在 `src/style.css`。新增游戏时登记 `src/pages.ts`、`src/router.ts`、目录及 `GamePage.vue` 的游戏组件，并更新分享与站点地图检查断言。构建自动生成 `game.html` 和 `games/*.html`，随完整 `dist/` 部署即可。
 
 运行 `node scripts/check-games.mjs` 验证合并规则、扫雷首步安全与胜负、接龙合法移动与发牌完整性，以及俄罗斯方块、数独、棋类、贪吃蛇、消灭星星、华容道和跳一跳的规则、数独唯一解与电脑战术边界。构建预览服务启动后，运行 `HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-games-browser.py` 检查游戏交互、键盘 / 触摸、路由刷新、主题和响应式；截图写入 `artifacts/game-*.png`。共享导航与音乐实例由 `scripts/check-navigation.py` 一并检查。动效和拖拽专项运行 `python3 scripts/check-games-motion.py`，连接开发服务器（默认 `http://127.0.0.1:5173`），覆盖动画耗时、输入锁、取消 / 重开、鼠标整段拖动、手机长按与原生滚动、胜利庆祝和减少动态效果；终局动画使用仅开发环境可访问的组件状态构造测试牌面，不向正式页面添加测试入口。专项截图写入 `artifacts/game-motion-*.png`。
 
@@ -232,7 +232,7 @@ npx prettier --write README.md AGENTS.md
 
 歌单使用本地快照；需要更新时运行 `npm run sync:music`。播放与歌词依赖网易云服务，无法播放的歌曲会显示提示及官方入口。详细行为、同步工作流和验证说明见 [docs/music.md](docs/music.md)。
 
-Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出目录 `dist`。歌词接口还需要部署根目录的 `functions/`；Git 集成可以同时部署静态站点与函数。仅上传静态产物不会包含歌词接口，具体步骤见音乐文档。
+Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出目录 `dist`。API 函数需部署根目录的 `functions/`；Git 集成可以同时部署静态站点与函数。仅上传静态产物不会包含函数。棋类经验接口还需创建 KV namespace，并在 Pages 项目的 Settings → Functions → KV namespace bindings 添加变量名 `GAME_EXPERIENCE`，绑定刚创建的 namespace，然后重新部署。可用 `npx --yes wrangler kv namespace create GAME_EXPERIENCE` 创建 namespace；账号登录后命令会返回 namespace ID。歌词部署步骤见音乐文档。
 
 站点分享配置和 `SITE_URL` 用法见 [docs/sharing.md](docs/sharing.md)。
 

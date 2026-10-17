@@ -2,6 +2,8 @@
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { RotateCcw, Lightbulb, X } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
+import PlayingCard from './PlayingCard.vue'
+import type { Card } from './solitaire'
 import { bid, cardLabel, cardText, chooseComputer, classify, computerBid, newDoudizhu, canBeat, playDoudizhu, type DDCard } from './doudizhu'
 const game = ref(newDoudizhu()), selected = ref<number[]>([]), notice = ref('先看看手牌，再决定叫几分。')
 const actions = ref(['等待叫分', '等待叫分', '等待叫分'])
@@ -15,6 +17,7 @@ const picked = computed(() => mine.value.filter(c => selected.value.includes(c.i
 const valid = computed(() => !bidding.value && canAct.value && canBeat(picked.value, game.value.last))
 const outcome = computed(() => game.value.finished === null ? '' : (game.value.finished === game.value.landlord) === (game.value.landlord === 0) ? '你赢了！' : '这局对方获胜，再来一局吧。')
 const status = computed(() => outcome.value || (allPassed.value ? '大家都不叫，重新发牌吧' : `${names[game.value.turn]}${bidding.value ? '叫分' : '出牌'}`))
+function cardFor(card: DDCard): Card { return { suit: card.rank < 13 ? card.id % 4 : 0, rank: card.rank < 13 ? card.rank + 3 : card.rank === 13 ? 14 : 15, faceUp: true } }
 function stop() { clearTimeout(timer); timer = undefined }
 function restart() { stop(); game.value = newDoudizhu(); selected.value = []; actions.value = ['等待叫分', '等待叫分', '等待叫分']; notice.value = '先看看手牌，再决定叫几分。' }
 function commitBid(score: number) {
@@ -64,12 +67,12 @@ onBeforeUnmount(stop)
       <div class="dd-table">
         <div class="dd-bottom"><span>地主底牌</span><span v-for="(card, i) in game.bottom" :key="i" class="dd-mini-card">{{ bidding ? '?' : cardText(card) }}</span></div>
         <p class="dd-last-label">{{ game.last.length ? `${names[game.lastPlayer]} · ${classify(game.last)?.kind}` : bidding ? '一副牌，三个人，慢慢来。' : '新一轮 · 自由领出' }}</p>
-        <div class="dd-played"><span v-for="c in game.last" :key="c.id" class="dd-mini-card">{{ cardText(c) }}</span></div>
+        <TransitionGroup name="dd-play" tag="div" class="dd-played"><span v-for="c in game.last" :key="c.id" class="dd-play-card playing-card"><PlayingCard :card="cardFor(c)" /></span></TransitionGroup>
       </div>
       <div class="dd-hand-heading"><span>你的手牌 · {{ mine.length }} 张</span><span>{{ selected.length ? `已选 ${selected.length} 张` : '点击选牌，再确认出牌' }}</span></div>
-      <div class="dd-hand" role="group" aria-label="你的手牌">
-        <button v-for="c in mine" :key="c.id" class="dd-card" :class="{ 'is-selected': selected.includes(c.id), 'is-red': c.rank === 14 || (c.rank < 13 && c.id % 2 === 1) }" :aria-label="cardLabel(c)" :aria-pressed="selected.includes(c.id)" :disabled="!canAct || bidding" @click="toggle(c)"><strong>{{ cardText(c) }}</strong><span aria-hidden="true">{{ c.rank < 13 ? ['♠', '♥', '♣', '♦'][c.id % 4] : '★' }}</span></button>
-      </div>
+      <TransitionGroup name="dd-hand" tag="div" class="dd-hand" role="group" aria-label="你的手牌">
+        <button v-for="c in mine" :key="c.id" class="dd-card playing-card" :class="{ 'is-selected': selected.includes(c.id) }" :aria-label="cardLabel(c)" :aria-pressed="selected.includes(c.id)" :disabled="!canAct || bidding" @click="toggle(c)"><PlayingCard :card="cardFor(c)" /></button>
+      </TransitionGroup>
       <div v-if="bidding && !allPassed" class="dd-actions"><button v-for="score in [0, 1, 2, 3]" :key="score" class="game-button" :disabled="!canAct || (score > 0 && score <= Math.max(...game.bids))" @click="chooseBid(score)">{{ score ? `叫 ${score} 分` : '不叫' }}</button></div>
       <div v-else-if="allPassed || game.finished !== null" class="dd-actions"><button class="game-button" @click="restart">再来一局</button></div>
       <div v-else class="dd-actions"><button class="game-button" :disabled="!valid" @click="play">出牌</button><button class="game-button" :disabled="!canAct || !game.last.length" @click="pass">不出</button><button class="game-button" :disabled="!canAct" @click="hint"><Lightbulb :size="16" aria-hidden="true" />提示</button><button class="game-button" :disabled="!selected.length" @click="selected = []"><X :size="16" aria-hidden="true" />重选</button></div>
