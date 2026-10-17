@@ -126,20 +126,22 @@ sudo systemctl disable gazed
 ::: code-group
 
 ```bash [Debian/Ubuntu]
-sudo apt remove --purge gaze gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
+sudo apt remove --purge gaze-zh gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
 sudo apt autoremove
 ```
 
 ```bash [Fedora and compatible]
-sudo dnf remove gaze gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
+sudo dnf remove gaze-zh gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
 ```
 
 ```bash [openSUSE Tumbleweed]
-sudo zypper remove gaze gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
+sudo zypper remove gaze-zh gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
 ```
 
 ```bash [Arch Linux / Manjaro]
-# Drop any name that isn't installed; -Rns errors out on an unknown package.
+# For packages built from this repository:
+sudo pacman -Rns gaze-zh gaze-gui gaze-gnome-extension gaze-cinnamon-extension gaze-hyprlock gaze-kde
+# If you installed the official AUR packages instead, use their -bin names:
 sudo pacman -Rns gaze-bin gaze-gui-bin gaze-gnome-extension-bin gaze-hyprlock-bin gaze-kde-bin
 # If you installed the Cinnamon extension, remove it too (check the exact name with `pacman -Qs gaze`):
 sudo pacman -Rns gaze-cinnamon-extension-bin

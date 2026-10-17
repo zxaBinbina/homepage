@@ -46,7 +46,7 @@ export const projects = [
   },
   {
     id: 'gaze',
-    repository: 'zxaBinbina/gaze-zh-rdp-fix',
+    repository: 'zxaBinbina/gaze-zh',
     role: '分支维护',
     featured: true,
     image: 'gaze.svg',

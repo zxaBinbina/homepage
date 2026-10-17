@@ -108,7 +108,7 @@ OpenCV 4 和 5 均可使用。在提供 OpenCV 5 的发行版（如 Arch Linux�
 
 ```bash
 git clone https://github.com/zxaBinbina/gaze-zh
-cd gaze
+cd gaze-zh
 just setup-hooks
 just build-rust
 just test
@@ -175,7 +175,7 @@ just fmt               # 应用格式化（fmt-check 仅检查）
 
 **选项 A：将你的构建链接到已安装的文件之上**（便于反复迭代）：
 
-这会将你的检出叠加到一个*已有的*软件包安装之上；它并不安装软件包本身。如果你在这台机器上从未安装过 Gaze，请先构建并安装一次软件包（`just package rpm` 然后 `sudo <包管理器> install dist/packages/gaze-*.rpm`，或对应的 `deb`/`archlinux`）；如果 `gazed.service` 尚未安装，`dev-link-system` 会快速失败并指回这里。
+这会将你的检出叠加到一个*已有的*软件包安装之上；它并不安装软件包本身。如果你在这台机器上从未安装过 Gaze，请先构建并安装一次软件包（`just package rpm` 然后 `sudo <包管理器> install dist/packages/gaze-zh-*.rpm`，或对应的 `deb`/`archlinux`）；如果 `gazed.service` 尚未安装，`dev-link-system` 会快速失败并指回这里。
 
 ```bash
 just build-rust

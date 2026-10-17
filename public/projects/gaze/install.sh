@@ -7,7 +7,7 @@
 #
 # 安装优先级：
 # 1. 在 zxaBinbina/gaze-zh 的 GitHub Releases 中查找匹配当前系统与架构的
-#    中文版安装包（包名 gaze-zh，格式支持 rpm / deb，持续扩展），自动安装。
+#    中文版核心安装包（包名 gaze-zh，支持 rpm / deb），自动安装。
 # 2. Releases 中暂无适配的安装包时，自动转用官方安装器（支持 Ubuntu、
 #    Debian、Arch、openSUSE 等发行版），原有参数会原样透传，例如：
 #    curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh -s -- --yes
@@ -63,7 +63,7 @@ list_assets() {
         sed -n 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
 }
 
-# 用法: find_package <格式> <架构>；优先 gaze-zh 前缀，其次仓库内其他 gaze 资产。
+# 用法: find_package <格式> <架构>；只匹配中文版核心包，避免误装组件包。
 find_package() {
     format="$1"
     arch="$2"
@@ -74,8 +74,7 @@ find_package() {
         deb) pattern="_${arch}\\.deb$" ;;
         *) return 1 ;;
     esac
-    echo "$assets" | grep -E "/${PKG_PREFIX}[^/]*${pattern}" | head -n 1 && return 0
-    echo "$assets" | grep -E "/gaze[^/]*${pattern}" | head -n 1
+    echo "$assets" | grep -E "/${PKG_PREFIX}[^/]*${pattern}" | head -n 1
 }
 
 install_package() {

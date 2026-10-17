@@ -13,7 +13,7 @@
 
 ## 第 1 步：安装 Gaze
 
-推荐使用中文版一键安装命令：脚本会优先在 [Releases](https://github.com/zxaBinbina/gaze-zh/releases) 中查找与你系统匹配的中文版软件包（包名 `gaze-zh`，rpm / deb 持续扩展，含中文提示与 KRDP 修复）并自动安装；暂无适配的安装包时，自动转用官方安装器：
+推荐使用中文版一键安装命令：脚本会优先在 [Releases](https://github.com/zxaBinbina/gaze-zh/releases) 中查找与你系统匹配的中文版核心软件包（包名 `gaze-zh`，提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst`，含中文提示与 KRDP 修复）并自动安装；暂无适配的安装包时，自动转用官方安装器：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh

@@ -3,7 +3,7 @@
 
 # 安装
 
-**中文版用户推荐使用一键安装命令**：脚本优先安装与你系统匹配的中文版软件包（包名 `gaze-zh`，含中文提示与 KRDP 修复，rpm / deb 等格式持续扩展），暂无适配时自动转用官方安装器，见下方「中文版安装」。其他发行版（Ubuntu、Debian、Arch、openSUSE 等）也可直接使用官方一行命令安装器或手动方式。
+**中文版用户推荐使用一键安装命令**：脚本优先安装与你系统匹配的中文版核心软件包（包名 `gaze-zh`，含中文提示与 KRDP 修复；提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst` 发布产物），暂无适配时自动转用官方安装器，见下方「中文版安装」。其他发行版（Ubuntu、Debian、Arch、openSUSE 等）也可直接使用官方一行命令安装器或手动方式。
 
 使用一行命令安装器时，它会检测你的桌面环境，并在可能的情况下配置对应的集成：GNOME 锁屏认证、Cinnamon 扩展、KDE 软件包，或 Omarchy 锁屏集成。在其他桌面上，它会跳过桌面专属的软件包。手动安装 GNOME 和 Cinnamon 时需要额外一步来启用扩展。
 
@@ -11,7 +11,7 @@
 
 ## 中文版安装：一键命令（推荐）
 
-本站对应的 [zxaBinbina/gaze-zh](https://github.com/zxaBinbina/gaze-zh) 仓库通过 GitHub Releases 发布**中文版软件包**（包名 `gaze-zh`，含中文提示与 KRDP 修复；rpm / deb 等格式持续扩展）。
+本站对应的 [zxaBinbina/gaze-zh](https://github.com/zxaBinbina/gaze-zh) 仓库通过 GitHub Releases 发布**中文版软件包**（核心包名 `gaze-zh`，组件包保留官方名称；提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst`）。
 
 在支持的系统上直接使用一键安装命令，脚本会优先查找与你系统、架构匹配的中文版安装包并自动安装：
 
@@ -19,7 +19,7 @@
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 ```
 
-Releases 中暂无适配当前系统的安装包时，同一条命令会自动转用官方安装器（原有参数会透传，如 `--yes`、`--no-pam`）。
+Releases 中暂无适配当前系统的安装包时，同一条命令会自动转用官方安装器（原有参数会透传，如 `--yes`、`--no-pam`）。当前一键脚本自动安装 RPM/DEB；Arch 用户请使用官方安装器或 AUR，Release 中的 `.pkg.tar.zst` 主要用于手动/发行版打包流程。
 
 也可以从 [Releases 页面](https://github.com/zxaBinbina/gaze-zh/releases)手动下载安装包后安装，例如 Fedora 系：
 

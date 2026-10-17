@@ -125,7 +125,7 @@ const forks = [
           style="margin-top: 0"
           >gaze-zh</a
         >，rpm / deb 持续扩展，含中文提示与 KRDP
-        修复）；暂无适配时自动转用官方安装器。手动安装细节见
+        修复；Arch 发行包也会随 Release 提供，但一键脚本当前在 Arch 上转用官方安装器）；暂无适配时自动转用官方安装器。手动安装细节见
         <a class="gaze-text-link" href="/projects/gaze/guide/installation" style="margin-top: 0"
           >安装指南 →</a
         >
