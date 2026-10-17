@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Check, RotateCcw, Undo2 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import GameResult from './GameResult.vue'
 import { useGameMotion } from './useGameMotion'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useComputer } from './useComputer'
-import { rememberMove, syncExperience } from './learning'
+import { clearExperience, finishExperience, recordExperienceTurn } from './learning'
 import { goGroup, goKomi, goSize, newGo, passGo, playGo, scoreGo, type GoState } from './go'
 
 const game = ref(newGo()),
@@ -34,6 +34,13 @@ const outcome = computed(
     `${score.value.winner === player.value ? '你赢了！' : '电脑赢了。'}${score.value.winner === 1 ? '黑' : '白'}棋胜 ${score.value.margin} 点。`,
 )
 let revision = 0
+let reportedResult = false
+watch(finished, (value) => {
+  if (value && !reportedResult) {
+    reportedResult = true
+    void finishExperience('go', score.value.winner)
+  }
+})
 const computer = useComputer<number, GoState>('go', (at) => {
   if (game.value.turn === player.value || game.value.passes >= 2 || finished.value) return
   if (at === null || (at !== -1 && 'error' in playGo(game.value, at))) {
@@ -60,6 +67,7 @@ function requestComputer() {
     computer.run(game.value, difficulty.value, -player.value)
 }
 async function commit(at: number) {
+  recordExperienceTurn('go', game.value, game.value.turn, at)
   const move = at === -1 ? { state: passGo(game.value), captured: [] } : playGo(game.value, at)
   if ('error' in move) {
     notice.value = move.error
@@ -140,15 +148,11 @@ function confirmStone() {
   if (pending.value === null || !canPlay.value) return
   const at = pending.value
   if ('error' in playGo(game.value, at)) return
-  rememberMove('go', game.value, at)
-  void syncExperience('go', game.value, at)
   remember()
   void commit(at)
 }
 function pass() {
   if (!canPlay.value) return
-  rememberMove('go', game.value, -1)
-  void syncExperience('go', game.value, -1)
   remember()
   void commit(-1)
 }
@@ -172,6 +176,8 @@ function undo() {
 }
 function restart() {
   cancel()
+  clearExperience('go')
+  reportedResult = false
   game.value = newGo()
   history.value = []
   selected.value = 40

@@ -2,8 +2,9 @@ import type { ChessState, ChessTurn } from './chess'
 import type { GoState } from './go'
 
 type LearnedMove = number | ChessTurn | { from: number; to: number }
-type Entry = { key: string; move: LearnedMove; count: number }
-const storageKey = 'homepage-game-experience-v1'
+type Entry = { key: string; move: LearnedMove; wins: number; draws: number; losses: number }
+type Observation = { key: string; move: LearnedMove; side: number }
+const storageKey = 'homepage-game-experience-v2'
 const maxEntries = 600
 
 function read(): Record<string, Entry[]> {
@@ -22,41 +23,68 @@ function write(value: Record<string, Entry[]>) {
     /* Storage is optional. */
   }
 }
-export function experienceKey(kind: string, board: unknown) {
-  if (kind === 'chess') return JSON.stringify({ kind, fen: (board as ChessState).fen })
+export function experienceKey(kind: string, board: unknown, side = 0) {
+  if (kind === 'chess') return JSON.stringify({ kind, fen: (board as ChessState).fen, side })
   if (kind === 'go') {
     const state = board as GoState
-    return JSON.stringify({ kind, board: state.board, turn: state.turn, passes: state.passes })
+    return JSON.stringify({
+      kind,
+      board: state.board,
+      turn: state.turn,
+      passes: state.passes,
+      side,
+    })
   }
-  return JSON.stringify({ kind, board })
+  return JSON.stringify({ kind, board, side })
 }
-export function rememberMove(kind: string, board: unknown, move: LearnedMove) {
+const pending: Record<string, Observation[]> = {}
+export function recordExperienceTurn(
+  kind: string,
+  board: unknown,
+  side: number,
+  move: LearnedMove,
+) {
+  ;(pending[kind] ||= []).push({ key: experienceKey(kind, board, side), move, side })
+}
+export function clearExperience(kind: string) {
+  pending[kind] = []
+}
+export async function finishExperience(kind: string, winner: number) {
+  const observations = pending[kind] || []
+  pending[kind] = []
+  const scored = observations.map(({ key, move, side }) => ({
+    key,
+    move,
+    result: winner === 0 ? 0 : winner === side ? 1 : -1,
+  }))
   const all = read(),
-    key = experienceKey(kind, board),
     entries = all[kind] || []
-  const encoded = JSON.stringify(move)
-  const existing = entries.find(
-    (entry) => entry.key === key && JSON.stringify(entry.move) === encoded,
-  )
-  if (existing) existing.count = Math.min(existing.count + 1, 99)
-  else entries.push({ key, move, count: 1 })
-  all[kind] = entries.sort((a, b) => b.count - a.count).slice(0, maxEntries)
+  for (const item of scored) {
+    const entry = entries.find(
+      (candidate) =>
+        candidate.key === item.key && JSON.stringify(candidate.move) === JSON.stringify(item.move),
+    )
+    if (entry) {
+      if (item.result > 0) entry.wins++
+      else if (item.result < 0) entry.losses++
+      else entry.draws++
+    } else {
+      entries.push({
+        key: item.key,
+        move: item.move,
+        wins: +(item.result > 0),
+        draws: +(item.result === 0),
+        losses: +(item.result < 0),
+      })
+    }
+  }
+  all[kind] = entries.slice(-maxEntries)
   write(all)
-}
-export function learnedMove(kind: string, board: unknown): LearnedMove | null {
-  const key = experienceKey(kind, board)
-  const match = (read()[kind] || [])
-    .filter((entry) => entry.key === key)
-    .sort((a, b) => b.count - a.count)[0]
-  return match && match.count >= 2 ? match.move : null
-}
-
-export async function syncExperience(kind: string, board: unknown, move: LearnedMove) {
   try {
     await fetch('/api/games/experience', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind, key: experienceKey(kind, board), move }),
+      body: JSON.stringify({ kind, observations: scored }),
       keepalive: true,
     })
   } catch {
@@ -64,13 +92,17 @@ export async function syncExperience(kind: string, board: unknown, move: Learned
   }
 }
 
-export async function sharedLearnedMove(kind: string, board: unknown): Promise<LearnedMove | null> {
+export async function sharedLearnedMove(
+  kind: string,
+  board: unknown,
+  side: number,
+): Promise<LearnedMove | null> {
   try {
-    const query = new URLSearchParams({ kind, key: experienceKey(kind, board) })
+    const query = new URLSearchParams({ kind, key: experienceKey(kind, board, side) })
     const response = await fetch(`/api/games/experience?${query}`)
     if (!response.ok) return null
-    const data = (await response.json()) as { move?: LearnedMove | null; count?: number }
-    return (data.count || 0) >= 2 ? data.move || null : null
+    const data = (await response.json()) as { move?: LearnedMove | null; samples?: number }
+    return (data.samples || 0) >= 20 ? data.move || null : null
   } catch {
     return null
   }

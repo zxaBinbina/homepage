@@ -5,8 +5,7 @@ type Env = { GAME_EXPERIENCE?: KVNamespace }
 type Context = { request: Request; env: Env }
 type RecordBody = {
   kind: string
-  key: string
-  move: number | { from: string; to: string; promotion?: string }
+  observations: { key: string; move: unknown; result: -1 | 0 | 1 }[]
 }
 
 function validMove(kind: string, move: unknown) {
@@ -53,29 +52,50 @@ export async function onRequestPost({ request, env }: Context) {
   }
   if (
     !allowedGames.has(body.kind) ||
-    typeof body.key !== 'string' ||
-    body.key.length < 2 ||
-    body.key.length > 1200 ||
-    !validMove(body.kind, body.move)
+    !Array.isArray(body.observations) ||
+    body.observations.length > 500 ||
+    body.observations.some(
+      (item) =>
+        !item ||
+        typeof item.key !== 'string' ||
+        item.key.length < 2 ||
+        item.key.length > 1200 ||
+        ![-1, 0, 1].includes(item.result) ||
+        !validMove(body.kind, item.move),
+    )
   )
     return new Response(JSON.stringify({ error: 'invalid experience' }), {
       status: 400,
       headers: cors,
     })
-  const key = `v1:${body.kind}:${await digest(body.key)}`
-  const raw = await env.GAME_EXPERIENCE.get(key)
-  let moves: Record<string, number> = {}
-  try {
-    moves = raw ? (JSON.parse(raw) as Record<string, number>) : {}
-  } catch {
-    moves = {}
+  const aggregate = new Map<
+    string,
+    Record<string, { wins: number; draws: number; losses: number }>
+  >()
+  for (const item of body.observations) {
+    const key = `v2:${body.kind}:${await digest(item.key)}`
+    let moves = aggregate.get(key)
+    if (!moves) {
+      moves = {}
+      const raw = await env.GAME_EXPERIENCE.get(key)
+      try {
+        if (raw) Object.assign(moves, JSON.parse(raw))
+      } catch {
+        /* Ignore damaged aggregate rows. */
+      }
+      aggregate.set(key, moves)
+    }
+    const moveKey = JSON.stringify(item.move)
+    const stats = moves[moveKey] || (moves[moveKey] = { wins: 0, draws: 0, losses: 0 })
+    const field = item.result > 0 ? 'wins' : item.result < 0 ? 'losses' : 'draws'
+    stats[field] = Math.min(stats[field] + 1, 10000)
   }
-  const moveKey = JSON.stringify(body.move)
-  moves[moveKey] = Math.min((moves[moveKey] || 0) + 1, 10000)
-  const top = Object.entries(moves)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-  await env.GAME_EXPERIENCE.put(key, JSON.stringify(Object.fromEntries(top)))
+  for (const [key, moves] of aggregate) {
+    const top = Object.entries(moves)
+      .sort((a, b) => total(b[1]) - total(a[1]))
+      .slice(0, 8)
+    await env.GAME_EXPERIENCE.put(key, JSON.stringify(Object.fromEntries(top)))
+  }
   return new Response(JSON.stringify({ saved: true }), { status: 202, headers: cors })
 }
 
@@ -93,18 +113,38 @@ export async function onRequestGet({ request, env }: Context) {
       status: 400,
       headers: cors,
     })
-  const raw = await env.GAME_EXPERIENCE.get(`v1:${kind}:${await digest(keyValue)}`)
-  let moves: Record<string, number> = {}
+  const raw = await env.GAME_EXPERIENCE.get(`v2:${kind}:${await digest(keyValue)}`)
+  let moves: Record<string, { wins: number; draws: number; losses: number }> = {}
   try {
-    moves = raw ? (JSON.parse(raw) as Record<string, number>) : {}
+    moves = raw
+      ? (JSON.parse(raw) as Record<string, { wins: number; draws: number; losses: number }>)
+      : {}
   } catch {
     moves = {}
   }
-  const move = Object.entries(moves).sort((a, b) => b[1] - a[1])[0]
+  const move = Object.entries(moves)
+    .filter(([, stats]) => total(stats) >= 20 && wilsonLowerBound(stats) > 0.5)
+    .sort((a, b) => wilsonLowerBound(b[1]) - wilsonLowerBound(a[1]))[0]
+  const samples = move ? total(move[1]) : 0
+  const winRate = move && samples ? (move[1].wins + move[1].draws * 0.5) / samples : 0
   return new Response(
-    JSON.stringify({ move: move ? JSON.parse(move[0]) : null, count: move?.[1] || 0 }),
+    JSON.stringify({ move: move ? JSON.parse(move[0]) : null, samples, winRate }),
     { headers: cors },
   )
+}
+
+function total(value: { wins: number; draws: number; losses: number }) {
+  return value.wins + value.draws + value.losses
+}
+function wilsonLowerBound(value: { wins: number; draws: number; losses: number }) {
+  const samples = total(value)
+  if (!samples) return 0
+  const rate = (value.wins + value.draws * 0.5) / samples
+  const z = 1.96
+  const denominator = 1 + (z * z) / samples
+  const center = rate + (z * z) / (2 * samples)
+  const margin = z * Math.sqrt((rate * (1 - rate) + (z * z) / (4 * samples)) / samples)
+  return (center - margin) / denominator
 }
 
 interface KVNamespace {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Check, RotateCcw, Undo2 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import GameResult from './GameResult.vue'
@@ -8,7 +8,7 @@ import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useComputer } from './useComputer'
-import { rememberMove, syncExperience } from './learning'
+import { clearExperience, finishExperience, recordExperienceTurn } from './learning'
 import {
   Chess,
   chessResult,
@@ -45,6 +45,7 @@ const targets = computed(() =>
 )
 const canPlay = computed(() => !busy.value && !result.value && rules.value.turn() === player.value)
 let revision = 0
+let reportedResult = false
 const computer = useComputer<ChessTurn, ChessState>('chess', (move) => {
   if (rules.value.turn() === player.value || result.value) return
   if (!move || !playChess(game.value, move)) {
@@ -82,6 +83,7 @@ function requestComputer() {
     computer.run(game.value, difficulty.value, computerFirst.value ? 1 : -1)
 }
 async function commit(move: ChessTurn) {
+  recordExperienceTurn('chess', game.value, rules.value.turn() === 'w' ? 1 : -1, move)
   const next = playChess(game.value, move)
   if (!next) return
   const token = ++revision
@@ -146,8 +148,6 @@ async function play(at: number) {
       ?.querySelector<HTMLButtonElement>('button')
       ?.focus({ preventScroll: true })
   } else {
-    rememberMove('chess', game.value, moves[0]!)
-    void syncExperience('chess', game.value, moves[0]!)
     remember()
     void commit(moves[0]!)
   }
@@ -155,8 +155,6 @@ async function play(at: number) {
 function promote(piece: PieceSymbol) {
   if (!promotion.value || !canPlay.value) return
   const move = { ...promotion.value, promotion: piece }
-  rememberMove('chess', game.value, move)
-  void syncExperience('chess', game.value, move)
   remember()
   void commit(move)
   void focusBoard()
@@ -190,11 +188,19 @@ function undo() {
 }
 function restart() {
   cancel()
+  clearExperience('chess')
+  reportedResult = false
   game.value = newChess()
   history.value = []
   selected.value = computerFirst.value ? 12 : 52
   requestComputer()
 }
+watch(result, (value) => {
+  if (value && !reportedResult) {
+    reportedResult = true
+    void finishExperience('chess', value.winner)
+  }
+})
 function toggleFirst() {
   computerFirst.value = !computerFirst.value
   restart()

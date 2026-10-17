@@ -6,7 +6,7 @@ import { gameFullscreenKey } from './fullscreen'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useGameMotion } from './useGameMotion'
 import { useComputer } from './useComputer'
-import { rememberMove, syncExperience } from './learning'
+import { clearExperience, finishExperience, recordExperienceTurn } from './learning'
 import { winningLine } from './gomoku'
 import {
   applyChessMove,
@@ -45,6 +45,7 @@ const onKey = useBoardKeyboard(boardElement, selected, columns, chess ? 90 : 225
 type Snapshot = { board: number[]; last: ChessMove | null; quiet: number; positions: string[] }
 const history = ref<Snapshot[]>([])
 let revision = 0
+let reportedResult = false
 const line = computed(() => (!chess && last.value ? winningLine(board.value, last.value.to) : []))
 const winner = computed(() =>
   chess
@@ -90,6 +91,12 @@ watch(
   },
   { flush: 'post' },
 )
+watch(ended, (value) => {
+  if (value && !reportedResult) {
+    reportedResult = true
+    void finishExperience(props.kind, winner.value)
+  }
+})
 const computer = useComputer<number | ChessMove>(props.kind, (move) => {
   if (turn.value !== computerSide.value || ended.value) return
   if (move === null) {
@@ -130,6 +137,7 @@ function requestComputer() {
     computer.run(board.value, difficulty.value, computerSide.value)
 }
 async function commit(move: ChessMove) {
+  recordExperienceTurn(props.kind, board.value, turn.value, chess ? move : move.to)
   const current = ++revision
   busy.value = true
   const cells = boardElement.value?.querySelectorAll('.board-cell')
@@ -188,8 +196,6 @@ function play(at: number) {
     }
     const move = legal.value.find((m) => m.from === source.value && m.to === at)
     if (move) {
-      rememberMove(props.kind, board.value, move)
-      void syncExperience(props.kind, board.value, move)
       remember()
       void commit(move)
     }
@@ -202,8 +208,6 @@ function confirmStone() {
   if (pending.value === null || turn.value !== playerSide.value || busy.value || ended.value) return
   const at = pending.value
   if (board.value[at]) return
-  rememberMove(props.kind, board.value, at)
-  void syncExperience(props.kind, board.value, at)
   remember()
   void commit({ from: -1, to: at })
 }
@@ -235,6 +239,8 @@ function toggleFirst() {
 }
 function restart() {
   cancelTurn()
+  clearExperience(props.kind)
+  reportedResult = false
   board.value = makeBoard()
   turn.value = 1
   history.value = []
