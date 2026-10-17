@@ -1,5 +1,6 @@
 import { onBeforeUnmount, ref } from 'vue'
 import ComputerWorker from './computer.worker?worker&inline'
+import { learnedMove, sharedLearnedMove } from './learning'
 
 /** A worker belongs to one turn; undo/restart/navigation terminate stale searches. */
 export function useComputer<T, State = number[]>(
@@ -15,7 +16,7 @@ export function useComputer<T, State = number[]>(
     worker = undefined
     thinking.value = false
   }
-  function run(board: State, difficulty: number, side: number) {
+  async function run(board: State, difficulty: number, side: number) {
     cancel()
     error.value = ''
     thinking.value = true
@@ -40,7 +41,16 @@ export function useComputer<T, State = number[]>(
       }
       watchdog = setTimeout(fail, 8000)
       // Vue state may contain proxies; send a detached, serializable turn snapshot.
-      current.postMessage({ kind, board: JSON.parse(JSON.stringify(board)), difficulty, side })
+      const localMove = learnedMove(kind, board)
+      const collectiveMove = await sharedLearnedMove(kind, board)
+      if (worker !== current) return
+      current.postMessage({
+        kind,
+        board: JSON.parse(JSON.stringify(board)),
+        difficulty,
+        side,
+        learnedMove: collectiveMove || localMove,
+      })
     } catch {
       fail()
     }

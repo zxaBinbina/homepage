@@ -19,6 +19,14 @@ async function lyricsMiddleware(request: IncomingMessage, response: ServerRespon
   response.end(await result.text())
 }
 
+async function experienceMiddleware(request: IncomingMessage, response: ServerResponse) {
+  response.writeHead(503, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+  })
+  response.end(JSON.stringify({ error: 'experience storage unavailable in local preview' }))
+}
+
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, cwd(), 'SITE_')
   return {
@@ -40,9 +48,11 @@ export default defineConfig(({ mode, command }) => {
         name: 'local-music-lyrics',
         configureServer(server) {
           server.middlewares.use('/api/music/lyrics', lyricsMiddleware)
+          server.middlewares.use('/api/games/experience', experienceMiddleware)
         },
         configurePreviewServer(server) {
           server.middlewares.use('/api/music/lyrics', lyricsMiddleware)
+          server.middlewares.use('/api/games/experience', experienceMiddleware)
         },
       },
       pageTemplates(env.SITE_URL, command === 'build'),

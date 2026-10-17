@@ -8,6 +8,7 @@ import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useComputer } from './useComputer'
+import { rememberMove, syncExperience } from './learning'
 import {
   Chess,
   chessResult,
@@ -145,6 +146,8 @@ async function play(at: number) {
       ?.querySelector<HTMLButtonElement>('button')
       ?.focus({ preventScroll: true })
   } else {
+    rememberMove('chess', game.value, moves[0]!)
+    void syncExperience('chess', game.value, moves[0]!)
     remember()
     void commit(moves[0]!)
   }
@@ -152,6 +155,8 @@ async function play(at: number) {
 function promote(piece: PieceSymbol) {
   if (!promotion.value || !canPlay.value) return
   const move = { ...promotion.value, promotion: piece }
+  rememberMove('chess', game.value, move)
+  void syncExperience('chess', game.value, move)
   remember()
   void commit(move)
   void focusBoard()

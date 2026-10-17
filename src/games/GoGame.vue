@@ -6,6 +6,7 @@ import GameResult from './GameResult.vue'
 import { useGameMotion } from './useGameMotion'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useComputer } from './useComputer'
+import { rememberMove, syncExperience } from './learning'
 import { goGroup, goKomi, goSize, newGo, passGo, playGo, scoreGo, type GoState } from './go'
 
 const game = ref(newGo()),
@@ -139,11 +140,15 @@ function confirmStone() {
   if (pending.value === null || !canPlay.value) return
   const at = pending.value
   if ('error' in playGo(game.value, at)) return
+  rememberMove('go', game.value, at)
+  void syncExperience('go', game.value, at)
   remember()
   void commit(at)
 }
 function pass() {
   if (!canPlay.value) return
+  rememberMove('go', game.value, -1)
+  void syncExperience('go', game.value, -1)
   remember()
   void commit(-1)
 }

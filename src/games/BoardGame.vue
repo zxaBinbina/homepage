@@ -6,6 +6,7 @@ import { gameFullscreenKey } from './fullscreen'
 import { useBoardKeyboard } from './useBoardKeyboard'
 import { useGameMotion } from './useGameMotion'
 import { useComputer } from './useComputer'
+import { rememberMove, syncExperience } from './learning'
 import { winningLine } from './gomoku'
 import {
   applyChessMove,
@@ -187,6 +188,8 @@ function play(at: number) {
     }
     const move = legal.value.find((m) => m.from === source.value && m.to === at)
     if (move) {
+      rememberMove(props.kind, board.value, move)
+      void syncExperience(props.kind, board.value, move)
       remember()
       void commit(move)
     }
@@ -199,6 +202,8 @@ function confirmStone() {
   if (pending.value === null || turn.value !== playerSide.value || busy.value || ended.value) return
   const at = pending.value
   if (board.value[at]) return
+  rememberMove(props.kind, board.value, at)
+  void syncExperience(props.kind, board.value, at)
   remember()
   void commit({ from: -1, to: at })
 }
