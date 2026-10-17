@@ -13,13 +13,13 @@
 
 ## 第 1 步：安装 Gaze
 
-推荐的方式是一行命令安装器：
+推荐直接安装中文版合并 RPM（当前面向 Fedora 44 x86_64，含中文提示与 KRDP 修复）：
 
 ```bash
-curl -fsSL https://gaze.gundulabs.com/install.sh | sh
+sudo dnf install ./gaze-*.rpm
 ```
 
-如果你更倾向手动配置软件包，请使用[安装指南](/projects/gaze/guide/installation)。
+从 [GitHub Releases](https://github.com/zxaBinbina/gaze-zh/releases) 下载合并包。其他发行版请使用[安装指南](/projects/gaze/guide/installation)中的一行命令安装器（官方渠道）或手动方式。
 
 ## 第 2 步：检查守护进程状态
 

@@ -3,9 +3,31 @@
 
 # 安装
 
-选择适合你系统的安装方式。使用一行命令安装器时，它会检测你的桌面环境，并在可能的情况下配置对应的集成：GNOME 锁屏认证、Cinnamon 扩展、KDE 软件包，或 Omarchy 锁屏集成。在其他桌面上，它会跳过桌面专属的软件包。手动安装 GNOME 和 Cinnamon 时需要额外一步来启用扩展。
+**中文版用户推荐直接安装合并 RPM**（含中文提示与 KRDP 修复，当前面向 Fedora 44 x86_64），见下方「中文版安装」。其他发行版（Ubuntu、Debian、Arch、openSUSE 等）请使用官方一行命令安装器或手动方式。
+
+使用一行命令安装器时，它会检测你的桌面环境，并在可能的情况下配置对应的集成：GNOME 锁屏认证、Cinnamon 扩展、KDE 软件包，或 Omarchy 锁屏集成。在其他桌面上，它会跳过桌面专属的软件包。手动安装 GNOME 和 Cinnamon 时需要额外一步来启用扩展。
 
 在 x86_64 和 arm64 上，安装器支持 Ubuntu 24.04/25.10/26.04/26.10、Debian 13 和 14（forky，当前为测试版）、Fedora 42/43/44/45 以及兼容发行版（包括基于镜像的 OSTree 系统，如 Silverblue、Kinoite 和 Bazzite）、Arch Linux，以及 Manjaro 和 CachyOS 等与 Arch 兼容的 AUR 发行版。openSUSE Tumbleweed 在 x86_64 上受支持。
+
+## 中文版安装：合并 RPM（推荐）
+
+本站对应的 [zxaBinbina/gaze-zh](https://github.com/zxaBinbina/gaze-zh) 仓库提供**合并 RPM**：一个软件包包含守护进程、CLI、GUI、KDE 集成、两个 PAM 模块以及 KRDP 修复（中文提示、KRDP 免打扰与画面冻结修复），当前面向 **Fedora 44 x86_64**。
+
+从仓库的 [Releases 页面](https://github.com/zxaBinbina/gaze-zh/releases)下载合并 RPM，然后安装：
+
+```bash
+sudo dnf install ./gaze-*.rpm
+```
+
+安装脚本会刷新已运行的用户服务管理器，并尝试重启当前正在运行的 KRDP，远程连接会短暂断开。软件包保留 `/etc/gaze/config.toml` 等用户配置，也不会覆盖官方的 KRDP 库。
+
+需要自行构建时，检出仓库源码，使用同版本的官方 Gaze RPM 作为经过校验的基础载荷：
+
+```bash
+python3 scripts/build-combined-rpm.py --base-rpm gaze-0.3.8-1.fc44.x86_64.rpm
+```
+
+合并包的组件清单、KRDP 修复细节与回退方式，见仓库文档 [docs/krdp-fix.md](https://github.com/zxaBinbina/gaze-zh/blob/main/docs/krdp-fix.md)。
 
 ## CPU 要求
 
@@ -19,7 +41,7 @@ grep -qw avx2 /proc/cpuinfo && echo "AVX2 present" || echo "AVX2 missing"
 
 Gaze 的推理运行时在 x86_64 上需要 AVX2。如果你的 CPU 不支持，一行命令安装器会在改动系统之前停止；软件包安装会让 `gazed` 处于停止状态，但 CLI 和 PAM 模块仍然安装。`gaze doctor` 也会报告这一限制。刷脸认证需要一个支持 AVX2 的 CPU；详见[故障排查](/projects/gaze/guide/troubleshooting)。
 
-## 路径 A：一行命令安装器（推荐）
+## 路径 A：一行命令安装器（其他发行版的官方渠道）
 
 ```bash
 curl -fsSL https://gaze.gundulabs.com/install.sh | sh
@@ -74,11 +96,13 @@ Debian 14（forky）仍处于测试阶段，因此其库会不断变化。`forky
 如果你要替换现有的手动仓库配置，请先删除当前的仓库文件：
 
 **Debian / Ubuntu：**
+
 ```bash
 sudo rm -f /etc/apt/sources.list.d/gundulabs.list /usr/share/keyrings/gundulabs-archive-keyring.gpg
 ```
 
 **Fedora 及兼容的 DNF/rpm-ostree 系统：**
+
 ```bash
 sudo rm -f /etc/yum.repos.d/gundulabs.repo /etc/pki/rpm-gpg/RPM-GPG-KEY-gundulabs
 ```

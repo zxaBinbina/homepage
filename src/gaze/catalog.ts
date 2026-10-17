@@ -24,7 +24,8 @@ export const gazeGuides: GazeGuide[] = [
     id: 'installation',
     title: '安装',
     group: 'start',
-    description: '一行安装脚本与 Debian、Fedora、openSUSE、Arch、Flatpak 等手动安装方式。',
+    description:
+      '中文版合并 RPM（Fedora 44 x86_64）与官方一行安装器、Debian、Fedora、openSUSE、Arch、Flatpak 等手动安装方式。',
   },
   {
     id: 'nixos',
