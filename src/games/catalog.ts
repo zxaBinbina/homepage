@@ -77,6 +77,18 @@ export const gameCatalog = {
     category: '棋艺策略',
     description: '一子落下，围出一片天地。在九路棋盘上与电脑对弈，慢慢体会连接、取舍与留白。',
   },
+  doudizhu: {
+    name: '欢乐斗地主单机版',
+    label: 'A FRIENDLY ROUND',
+    category: '经典纸牌',
+    description: '和两位本地电脑来一局斗地主。叫地主、理好手牌，在出牌与不出之间找准节奏。',
+  },
+  junqi: {
+    name: '军旗单机版',
+    label: 'PLAN YOUR CAMPAIGN',
+    category: '棋艺策略',
+    description: '排兵布阵，在棋盘上寻找突破口。与电脑对弈，保护军旗并一步步赢下战局。',
+  },
 } as const
 
 export type GameId = keyof typeof gameCatalog

@@ -17,6 +17,8 @@ export const pages = {
   jump: '/games/jump',
   chess: '/games/chess',
   go: '/games/go',
+  doudizhu: '/games/doudizhu',
+  junqi: '/games/junqi',
   json: '/tools/json',
   base64: '/tools/base64',
   url: '/tools/url',

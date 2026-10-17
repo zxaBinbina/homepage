@@ -134,6 +134,8 @@ import ChessPiece from './ChessPiece.vue'
                   side="w"
               /></span>
             </div>
+            <div v-else-if="id === 'doudizhu'" class="preview-cards"><span>地主</span><span>2</span><span>王</span></div>
+            <div v-else-if="id === 'junqi'" class="preview-xiangqi"><span>军</span><span>旗</span><span>雷</span></div>
             <span class="game-preview-index">{{ String(index + 1).padStart(2, '0') }}</span>
           </div>
           <div class="game-card-content">

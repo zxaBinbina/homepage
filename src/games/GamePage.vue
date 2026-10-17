@@ -24,6 +24,8 @@ const components = {
   jump: defineAsyncComponent(() => import('./JumpGame.vue')),
   chess: defineAsyncComponent(() => import('./ChessGame.vue')),
   go: defineAsyncComponent(() => import('./GoGame.vue')),
+  doudizhu: defineAsyncComponent(() => import('./DoudizhuGame.vue')),
+  junqi: defineAsyncComponent(() => import('./JunqiGame.vue')),
 }
 const fullscreen = ref(false)
 const fullscreenDialog = ref<HTMLDialogElement>()
