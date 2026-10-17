@@ -207,7 +207,8 @@ button:disabled {
   inset: 0;
 }
 .app-header-transition > .header-layer > .header,
-.app-header-transition > .header-layer > .rdp-header {
+.app-header-transition > .header-layer > .rdp-header,
+.app-header-transition > .header-layer > .gaze-header {
   position: absolute;
   inset: 0;
   width: 100%;

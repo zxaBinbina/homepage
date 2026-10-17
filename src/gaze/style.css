@@ -9,6 +9,60 @@
 .gaze-page {
   padding-top: 86px;
 }
+.gaze-header {
+  position: fixed;
+  z-index: 20;
+  top: 22px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: min(1020px, calc(100% - 48px));
+  margin-top: 0;
+  padding: 10px 22px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.gaze-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  letter-spacing: -0.5px;
+}
+.gaze-brand b {
+  font-weight: 500;
+}
+.gaze-mark {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.gaze-header nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 13px;
+}
+.gaze-header nav a:not(.icon-button) {
+  padding: 8px 14px;
+  border-radius: 24px;
+}
+.gaze-header nav a[aria-current] {
+  color: var(--blue);
+  background: var(--panel-hover);
+}
+.gaze-nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
 .gaze-content-enter-active,
 .gaze-content-leave-active {
   transition:
@@ -761,6 +815,9 @@
   background: var(--blue);
 }
 @media (prefers-reduced-motion: no-preference) {
+  .gaze-header {
+    animation: header-enter 0.55s var(--motion-ease) both;
+  }
   .gaze-hero-copy > *,
   .gaze-hero-demo {
     animation: page-enter 0.75s var(--motion-ease) both;
@@ -947,6 +1004,15 @@
 @media (max-width: 480px) {
   .gaze-page {
     padding-top: 86px;
+  }
+  .gaze-header {
+    border-radius: 24px;
+    width: calc(100% - 24px);
+  }
+  .gaze-header nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
   }
   .gaze-deploy-card {
     padding: 24px;

@@ -3,17 +3,19 @@ import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import SiteHeader from './components/SiteHeader.vue'
 import ProjectHeader from './rdp/components/ProjectHeader.vue'
+import GazeHeader from './gaze/components/GazeHeader.vue'
 import './rdp/style.css'
 import { navigateInternalLink } from './router'
 import { isProjectPage, isGazePage } from './pages'
 import { isGameId } from './games/catalog'
 const route = useRoute()
 const project = computed(() => isProjectPage(route.name))
-// 个人主页、目录、工具、游戏与 Gaze 子站共用全站统一导航；RDP 子站保留项目导航。
+const gaze = computed(() => isGazePage(route.name))
+// 个人主页、目录、工具与游戏共用全站统一导航；Gaze 与 RDP 子站各用项目导航。
 const activeNav = computed(() =>
   route.name === 'home'
     ? 'home'
-    : route.name === 'directory' || isGazePage(route.name)
+    : route.name === 'directory'
       ? 'projects'
       : route.name === 'games' || isGameId(route.name)
         ? 'games'
@@ -24,10 +26,13 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
 </script>
 <template>
   <a class="skip-link" href="#main">跳至内容</a>
-  <div class="app-header-transition" :class="{ 'is-project': project }">
+  <div class="app-header-transition" :class="{ 'is-project': project || gaze }">
     <Transition name="header-swap">
-      <div v-if="!project" class="header-layer" key="unified-header">
+      <div v-if="!project && !gaze" class="header-layer" key="unified-header">
         <SiteHeader :home="route.name === 'home'" :active="activeNav" />
+      </div>
+      <div v-else-if="gaze" class="header-layer" key="gaze-header">
+        <GazeHeader :view="route.name === 'gaze' ? 'home' : 'guide'" />
       </div>
       <div v-else class="header-layer" key="project-header">
         <ProjectHeader
