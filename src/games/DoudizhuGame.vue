@@ -69,10 +69,12 @@ onBeforeUnmount(stop)
         <p class="dd-last-label">{{ game.last.length ? `${names[game.lastPlayer]} · ${classify(game.last)?.kind}` : bidding ? '一副牌，三个人，慢慢来。' : '新一轮 · 自由领出' }}</p>
         <TransitionGroup name="dd-play" tag="div" class="dd-played"><span v-for="c in game.last" :key="c.id" class="dd-play-card playing-card"><PlayingCard :card="cardFor(c)" /></span></TransitionGroup>
       </div>
-      <div class="dd-hand-heading"><span>你的手牌 · {{ mine.length }} 张</span><span>{{ selected.length ? `已选 ${selected.length} 张` : '点击选牌，再确认出牌' }}</span></div>
-      <TransitionGroup name="dd-hand" tag="div" class="dd-hand" role="group" aria-label="你的手牌">
-        <button v-for="c in mine" :key="c.id" class="dd-card playing-card" :class="{ 'is-selected': selected.includes(c.id) }" :aria-label="cardLabel(c)" :aria-pressed="selected.includes(c.id)" :disabled="!canAct || bidding" @click="toggle(c)"><PlayingCard :card="cardFor(c)" /></button>
-      </TransitionGroup>
+      <section class="dd-hand-area" aria-label="你的手牌区域">
+        <div class="dd-hand-heading"><span>你的手牌 · {{ mine.length }} 张</span><span>{{ selected.length ? `已选 ${selected.length} 张` : '点击选牌，再确认出牌' }}</span></div>
+        <TransitionGroup name="dd-hand" tag="div" class="dd-hand" role="group" aria-label="你的手牌">
+          <button v-for="c in mine" :key="c.id" class="dd-card playing-card" :class="{ 'is-selected': selected.includes(c.id) }" :aria-label="cardLabel(c)" :aria-pressed="selected.includes(c.id)" :disabled="!canAct || bidding" @click="toggle(c)"><PlayingCard :card="cardFor(c)" /></button>
+        </TransitionGroup>
+      </section>
       <div v-if="bidding && !allPassed" class="dd-actions"><button v-for="score in [0, 1, 2, 3]" :key="score" class="game-button" :disabled="!canAct || (score > 0 && score <= Math.max(...game.bids))" @click="chooseBid(score)">{{ score ? `叫 ${score} 分` : '不叫' }}</button></div>
       <div v-else-if="allPassed || game.finished !== null" class="dd-actions"><button class="game-button" @click="restart">再来一局</button></div>
       <div v-else class="dd-actions"><button class="game-button" :disabled="!valid" @click="play">出牌</button><button class="game-button" :disabled="!canAct || !game.last.length" @click="pass">不出</button><button class="game-button" :disabled="!canAct" @click="hint"><Lightbulb :size="16" aria-hidden="true" />提示</button><button class="game-button" :disabled="!selected.length" @click="selected = []"><X :size="16" aria-hidden="true" />重选</button></div>
