@@ -17,11 +17,13 @@ export type DDState = {
 export const ranks = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2', '小王', '大王']
 export const sortHand = (hand: DDCard[]) => [...hand].sort((a, b) => b.rank - a.rank || a.id - b.id)
 export function newDoudizhu(random = Math.random): DDState {
-  const deck = Array.from({ length: 54 }, (_, id) => ({ rank: id < 52 ? Math.floor(id / 4) : id - 39, id }))
+  const deck: DDCard[] = Array.from({ length: 52 }, (_, id) => ({ rank: Math.floor(id / 4), id }))
+  deck.push({ rank: 13, id: 52 }, { rank: 14, id: 53 })
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1))
     ;[deck[i], deck[j]] = [deck[j]!, deck[i]!]
   }
+  if (new Set(deck.map(card => card.id)).size !== 54 || deck.filter(card => card.rank === 13).length !== 1 || deck.filter(card => card.rank === 14).length !== 1) throw new Error('斗地主牌组构造异常')
   return { hands: [deck.slice(0, 17), deck.slice(17, 34), deck.slice(34, 51)].map(sortHand), bottom: deck.slice(51), landlord: -1, turn: 0, last: [], lastPlayer: -1, passes: 0, finished: null, bids: [-1, -1, -1], bidCount: 0, multiplier: 1, plays: [0, 0, 0] }
 }
 export function cardText(c: DDCard) { return ranks[c.rank]! }

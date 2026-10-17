@@ -17,7 +17,10 @@ const picked = computed(() => mine.value.filter(c => selected.value.includes(c.i
 const valid = computed(() => !bidding.value && canAct.value && canBeat(picked.value, game.value.last))
 const outcome = computed(() => game.value.finished === null ? '' : (game.value.finished === game.value.landlord) === (game.value.landlord === 0) ? '你赢了！' : '这局对方获胜，再来一局吧。')
 const status = computed(() => outcome.value || (allPassed.value ? '大家都不叫，重新发牌吧' : `${names[game.value.turn]}${bidding.value ? '叫分' : '出牌'}`))
-function cardFor(card: DDCard): Card { return { suit: card.rank < 13 ? card.id % 4 : 0, rank: card.rank < 13 ? card.rank + 3 : card.rank === 13 ? 14 : 15, faceUp: true } }
+function cardFor(card: DDCard): Card {
+  const rank = card.rank < 11 ? card.rank + 3 : card.rank === 11 ? 1 : card.rank === 12 ? 2 : card.rank === 13 ? 14 : 15
+  return { suit: card.rank < 13 ? card.id % 4 : 0, rank, faceUp: true }
+}
 function stop() { clearTimeout(timer); timer = undefined }
 function restart() { stop(); game.value = newDoudizhu(); selected.value = []; actions.value = ['等待叫分', '等待叫分', '等待叫分']; notice.value = '先看看手牌，再决定叫几分。' }
 function commitBid(score: number) {
