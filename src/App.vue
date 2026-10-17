@@ -5,11 +5,20 @@ import SiteHeader from './components/SiteHeader.vue'
 import ProjectHeader from './rdp/components/ProjectHeader.vue'
 import './rdp/style.css'
 import { navigateInternalLink } from './router'
-import { isProjectPage } from './pages'
+import { isProjectPage, isGazePage } from './pages'
 import { isGameId } from './games/catalog'
 const route = useRoute()
 const project = computed(() => isProjectPage(route.name))
-const personal = computed(() => !project.value)
+// 个人主页、目录、工具、游戏与 Gaze 子站共用全站统一导航；RDP 子站保留项目导航。
+const activeNav = computed(() =>
+  route.name === 'home'
+    ? 'home'
+    : route.name === 'directory' || isGazePage(route.name)
+      ? 'projects'
+      : route.name === 'games' || isGameId(route.name)
+        ? 'games'
+        : 'tools',
+)
 onMounted(() => document.addEventListener('click', navigateInternalLink))
 onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))
 </script>
@@ -17,19 +26,8 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
   <a class="skip-link" href="#main">跳至内容</a>
   <div class="app-header-transition" :class="{ 'is-project': project }">
     <Transition name="header-swap">
-      <div v-if="personal" class="header-layer" key="personal-header">
-        <SiteHeader
-          :home="route.name === 'home'"
-          :active="
-            route.name === 'home'
-              ? 'home'
-              : route.name === 'directory'
-                ? 'projects'
-                : route.name === 'games' || isGameId(route.name)
-                  ? 'games'
-                  : 'tools'
-          "
-        />
+      <div v-if="!project" class="header-layer" key="unified-header">
+        <SiteHeader :home="route.name === 'home'" :active="activeNav" />
       </div>
       <div v-else class="header-layer" key="project-header">
         <ProjectHeader
@@ -44,7 +42,16 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
       @before-leave="(el) => el.setAttribute('inert', '')"
       @before-enter="(el) => el.removeAttribute('inert')"
     >
-      <component :is="Component" :key="isProjectPage(pageRoute.name) ? 'rdp' : pageRoute.name" />
+      <component
+        :is="Component"
+        :key="
+          isProjectPage(pageRoute.name)
+            ? 'rdp'
+            : isGazePage(pageRoute.name)
+              ? 'gaze'
+              : pageRoute.name
+        "
+      />
     </Transition>
   </RouterView>
 </template>

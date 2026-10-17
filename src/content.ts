@@ -56,8 +56,8 @@ export const projects = [
     description:
       '基于 Gaze 的源码分支，为 PAM 认证加入中文提示，并修复 KDE 远程桌面误触发本机人脸扫描的问题。',
     tags: ['Rust', 'Linux', 'PAM'],
-    url: 'https://github.com/zxaBinbina/gaze-zh-rdp-fix',
-    link: '探索源码',
+    url: '/projects/gaze',
+    link: '访问官网',
     icon: 'scan',
   },
   {

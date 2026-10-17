@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { isProjectPage, knownPageForPath, pages, type PageName } from './pages'
+import { isProjectPage, isGazePage, knownPageForPath, pages, type PageName } from './pages'
+import { gazeGuides } from './gaze/catalog'
 import { isToolId } from './tools/catalog'
 import { isGameId } from './games/catalog'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
@@ -40,6 +41,10 @@ const components = {
   rdp: () => import('./rdp/App.vue'),
   wiki: () => import('./rdp/App.vue'),
   downloads: () => import('./rdp/App.vue'),
+  gaze: () => import('./gaze/App.vue'),
+  ...Object.fromEntries(
+    gazeGuides.map((guide) => [`gaze.${guide.id}`, () => import('./gaze/App.vue')]),
+  ),
 }
 
 function hashTarget(hash: string) {
@@ -97,11 +102,13 @@ export const router = createRouter({
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: components[name],
-      props: isProjectPage(name)
-        ? { view: name }
-        : isToolId(name) || isGameId(name)
-          ? { id: name }
-          : undefined,
+      props: isGazePage(name)
+        ? { guide: name === 'gaze' ? null : name.slice(5) }
+        : isProjectPage(name)
+          ? { view: name }
+          : isToolId(name) || isGameId(name)
+            ? { id: name }
+            : undefined,
     })),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
@@ -145,6 +152,7 @@ router.afterEach((to, _from, failure) => {
   const page = to.name as PageName
   const meta = createSiteMeta(import.meta.env.SITE_URL, page)
   const project = isProjectPage(page)
+  const gaze = isGazePage(page)
   document.title = meta.title
   const structuredData = document.getElementById('site-structured-data')
   if (structuredData)
@@ -171,7 +179,10 @@ router.afterEach((to, _from, failure) => {
   }
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', meta.url)
   const favicon = document.querySelector('link[rel="icon"]')
-  favicon?.setAttribute('href', project ? '/images/rdp-access-auth.png' : '/favicon.svg')
+  favicon?.setAttribute(
+    'href',
+    project ? '/images/rdp-access-auth.png' : gaze ? '/images/gaze.svg' : '/favicon.svg',
+  )
   favicon?.setAttribute('type', project ? 'image/png' : 'image/svg+xml')
 })
 

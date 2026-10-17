@@ -1,6 +1,7 @@
-import { isProjectPage, pages, type PageName } from './src/pages'
+import { isProjectPage, isGazePage, pages, type PageName } from './src/pages'
 import { isToolId, toolCatalog } from './src/tools/catalog'
 import { isGameId, gameCatalog } from './src/games/catalog'
+import { gazeGuide } from './src/gaze/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -47,6 +48,21 @@ const projectPages = {
   },
 }
 
+const gazeHomeMeta = {
+  title: 'Gaze 中文官网 · Linux 面部识别认证',
+  description:
+    'Gaze 中文文档与中文分支：为 Linux 登录、锁屏、sudo 与桌面管理提供设备端本地面部识别认证，附带中文 PAM 提示与 KRDP 修复。',
+}
+
+function gazePageMeta(page: PageName) {
+  if (page === 'gaze') return gazeHomeMeta
+  const guide = gazeGuide(page.slice(5))
+  return {
+    title: `${guide?.title ?? '文档'} · Gaze 中文文档`,
+    description: guide?.description ?? gazeHomeMeta.description,
+  }
+}
+
 export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home') {
   const url = new URL(baseUrl)
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
@@ -66,16 +82,26 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
               title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
               description: gameCatalog[page].description,
             }
-          : projectPages[page]
-  const image = isProjectPage(page)
+          : isGazePage(page)
+            ? gazePageMeta(page)
+            : projectPages[page]
+  const image = isGazePage(page)
     ? {
-        image: 'images/rdp-access-auth.png',
-        imageAlt: 'RDP Access Auth 软件 Logo',
+        image: 'images/gaze-share.png',
+        imageAlt: 'Gaze 图标',
         imageType: 'image/png',
-        imageWidth: 512,
-        imageHeight: 394,
+        imageWidth: 1200,
+        imageHeight: 630,
       }
-    : siteContent
+    : isProjectPage(page)
+      ? {
+          image: 'images/rdp-access-auth.png',
+          imageAlt: 'RDP Access Auth 软件 Logo',
+          imageType: 'image/png',
+          imageWidth: 512,
+          imageHeight: 394,
+        }
+      : siteContent
   return {
     ...siteContent,
     imageAlt: image.imageAlt,

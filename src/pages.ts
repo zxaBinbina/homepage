@@ -1,4 +1,10 @@
 /** One route table for Vue page selection and generated sharing documents. */
+import { gazeGuides, gazeGuidePath } from './gaze/catalog'
+
+const gazeGuidePages = Object.fromEntries(
+  gazeGuides.map((guide) => [`gaze.${guide.id}`, gazeGuidePath(guide.id)]),
+)
+
 export const pages = {
   home: '/',
   directory: '/project',
@@ -34,10 +40,15 @@ export const pages = {
   rdp: '/projects/rdp-access-auth',
   wiki: '/projects/rdp-access-auth/wiki',
   downloads: '/projects/rdp-access-auth/downloads',
+  gaze: '/projects/gaze',
+  ...gazeGuidePages,
 } as const
 export type PageName = keyof typeof pages
 export function isProjectPage(page: unknown) {
   return page === 'rdp' || page === 'wiki' || page === 'downloads'
+}
+export function isGazePage(page: unknown): page is PageName {
+  return typeof page === 'string' && (page === 'gaze' || page.startsWith('gaze.'))
 }
 export function knownPageForPath(path: string): PageName | undefined {
   const normalized =

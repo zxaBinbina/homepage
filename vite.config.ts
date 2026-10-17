@@ -1,6 +1,8 @@
 import { cwd } from 'node:process'
 import { resolve } from 'node:path'
+import { compileGazeContent } from './build/gazeContent'
 import { compileRdpWiki } from './build/rdpWiki'
+import { gazeGuideIds } from './src/gaze/catalog'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { pageTemplates } from './build/pageTemplates'
@@ -42,6 +44,20 @@ export default defineConfig(({ mode, command }) => {
           const path = resolve('docs/rdp-access-auth.md')
           this.addWatchFile(path)
           return `export default ${JSON.stringify(compileRdpWiki(path))}`
+        },
+      },
+      {
+        name: 'gaze-content',
+        resolveId(id) {
+          if (id === 'virtual:gaze-content') return '\0virtual:gaze-content'
+        },
+        load(id) {
+          if (id !== '\0virtual:gaze-content') return
+          const contentDir = resolve('src/gaze/content')
+          this.addWatchFile(resolve(contentDir, 'anchors.json'))
+          for (const guideId of gazeGuideIds)
+            this.addWatchFile(resolve(contentDir, 'guide', `${guideId}.md`))
+          return `export default ${JSON.stringify(compileGazeContent(contentDir))}`
         },
       },
       {
