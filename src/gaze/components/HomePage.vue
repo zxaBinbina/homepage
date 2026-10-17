@@ -108,20 +108,24 @@ const forks = [
       <ScanDemo class="gaze-hero-demo" />
     </section>
     <section class="gaze-section shell gaze-reveal">
-      <p class="gaze-eyebrow">INSTALL / 中文版下载</p>
-      <h2>一个安装包，装好一切。</h2>
-      <CodeBlock code="sudo dnf install ./gaze-*.rpm" language="bash" copy-label="复制安装命令" />
+      <p class="gaze-eyebrow">INSTALL / 一键安装</p>
+      <h2>一条命令，装好一切。</h2>
+      <CodeBlock
+        code="curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh"
+        language="bash"
+        copy-label="复制一键安装命令"
+      />
       <p class="gaze-caption">
-        从
+        优先安装与你系统匹配的中文版软件包（
         <a
           class="gaze-text-link"
           href="https://github.com/zxaBinbina/gaze-zh/releases"
           target="_blank"
           rel="noopener noreferrer"
           style="margin-top: 0"
-          >GitHub Releases</a
-        >
-        下载中文版合并 RPM（Fedora 44 x86_64，含中文提示与 KRDP 修复）；其他发行版走官方渠道，细节见
+          >gaze-zh</a
+        >，rpm / deb 持续扩展，含中文提示与 KRDP
+        修复）；暂无适配时自动转用官方安装器。手动安装细节见
         <a class="gaze-text-link" href="/projects/gaze/guide/installation" style="margin-top: 0"
           >安装指南 →</a
         >
