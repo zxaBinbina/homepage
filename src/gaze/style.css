@@ -131,15 +131,15 @@
   font-weight: 600;
 }
 .gaze-button.primary {
-  background: #4ea4ef;
-  color: #0c1c31;
-  border-color: #4ea4ef;
+  background: var(--primary-action);
+  color: var(--primary-action-text);
+  border-color: var(--primary-action);
 }
 .gaze-button:hover {
   background: var(--panel-hover);
 }
 .gaze-button.primary:hover {
-  background: #81bff4;
+  background: var(--primary-action-hover);
 }
 .gaze-caption {
   font-size: 11px;
@@ -657,7 +657,7 @@
   align-items: center;
   gap: 10px;
   padding: 16px 22px;
-  cursor: pointer;
+  cursor: var(--cursor-link);
   list-style: none;
   font-size: 14px;
   font-weight: 600;

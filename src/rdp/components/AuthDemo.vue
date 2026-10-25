@@ -563,8 +563,8 @@ onBeforeUnmount(() => {
   justify-content: center;
   gap: 8px;
   min-height: 43px;
-  background: #4ea4ef;
-  color: #0c1c31;
+  background: var(--primary-action);
+  color: var(--primary-action-text);
   border-radius: 22px;
   font-size: 12px;
   font-weight: 600;

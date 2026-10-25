@@ -35,7 +35,7 @@
 
 ## 3. 色彩与主题
 
-主题变量集中在 [src/style.css](src/style.css)。`:root` 定义深色基底，`[data-theme='light']` 覆盖浅色变量。实际初始主题优先使用已保存的手动选择，否则跟随系统偏好；没有手动选择时，系统主题变化会同步到页面。
+主题变量集中在 [src/style.css](src/style.css)。`:root` 定义深色基底，`[data-theme='light']` 覆盖浅色变量；`data-palette` 选择配色，默认「芙芙蓝」，也可选择「胡桃红」。配色和明暗模式分别保存在本地，明暗模式优先使用已保存的手动选择，否则跟随系统偏好；没有手动选择时，系统主题变化会同步到页面。首帧初始化在 `index.html` 同步读取两项选择。
 
 根画布与正文统一使用 `--bg`，正文至少铺满视口。`index.html` 提供与主题一致的首帧背景和 `color-scheme` 回退，使样式与异步页面尚未加载时也不会露出错误主题的底色。
 
@@ -56,11 +56,14 @@
 | `--indigo`      | `#2d3c81`                   | 同深色                      | 靛蓝辅助色、音乐封面占位     |
 | `--warm`        | `#937562`                   | 同深色                      | 暖色基准，与局部暖棕装饰呼应 |
 
+胡桃红以用户提供的 `#3a1b19`、`#7b595e`、`#c7a085`、`#fcf0e1` 和 `#c94737` 为基础：深色模式使用酒红页面基底、奶油色文字与暖棕强调；浅色模式使用奶油色背景、深酒红正文与红色强调。链接、标题渐变、主要按钮、卡片表面及游戏主题变量均按明暗模式分别适配。配色入口位于导航浅 / 深色切换按钮左侧，弹窗列出两种方案与当前选择。普通、链接、文本、加载与拖拽指针由全局 CSS 按所选配色加载；加载动画由 `src/components/AnimatedCursor.vue` 跟随配色切换，并尊重减少动态效果设置。
+
 ### 局部色彩约定
 
-- 主标题强调行采用 `110deg` 渐变：`#8bc8fa → #4ea4ef（58%）→ #7686d5`。
-- 首屏主按钮固定使用 `#4ea4ef` 背景与 `#0c1c31` 文字，悬停背景为 `#81bff4`；它与随主题变化的 `--blue` 用途不同。
+- 芙芙蓝主标题强调行采用 `110deg` 渐变：`#8bc8fa → #4ea4ef（58%）→ #7686d5`；胡桃红使用主题变量切换为红棕渐变。
+- 首屏、Gaze 与 RDP 的主按钮共用主题变量：芙芙蓝使用 `#4ea4ef` 与深蓝文字，胡桃红使用相衬的红色与奶油色文字；悬停颜色和阴影也按配色调整。
 - 项目图标可用少量变体：Gaze 为浅紫 `#b6bbeb`，RDP 为暖棕 `#b39b88`。其余结构和文字层级保持一致。
+- 首页网页预览边框与数字合成游戏的高等级方块使用独立主题变量，在胡桃红下改为酒红、赤陶与暖棕色；游戏阵营等具有明确玩法含义的颜色仍按其用途区分。
 - 图片上的文字独立于页面主题：首屏横幅使用白字与底部暗色渐变，服务器卡片使用浅字与从左向右减弱的暗色遮罩。
 - `::selection` 使用靛蓝背景和白字。滚动条采用圆角细滑块，并随主题改变颜色。
 
@@ -113,9 +116,9 @@
 
 ### 导航与按钮
 
-导航当前项使用圆角浅底与主文字色，并通过 `aria-current="page"` 标识当前页面；主页标记「首页」，项目目录标记「项目」，工具目录与详情页标记「工具」。主题、音乐等工具使用线性图标；通用图标来自 `lucide-vue-next`，网易云图标使用独立 SVG 组件并继承 `currentColor`。
+导航当前项使用圆角浅底与主文字色，并通过 `aria-current="page"` 标识当前页面；主页标记「首页」，项目目录标记「项目」，工具目录与详情页标记「工具」。配色选择和浅 / 深色切换分别使用线性图标，配色弹窗支持鼠标、触摸与 Escape 关闭；通用图标来自 `lucide-vue-next`，网易云图标使用独立 SVG 组件并继承 `currentColor`。
 
-「异次元之旅」位于导航工具区、主题切换按钮左侧；主页导航在 `≤ 1050px` 时收起文字，保留 `44 × 44px` 火箭图标入口与可读名称。入口使用 Lucide 火箭线性图标、`--blue` 文字、低透明度蓝色底与细边框，随深浅主题调整。悬停或键盘聚焦时，火箭短暂蓄力后向右上方起飞，带短尾焰并归位，全程 `850ms`，不循环；按下轻微缩小，减少动态效果时关闭这些动画。按[官方接入说明](https://moe.one/thread-254.htm)链接到 `https://travel.moe/go.html?travel=on`，在新标签页开启 2.0 版全自动旅程。
+「异次元之旅」位于导航工具区、配色与主题切换按钮左侧；主页导航在 `≤ 1050px` 时收起文字，保留 `44 × 44px` 火箭图标入口与可读名称。入口使用 Lucide 火箭线性图标、`--blue` 文字、低透明度蓝色底与细边框，随深浅主题调整。悬停或键盘聚焦时，火箭短暂蓄力后向右上方起飞，带短尾焰并归位，全程 `850ms`，不循环；按下轻微缩小，减少动态效果时关闭这些动画。按[官方接入说明](https://moe.one/thread-254.htm)链接到 `https://travel.moe/go.html?travel=on`，在新标签页开启 2.0 版全自动旅程。
 
 主按钮使用蓝色实底，次按钮使用透明浅底和细边框，图片上的服务器官网按钮使用浅色实底。文本链接以蓝色和方向箭头提示动作。按钮悬停轻微上移，按下略缩小；不能只依赖动效表达可点击性。
 
@@ -204,34 +207,36 @@
 
 ## 10. 素材与源码位置
 
-| 资源                                                                                                     | 用途                                          |
-| -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| [public/images/avatar.png](public/images/avatar.png)                                                     | 导航与个人介绍头像                            |
-| [public/images/world.webp](public/images/world.webp)、[world-small.webp](public/images/world-small.webp) | 首屏主图及响应式小图                          |
-| [public/images/show_1.webp](public/images/show_1.webp)                                                   | 悠哉世界服务器景观                            |
-| [public/images/logocircle.webp](public/images/logocircle.webp)                                           | 悠哉世界标志                                  |
-| [public/images/youzaiworld-core.png](public/images/youzaiworld-core.png)                                 | 核心模组项目图标，保留像素边缘                |
-| [public/images/youzaiworld-web.webp](public/images/youzaiworld-web.webp)                                 | 官网项目预览                                  |
-| [public/images/music-cover.webp](public/images/music-cover.webp)                                         | 默认音乐封面                                  |
-| [public/images/share-cover.jpg](public/images/share-cover.jpg)                                           | `1200 × 630` Minecraft 图片，用于 README 展示 |
-| [public/favicon.svg](public/favicon.svg)                                                                 | 浏览器站点图标                                |
+| 资源                                                                                                             | 用途                                          |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| [public/images/avatar.png](public/images/avatar.png)                                                             | 导航与个人介绍头像                            |
+| [public/images/world.webp](public/images/world.webp)、[world-small.webp](public/images/world-small.webp)         | 首屏主图及响应式小图                          |
+| [public/images/show_1.webp](public/images/show_1.webp)                                                           | 悠哉世界服务器景观                            |
+| [public/images/logocircle.webp](public/images/logocircle.webp)                                                   | 悠哉世界标志                                  |
+| [public/images/youzaiworld-core.png](public/images/youzaiworld-core.png)                                         | 核心模组项目图标，保留像素边缘                |
+| [public/images/youzaiworld-web.webp](public/images/youzaiworld-web.webp)                                         | 官网项目预览                                  |
+| [public/images/music-cover.webp](public/images/music-cover.webp)                                                 | 默认音乐封面                                  |
+| [public/images/share-cover.jpg](public/images/share-cover.jpg)                                                   | `1200 × 630` Minecraft 图片，用于 README 展示 |
+| [public/favicon.svg](public/favicon.svg)                                                                         | 浏览器站点图标                                |
+| [public/cursors/fufu-blue/](public/cursors/fufu-blue/) 与 [public/cursors/hutao-red/](public/cursors/hutao-red/) | 芙芙蓝与胡桃红配色的鼠标指针及忙碌动画        |
 
 个人主页、项目目录、工具与游戏页面的 OG 分享图片使用 `public/images/share-avatar.jpg`（256 × 256，个人头像）；RDP 子站使用 `public/images/rdp-access-auth.png`（512 × 394，软件 Logo）。图片格式、尺寸和替代文字由 `site.config.ts` 按页面提供，详情见 [分享配置](docs/sharing.md)。
 
 首屏主图通过 `srcset` 选择分辨率并优先加载；下方主要图片延迟加载。更换素材时保留尺寸信息与合适的裁切方式，避免加载后改变布局。像素化渲染仅用于核心模组图标，景观与网页预览保持常规图像渲染。
 
-| 文件                                                             | 维护职责                                           |
-| ---------------------------------------------------------------- | -------------------------------------------------- |
-| [src/style.css](src/style.css)                                   | 主题变量、页面布局、通用组件、断点、全局动效       |
-| [src/HomePage.vue](src/HomePage.vue)                             | 页面结构、滚动显现、复制反馈                       |
-| [src/router.ts](src/router.ts)                                   | 站内导航、历史滚动、运行时元信息                   |
-| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)   | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
-| [src/content.ts](src/content.ts)                                 | 个人资料、项目文案与链接                           |
-| [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、宽度、开合与外观                     |
-| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 音乐控制、歌词、列表与组件局部样式                 |
-| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue) | 网易云 SVG 图标                                    |
-| [index.html](index.html)                                         | 首次绘制前的主题设置，避免主题闪烁                 |
-| [site.config.ts](site.config.ts)                                 | 站点标题、描述及分享视觉配置                       |
+| 文件                                                                   | 维护职责                                           |
+| ---------------------------------------------------------------------- | -------------------------------------------------- |
+| [src/style.css](src/style.css)                                         | 主题变量、页面布局、通用组件、断点、全局动效       |
+| [src/HomePage.vue](src/HomePage.vue)                                   | 页面结构、滚动显现、复制反馈                       |
+| [src/router.ts](src/router.ts)                                         | 站内导航、历史滚动、运行时元信息                   |
+| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)         | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
+| [src/components/AnimatedCursor.vue](src/components/AnimatedCursor.vue) | 随配色切换的忙碌指针动画                           |
+| [src/content.ts](src/content.ts)                                       | 个人资料、项目文案与链接                           |
+| [src/components/MusicDialog.vue](src/components/MusicDialog.vue)       | 音乐浮层定位、宽度、开合与外观                     |
+| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue)       | 音乐控制、歌词、列表与组件局部样式                 |
+| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)       | 网易云 SVG 图标                                    |
+| [index.html](index.html)                                               | 首次绘制前的主题设置，避免主题闪烁                 |
+| [site.config.ts](site.config.ts)                                       | 站点标题、描述及分享视觉配置                       |
 
 修改设计时同步更新本文对应部分。视觉调整完成后，应检查深浅主题、桌面与窄屏、键盘焦点、减少动态效果模式，以及涉及组件的加载和失败状态。
 

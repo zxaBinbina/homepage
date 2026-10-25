@@ -236,7 +236,7 @@
   align-items: center;
   gap: 14px;
   padding: 18px 24px;
-  cursor: pointer;
+  cursor: var(--cursor-link);
   list-style: none;
 }
 .wiki-agent summary::-webkit-details-marker {

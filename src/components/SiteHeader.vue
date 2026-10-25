@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { Github, Menu, Rocket, X } from 'lucide-vue-next'
 import { profile } from '../content'
+import ColorPalettePicker from './ColorPalettePicker.vue'
 import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
@@ -74,6 +75,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         <span class="nav-travel-icon" aria-hidden="true"><Rocket :size="16" /></span>
         <span class="nav-travel-label">异次元之旅</span>
       </a>
+      <ColorPalettePicker />
       <ThemeToggle />
       <button
         ref="musicTrigger"

@@ -630,10 +630,10 @@ onBeforeUnmount(() => {
   font-size: 13px;
   line-height: 1.8;
   transition: color 0.25s;
-  cursor: pointer;
+  cursor: var(--cursor-link);
 }
 .lyric-line:disabled {
-  cursor: default;
+  cursor: var(--cursor-normal);
 }
 .lyric-line[data-active='true'] {
   color: var(--blue);
@@ -661,7 +661,7 @@ onBeforeUnmount(() => {
   padding: 22px 25px 18px;
   border: 0;
   border-radius: 0;
-  background: linear-gradient(110deg, rgba(45, 60, 129, 0.12), transparent 70%), var(--panel);
+  background: linear-gradient(110deg, var(--music-card-glow), transparent 70%), var(--panel);
 }
 .music-heading {
   display: flex;
@@ -708,7 +708,7 @@ onBeforeUnmount(() => {
   object-fit: cover;
 }
 .music-cover.is-playing {
-  box-shadow: 0 5px 24px #4ea4ef28;
+  box-shadow: 0 5px 24px var(--music-playing-shadow);
 }
 .music-cover-shine {
   position: absolute;
@@ -773,7 +773,7 @@ onBeforeUnmount(() => {
 .music-icon-button:hover,
 .music-icon-button.selected {
   color: var(--blue);
-  background: #4ea4ef10;
+  background: var(--music-action-tint);
 }
 .music-play-button {
   width: 44px;
@@ -790,7 +790,7 @@ onBeforeUnmount(() => {
 }
 .music-play-button:hover {
   transform: scale(1.06);
-  box-shadow: 0 0 22px #4ea4ef30;
+  box-shadow: 0 0 22px var(--music-play-hover-shadow);
 }
 .music-play-button > svg:last-child {
   stroke-width: 1.5;
@@ -813,7 +813,7 @@ onBeforeUnmount(() => {
   accent-color: var(--blue);
 }
 input[type='range'] {
-  cursor: pointer;
+  cursor: var(--cursor-link);
   height: 16px;
 }
 .music-progress {
@@ -869,7 +869,7 @@ input[type='range'] {
   background: var(--blue);
 }
 .music-progress input:disabled {
-  cursor: default;
+  cursor: var(--cursor-normal);
   opacity: 0.55;
 }
 .music-error {
@@ -974,10 +974,10 @@ input[type='range'] {
   color: var(--text);
 }
 .music-track:hover {
-  background: #4ea4ef0a;
+  background: var(--music-hover-tint);
 }
 .music-track.selected {
-  background: #4ea4ef12;
+  background: var(--music-selected-tint);
   color: var(--blue);
 }
 .music-track-number {

@@ -128,15 +128,15 @@
   font-weight: 600;
 }
 .rdp-button.primary {
-  background: #4ea4ef;
-  color: #0c1c31;
-  border-color: #4ea4ef;
+  background: var(--primary-action);
+  color: var(--primary-action-text);
+  border-color: var(--primary-action);
 }
 .rdp-button:hover {
   background: var(--panel-hover);
 }
 .rdp-button.primary:hover {
-  background: #81bff4;
+  background: var(--primary-action-hover);
 }
 .rdp-caption {
   font-size: 11px;

@@ -20,21 +20,23 @@
 
 ## 文件职责与修改边界
 
-| 文件或目录                                                       | 适合修改的内容                                     |
-| ---------------------------------------------------------------- | -------------------------------------------------- |
-| [src/style.css](src/style.css)                                   | 全局主题变量、页面排版、通用组件、响应式和动效     |
-| [src/HomePage.vue](src/HomePage.vue)                             | 个人主页结构、滚动显现、复制提示                   |
-| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)   | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
-| [src/router.ts](src/router.ts)                                   | 站内无刷新导航、历史滚动恢复、运行时元信息         |
-| [src/content.ts](src/content.ts)                                 | 个人资料、项目文案和链接                           |
-| [src/games/](src/games/)                                         | 游戏目录、游戏页面、规则逻辑与游戏文案             |
-| [src/tools/](src/tools/)                                         | 工具目录、工作页、转换逻辑与工具文案               |
-| [src/components/MusicDialog.vue](src/components/MusicDialog.vue) | 音乐浮层定位、展开宽度及外观                       |
-| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue) | 播放器、歌词、歌单与局部样式                       |
-| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue) | 网易云 SVG 图标                                    |
-| [public/images/](public/images/)                                 | 头像、景观、项目和分享图片                         |
-| [index.html](index.html)                                         | 首次绘制前的主题初始化与 HTML 模板                 |
-| [site.config.ts](site.config.ts)                                 | 站点标题、简介、域名及分享配置                     |
+| 文件或目录                                                             | 适合修改的内容                                     |
+| ---------------------------------------------------------------------- | -------------------------------------------------- |
+| [src/style.css](src/style.css)                                         | 全局主题变量、页面排版、通用组件、响应式和动效     |
+| [src/HomePage.vue](src/HomePage.vue)                                   | 个人主页结构、滚动显现、复制提示                   |
+| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)         | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
+| [src/router.ts](src/router.ts)                                         | 站内无刷新导航、历史滚动恢复、运行时元信息         |
+| [src/content.ts](src/content.ts)                                       | 个人资料、项目文案和链接                           |
+| [src/games/](src/games/)                                               | 游戏目录、游戏页面、规则逻辑与游戏文案             |
+| [src/tools/](src/tools/)                                               | 工具目录、工作页、转换逻辑与工具文案               |
+| [src/components/MusicDialog.vue](src/components/MusicDialog.vue)       | 音乐浮层定位、展开宽度及外观                       |
+| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue)       | 播放器、歌词、歌单与局部样式                       |
+| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)       | 网易云 SVG 图标                                    |
+| [public/images/](public/images/)                                       | 头像、景观、项目和分享图片                         |
+| [public/cursors/](public/cursors/)                                     | 芙芙蓝与胡桃红两套鼠标指针资源                     |
+| [src/components/AnimatedCursor.vue](src/components/AnimatedCursor.vue) | 加载区域的跟随鼠标指针动画                         |
+| [index.html](index.html)                                               | 首次绘制前的主题初始化与 HTML 模板                 |
+| [site.config.ts](site.config.ts)                                       | 站点标题、简介、域名及分享配置                     |
 
 站内页面由 `src/main.ts`、`src/App.vue`、`src/router.ts` 与 `src/pages.ts` 使用 Vue Router 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成各地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页面切换时保留播放器实例；导航逻辑修改后运行 `python3 scripts/check-navigation.py`，建议连接构建预览服务器。主题按钮与状态分别维护在 [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue) 和 [src/composables/useTheme.ts](src/composables/useTheme.ts)，全站共用。
 
@@ -54,7 +56,7 @@ RDP 子站的 Vue 页面组件与样式位于 `src/rdp/`，部署正文位于 [d
 
 - 通用文字、表面、边框、链接和交互状态使用 `--text`、`--muted`、`--bg`、`--panel`、`--blue`、`--border` 等语义变量。
 - 新增主题变量时考虑深浅两套取值，放在现有 `:root` 与 `[data-theme='light']` 中。
-- 保留主标题渐变、固定蓝色主按钮、图片遮罩及项目图标变体的用途差异；不要机械地把所有固定颜色替换为同一个变量。
+- 保留主标题渐变、按配色变化的主按钮、图片遮罩及项目图标变体的用途差异；不要机械地把所有固定颜色替换为同一个变量。
 - 页面与通用样式放在 `src/style.css`；音乐组件细节保留在对应组件的 scoped 样式内。
 - 修改前检查已有选择器和后续媒体查询覆盖，优先修改对应规则，避免通过不断追加覆盖或滥用 `!important` 解决问题。
 - 保留现有字体回退栈。不要为了匹配单张截图而默认引入外部字体请求。

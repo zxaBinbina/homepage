@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Github } from 'lucide-vue-next'
+import ColorPalettePicker from '../../components/ColorPalettePicker.vue'
 import ThemeToggle from '../../components/ThemeToggle.vue'
 defineProps<{ view: 'rdp' | 'wiki' | 'downloads' }>()
 </script>
@@ -20,6 +21,7 @@ defineProps<{ view: 'rdp' | 'wiki' | 'downloads' }>()
         >下载</a
       >
       <div class="rdp-nav-tools">
+        <ColorPalettePicker />
         <ThemeToggle class="rdp-theme" />
         <a
           class="icon-button"
