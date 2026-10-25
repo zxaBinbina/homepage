@@ -118,7 +118,13 @@ onBeforeUnmount(() => controller.value?.abort())
       </p>
     </section>
 
-    <div v-if="loading" class="downloads-state downloads-entry" role="status" aria-live="polite">
+    <div
+      v-if="loading"
+      class="downloads-state downloads-entry"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <LoaderCircle :size="24" class="downloads-spinner" />
       <p>正在读取 GitHub Releases…</p>
     </div>

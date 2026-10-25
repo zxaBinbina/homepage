@@ -101,9 +101,44 @@ body {
   min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
+  cursor:
+    url('/cursors/normal.png') 3 4,
+    auto;
   transition:
     background 0.3s,
     color 0.3s;
+}
+a,
+button,
+[role='button'] {
+  cursor:
+    url('/cursors/link.png') 13 4,
+    pointer;
+}
+input,
+textarea,
+select,
+[contenteditable='true'] {
+  cursor:
+    url('/cursors/text.png') 16 16,
+    text;
+}
+[aria-busy='true'],
+.is-loading {
+  cursor:
+    url('/cursors/busy.gif') 16 16,
+    url('/cursors/busy.png') 16 16,
+    progress;
+}
+body.has-animated-busy-cursor,
+body.has-animated-busy-cursor * {
+  cursor: none !important;
+}
+.is-dragging,
+[draggable='true'] {
+  cursor:
+    url('/cursors/link.png') 13 4,
+    grabbing;
 }
 a {
   color: inherit;
@@ -5610,7 +5645,9 @@ h1 > span {
   left: 0;
 }
 .solitaire-surface.is-dragging {
-  cursor: grabbing;
+  cursor:
+    url('/cursors/link.png') 13 4,
+    grabbing;
   user-select: none;
 }
 .playing-card.is-drag-origin {

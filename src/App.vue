@@ -4,6 +4,7 @@ import { RouterView, useRoute } from 'vue-router'
 import SiteHeader from './components/SiteHeader.vue'
 import ProjectHeader from './rdp/components/ProjectHeader.vue'
 import GazeHeader from './gaze/components/GazeHeader.vue'
+import AnimatedCursor from './components/AnimatedCursor.vue'
 import './rdp/style.css'
 import { navigateInternalLink } from './router'
 import { isProjectPage, isGazePage } from './pages'
@@ -25,6 +26,7 @@ onMounted(() => document.addEventListener('click', navigateInternalLink))
 onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))
 </script>
 <template>
+  <AnimatedCursor />
   <a class="skip-link" href="#main">跳至内容</a>
   <div class="app-header-transition" :class="{ 'is-project': project || gaze }">
     <Transition name="header-swap">

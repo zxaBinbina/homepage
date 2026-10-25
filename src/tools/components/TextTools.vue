@@ -114,7 +114,7 @@ function clear() {
 </script>
 
 <template>
-  <div class="tool-workspace">
+  <div class="tool-workspace" :aria-busy="busy">
     <div class="tool-controls">
       <template v-if="id === 'json'">
         <label class="tool-field-inline"

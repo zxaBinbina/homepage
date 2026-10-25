@@ -303,6 +303,7 @@ onBeforeUnmount(() => {
       'playlist-overlay': overlayPlaylist,
     }"
     aria-label="网易云音乐播放器"
+    :aria-busy="loading"
   >
     <div class="music-player-body" :inert="overlayPlaylist && listOpen">
       <div class="music-heading">
@@ -405,7 +406,11 @@ onBeforeUnmount(() => {
           @input="seek"
         /><span>{{ formatTime(duration || current.duration) }}</span>
       </div>
-      <section class="music-lyrics" :aria-label="error ? '播放状态' : '歌词'">
+      <section
+        class="music-lyrics"
+        :aria-label="error ? '播放状态' : '歌词'"
+        :aria-busy="lyricState === 'loading' && !error"
+      >
         <div :key="`${current.id}-${lyricState}-${Boolean(error)}`" class="track-lyrics-enter">
           <div v-if="error" class="lyric-placeholder music-error" role="status">
             <span>{{ error }}</span>
