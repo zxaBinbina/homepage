@@ -3,7 +3,7 @@
 
 # 安装
 
-**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-29）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版合并为四份压缩包，每份保留七个独立组件。
+**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-30）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版合并为四份压缩包，每份保留七个独立组件。
 
 ## 中文版安装：一键命令（推荐）
 

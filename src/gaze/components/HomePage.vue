@@ -110,7 +110,7 @@ const forks = [
     </section>
     <section class="gaze-section shell gaze-reveal">
       <div class="gaze-note gaze-release-note">
-        <b>v0.4.1-zh.2 已发布 · 2026-10-29</b>
+        <b>v0.4.1-zh.2 已发布 · 2026-10-30</b>
         <p>
           同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1
           更新，下载整理为四份发行版压缩包，每份保留七个组件。
