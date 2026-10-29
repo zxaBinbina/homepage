@@ -74,13 +74,14 @@ const forks = [
   {
     no: '03 / 画面冻结修复',
     title: 'KRDP 6.7.5 修复',
-    details: '补齐帧暂停/恢复确认与帧编号回绕处理，修复 Windows App 连接约 4 秒后画面冻结的问题。',
+    details:
+      '源码保留 Fedora 44 / KRDP 6.7.5 的画面冻结修复，供单独构建；标准发行包不包含这份私有修复库。',
   },
   {
-    no: '04 / 合并 RPM',
-    title: '单包安装',
+    no: '04 / 按需安装',
+    title: '四份下载，组件自选',
     details:
-      '守护进程、CLI、GUI、KDE 集成、PAM 模块与 KRDP 修复合并为一个 RPM，面向 Fedora 44 x86_64。',
+      '按 Ubuntu、Fedora、openSUSE、Arch 整理下载包，保留主程序、图形界面与各桌面集成，按当前环境选择安装。',
   },
 ]
 </script>
@@ -108,6 +109,20 @@ const forks = [
       <ScanDemo class="gaze-hero-demo" />
     </section>
     <section class="gaze-section shell gaze-reveal">
+      <div class="gaze-note gaze-release-note">
+        <b>v0.4.1-zh.2 已发布 · 2026-10-29</b>
+        <p>
+          同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1
+          更新，下载整理为四份发行版压缩包，每份保留七个组件。
+        </p>
+        <a
+          class="gaze-text-link"
+          href="https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2"
+          target="_blank"
+          rel="noopener noreferrer"
+          >查看更新与下载 ↗</a
+        >
+      </div>
       <p class="gaze-eyebrow">INSTALL / 一键安装</p>
       <h2>一条命令，装好一切。</h2>
       <CodeBlock
@@ -116,16 +131,9 @@ const forks = [
         copy-label="复制一键安装命令"
       />
       <p class="gaze-caption">
-        优先安装与你系统匹配的中文版软件包（
-        <a
-          class="gaze-text-link"
-          href="https://github.com/zxaBinbina/gaze-zh/releases"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="margin-top: 0"
-          >gaze-zh</a
-        >，rpm / deb 持续扩展，含中文提示与 KRDP
-        修复；Arch 发行包也会随 Release 提供，但一键脚本当前在 Arch 上转用官方安装器）；暂无适配时自动转用官方安装器。手动安装细节见
+        自动选择 Fedora 45、Ubuntu 24.04 / Linux Mint 22 或 openSUSE Tumbleweed 的 x86_64 中文版，
+        校验后安装主程序、图形界面与当前桌面集成。其他系统转用上游安装器；Arch
+        也提供手动下载包。详见
         <a class="gaze-text-link" href="/projects/gaze/guide/installation" style="margin-top: 0"
           >安装指南 →</a
         >

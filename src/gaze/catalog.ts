@@ -25,7 +25,7 @@ export const gazeGuides: GazeGuide[] = [
     title: '安装',
     group: 'start',
     description:
-      '中文版合并 RPM（Fedora 44 x86_64）与官方一行安装器、Debian、Fedora、openSUSE、Arch、Flatpak 等手动安装方式。',
+      '中文版按发行版打包下载、组件选择与升级，以及上游软件源、Arch、Flatpak 等安装方式。',
   },
   {
     id: 'nixos',

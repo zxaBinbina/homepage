@@ -13,19 +13,15 @@
 
 ## 第 1 步：安装 Gaze
 
-推荐使用中文版一键安装命令：脚本会优先在 [Releases](https://github.com/zxaBinbina/gaze-zh/releases) 中查找与你系统匹配的中文版核心软件包（包名 `gaze-zh`，提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst`，含中文提示与 KRDP 修复）并自动安装；暂无适配的安装包时，自动转用官方安装器：
+最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)。一键安装会选择匹配系统的发行版压缩包，校验后安装主程序、GUI 与当前桌面集成；暂无适配时转用上游安装器：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 ```
 
-也可以从 [GitHub Releases](https://github.com/zxaBinbina/gaze-zh/releases) 手动下载安装包后自行安装，例如 Fedora 系：
+中文版自动安装支持 Fedora 45、Ubuntu 24.04 / Linux Mint 22、openSUSE Tumbleweed 的 x86_64 系统。Arch 另提供手动下载压缩包。其他版本和架构使用上游渠道。
 
-```bash
-sudo dnf install ./gaze-zh-*.rpm
-```
-
-其他发行版的官方安装器与手动方式见[安装指南](/projects/gaze/guide/installation)。
+手动安装时，下载对应系统的压缩包，校验并解压，再按包内 `README.md` 安装主程序、可选 GUI 和一个桌面集成包；不同系统的 RPM/DEB 不可混用。组件选择、升级与 KRDP 修复范围见[安装指南](/projects/gaze/guide/installation)。
 
 ## 第 2 步：检查守护进程状态
 

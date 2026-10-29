@@ -170,6 +170,12 @@ Wiki 按「开始部署、使用与维护、了解项目」组织内容，提供
 
 开发服务器启动后，执行 `python3 scripts/check-rdp-pages.py` 检查入口、目录锚点、主题与响应式。动效检查使用 `python3 scripts/check-rdp-motion.py`（默认端口 4174）；两个脚本都可用 `HOMEPAGE_TEST_URL` 指向开发或构建预览地址。分享标签检查使用 `python3 scripts/check-sharing.py`，覆盖主页、官网与 Wiki。Wiki 搜索、复制与移动目录专项检查使用 `python3 scripts/check-rdp-wiki.py`，默认端口 4174，同样支持 `HOMEPAGE_TEST_URL`。
 
+## Gaze 中文官网与发行消息
+
+官网地址为 `https://zxabinbina.cc.cd/projects/gaze`。当前消息与安装指南对应 `v0.4.1-zh.2`：四份发行版压缩包，每份保留七个组件；标准包与 Fedora 44 专用 KRDP 私有修复库的范围分别说明。
+
+更新发行版时同步 `src/gaze/components/HomePage.vue` 的消息、`src/gaze/content/guide/installation.md` 与 `getting-started.md`，以及 `src/gaze/catalog.ts` 的摘要。`public/projects/gaze/install.sh` 从最新 Release 按系统选择压缩包，验证两层 SHA256 后安装主程序、GUI 和当前桌面集成；暂无适配时向上游安装器原样传递参数。不要退回按扩展名扫描旧 Release 的方式，以免混装不同系统的包。
+
 ## 本地运行
 
 建议使用 Node.js `22.12+` 与 npm。安装依赖后启动开发服务器：

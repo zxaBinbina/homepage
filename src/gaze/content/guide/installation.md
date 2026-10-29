@@ -3,39 +3,48 @@
 
 # 安装
 
-**中文版用户推荐使用一键安装命令**：脚本优先安装与你系统匹配的中文版核心软件包（包名 `gaze-zh`，含中文提示与 KRDP 修复；提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst` 发布产物），暂无适配时自动转用官方安装器，见下方「中文版安装」。其他发行版（Ubuntu、Debian、Arch、openSUSE 等）也可直接使用官方一行命令安装器或手动方式。
-
-使用一行命令安装器时，它会检测你的桌面环境，并在可能的情况下配置对应的集成：GNOME 锁屏认证、Cinnamon 扩展、KDE 软件包，或 Omarchy 锁屏集成。在其他桌面上，它会跳过桌面专属的软件包。手动安装 GNOME 和 Cinnamon 时需要额外一步来启用扩展。
-
-在 x86_64 和 arm64 上，安装器支持 Ubuntu 24.04/25.10/26.04/26.10、Debian 13 和 14（forky，当前为测试版）、Fedora 42/43/44/45 以及兼容发行版（包括基于镜像的 OSTree 系统，如 Silverblue、Kinoite 和 Bazzite）、Arch Linux，以及 Manjaro 和 CachyOS 等与 Arch 兼容的 AUR 发行版。openSUSE Tumbleweed 在 x86_64 上受支持。
+**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-29）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版合并为四份压缩包，每份保留七个独立组件。
 
 ## 中文版安装：一键命令（推荐）
-
-本站对应的 [zxaBinbina/gaze-zh](https://github.com/zxaBinbina/gaze-zh) 仓库通过 GitHub Releases 发布**中文版软件包**（核心包名 `gaze-zh`，组件包保留官方名称；提供 `.deb`、`.rpm` 和 Arch `.pkg.tar.zst`）。
-
-在支持的系统上直接使用一键安装命令，脚本会优先查找与你系统、架构匹配的中文版安装包并自动安装：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 ```
 
-Releases 中暂无适配当前系统的安装包时，同一条命令会自动转用官方安装器（原有参数会透传，如 `--yes`、`--no-pam`）。当前一键脚本自动安装 RPM/DEB；Arch 用户请使用官方安装器或 AUR，Release 中的 `.pkg.tar.zst` 主要用于手动/发行版打包流程。
+脚本只从最新发行版选择匹配系统的压缩包，校验下载与组件后，安装 `gaze-zh`、`gaze-gui` 和当前桌面对应的集成包。当前自动安装支持 **Fedora 45、Ubuntu 24.04 / Linux Mint 22、openSUSE Tumbleweed 的 x86_64 系统**。
 
-也可以从 [Releases 页面](https://github.com/zxaBinbina/gaze-zh/releases)手动下载安装包后安装，例如 Fedora 系：
+其他系统及架构自动转用上游安装器，不会尝试安装旧发行版中同扩展名的软件包。`--yes` 和 `--no-pam` 可直接使用，其他参数会原样转交上游安装器。Arch 的中文版提供手动下载包；一键安装仍走上游 / AUR 渠道。
+
+## 中文版手动下载与升级
+
+从 [v0.4.1-zh.2 发行页](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2) 选择以下一份，并下载同页的 `SHA256SUMS`：
+
+| 系统 / 架构                         | 下载标识                     | 包格式         |
+| ----------------------------------- | ---------------------------- | -------------- |
+| Ubuntu 24.04 / Linux Mint 22，amd64 | `ubuntu-24.04-amd64`         | DEB            |
+| Fedora 45，x86_64                   | `fedora-45-x86_64`           | RPM            |
+| openSUSE Tumbleweed，x86_64         | `opensuse-tumbleweed-x86_64` | RPM            |
+| Arch Linux，x86_64                  | `archlinux-x86_64`           | `.pkg.tar.zst` |
+
+Fedora 与 openSUSE 的 RPM 使用不同依赖及 PAM 配置，请勿混用；Ubuntu 24.04 构建的 DEB 也不适用于所有 Debian/Ubuntu 版本。请按照构建环境选择，其他系统使用下面的上游渠道或自行构建。
+
+下载后校验所选压缩包并解压，在解压目录中运行：
 
 ```bash
-sudo dnf install ./gaze-zh-*.rpm
+sha256sum -c SHA256SUMS
 ```
 
-安装脚本会刷新已运行的用户服务管理器，并尝试重启当前正在运行的 KRDP，远程连接会短暂断开。软件包保留 `/etc/gaze/config.toml` 等用户配置，也不会覆盖官方的 KRDP 库。
-
-需要自行构建时，检出仓库源码，使用与合并包同版本的官方 Gaze RPM 作为经过校验的基础载荷：
+压缩包内的 `README.md` 提供具体命令。以 Fedora 45 为例，安装或升级主程序与图形界面：
 
 ```bash
-python3 scripts/build-combined-rpm.py --base-rpm gaze-<版本>-1.fc44.x86_64.rpm
+sudo dnf install ./gaze-zh-0.4.1-2.x86_64.rpm ./gaze-gui-0.4.1-2.x86_64.rpm
 ```
 
-合并包的组件清单、KRDP 修复细节与回退方式，见仓库文档 [docs/krdp-fix.md](https://github.com/zxaBinbina/gaze-zh/blob/main/docs/krdp-fix.md)。
+若使用 KDE Plasma，再安装同一压缩包中的 `gaze-kde`；GNOME、Cinnamon、Hyprlock、Omarchy 各自选择对应组件。不要一次安装全部桌面组件。核心包与 GUI、桌面集成的文件不重复，合并下载附件后仍可按需安装与卸载。
+
+### KRDP 修复范围
+
+标准发行包保留中文提示与 PAM 层的 KRDP 登录兼容逻辑。Fedora 44 / KRDP 6.7.5 专用的私有画面冻结修复库属于单独的历史合并构建，**未包含在这四份下载包中**。其源码、构建与回退说明见 [docs/krdp-fix.md](https://github.com/zxaBinbina/gaze-zh/blob/main/docs/krdp-fix.md)。
 
 ## CPU 要求
 
