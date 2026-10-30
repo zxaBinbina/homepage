@@ -40,15 +40,15 @@ sitemap = ET.parse(root / 'sitemap.xml')
 urls = [node.text for node in sitemap.findall('{*}url/{*}loc')]
 assert len(urls) == len(set(urls)), 'Duplicate sitemap URLs'
 canonical_urls = []
+error_codes = {400, 401, 403, 404, 408, 429, 500, 502, 503, 504}
+error_files = {f'{code}.html' for code in error_codes}
 for file in root.rglob('*.html'):
-    if file.name == '404.html':
-        assert Document(file.read_text()).robots == ['noindex']
-        continue
     doc = Document(file.read_text())
     route = file.relative_to(root).as_posix().removesuffix('.html')
+    error = file.relative_to(root).as_posix() in error_files
     expected = urljoin(base, '' if route == 'index' else route)
     assert doc.canonical == [expected], (file, doc.canonical)
-    assert doc.robots == ['index, follow, max-image-preview:large'], file
+    assert doc.robots == (['noindex'] if error else ['index, follow, max-image-preview:large']), file
     assert len(doc.structured) == 1, file
     data = doc.structured[0]
     assert data['@context'] == 'https://schema.org'
@@ -56,11 +56,15 @@ for file in root.rglob('*.html'):
     assert website['url'] == base
     assert page['url'] == expected and page['name'] and page['description']
     assert page['isPartOf']['@id'] == website['@id']
-    canonical_urls.append(expected)
-assert len(canonical_urls) == 32, canonical_urls
+    if error:
+        assert expected not in urls, f'Error page indexed: {expected}'
+    else:
+        canonical_urls.append(expected)
+assert base in canonical_urls, 'Missing homepage'
+assert len(canonical_urls) == 57, canonical_urls
 assert set(urls) == set(canonical_urls), 'Sitemap must contain all canonical pages only'
 robots = (root / 'robots.txt').read_text()
 assert 'User-agent: *\nAllow: /' in robots
 assert f'Sitemap: {urljoin(base, "sitemap.xml")}' in robots
-assert (root / '404.html').is_file()
-print(f'SEO checks passed: {len(urls)} canonical pages, JSON-LD, robots, sitemap and noindex 404.')
+assert all((root / file).is_file() for file in error_files), 'Missing error document'
+print(f'SEO checks passed: {len(urls)} canonical pages, JSON-LD, robots, sitemap and {len(error_files)} noindex error pages.')

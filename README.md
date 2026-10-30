@@ -154,6 +154,16 @@
 
 共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。运行 `python3 scripts/check-navigation.py` 验证导航，推荐用 `HOMEPAGE_TEST_URL` 指向构建预览服务。
 
+## 错误页面
+
+`/400`、`/401`、`/403`、`/404`、`/408`、`/429`、`/500`、`/502`、`/503` 与 `/504` 使用统一错误页：大号状态码、方块装饰、中文说明和胶囊按钮，沿用本站配色、深浅主题、导航与页脚。访客可返回首页、查看作品、进入工具或游戏；超时和服务异常提供「重新加载」。错误页不高亮任何导航栏目，与主页等页面切换时继续保留音乐播放器。
+
+进入时卡片、状态码、方块与文案依次出现，离开时轻微上移、缩小并淡出，与目标页面交叉过渡；动画只播放一次，尊重系统的减少动态效果设置。
+
+未知路由保留原地址并显示 404。构建会生成相应的 `400.html` 等文件，其中 `404.html` 由 Cloudflare Pages 自动用于不存在的地址；其资源使用根路径，多级错误地址也能加载样式。其余状态页可直接访问，若要用于真实的 HTTP 错误，需要由服务器或代理配置相应错误响应；静态页面本身不会改变 HTTP 状态码，也不会替换 Cloudflare 在站点应用之外产生的拦截或故障页面。所有错误页使用 `noindex`，不进入站点地图。
+
+文案与状态码维护在 `src/errors/catalog.ts`，页面位于 `src/errors/ErrorPage.vue`，样式在 `src/style.css`。构建并启动预览服务后，运行 `HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-errors.py` 检查路由、深层错误文档的资源、恢复操作、主题、窄屏和键盘焦点。脚本通过本地响应模拟部署平台返回 404，不代表线上状态码验收；本次截图写入 `artifacts/error-*.png`。
+
 ## RDP Access Auth 官网与 Wiki
 
 - 官网：`https://zxabinbina.cc.cd/projects/rdp-access-auth`

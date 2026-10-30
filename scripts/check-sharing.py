@@ -57,6 +57,16 @@ pages = {
     'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth',
     '部署与维护 Wiki · RDP Access Auth': 'projects/rdp-access-auth/wiki',
     '下载发行版 · RDP Access Auth': 'projects/rdp-access-auth/downloads',
+    '400 · 这个请求有点不对劲 · a彬彬a': '400',
+    '401 · 先确认一下你的身份 · a彬彬a': '401',
+    '403 · 这片区域暂未开放 · a彬彬a': '403',
+    '404 · 这块世界，还没有生成 · a彬彬a': '404',
+    '408 · 这次等待有点久 · a彬彬a': '408',
+    '429 · 慢一点，风景还在 · a彬彬a': '429',
+    '500 · 方块之间，出了点小差错 · a彬彬a': '500',
+    '502 · 通往这里的桥暂时断了 · a彬彬a': '502',
+    '503 · 世界正在稍作休息 · a彬彬a': '503',
+    '504 · 远方的回应，还没到达 · a彬彬a': '504',
 }
 paths = [Path(sys.argv[1])] if len(sys.argv) > 1 else [Path('dist') / (f'{route}.html' if route else 'index.html') for route in pages.values()]
 for path in paths:
@@ -73,6 +83,7 @@ for path in paths:
 
     title = head.title.strip()
     assert title in pages, title
+    assert meta('name', 'robots') == ('noindex' if pages[title].isdigit() else 'index, follow, max-image-preview:large')
     assert meta('property', 'og:title') == meta('itemprop', 'name') == title
     description = meta('name', 'description')
     assert meta('property', 'og:description') == meta('itemprop', 'description') == description

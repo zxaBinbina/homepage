@@ -85,7 +85,7 @@ with sync_playwright() as p:
     expect(page.locator('.project-card')).to_have_count(9)
 
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='游戏', exact=True).click()
-    expect(page.locator('.game-card')).to_have_count(13)
+    expect(page.locator('.game-card')).to_have_count(15)
     metadata('/game')
     for path, title in [('2048', '2048'), ('minesweeper', '扫雷'), ('solitaire', '纸牌接龙'), ('tetris', '俄罗斯方块'), ('sudoku', '数独经典版'), ('xiangqi', '中国象棋单机版'), ('gomoku', '五子棋单机版'), ('snake', '贪吃蛇'), ('popstar', '消灭星星经典版'), ('huarongdao', '华容道'), ('jump', '跳一跳')]:
         page.locator(f'.game-card[href="/games/{path}"]').click()
@@ -96,7 +96,7 @@ with sync_playwright() as p:
         assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
         assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
         page.get_by_role('link', name='全部游戏', exact=True).click()
-        expect(page.locator('.game-card')).to_have_count(13)
+        expect(page.locator('.game-card')).to_have_count(15)
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
     expect(page.locator('.project-card')).to_have_count(9)
 

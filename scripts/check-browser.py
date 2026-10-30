@@ -115,7 +115,7 @@ with sync_playwright() as p:
     page.get_by_role('button', name='选择配色方案').click()
     page.get_by_role('button', name='芙芙蓝').click()
     assert page.locator('html').get_attribute('data-palette') == 'fufu-blue'
-    page.wait_for_timeout(350)
+    page.wait_for_function('getComputedStyle(document.body).backgroundColor === "rgb(244, 246, 250)"')
     assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(244, 246, 250)'
     page.screenshot(path=str(OUT / 'desktop-light.png'))
     page.get_by_role('button', name='切换深色主题').click()
@@ -132,6 +132,8 @@ with sync_playwright() as p:
         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), f'overflow at {width}'
     page.set_viewport_size({'width':320, 'height':844})
     page.get_by_role('button', name='选择配色方案').click()
+    page.wait_for_function('document.querySelector(".palette-popover") && !document.querySelector(".palette-popover").classList.contains("palette-popover-enter-active")')
+    assert page.locator('.header .brand').evaluate('(el) => el.scrollWidth <= el.clientWidth')
     palette_box = page.locator('.palette-popover').bounding_box()
     assert palette_box['x'] >= 0 and palette_box['x'] + palette_box['width'] <= 320, palette_box
     page.keyboard.press('Escape')

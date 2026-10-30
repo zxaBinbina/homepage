@@ -1,5 +1,6 @@
 /** One route table for Vue page selection and generated sharing documents. */
 import { gazeGuides, gazeGuidePath } from './gaze/catalog'
+import { errorPaths } from './errors/catalog'
 
 const gazeGuidePages = Object.fromEntries(
   gazeGuides.map((guide) => [`gaze.${guide.id}`, gazeGuidePath(guide.id)]),
@@ -41,6 +42,7 @@ export const pages = {
   wiki: '/projects/rdp-access-auth/wiki',
   downloads: '/projects/rdp-access-auth/downloads',
   gaze: '/projects/gaze',
+  ...errorPaths,
   ...gazeGuidePages,
 } as const
 export type PageName = keyof typeof pages
@@ -62,5 +64,5 @@ export function pageFile(page: PageName): string {
   return page === 'home' ? 'index.html' : `${pages[page].slice(1)}.html`
 }
 export function pageForPath(path: string): PageName {
-  return knownPageForPath(path) ?? 'home'
+  return knownPageForPath(path) ?? 'error404'
 }

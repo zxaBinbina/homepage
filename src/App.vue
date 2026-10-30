@@ -9,6 +9,7 @@ import './rdp/style.css'
 import { navigateInternalLink } from './router'
 import { isProjectPage, isGazePage } from './pages'
 import { isGameId } from './games/catalog'
+import { isToolId } from './tools/catalog'
 const route = useRoute()
 const project = computed(() => isProjectPage(route.name))
 const gaze = computed(() => isGazePage(route.name))
@@ -20,7 +21,9 @@ const activeNav = computed(() =>
       ? 'projects'
       : route.name === 'games' || isGameId(route.name)
         ? 'games'
-        : 'tools',
+        : route.name === 'tools' || isToolId(route.name)
+          ? 'tools'
+          : null,
 )
 onMounted(() => document.addEventListener('click', navigateInternalLink))
 onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))

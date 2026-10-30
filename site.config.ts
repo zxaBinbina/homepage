@@ -2,6 +2,7 @@ import { isProjectPage, isGazePage, pages, type PageName } from './src/pages'
 import { isToolId, toolCatalog } from './src/tools/catalog'
 import { isGameId, gameCatalog } from './src/games/catalog'
 import { gazeGuide } from './src/gaze/catalog'
+import { errorCatalog, isErrorPage } from './src/errors/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -72,19 +73,24 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
   const content =
     page === 'home'
       ? siteContent
-      : isToolId(page)
+      : isErrorPage(page)
         ? {
-            title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
-            description: toolCatalog[page].description,
+            title: `${errorCatalog[page].code} · ${errorCatalog[page].title} · a彬彬a`,
+            description: errorCatalog[page].description,
           }
-        : isGameId(page)
+        : isToolId(page)
           ? {
-              title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
-              description: gameCatalog[page].description,
+              title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
+              description: toolCatalog[page].description,
             }
-          : isGazePage(page)
-            ? gazePageMeta(page)
-            : projectPages[page]
+          : isGameId(page)
+            ? {
+                title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
+                description: gameCatalog[page].description,
+              }
+            : isGazePage(page)
+              ? gazePageMeta(page)
+              : projectPages[page]
   const image = isGazePage(page)
     ? {
         image: 'images/gaze-share.png',
@@ -109,6 +115,7 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
     imageWidth: image.imageWidth,
     imageHeight: image.imageHeight,
     title: content.title,
+    robots: isErrorPage(page) ? 'noindex' : 'index, follow, max-image-preview:large',
     description: content.description,
     url: page === 'home' ? url.href : new URL(pages[page].slice(1), url).href,
     image: new URL(image.image, url).href,

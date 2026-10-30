@@ -4,6 +4,7 @@ import { isProjectPage, isGazePage, knownPageForPath, pages, type PageName } fro
 import { gazeGuides } from './gaze/catalog'
 import { isToolId } from './tools/catalog'
 import { isGameId } from './games/catalog'
+import { isErrorPage } from './errors/catalog'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 
 const components = {
@@ -101,16 +102,23 @@ export const router = createRouter({
       path: pages[name],
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
-      component: components[name],
-      props: isGazePage(name)
-        ? { guide: name === 'gaze' ? null : name.slice(5) }
-        : isProjectPage(name)
-          ? { view: name }
-          : isToolId(name) || isGameId(name)
-            ? { id: name }
-            : undefined,
+      component: isErrorPage(name) ? () => import('./errors/ErrorPage.vue') : components[name],
+      props: isErrorPage(name)
+        ? { error: name }
+        : isGazePage(name)
+          ? { guide: name === 'gaze' ? null : name.slice(5) }
+          : isProjectPage(name)
+            ? { view: name }
+            : isToolId(name) || isGameId(name)
+              ? { id: name }
+              : undefined,
     })),
-    { path: '/:pathMatch(.*)*', redirect: '/' },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'unknown',
+      component: () => import('./errors/ErrorPage.vue'),
+      props: { error: 'error404' },
+    },
   ],
   async scrollBehavior(to, from, savedPosition) {
     await nextTick()
@@ -149,7 +157,7 @@ router.beforeEach((to) => {
 
 router.afterEach((to, _from, failure) => {
   if (failure) return
-  const page = to.name as PageName
+  const page = to.name === 'unknown' ? 'error404' : (to.name as PageName)
   const meta = createSiteMeta(import.meta.env.SITE_URL, page)
   const project = isProjectPage(page)
   const gaze = isGazePage(page)
@@ -161,6 +169,7 @@ router.afterEach((to, _from, failure) => {
     )
   document.body.classList.toggle('rdp-site', project)
   const values = {
+    'meta[name="robots"]': meta.robots,
     'meta[name="description"]': meta.description,
     'meta[property="og:title"]': meta.title,
     'meta[property="og:description"]': meta.description,

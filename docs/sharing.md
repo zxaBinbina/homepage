@@ -30,9 +30,11 @@
 
 ## 搜索引擎收录
 
-构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含 32 个页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
+构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含内容页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
 
-构建同时生成带 `noindex` 的 `404.html`，让 Cloudflare Pages 对未知路径返回真实 404，避免把不存在的地址当作首页收录。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
+构建同时生成 `400.html`、`401.html`、`403.html`、`404.html`、`408.html`、`429.html`、`500.html`、`502.html`、`503.html` 与 `504.html`，使用统一 Vue 错误页、对应状态的标题和描述，均带 `noindex` 且不进入站点地图。Cloudflare Pages 自动使用 `404.html` 对未知路径返回真实 404；错误文档的脚本与样式使用根路径，避免嵌套网址无法加载。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。其余状态页需由服务器或代理配置使用，静态 HTML 本身不会设置 HTTP 状态。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
+
+未知 Vue 路由也显示 404，并保留访问地址；站内进入或离开错误页时同步更新 `robots`、标题、canonical 与分享标签，返回正常页面后恢复 `index, follow, max-image-preview:large`。文案和路径定义见 `src/errors/catalog.ts`，浏览器检查见 `scripts/check-errors.py`。
 
 正文继续按原来的 Vue 客户端逻辑加载，动画和交互不变；JSON-LD 随站内切换更新。当前优化帮助搜索引擎发现页面与理解元信息，正文抓取仍依赖搜索引擎执行 JavaScript 的能力，不能保证收录或排名。无需填写关键词堆砌标签，也不虚构评价或评分。
 

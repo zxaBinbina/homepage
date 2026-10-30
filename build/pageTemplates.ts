@@ -3,6 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import ejs from 'ejs'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 import { pages, pageForPath, knownPageForPath, pageFile, type PageName } from '../src/pages'
+import { isErrorPage } from '../src/errors/catalog'
 
 /** All URLs share index.html; page content lives in Vue single-file components. */
 export function pageTemplates(baseUrl: string | undefined, build: boolean): Plugin {
@@ -52,7 +53,10 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
         const template = entry.source
         for (const page of Object.keys(pages) as PageName[]) {
           const fileName = pageFile(page)
-          const prefix = '../'.repeat(fileName.split('/').length - 1) || './'
+          // Error documents can be served at arbitrary nested URLs by the host.
+          const prefix = isErrorPage(page)
+            ? '/'
+            : '../'.repeat(fileName.split('/').length - 1) || './'
           const html = render(template, page).replace(/(src|href)="\.\//g, `$1="${prefix}`)
           if (page === 'home') entry.source = html
           else this.emitFile({ type: 'asset', fileName, source: html })
@@ -70,9 +74,9 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
         })
         const escapeXml = (value: string) =>
           value.replace(/[<>&"']/g, (character) => `&#${character.charCodeAt(0)};`)
-        const urls = (Object.keys(pages) as PageName[]).map(
-          (page) => `  <url><loc>${escapeXml(createSiteMeta(baseUrl, page).url)}</loc></url>`,
-        )
+        const urls = (Object.keys(pages) as PageName[])
+          .filter((page) => !isErrorPage(page))
+          .map((page) => `  <url><loc>${escapeXml(createSiteMeta(baseUrl, page).url)}</loc></url>`)
         this.emitFile({
           type: 'asset',
           fileName: 'sitemap.xml',
@@ -83,13 +87,7 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
           fileName: 'robots.txt',
           source: `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', createSiteMeta(baseUrl).url).href}\n`,
         })
-        // A real 404 also disables Cloudflare Pages' implicit SPA fallback for unknown URLs.
-        this.emitFile({
-          type: 'asset',
-          fileName: '404.html',
-          source:
-            '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>页面不存在 · a彬彬a</title><main><h1>页面不存在</h1><p>这个地址可能已经变更。</p><a href="/">返回首页</a></main></html>',
-        })
+        // The registered /404 emits 404.html, disabling Cloudflare Pages' implicit SPA fallback.
       },
     },
   }

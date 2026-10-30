@@ -7,7 +7,7 @@ import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
 const props = withDefaults(
-  defineProps<{ home?: boolean; active?: 'home' | 'projects' | 'tools' | 'games' }>(),
+  defineProps<{ home?: boolean; active?: 'home' | 'projects' | 'tools' | 'games' | null }>(),
   {
     home: false,
     active: 'home',
@@ -47,7 +47,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 </script>
 <template>
   <header class="header">
-    <a href="/" class="brand" @click="menuOpen = false"
+    <a href="/" class="brand" :aria-label="`${profile.name}的首页`" @click="menuOpen = false"
       ><img :src="asset('avatar.png')" alt="" width="30" height="30" /><span
         >{{ profile.name }}<span class="brand-dot">.</span></span
       ></a
