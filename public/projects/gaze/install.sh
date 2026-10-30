@@ -174,7 +174,7 @@ main() {
             *) die "最新发行页地址与项目仓库不匹配。" ;;
         esac
         release_tag="${latest_url##*/}"
-        printf '%s\n' "$release_tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+-zh(\.[1-9][0-9]*)?$' || die "无法识别最新发行版本号。"
+        printf '%s\n' "$release_tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-zh(\.[1-9][0-9]*)?)?$' || die "无法识别最新发行版本号。"
         release_base="https://github.com/${ZH_REPO}/releases/download/${release_tag}"
         release_checksums="$(curl -fsSL "$release_base/SHA256SUMS")" || die "无法读取最新发行版的下载清单。"
         bundle="gaze-zh-${release_tag#v}-${target}.tar.gz"

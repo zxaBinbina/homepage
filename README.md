@@ -172,9 +172,9 @@ Wiki 按「开始部署、使用与维护、了解项目」组织内容，提供
 
 ## Gaze 中文官网与发行消息
 
-官网地址为 `https://zxabinbina.cc.cd/projects/gaze`。当前消息与安装指南对应 `v0.4.1-zh.2`：八份按发行版与架构区分的压缩包，每份保留七个组件；标准包与 Fedora 44 专用 KRDP 私有修复库的范围分别说明。
+官网地址为 `https://zxabinbina.cc.cd/projects/gaze`。首页及指南介绍独立版本 `v0.5.0`：补齐 GUI、CLI 与桌面设置汉化，保持原有排版，同步上游至 `cc74790`。下载入口使用 GitHub 最新发行页；八份压缩包按发行版与架构区分，每份保留七个组件。标准包与 Fedora 44 专用 KRDP 私有修复库的范围分别说明。
 
-更新发行版时同步 `src/gaze/components/HomePage.vue` 的消息、`src/gaze/content/guide/installation.md` 与 `getting-started.md`，以及 `src/gaze/catalog.ts` 的摘要。`public/projects/gaze/install.sh` 从最新 Release 按系统版本与 CPU 架构选择压缩包，显示组件菜单，以桌面检测结果标注推荐，由用户选择 GUI 与桌面集成；最后一项为「不安装 GUI，仅安装命令行」。验证两层 SHA256 后安装所选包；暂无适配时停止并链接安装指南。不要退回按扩展名扫描旧 Release 的方式，以免混装不同系统的包。`--dry-run` 只检查匹配结果，`--profile=cli` 等方案用于明确指定非交互安装组件，`--yes` 不代选。运行 `python3 scripts/check-gaze-installer.py` 验证 Fedora 44/45、ARM/x86 匹配、管道安装菜单与终端输入、纯命令行选择及校验失败。
+更新发行版时同步 `src/gaze/components/HomePage.vue` 的消息、`src/gaze/content/guide/installation.md` 与 `getting-started.md`，以及 `src/gaze/catalog.ts` 的摘要。`public/projects/gaze/install.sh` 从最新 Release 按系统版本与 CPU 架构选择压缩包，显示组件菜单，以桌面检测结果标注推荐，由用户选择 GUI 与桌面集成；最后一项为「不安装 GUI，仅安装命令行」。验证两层 SHA256 后安装所选包；暂无适配时停止并链接安装指南。不要退回按扩展名扫描旧 Release 的方式，以免混装不同系统的包。安装器同时支持独立版本标签（如 `v0.5.0`）和历史 `-zh` 标签。`--dry-run` 只检查匹配结果，`--profile=cli` 等方案用于明确指定非交互安装组件，`--yes` 不代选。运行 `python3 scripts/check-gaze-installer.py` 验证 Fedora 44/45、ARM/x86 匹配、管道安装菜单与终端输入、纯命令行选择及校验失败。
 
 ## 本地运行
 

@@ -67,12 +67,15 @@ class Installer(unittest.TestCase):
         self.script = self.root / 'install.sh'
         self.script.write_text(SOURCE.replace('/etc/os-release', str(self.root / 'os-release'))
                                .replace('/run/ostree-booted', str(self.root / 'ostree-booted')))
+        self.write_release('v0.4.1-zh.2', '0.4.1', '2')
+
+    def write_release(self, tag, version, revision):
         checksums, assets = [], []
         for target in TARGETS:
-            stem = f'gaze-zh-0.4.1-zh.2-{target}'
+            stem = f'gaze-zh-{tag.removeprefix("v")}-{target}'
             suffix = target.rsplit('-', 1)[1]
-            names = [f'{name}_0.4.1-2_{suffix}.deb' if target.startswith('ubuntu')
-                     else f'{name}-0.4.1-2.{suffix}.rpm' for name in COMPONENTS]
+            names = [f'{name}_{version}-{revision}_{suffix}.deb' if target.startswith('ubuntu')
+                     else f'{name}-{version}-{revision}.{suffix}.rpm' for name in COMPONENTS]
             files = {name: b'fixture package' for name in names}
             files['SHA256SUMS'] = ''.join(f'{hashlib.sha256(data).hexdigest()}  {name}\n'
                                          for name, data in files.items()).encode()
@@ -83,7 +86,7 @@ class Installer(unittest.TestCase):
                     info.size = len(data)
                     bundle.addfile(info, io.BytesIO(data))
             checksums.append(f'{hashlib.sha256(archive.read_bytes()).hexdigest()}  {archive.name}\n')
-            assets.append({'browser_download_url': 'https://github.com/zxaBinbina/gaze-zh/releases/download/v0.4.1-zh.2/' + archive.name})
+            assets.append({'browser_download_url': f'https://github.com/zxaBinbina/gaze-zh/releases/download/{tag}/' + archive.name})
         # A compact response containing both architectures exercises JSON URL splitting.
         (self.root / 'api.json').write_text(json.dumps({'assets': assets}))
         (self.root / 'checksums').write_text(''.join(checksums))
@@ -275,6 +278,18 @@ class Installer(unittest.TestCase):
         self.assertEqual([Path(arg).name for arg in install if arg.endswith('.rpm')],
                          ['gaze-zh-0.4.1-2.x86_64.rpm'])
         self.assertFalse((self.root / 'forwarded').exists())
+
+    def test_independent_version_with_api_and_release_page_fallback(self):
+        self.write_release('v0.5.0', '0.5.0', '1')
+        for fail_api in ['', '1']:
+            with self.subTest(fail_api=bool(fail_api)):
+                result = self.run_installer(
+                    FAIL_API=fail_api, args=('--profile=cli',),
+                    FIXTURE_RELEASE_PAGE='https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.5.0')
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                install = next(call for call in self.calls() if call[:2] == ['sudo', 'dnf'])
+                self.assertEqual([Path(arg).name for arg in install if arg.endswith('.rpm')],
+                                 ['gaze-zh-0.5.0-1.x86_64.rpm'])
 
     def test_fallback_rejects_unexpected_release_host(self):
         result = self.run_installer(FAIL_API='1', FIXTURE_RELEASE_PAGE='https://example.com/v0.4.1-zh.2')

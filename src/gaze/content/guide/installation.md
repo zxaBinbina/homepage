@@ -3,7 +3,7 @@
 
 # 安装
 
-**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-30）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版与 CPU 架构分为八份压缩包，每份保留七个独立组件。
+**Gaze 中文版 v0.5.0**：补齐 GUI、CLI 和桌面设置的简体中文，保留原有排版，并采用独立版本号。下载附件按发行版与 CPU 架构分为八份压缩包，每份保留七个独立组件。
 
 ## 中文版安装：一键命令（推荐）
 
@@ -39,7 +39,7 @@ curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh -s -- --dry-ru
 
 ## 中文版手动下载与升级
 
-从 [v0.4.1-zh.2 发行页](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2) 选择以下一份，并下载同页的 `SHA256SUMS`：
+从[最新发行页](https://github.com/zxaBinbina/gaze-zh/releases/latest)选择以下一份，并下载同页的 `SHA256SUMS`：
 
 | 系统 / 架构                         | 下载标识                     | 包格式         |
 | ----------------------------------- | ---------------------------- | -------------- |
@@ -63,7 +63,7 @@ sha256sum -c SHA256SUMS
 压缩包内的 `README.md` 提供具体命令。以 Fedora 44 x86_64 的压缩包为例，安装或升级主程序与图形界面：
 
 ```bash
-sudo dnf install ./gaze-zh-0.4.1-2.x86_64.rpm ./gaze-gui-0.4.1-2.x86_64.rpm
+sudo dnf install ./gaze-zh-0.5.0-1.x86_64.rpm ./gaze-gui-0.5.0-1.x86_64.rpm
 ```
 
 若使用 KDE Plasma，再安装同一压缩包中的 `gaze-kde`；GNOME、Cinnamon、Hyprlock、Omarchy 各自选择对应组件。不要一次安装全部桌面组件。核心包与 GUI、桌面集成的文件不重复，合并下载附件后仍可按需安装与卸载。
@@ -292,9 +292,9 @@ GDM 登录刷脸认证在你显式启用之前保持禁用；在此之前请参�
 
 ### KDE Plasma 及其他基于 PAM 的桌面
 
-一行命令安装器会检测到 KDE Plasma，并有意跳过 `gaze-gnome-extension`，因为该包依赖于 GNOME Shell。它会改为安装 `gaze-kde`，使 KDE **锁屏**无需按键即可自行启动刷脸认证，并向系统设置添加一个 Gaze 页面。在测试期间请保持密码回退启用。
+中文版安装器会在检测到 KDE Plasma 时推荐 KDE 方案，由你在菜单中选择。该方案安装 `gaze-kde`，使 KDE **锁屏**无需按键即可自行启动刷脸认证，并向系统设置添加一个 Gaze 页面；不安装依赖 GNOME Shell 的 `gaze-gnome-extension`。在测试期间请保持密码回退启用。
 
-KDE **登录管理器**（Plasma Login Manager，或 SDDM）是一个独立的程序，上游并未为其提供前置的生物识别槽位，因此那里的刷脸认证在你提交登录表单时开始，正如同一屏幕上的指纹读取器一样。参见 [KDE Plasma 指南](/projects/gaze/guide/kde#login-greeter)。
+KDE **登录管理器**与锁屏是独立的程序。支持 `plasmalogin-fingerprint` 的 Plasma Login Manager 在正确安装 PAM 集成后，可在显示用户时自动开始刷脸；SDDM 及未提供该槽位的登录管理器仍在提交登录表单时开始。运行 `gaze doctor` 可查看当前系统采用哪种方式。参见 [KDE Plasma 指南](/projects/gaze/guide/kde#login-greeter)。
 
 对于其他基于 PAM 的桌面，请使用基础 `gaze` 软件包的 PAM 模块，并参见 [PAM 指南](/projects/gaze/guide/pam)。
 
@@ -304,7 +304,7 @@ KDE **登录管理器**（Plasma Login Manager，或 SDDM）是一个独立的�
 
 ### 为 hyprlock 启用刷脸解锁
 
-在使用 hyprlock 的 Hyprland 上，请安装 `gaze-hyprlock` 软件包（在检测到 Hyprland 时会由一行命令安装器自动安装），并将 hyprlock 指向 Gaze 的 PAM 服务。参见 [Hyprland 指南](/projects/gaze/guide/hyprland)。
+在使用 hyprlock 的 Hyprland 上，请安装 `gaze-hyprlock` 软件包（中文版安装器会在检测到 Hyprland 时推荐相应方案），并将 hyprlock 指向 Gaze 的 PAM 服务。参见 [Hyprland 指南](/projects/gaze/guide/hyprland)。
 
 ## 路径 D：Nix 与 NixOS
 

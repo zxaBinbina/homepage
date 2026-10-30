@@ -54,7 +54,7 @@ export const projects = [
     title: 'Gaze · 中文与登录修复',
     subtitle: '让日常使用，顺手一点。',
     description:
-      '基于 Gaze 的源码分支，为 PAM 认证加入中文提示，并修复 KDE 远程桌面误触发本机人脸扫描的问题。',
+      '基于 Gaze 的中文源码分支，汉化图形界面与命令行，并修复 KDE 远程桌面误触发本机人脸扫描的问题。',
     tags: ['Rust', 'Linux', 'PAM'],
     url: '/projects/gaze',
     link: '访问官网',

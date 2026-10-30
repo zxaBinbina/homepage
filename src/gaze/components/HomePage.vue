@@ -63,8 +63,8 @@ const pipeline = [
 const forks = [
   {
     no: '01 / 中文提示',
-    title: '认证提示中文化',
-    details: 'PAM 认证过程的提示信息全面中文化，终端与锁屏上的交互更亲切。',
+    title: '界面与命令行中文化',
+    details: 'GTK、KDE 与 GNOME 设置，以及 CLI 帮助、配置向导和诊断全面中文化，保留原有排版。',
   },
   {
     no: '02 / KRDP 免打扰',
@@ -110,17 +110,17 @@ const forks = [
     </section>
     <section class="gaze-section shell gaze-reveal">
       <div class="gaze-note gaze-release-note">
-        <b>v0.4.1-zh.2 已发布 · 2026-10-30</b>
+        <b>v0.5.0 · 完整界面汉化</b>
         <p>
-          同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1 更新，已补齐 ARM64 与 Fedora 44。ARM 和
-          x86 分开下载，共八份压缩包，每份保留七个组件。安装脚本新增组件选择菜单，支持仅安装命令行。
+          补齐图形界面、命令行与桌面设置的简体中文，保留原有排版。中文版采用独立版本号，持续同步上游。
+          八种系统与架构组合分别下载，每份保留七个组件，支持仅安装命令行。
         </p>
         <a
           class="gaze-text-link"
-          href="https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2"
+          href="https://github.com/zxaBinbina/gaze-zh/releases/latest"
           target="_blank"
           rel="noopener noreferrer"
-          >查看更新与下载 ↗</a
+          >下载最新版 ↗</a
         >
       </div>
       <p class="gaze-eyebrow">INSTALL / 一键安装</p>

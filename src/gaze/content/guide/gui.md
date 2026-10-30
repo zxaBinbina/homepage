@@ -7,7 +7,11 @@
 `gaze-kde` 会在"系统设置"中添加一个原生的 **Gaze** 页面，功能与此应用相同。详见 [KDE Plasma 指南](/projects/gaze/guide/kde#system-settings)。
 :::
 
-使用 `gaze-gui` 来录入你的面孔、测试识别以及调整 Gaze 设置。
+使用 `gaze-gui` 来录入人脸、测试识别以及调整 Gaze 设置。
+
+::: tip 中文界面版本
+本页对应 `v0.5.0` 的中文界面，窗口尺寸、控件顺序与页面结构沿用上游。
+:::
 
 启动它：
 
@@ -26,34 +30,33 @@ gaze-gui
 
 从头部栏的设置按钮打开配置对话框。
 
-该对话框镜像 `/etc/gaze/config.toml`，分组方式相同。保存会通过守护进程写入该文件，因此需要一次 polkit 授权。
+该对话框提供 `/etc/gaze/config.toml` 的常用选项，按以下页面分组显示。解锁需通过 polkit 授权，修改会自动保存到守护进程；未在 GUI 中显示的选项可通过 `gaze config` 或配置文件管理。
 
 **安全**
 
-- 安全级别（`low`、`medium`、`high`、`maximum`，或 `custom`）
-- 对于 `custom`：检测器级别、识别器级别、RGB 与 IR 相似度阈值
+- 安全级别：低、中、高、最高或自定义（配置值仍为 `low`、`medium`、`high`、`maximum`、`custom`）
+- 选择自定义后显示检测器级别、识别器级别、RGB 与 IR 相似度阈值
 
 **硬件**
 
-- 推理执行提供方：CPU、自动 NPU 选择、Intel OpenVINO，或 AMD Vitis AI
-- OpenVINO 推理设备；自动与 AMD 模式会选择 NPU
+- 推理执行后端：CPU、自动（NPU）、Intel OpenVINO 或 AMD Ryzen AI
+- OpenVINO 推理设备；自动与 AMD 模式使用 NPU
+- RGB 摄像头来源、红外摄像头来源
+- 指定红外画面尺寸：自动模式下画面偏绿或损坏时，可设置固定宽度与高度
+- 强制开启红外发射器：仅在无法自动开启时使用
+- 并行采集 RGB 与红外：从不、自动或始终；默认依次采集，自动模式仅在摄像头支持时并行
+- 暗光阈值：拒绝平均亮度低于指定值的画面（0–255）
 
-标准构建会暴露所有提供方。请使用 [硬件加速](/projects/gaze/guide/acceleration) 安装厂商运行时与驱动，然后在更改提供方后重启守护进程。
-
-**相机**
-
-- RGB 相机源、IR 相机源，以及 Force IR Emitter（强制红外发射器）
-- 并行 RGB + IR 捕获，它决定混合验证是否同时读取两个传感器。某些摄像头无法做到，因此默认会逐一捕获它们
-- Darkness cutoff（黑暗截止值），即暗帧拒绝阈值
+标准构建提供上述推理后端。请按 [硬件加速](/projects/gaze/guide/acceleration) 安装厂商运行时与驱动，并在更改后端后重启守护进程。
 
 **录入**
 
-- 每个面孔的最大模板数
-- Minimum face size ratio（最小面孔尺寸比例），值越低允许从更远处录入
+- 模板上限：每张人脸保存的采集组数
+- 最小人脸占比：调低可在更远处录入
 
-**活体防欺骗**
+**活体防伪**
 
-- 启用活体防欺骗、活体阈值、活体最大秒数
+- 启用活体防伪、活体检测阈值、活体检测最长时长
 
 **认证**
 
@@ -62,12 +65,13 @@ gaze-gui
 - 锁屏要求确认、提权认证要求确认
 - 恢复宽限期与启动延迟，均以毫秒为单位
 - 启动延迟应用于：每次面部认证，或仅屏幕锁定器
-- 混合合并策略，在 RGB 与 IR 均录入时使用
+- 混合匹配策略，在 RGB 与 IR 均录入时使用
 
 **存储**
 
-- 加密面部模板，它使用 TPM 封存已录入的模板。详见 [工作原理](/projects/gaze/guide/how-it-works) 了解它防护了什么。
+- 加密人脸模板：使用 TPM 密封密钥加密存储模板。详见 [工作原理](/projects/gaze/guide/how-it-works) 了解它防护了什么。
 - 解锁 GNOME 密钥环，它会在一次受活体保护的 GDM 或 greetd 面部登录后重放已录入的密码。它需要开启模板加密与活体检测，且每个用户仍需运行 `gaze keyring`。请先阅读 [它对你的安全意味着什么](/projects/gaze/guide/gnome#what-this-changes-about-your-security)。
+- 解锁 KWallet：在通过活体检测的 KDE 人脸登录后使用已录入的密码，同样需要模板加密和活体检测；运行 `gaze keyring --kwallet` 录入凭据，并按 [KDE 指南](/projects/gaze/guide/kde#optional-tpm-backed-kwallet-unlock) 配置。
 
 ## 常见任务
 

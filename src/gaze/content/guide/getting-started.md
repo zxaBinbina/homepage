@@ -13,7 +13,7 @@
 
 ## 第 1 步：安装 Gaze
 
-最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)。一键安装会匹配系统与 CPU 架构，显示安装菜单，并在检测到的桌面对应选项旁标注「推荐」。由你选择 GUI 与桌面集成，最后一项为「不安装 GUI，仅安装命令行」：
+`v0.5.0` 提供完整的 GUI 与 CLI 中文界面。[下载最新版](https://github.com/zxaBinbina/gaze-zh/releases/latest)。一键安装会匹配系统与 CPU 架构，显示安装菜单，并在检测到的桌面对应选项旁标注「推荐」。由你选择 GUI 与桌面集成，最后一项为「不安装 GUI，仅安装命令行」：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
@@ -77,7 +77,7 @@ gnome-extensions enable gaze@gundulabs.com
 gsettings set org.gnome.shell.extensions.gaze enable-face-authentication true
 ```
 
-请在一个**在**软件包安装之后才启动的 GNOME 会话中运行这些命令。GNOME Shell 会在会话启动时扫描扩展目录，并丢弃它尚未见过的扩展 ID。如果你在安装它的那个会话里启用该扩展，设置可能看起来有效，但在你注销后就会消失。请重启，然后再次运行这些命令。`gaze doctor` 会将其报告为 `GNOME extension: installed, but not enabled for the current user`（GNOME 扩展：已安装，但未为当前用户启用），并打印相同的步骤。参见[扩展在注销后又一次消失](/projects/gaze/guide/gnome#the-extension-disappears-again-after-a-logout)。
+请在一个**在**软件包安装之后才启动的 GNOME 会话中运行这些命令。GNOME Shell 会在会话启动时扫描扩展目录，并丢弃它尚未见过的扩展 ID。如果你在安装它的那个会话里启用该扩展，设置可能看起来有效，但在你注销后就会消失。请重启，然后再次运行这些命令。`gaze doctor` 会将其报告为 “GNOME 扩展：已安装，但尚未为当前用户启用”，并打印相同的步骤。参见[扩展在注销后又一次消失](/projects/gaze/guide/gnome#the-extension-disappears-again-after-a-logout)。
 
 通过此扩展实现的免手动锁屏和 GDM 登录认证是 GNOME 特有的。Cinnamon 有一个用于其锁屏和 PolKit 提示的独立扩展；参见 [Cinnamon 指南](/projects/gaze/guide/cinnamon)。KDE Plasma 使用 KScreenLocker 提前启动的生物识别 PAM 槽位；参见 [KDE Plasma 指南](/projects/gaze/guide/kde)。其他登录界面使用 PAM 集成。参见 [Hyprland](/projects/gaze/guide/hyprland)、[LightDM](/projects/gaze/guide/lightdm)、[控制台登录（TTY）](/projects/gaze/guide/console) 以及 [PAM](/projects/gaze/guide/pam) 的指南。
 GDM 登录刷脸认证是独立的，并且默认禁用，这与 GNOME 钥匙环的行为有关。
