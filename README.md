@@ -43,14 +43,16 @@
 
 ## 网页工具
 
-访问 `/tool`，或点击导航「工具」，可按分类和关键词查找网页工具。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
+访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **56 个工具**。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
 
 工具来源分为两部分，均为 MIT 许可：
 
-- **Freemium**（[incentius-foss/freemium](https://github.com/incentius-foss/freemium)）：其 Vue 源码已迁入 `src/tools/freemium/`，替换原有 12 个工具的实现；完整上游清单与原文件 SHA-256 保存在 [third_party/freemium/upstream.json](third_party/freemium/upstream.json)，许可证见 [third_party/freemium/LICENSE](third_party/freemium/LICENSE)。
-- **jaywcjlove/tools**（[jaywcjlove/tools](https://github.com/jaywcjlove/tools)）：补充工具位于 `src/tools/jaytools/`，上游清单见 [third_party/jaywcjlove-tools/upstream.json](third_party/jaywcjlove-tools/upstream.json)，许可证副本见 [public/licenses/jaywcjlove-tools.txt](public/licenses/jaywcjlove-tools.txt)。
+- **Freemium**（[incentius-foss/freemium](https://github.com/incentius-foss/freemium)）：全部 **41 个工具**的 Vue 源码已迁入 `src/tools/freemium/`，替换原有 12 个工具的实现；完整上游清单与原文件 SHA-256 保存在 [third_party/freemium/upstream.json](third_party/freemium/upstream.json)，许可证见 [third_party/freemium/LICENSE](third_party/freemium/LICENSE)。
+- **jaywcjlove/tools**（[jaywcjlove/tools](https://github.com/jaywcjlove/tools)）：固定版本共有 31 个实际工具页面，按功能排除 16 个重复项，新增 **15 个工具**，Vue 实现位于 `src/tools/jaytools/`。完整源码归档与版本说明见 [源码来源](third_party/jaywcjlove-tools/README.md)，逐项去重映射见 [upstream.json](third_party/jaywcjlove-tools/upstream.json)，许可证副本见 [public/licenses/jaywcjlove-tools.txt](public/licenses/jaywcjlove-tools.txt)。
 
-覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串、中文简繁与拼音转换和编解码。新增 PDF 转图片、EXIF 查看、SVG 优化、代码图片、汉字拼音 / 简繁 / 字表、人民币大写、TOML / XML / INI 转换、HTML 转 Markdown、项目徽章、CSS 缓动曲线和 JavaScript 混淆。输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，无新增后端，继续使用 Cloudflare Pages。
+覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串和编解码。还提供 PDF 转图片、EXIF 查看、SVG 优化、代码图片、汉字拼音 / 简繁 / 字表、人民币大写、TOML / XML / INI 转换、HTML 转 Markdown、项目徽章、CSS 缓动曲线和 JavaScript 混淆。
+
+输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布，无新增工具后端，继续使用 Cloudflare Pages。
 
 目录、中文操作界面、Lucide 图标、深浅主题与芙芙蓝 / 胡桃红配色保持一致；保留共享播放器与页脚，加入卡片错峰进入、筛选退出 / 重排和页面切换动画。完整地址、使用限制与维护说明见 [网页工具说明](docs/tools.md)。
 
@@ -214,4 +216,4 @@ Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出�
 
 Gaze 官方图标 [gaze.svg](public/images/gaze.svg) 来自 [Gundu Labs 官方仓库](https://github.com/gundulabs/gaze/blob/main/packaging/gui/com.gundulabs.Gaze.svg)，原样保留，版权归 2026 Gundu Labs，遵循 [GPL-3.0-or-later](public/images/gaze.LICENSE.txt)；该第三方素材不适用本站代码许可证。
 
-网页工具的第三方源码遵循各自上游许可（MIT），副本见 `third_party/` 与 `public/licenses/`。
+Freemium 与 jaywcjlove/tools 的工具源码采用 MIT 许可；其运行时依赖及附带资源遵循各自许可证，包括 Apache-2.0、BSD 与 MPL-2.0。许可证副本、依赖声明与 ExifReader 对应源码随 `public/licenses/` 发布，PDF.js 附带资源的许可随 `/tool-assets/pdfjs/` 发布；完整来源说明见 [网页工具说明](docs/tools.md#源码与许可证)。

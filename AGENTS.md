@@ -44,7 +44,7 @@
 | [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)               | 网易云 SVG 图标                                    |
 | [src/components/AnimatedCursor.vue](src/components/AnimatedCursor.vue)         | 加载区域的跟随鼠标指针动画                         |
 | [src/router.ts](src/router.ts)                                                 | 站内无刷新导航、历史滚动恢复、运行时元信息         |
-| [src/pages.ts](src/pages.ts)                                                   | 全部页面路径表，新增页面时必须登记                 |
+| [src/pages.ts](src/pages.ts)                                                   | 页面路径表，工具路径由工具目录自动派生             |
 | [src/content.ts](src/content.ts)                                               | 个人资料、项目文案和链接                           |
 | [src/composables/useTheme.ts](src/composables/useTheme.ts)                     | 主题状态：保存选择优先，否则跟随系统               |
 | [src/utils/lyrics.ts](src/utils/lyrics.ts)                                     | 歌词解析与翻译合并                                 |
@@ -80,16 +80,18 @@
 
 ### 网页工具
 
-工具目录为 `/tool`，工具地址为 `/tools/*`。名称、分类和路径维护在 `src/tools/catalog.ts`，异步组件登记在 `src/tools/components.ts`。
+工具目录为 `/tool`，工具地址为 `/tools/*`。名称、分类、搜索词和路径由 `src/tools/catalog.ts` 汇总，其中 jaywcjlove/tools 的条目维护在 `src/tools/jaytools/catalog.ts`；异步组件登记在 `src/tools/components.ts`。页面路径、分享标签与站点地图从工具目录派生，无需逐项编辑 `src/pages.ts`。
 
 工具源码分两处：
 
 - `src/tools/freemium/`：Freemium（MIT）迁入的全部上游工具源码。
 - `src/tools/jaytools/`：jaywcjlove/tools（MIT）补充工具的 Vue 实现与本地资源。
 
-共享样式在 `src/style.css`（`.freemium-workbench` 范围），工具专用样式随上游组件保留。来源、版本、许可证与使用限制见 `docs/tools.md`、`third_party/freemium/README.md` 与 `third_party/jaywcjlove-tools/upstream.json`；升级时核对完整上游清单并保留许可证。
+共享样式在 `src/style.css`（`.freemium-workbench` 与 `.jay-*` 范围），Freemium 组件的专用样式随组件保留。来源、版本、许可证与使用限制见 [docs/tools.md](docs/tools.md)、[Freemium 来源说明](third_party/freemium/README.md) 与 [Web Tools 来源说明](third_party/jaywcjlove-tools/README.md)。升级时核对完整上游清单，更新固定版本、源码归档、校验值与逐项去重映射，保留原始许可证。更新 jaytools 依赖后运行 `node scripts/update-jaytools-notices.mjs`，并核对依赖声明、补充许可证与 ExifReader 对应源码。
 
-输入仅在本地处理，不上传、不持久保存。变更转换规则运行 `node scripts/check-tools.mjs` 与 `node scripts/check-jaytools.mjs`；交互或布局变更运行 `python3 scripts/check-tools-browser.py`，jaytools 页面另可运行 `python3 scripts/check-jaytools-browser.py`。
+工具计算仅在浏览器内处理输入，不上传、不持久保存；项目徽章的引用代码在本地生成，只有主动打开远程徽章链接时才向对应服务发送项目名或徽章文字。保留计算任务的取消、过期结果隔离与卸载清理。PDF.js 的字体、CMap、WASM 与附带许可证由 `build/toolAssets.ts` 在开发和构建时提供本地资源；新增工具无需应用后端，浏览器 Web Worker 不改变 Cloudflare Pages 部署方式。
+
+变更清单或转换规则运行 `node scripts/check-tools.mjs`，该入口已包含 `check-jaytools.mjs`，无需重复执行；归档校验需要系统提供 `tar`。交互或布局变更运行 `python3 scripts/check-tools-browser.py`，涉及 jaytools 时再运行 `python3 scripts/check-jaytools-browser.py`，检查真实文件、图片与 ZIP 导出、取消、主题、响应式和动效。后者还需要 Python Pillow（`PIL`），截图与下载结果位于 `artifacts/jaytools/`。
 
 ### 小游戏
 
@@ -180,8 +182,8 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 | 页面 CSS、模板、前端逻辑或图片 | `npm run build`，检查受影响区域的深浅主题和桌面、窄屏表现                                                                                        |
 | 导航、主题、复制或整体布局     | 在开发服务器运行时执行 `python3 scripts/check-browser.py`                                                                                        |
 | 项目目录                       | `python3 scripts/check-project-directory.py`                                                                                                     |
-| 网页工具                       | `node scripts/check-tools.mjs`、`node scripts/check-jaytools.mjs`                                                                                |
-| 工具交互或布局                 | `python3 scripts/check-tools-browser.py`、`python3 scripts/check-jaytools-browser.py`                                                            |
+| 工具清单或转换规则             | `node scripts/check-tools.mjs`（已包含 `check-jaytools.mjs`）                                                                                    |
+| 工具交互或布局                 | `python3 scripts/check-tools-browser.py`；涉及 jaytools 时另运行 `python3 scripts/check-jaytools-browser.py`                                     |
 | 游戏规则                       | `node scripts/check-games.mjs`                                                                                                                   |
 | 游戏交互或布局                 | `python3 scripts/check-games-browser.py`                                                                                                         |
 | 游戏动效、拖拽与终局           | `python3 scripts/check-games-motion.py`、`python3 scripts/check-games-options-motion.py`                                                         |
