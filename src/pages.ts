@@ -1,3 +1,4 @@
+import { toolCatalog, toolIds, type ToolId } from './tools/catalog'
 /** One route table for Vue page selection and generated sharing documents. */
 import { gazeGuides, gazeGuidePath } from './gaze/catalog'
 import { errorPaths } from './errors/catalog'
@@ -5,6 +6,10 @@ import { errorPaths } from './errors/catalog'
 const gazeGuidePages = Object.fromEntries(
   gazeGuides.map((guide) => [`gaze.${guide.id}`, gazeGuidePath(guide.id)]),
 )
+
+const toolPages = Object.fromEntries(toolIds.map((id) => [id, toolCatalog[id].path])) as {
+  [Id in ToolId]: `/tools/${Id}`
+}
 
 export const pages = {
   home: '/',
@@ -26,18 +31,7 @@ export const pages = {
   go: '/games/go',
   doudizhu: '/games/doudizhu',
   junqi: '/games/junqi',
-  json: '/tools/json',
-  base64: '/tools/base64',
-  url: '/tools/url',
-  timestamp: '/tools/timestamp',
-  uuid: '/tools/uuid',
-  text: '/tools/text',
-  radix: '/tools/radix',
-  hash: '/tools/hash',
-  jwt: '/tools/jwt',
-  password: '/tools/password',
-  html: '/tools/html',
-  color: '/tools/color',
+  ...toolPages,
   rdp: '/projects/rdp-access-auth',
   wiki: '/projects/rdp-access-auth/wiki',
   downloads: '/projects/rdp-access-auth/downloads',

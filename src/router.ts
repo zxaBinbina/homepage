@@ -2,7 +2,7 @@ import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { isProjectPage, isGazePage, knownPageForPath, pages, type PageName } from './pages'
 import { gazeGuides } from './gaze/catalog'
-import { isToolId } from './tools/catalog'
+import { isToolId, toolIds, type ToolId } from './tools/catalog'
 import { isGameId } from './games/catalog'
 import { isErrorPage } from './errors/catalog'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
@@ -11,6 +11,10 @@ const components = {
   home: () => import('./HomePage.vue'),
   directory: () => import('./ProjectDirectory.vue'),
   tools: () => import('./tools/ToolDirectory.vue'),
+  ...(Object.fromEntries(toolIds.map((id) => [id, () => import('./tools/ToolPage.vue')])) as Record<
+    ToolId,
+    () => Promise<typeof import('./tools/ToolPage.vue')>
+  >),
   games: () => import('./games/GameDirectory.vue'),
   twenty48: () => import('./games/GamePage.vue'),
   minesweeper: () => import('./games/GamePage.vue'),
@@ -27,18 +31,6 @@ const components = {
   go: () => import('./games/GamePage.vue'),
   doudizhu: () => import('./games/GamePage.vue'),
   junqi: () => import('./games/GamePage.vue'),
-  json: () => import('./tools/ToolPage.vue'),
-  base64: () => import('./tools/ToolPage.vue'),
-  url: () => import('./tools/ToolPage.vue'),
-  timestamp: () => import('./tools/ToolPage.vue'),
-  uuid: () => import('./tools/ToolPage.vue'),
-  text: () => import('./tools/ToolPage.vue'),
-  radix: () => import('./tools/ToolPage.vue'),
-  hash: () => import('./tools/ToolPage.vue'),
-  jwt: () => import('./tools/ToolPage.vue'),
-  password: () => import('./tools/ToolPage.vue'),
-  html: () => import('./tools/ToolPage.vue'),
-  color: () => import('./tools/ToolPage.vue'),
   rdp: () => import('./rdp/App.vue'),
   wiki: () => import('./rdp/App.vue'),
   downloads: () => import('./rdp/App.vue'),
@@ -100,6 +92,7 @@ export const router = createRouter({
     ...(Object.keys(pages) as PageName[]).map((name) => ({
       name,
       path: pages[name],
+      meta: isToolId(name) ? { tool: name } : {},
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
       component: isErrorPage(name) ? () => import('./errors/ErrorPage.vue') : components[name],

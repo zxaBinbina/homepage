@@ -2852,6 +2852,7 @@ h1 > span {
 
 /* Browser tools use the shared surfaces, pills and typography. */
 .tools-accent {
+  display: inline-block;
   color: var(--blue);
 }
 .tool-filters {
@@ -2897,7 +2898,7 @@ h1 > span {
     ),
     var(--panel);
   transition:
-    transform 0.25s var(--motion-ease),
+    translate 0.25s var(--motion-ease),
     border-color 0.25s,
     box-shadow 0.25s;
 }
@@ -2979,217 +2980,531 @@ h1 > span {
   letter-spacing: -1px;
   margin: 14px 0 0;
 }
-.tool-workspace {
-  margin-top: 32px;
+.tool-heading > p:last-child {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
 }
-.tool-controls,
-.tool-after-actions {
+.tool-main > .freemium-workbench {
+  margin-top: 30px;
+}
+.tool-privacy {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.tool-controls .button,
-.tool-form-panel .button,
-.tool-after-actions .button {
-  min-height: 44px;
-  padding: 11px 18px;
   gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 26px;
+  line-height: 1.8;
 }
-.tool-field-inline,
-.tool-checkbox {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  max-width: 100%;
-  gap: 10px;
-  font-size: 13px;
+.tools-credit {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
 }
-.tool-field-inline input[type='number'] {
-  width: 88px;
+.tools-credit a {
+  color: var(--blue);
+  text-underline-offset: 3px;
 }
-.tool-workspace :is(input:not([type='checkbox']), select) {
-  min-width: 0;
-  max-width: 100%;
-  min-height: 44px;
+.tools-directory .directory-toolbar {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.tool-load-state {
+  padding: 50px 24px;
+  min-height: 300px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: var(--panel);
-  color: var(--text);
-  font: inherit;
+  border-radius: 20px;
+  color: var(--muted);
 }
-.tool-workspace :is(input, select, textarea):focus-visible {
+.tool-load-state .button {
+  margin-top: 20px;
+}
+.tools-grid {
+  position: relative;
+}
+.tool-card {
+  will-change: auto;
+}
+.tool-card:hover {
+  translate: 0 -5px;
+  transform: none;
+}
+.tool-list-enter-active {
+  transition:
+    opacity 300ms ease var(--tool-delay),
+    transform 360ms var(--motion-ease) var(--tool-delay);
+}
+.tool-list-leave-active {
+  position: absolute;
+  transition:
+    opacity 140ms ease,
+    transform 180ms var(--motion-ease);
+}
+.tool-list-enter-from {
+  opacity: 0;
+  transform: translateY(14px) scale(0.98);
+}
+.tool-list-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+.tool-list-move {
+  transition: transform 320ms var(--motion-ease);
+}
+.tool-empty-enter-active,
+.tool-empty-leave-active {
+  transition:
+    opacity 160ms ease,
+    translate 200ms var(--motion-ease);
+}
+.tool-empty-enter-from,
+.tool-empty-leave-to {
+  opacity: 0;
+  translate: 0 8px;
+}
+@keyframes tool-workbench-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.tool-heading {
+  animation: tool-workbench-in 420ms var(--motion-ease) both;
+}
+.tool-main > .freemium-workbench {
+  animation: tool-workbench-in 480ms var(--motion-ease) 60ms backwards;
+}
+.tool-route.page-swap-leave-active .tool-heading,
+.tool-route.page-swap-leave-active .freemium-workbench {
+  animation: none;
+}
+/* Freemium MIT components use local aliases of the existing site tokens. No upstream global reset. */
+.freemium-workbench {
+  --bg-2: var(--panel);
+  --bg-3: var(--bg);
+  --label: var(--text);
+  --label-2: var(--muted);
+  --label-3: var(--muted);
+  --label-4: var(--border);
+  --fill: color-mix(in srgb, var(--text) 20%, transparent);
+  --fill-2: var(--panel-hover);
+  --fill-3: color-mix(in srgb, var(--text) 7%, transparent);
+  --fill-4: color-mix(in srgb, var(--text) 4%, transparent);
+  --separator: var(--border);
+  --separator-opaque: var(--border);
+  --tint: var(--primary-action);
+  --tint-text: var(--blue);
+  --on-tint: var(--primary-action-text);
+  --green: var(--status-success);
+  --red: var(--status-danger);
+  --orange: var(--warm);
+  --yellow: var(--warm);
+  --purple: var(--blue);
+  --danger-text: var(--status-danger);
+  --success-text: var(--status-success);
+  --warning-text: var(--muted);
+  --glass-bg: var(--glass);
+  --glass-filter: blur(20px);
+  --glass-rim: inset 0 0 0 1px var(--border);
+  --glass-edge: 0 0 transparent;
+  --glass-shadow: 0 10px 30px var(--shadow);
+  --glass-hover: var(--panel-hover);
+  --radius-card: 20px;
+  --radius-field: 12px;
+  --radius-window: 20px;
+  --inset: 12px;
+  --hit: 44px;
+  --shadow-card: 0 0 0 1px var(--border);
+  --font-sans: Inter, 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  --focus-ring: 0 0 0 2px var(--blue);
+  --ease: var(--motion-ease);
+  --dur: 240ms;
+  color: var(--text);
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.freemium-workbench :is(button, input, select, textarea) {
+  font-family: inherit;
+  max-width: 100%;
+}
+.freemium-workbench :is(button, a, input, select, textarea):focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 3px;
 }
-.tool-checkbox input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--blue);
+.freemium-workbench :is(h2, h3, h4, p, figure, dl, dd) {
+  margin: 0;
 }
-.tool-editor-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.freemium-workbench .tool-page {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-}
-.tool-editor {
-  align-self: start;
-}
-.tool-editor,
-.tool-form-panel {
   min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--panel);
 }
-.tool-editor-header {
+.freemium-workbench .tool-page__options,
+.freemium-workbench .tool-page__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  gap: 12px 16px;
 }
-.tool-editor-header > label {
-  padding-block: 10px;
+.freemium-workbench .tool-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  container-type: inline-size;
+}
+.freemium-workbench .tool-page__body > * {
+  min-width: 0;
+}
+
+/* Text styles ───────────────────────── */
+.freemium-workbench .t-large-title {
+  font-size: 2.125rem;
+  line-height: 1.206;
+  font-weight: 700;
+  letter-spacing: 0.011em;
+}
+.freemium-workbench .t-title1 {
+  font-size: 1.75rem;
+  line-height: 1.214;
+  font-weight: 700;
+  letter-spacing: 0.012em;
+}
+.freemium-workbench .t-title2 {
+  font-size: 1.375rem;
+  line-height: 1.273;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+.freemium-workbench .t-title3 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+.freemium-workbench .t-headline {
+  font-size: 1.0625rem;
+  line-height: 1.294;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.freemium-workbench .t-body {
+  font-size: 1.0625rem;
+  line-height: 1.294;
+  letter-spacing: -0.025em;
+}
+.freemium-workbench .t-callout {
+  font-size: 1rem;
+  line-height: 1.3125;
+  letter-spacing: -0.02em;
+}
+.freemium-workbench .t-subhead {
+  font-size: 0.9375rem;
+  line-height: 1.333;
+  letter-spacing: -0.015em;
+}
+.freemium-workbench .t-footnote {
+  font-size: 0.8125rem;
+  line-height: 1.385;
+  letter-spacing: -0.006em;
+}
+.freemium-workbench .t-caption {
+  font-size: 0.75rem;
+  line-height: 1.333;
+  letter-spacing: 0;
+}
+.freemium-workbench .t-caption2 {
+  font-size: 0.6875rem;
+  line-height: 1.18;
+  letter-spacing: 0.005em;
+}
+.freemium-workbench .t-secondary {
+  color: var(--label-2);
+}
+.freemium-workbench .t-tertiary {
+  color: var(--label-3);
+}
+.freemium-workbench .t-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+.freemium-workbench .t-semibold {
   font-weight: 600;
 }
-.tool-inline-actions {
-  display: flex;
-  gap: 4px;
+
+/* ───────────────────────── Liquid Glass (navigation layer only) ───────────────────────── */
+.freemium-workbench .glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-rim), var(--glass-edge), var(--glass-shadow);
 }
-.tool-inline-actions button {
+
+/* ───────────────────────── Buttons ───────────────────────── */
+.freemium-workbench .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 44px;
-  min-width: 44px;
-  padding-inline: 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  background: transparent;
-}
-.tool-inline-actions button:not(:disabled):hover {
-  background: var(--panel-hover);
-  color: var(--text);
-}
-.tool-workspace button:disabled {
-  opacity: 0.45;
-  transform: none;
-  box-shadow: none;
-}
-.tool-editor textarea {
-  display: block;
-  width: 100%;
-  min-height: 360px;
-  resize: vertical;
-  padding: 20px;
+  min-height: var(--hit);
+  padding: 0 14px;
   border: 0;
-  border-radius: 0;
+  border-radius: 999px;
+  background: var(--fill-3);
+  color: var(--tint-text);
+  font-size: 0.9375rem;
+  font-weight: 590;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease,
+    transform 160ms var(--ease),
+    opacity 160ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.freemium-workbench .btn:hover {
+  background: var(--fill-2);
+}
+.freemium-workbench .btn:active {
+  transform: scale(0.97);
+}
+.freemium-workbench .btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.freemium-workbench .btn--prominent {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+.freemium-workbench .btn--prominent:hover {
+  background: color-mix(in srgb, var(--tint) 88%, #000);
+}
+.freemium-workbench .btn--plain {
   background: transparent;
-  color: var(--text);
-  font:
-    13px/1.8 ui-monospace,
-    SFMono-Regular,
-    Consolas,
-    'Liberation Mono',
-    monospace;
-  tab-size: 2;
-  overflow-wrap: anywhere;
 }
-.tool-editor textarea::placeholder {
-  color: var(--muted);
+.freemium-workbench .btn--plain:hover {
+  background: var(--fill-4);
 }
-.tool-editor-meta {
-  min-height: 43px;
-  padding: 12px 18px;
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
+.freemium-workbench .btn--neutral {
+  color: var(--label);
 }
-.tool-after-actions {
-  margin-top: 16px;
-  margin-bottom: 0;
+.freemium-workbench .btn--danger {
+  color: var(--danger-text);
 }
-.tool-muted {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
+.freemium-workbench .btn--glass {
+  background: var(--glass-bg);
+  color: var(--label);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow:
+    var(--glass-rim),
+    var(--glass-edge),
+    0 4px 16px rgba(0, 0, 0, 0.08);
 }
-.tool-error {
-  margin-block: 16px;
-  padding: 14px 18px;
-  border: 1px solid color-mix(in srgb, var(--status-danger) 35%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--status-danger) 6%, transparent);
-  color: var(--status-danger);
-  font-size: 13px;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
+.freemium-workbench .btn--glass:hover {
+  background: color-mix(in srgb, var(--glass-bg) 100%, var(--glass-hover));
 }
-.tool-hint {
-  margin-top: 24px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.9;
+.freemium-workbench .btn--sm {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+  gap: 4px;
 }
-.tool-form-panel {
+@media (pointer: coarse) {
+  .freemium-workbench .btn--sm {
+    min-height: 44px;
+    padding: 0 14px;
+  }
+}
+
+.freemium-workbench .icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--hit);
+  height: var(--hit);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--label-2);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.freemium-workbench .icon-btn:hover {
+  background: var(--fill-3);
+  color: var(--label);
+}
+.freemium-workbench .icon-btn:active {
+  transform: scale(0.92);
+}
+.freemium-workbench .icon-btn[aria-pressed='true'] {
+  color: var(--tint-text);
+}
+.freemium-workbench .icon-btn--sm {
+  width: 44px;
+  height: 44px;
+}
+@media (pointer: coarse) {
+  .freemium-workbench .icon-btn--sm {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Grouped toolbar items share one glass capsule (HIG: group related items) */
+.freemium-workbench .btn-group {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+}
+
+/* ───────────────────────── Fields ───────────────────────── */
+.freemium-workbench .field {
+  width: 100%;
+  min-height: var(--hit);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--fill-3);
+  color: var(--label);
+  font-size: 1rem;
+}
+.freemium-workbench .field::placeholder {
+  color: var(--label-3);
+}
+.freemium-workbench .field:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+.freemium-workbench select.field {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 9 5-5 5 5M7 15l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+.freemium-workbench textarea.field {
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.freemium-workbench .label {
+  display: block;
+  margin: 0 0 6px 4px;
+  font-size: 0.8125rem;
+  color: var(--label-2);
+}
+
+/* ───────────────────────── Cards (content layer) ───────────────────────── */
+.freemium-workbench .card {
+  background: var(--bg-2);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.freemium-workbench .inset-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-2);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.freemium-workbench .inset-list > * + * {
+  box-shadow:
+    inset 16px 1px 0 -0.5px var(--bg-2),
+    inset 0 0.5px 0 0 var(--separator);
+}
+.freemium-workbench .row {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 24px;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
 }
-.tool-form-panel h2 {
-  font-size: 18px;
+.freemium-workbench .row__label {
+  flex: 1;
+  min-width: 0;
+}
+.freemium-workbench .row__value {
+  color: var(--label-2);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0;
+  text-align: right;
+  word-break: break-all;
+}
+
+.freemium-workbench .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--fill-3);
+  color: var(--label-2);
+}
+.freemium-workbench .badge--ok {
+  color: var(--success-text);
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+}
+.freemium-workbench .badge--err {
+  color: var(--danger-text);
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+}
+
+.freemium-workbench kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--fill-3);
+  color: var(--label-2);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
   font-weight: 600;
 }
-.tool-field {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-  font-size: 13px;
+
+/* ───────────────────────── Split arrangement ─────────────────────────
+   HIG (iPhone Duo › Arrangement views): split side by side when wide,
+   one above the other when narrow. Driven by the container, not the device. */
+.freemium-workbench .split {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
 }
-.tool-field :is(input, select) {
-  width: 100%;
+@container (min-width: 640px) {
+  .freemium-workbench .split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .freemium-workbench .split--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
-.tool-compact-output {
-  margin-top: 20px;
+.freemium-workbench .tool-page--fill .split {
+  flex: 1;
+  min-height: 0;
+  grid-auto-rows: minmax(220px, 1fr);
 }
-.tool-compact-output textarea {
-  min-height: 170px;
-}
-.tool-time-note {
-  margin-top: 16px;
-}
-.tool-color-preview {
-  width: 100%;
-  min-height: 160px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--bg);
-}
-.tool-color-controls {
-  margin-bottom: 0;
-}
-.tool-color-controls input[type='color'] {
-  width: 56px;
-  padding: 4px;
-  cursor: var(--cursor-link);
-}
-.tool-color-output {
-  margin-top: 0;
-}
+
 @media (max-width: 1050px) {
   .tools-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3207,15 +3522,6 @@ h1 > span {
   .tool-main {
     padding-block: 106px 48px;
   }
-  .tool-editor-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .tool-editor textarea {
-    min-height: 260px;
-  }
-  .tool-compact-output textarea {
-    min-height: 190px;
-  }
   .tool-card {
     padding: 22px;
   }
@@ -3224,12 +3530,6 @@ h1 > span {
   .tools-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-  .tool-form-panel {
-    padding: 20px;
-  }
-  .tool-editor-header {
-    padding-inline: 12px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .tool-card {
@@ -3237,6 +3537,83 @@ h1 > span {
   }
   .tool-card:hover {
     transform: none;
+  }
+}
+
+.freemium-workbench .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.freemium-workbench.pane-portal {
+  display: contents;
+}
+.freemium-workbench .seg {
+  max-width: 100%;
+}
+.freemium-workbench .opt-field {
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+.freemium-workbench .opt-field__control {
+  min-width: 0;
+  min-height: 44px;
+}
+.freemium-workbench .pane__actions {
+  flex-wrap: wrap;
+}
+.freemium-workbench .pane__text {
+  min-height: 320px;
+  resize: vertical;
+  font-family: var(--font-mono);
+}
+.freemium-workbench .pane--max .pane__text {
+  resize: none;
+}
+.freemium-workbench .pane__bar {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+@media (max-width: 480px) {
+  .freemium-workbench .pane__bar {
+    gap: 4px;
+    padding-left: 12px;
+  }
+  .freemium-workbench .pane__actions {
+    margin-left: auto;
+  }
+  .freemium-workbench .pane__text {
+    min-height: 220px;
+  }
+  .freemium-workbench .row {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-heading,
+  .tool-main > .freemium-workbench {
+    animation: none;
+  }
+  .tool-card,
+  .tool-empty-enter-active,
+  .tool-empty-leave-active {
+    transition: none;
+  }
+  .tool-card:hover {
+    translate: none;
+  }
+  .freemium-workbench *,
+  .freemium-workbench *::before,
+  .freemium-workbench *::after {
+    animation-duration: 0s;
+    transition-duration: 0s;
+    scroll-behavior: auto;
   }
 }
 

@@ -11,10 +11,23 @@
     "sync:music": "node scripts/sync-music.mjs"
   },
   "dependencies": {
+    "@peculiar/x509": "1.14.3",
     "chess.js": "^1.4.0",
+    "cron-parser": "5.10.2",
+    "crypto-js": "4.2.0",
+    "diff": "9.0.0",
+    "dompurify": "3.4.17",
+    "js-beautify": "2.0.3",
+    "js-yaml": "5.4.3",
+    "json-2-csv": "5.6.0",
+    "jsqr": "1.4.0",
     "lucide-vue-next": "^0.468.0",
+    "qrious": "4.0.2",
+    "sql-formatter": "15.9.0",
+    "vkbeautify": "0.99.3",
     "vue": "^3.5.22",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@types/ejs": "^3.1.5",
@@ -24,7 +37,7 @@
     "marked": "^18.0.14",
     "prettier": "^3.9.9",
     "typescript": "~5.9.3",
-    "vite": "^7.1.9",
+    "vite": "^7.3.7",
     "vue-tsc": "^3.1.0"
   }
 }

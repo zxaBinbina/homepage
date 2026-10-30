@@ -25,7 +25,7 @@ const projectPages = {
   tools: {
     title: '网页工具 · a彬彬a',
     description:
-      '浏览器本地处理的网页工具：JSON 格式化、编解码、时间戳与进制转换、哈希计算、JWT 解析、密码与 UUID 生成、文本整理和颜色转换。',
+      '41 个浏览器本地工具：代码格式化、JSON / YAML / CSV / Excel 转换、二维码、正则测试、证书检查、哈希与随机生成，输入不上传、不保存。',
   },
   directory: {
     title: '项目目录 · a彬彬a',

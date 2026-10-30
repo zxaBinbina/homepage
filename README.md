@@ -43,28 +43,13 @@
 
 ## 网页工具
 
-访问 `https://zxabinbina.cc.cd/tool`，或点击桌面 / 移动导航中的「工具」，可按分类与关键词查找十二个网页工具。工具页沿用主页的深浅主题、胶囊导航、圆角卡片和共用页脚；主页、项目目录、工具与游戏之间切换时保留播放器实例。
+访问 `/tool`，或点击导航「工具」，可按分类和关键词查找 **41 个网页工具**。全部工具来自 [Freemium](https://github.com/incentius-foss/freemium)（MIT），已将其 Vue 源码迁入本站，替换原有 12 个工具的实现。目录、中文操作界面、Lucide 图标、深浅主题与芙芙蓝 / 胡桃红配色保持一致；保留共享播放器与页脚，加入卡片错峰进入、筛选退出 / 重排和页面切换动画。
 
-| 工具          | 地址               | 功能                                                              |
-| ------------- | ------------------ | ----------------------------------------------------------------- |
-| JSON 格式化   | `/tools/json`      | 语法校验、2 / 4 空格或 Tab 缩进、压缩；保留长整数、键顺序和重复键 |
-| Base64 编解码 | `/tools/base64`    | UTF-8 文本与标准 / URL 安全 Base64 双向转换，支持中文和 Emoji     |
-| URL 编解码    | `/tools/url`       | 参数值或完整网址转换，可将参数中的 `+` 解码为空格                 |
-| 时间戳转换    | `/tools/timestamp` | 秒 / 毫秒与日期双向转换，显示 UTC 和本地时区，支持当前时间        |
-| UUID 生成     | `/tools/uuid`      | 浏览器安全随机数生成 UUID v4，每批 1–100 个，可选大写和连字符     |
-| 文本整理      | `/tools/text`      | 按行去重、移除空行、清理行首尾空格、大小写转换和字符 / 行数统计   |
-| 进制转换      | `/tools/radix`     | 2–36 进制整数互转，支持正负数、匹配进制的前缀和超长整数           |
-| 哈希计算      | `/tools/hash`      | UTF-8 文本的 SHA-256 / SHA-384 / SHA-512 / SHA-1 摘要             |
-| JWT 解析      | `/tools/jwt`       | 查看 Header、Payload、签发 / 到期时间；不验证签名                 |
-| 密码生成      | `/tools/password`  | 安全随机密码，自选长度、字符类型、数量，可排除易混字符            |
-| HTML 实体转换 | `/tools/html`      | 特殊字符转义与带分号实体还原，结果始终按文本显示                  |
-| 颜色转换      | `/tools/color`     | HEX / RGB / HSL 互转、原生取色器和颜色预览                        |
+覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串和编解码。输入在浏览器内处理，不上传、不持久保存；需要的库随工具按需加载。完整地址、使用限制与维护说明见 [网页工具说明](docs/tools.md)，上游版本与许可证见 [源码来源](third_party/freemium/README.md)。
 
-所有输入仅在浏览器内处理，不发送到接口、不持久保存，离开页面后清空。结果支持复制和下载；文本工具提供示例与清空，可继续转换的结果支持「将结果用作输入」。修改输入或转换选项后旧结果立即失效，避免误复制。文本输入处理上限为 100 万个 UTF-16 字符，JSON 支持最多 64 层嵌套，格式化结果上限为 400 万字符。Base64 工具用于 UTF-8 文本，不用于二进制文件。进制转换支持最多 4096 位整数，使用 BigInt 保留精度。哈希通过 Web Crypto 计算，支持空文本；等待计算时修改输入或选项会丢弃旧任务的结果。JWT 只解析内容与时间字段，不验证签名或授权。密码长度为 8–128，每批 1–50 个，使用浏览器安全随机数，每个密码包含所选的每类字符。颜色转换支持三位 / 六位 HEX、整数 RGB 与 HSL，不含透明度。
+`src/tools/catalog.ts` 维护名称、分类与路径；`src/tools/components.ts` 登记延迟加载组件，功能源码位于 `src/tools/freemium/`。工具地址、分享标签与站点地图由统一目录派生，构建生成 `tool.html` 与 `tools/*.html`。旧工具已移除，以目录中的新地址为准。
 
-工具目录与工作页位于 `src/tools/`，名称、说明与分类统一维护在 `src/tools/catalog.ts`，转换逻辑位于 `src/tools/transform.ts`，样式位于 `src/style.css`。新增工具时同时登记 `src/pages.ts`、`src/router.ts` 和分享检查断言；`site.config.ts` 根据目录文案生成工具元信息。构建自动生成 `tool.html` 和 `tools/*.html`，随完整构建产物部署到现有 Cloudflare Pages 即可。
-
-运行 `node scripts/check-tools.mjs` 检查转换规则和边界；预览服务启动后运行 `python3 scripts/check-tools-browser.py` 检查工具操作、复制下载、地址刷新、主题、移动菜单和响应式。浏览器脚本支持 `HOMEPAGE_TEST_URL` 与 `HOMEPAGE_BROWSER`，本次截图写入 `artifacts/tool*.png`。
+运行 `node scripts/check-tools.mjs` 检查完整清单与转换规则；启动开发或构建预览服务后运行 `python3 scripts/check-tools-browser.py`，检查全部 41 个工具、文件操作、复制下载、响应式、主题与动效。浏览器脚本需要 Python Playwright，可用 `HOMEPAGE_TEST_URL` 和 `HOMEPAGE_BROWSER` 指定服务器与浏览器；截图写入 `artifacts/`。
 
 ## 小游戏
 

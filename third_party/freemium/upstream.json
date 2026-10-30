@@ -1,0 +1,431 @@
+{
+  "repository": "https://github.com/incentius-foss/freemium",
+  "commit": "ddae2a2ebee1354b2f69766cf673e06ef1593658",
+  "license": "MIT",
+  "tools": [
+    {
+      "id": "json-formatter",
+      "title": "JSON Formatter",
+      "description": "Format, validate, sort and minify JSON.",
+      "category": "format",
+      "icon": "braces",
+      "keywords": "['json', 'pretty', 'validate', 'minify', 'lint']",
+      "file": "JsonFormatter.vue"
+    },
+    {
+      "id": "html-beautify",
+      "title": "HTML Beautify",
+      "description": "Beautify or minify HTML and ERB templates.",
+      "category": "format",
+      "icon": "code",
+      "keywords": "['html', 'erb', 'markup', 'pretty', 'minify']",
+      "file": "HtmlBeautify.vue"
+    },
+    {
+      "id": "css-beautify",
+      "title": "CSS Beautify",
+      "description": "Beautify or minify CSS, SCSS and LESS.",
+      "category": "format",
+      "icon": "palette",
+      "keywords": "['css', 'scss', 'less', 'sass', 'style', 'minify']",
+      "file": "CssBeautify.vue"
+    },
+    {
+      "id": "js-beautify",
+      "title": "JavaScript Beautify",
+      "description": "Beautify or minify JavaScript.",
+      "category": "format",
+      "icon": "textAlign",
+      "keywords": "['js', 'javascript', 'typescript', 'pretty', 'minify']",
+      "file": "JsBeautify.vue"
+    },
+    {
+      "id": "xml-beautify",
+      "title": "XML Beautify",
+      "description": "Beautify or minify XML documents.",
+      "category": "format",
+      "icon": "code",
+      "keywords": "['xml', 'svg', 'plist', 'rss', 'pretty', 'minify']",
+      "file": "XmlBeautify.vue"
+    },
+    {
+      "id": "sql-formatter",
+      "title": "SQL Formatter",
+      "description": "Format SQL for a dozen dialects.",
+      "category": "format",
+      "icon": "table",
+      "keywords": "['sql', 'query', 'postgres', 'mysql', 'database']",
+      "file": "SqlFormatter.vue"
+    },
+    {
+      "id": "line-sort",
+      "title": "Line Sort & Dedupe",
+      "description": "Sort, reverse, shuffle and de-duplicate lines.",
+      "category": "format",
+      "icon": "sort",
+      "keywords": "['lines', 'sort', 'unique', 'dedupe', 'shuffle', 'reverse']",
+      "file": "LineSort.vue"
+    },
+    {
+      "id": "yaml-to-json",
+      "title": "YAML to JSON",
+      "description": "Convert YAML documents to JSON.",
+      "category": "convert",
+      "icon": "swap",
+      "keywords": "['yaml', 'yml', 'json', 'convert', 'kubernetes']",
+      "file": "YamlToJson.vue"
+    },
+    {
+      "id": "json-to-yaml",
+      "title": "JSON to YAML",
+      "description": "Convert JSON to readable YAML.",
+      "category": "convert",
+      "icon": "swap",
+      "keywords": "['json', 'yaml', 'yml', 'convert']",
+      "file": "JsonToYaml.vue"
+    },
+    {
+      "id": "json-to-csv",
+      "title": "JSON to CSV",
+      "description": "Turn an array of objects into CSV.",
+      "category": "convert",
+      "icon": "table",
+      "keywords": "['json', 'csv', 'spreadsheet', 'excel', 'convert']",
+      "file": "JsonToCsv.vue"
+    },
+    {
+      "id": "csv-to-json",
+      "title": "CSV to JSON",
+      "description": "Parse CSV or TSV into JSON.",
+      "category": "convert",
+      "icon": "table",
+      "keywords": "['csv', 'tsv', 'json', 'spreadsheet', 'convert']",
+      "file": "CsvToJson.vue"
+    },
+    {
+      "id": "excel-to-json",
+      "title": "Excel to JSON",
+      "description": "Read .xlsx sheets as JSON.",
+      "category": "convert",
+      "icon": "table",
+      "keywords": "['excel', 'xlsx', 'xls', 'sheet', 'json']",
+      "file": "ExcelToJson.vue"
+    },
+    {
+      "id": "number-base",
+      "title": "Number Base Converter",
+      "description": "Binary, octal, decimal, hex and any base.",
+      "category": "convert",
+      "icon": "number",
+      "keywords": "['binary', 'hex', 'octal', 'decimal', 'radix', 'base']",
+      "file": "NumberBase.vue"
+    },
+    {
+      "id": "text-case",
+      "title": "String Case Converter",
+      "description": "camelCase, snake_case, Title Case and more.",
+      "category": "convert",
+      "icon": "textformat",
+      "keywords": "['case', 'camel', 'snake', 'kebab', 'pascal', 'title', 'upper', 'lower', 'text style']",
+      "file": "TextCase.vue"
+    },
+    {
+      "id": "html-to-jsx",
+      "title": "HTML to JSX",
+      "description": "Convert HTML markup into valid JSX.",
+      "category": "convert",
+      "icon": "code",
+      "keywords": "['html', 'jsx', 'react', 'tsx', 'component']",
+      "file": "HtmlToJsx.vue"
+    },
+    {
+      "id": "php-json",
+      "title": "PHP ↔ JSON",
+      "description": "Arrays, serialize() and unserialize() for PHP.",
+      "category": "convert",
+      "icon": "swap",
+      "keywords": "['php', 'serialize', 'unserialize', 'array', 'json']",
+      "file": "PhpJson.vue"
+    },
+    {
+      "id": "svg-to-css",
+      "title": "SVG to CSS",
+      "description": "Embed SVG as a CSS background data URI.",
+      "category": "convert",
+      "icon": "image",
+      "keywords": "['svg', 'css', 'data uri', 'background', 'icon']",
+      "file": "SvgToCss.vue"
+    },
+    {
+      "id": "curl-to-code",
+      "title": "cURL to Code",
+      "description": "Turn a curl command into fetch, Python, Go and more.",
+      "category": "convert",
+      "icon": "terminal",
+      "keywords": "['curl', 'http', 'request', 'fetch', 'axios', 'python', 'go']",
+      "file": "CurlToCode.vue"
+    },
+    {
+      "id": "json-to-code",
+      "title": "JSON to Code",
+      "description": "Generate TypeScript, Swift, Go and Kotlin types.",
+      "category": "convert",
+      "icon": "braces",
+      "keywords": "['json', 'typescript', 'interface', 'swift', 'codable', 'go', 'struct', 'kotlin', 'types']",
+      "file": "JsonToCode.vue"
+    },
+    {
+      "id": "hex-ascii",
+      "title": "Hex ↔ ASCII",
+      "description": "Convert between hex bytes and text.",
+      "category": "convert",
+      "icon": "number",
+      "keywords": "['hex', 'ascii', 'bytes', 'utf8', 'text']",
+      "file": "HexAscii.vue"
+    },
+    {
+      "id": "unix-time",
+      "title": "Unix Time Converter",
+      "description": "Timestamps to dates and back, in any zone.",
+      "category": "inspect",
+      "icon": "clock",
+      "keywords": "['unix', 'epoch', 'timestamp', 'date', 'time', 'iso']",
+      "file": "UnixTime.vue"
+    },
+    {
+      "id": "jwt-debugger",
+      "title": "JWT Debugger",
+      "description": "Decode JSON Web Tokens and verify HMAC signatures.",
+      "category": "inspect",
+      "icon": "key",
+      "keywords": "['jwt', 'token', 'auth', 'bearer', 'jws', 'oauth']",
+      "file": "JwtDebugger.vue"
+    },
+    {
+      "id": "regex-tester",
+      "title": "RegExp Tester",
+      "description": "Test regular expressions with live highlighting.",
+      "category": "inspect",
+      "icon": "regex",
+      "keywords": "['regex', 'regexp', 'regular expression', 'match', 'pattern']",
+      "file": "RegexTester.vue"
+    },
+    {
+      "id": "html-preview",
+      "title": "HTML Preview",
+      "description": "Render HTML safely in a sandbox.",
+      "category": "inspect",
+      "icon": "eye",
+      "keywords": "['html', 'preview', 'render', 'sandbox']",
+      "file": "HtmlPreview.vue"
+    },
+    {
+      "id": "text-diff",
+      "title": "Text Diff Checker",
+      "description": "Compare two texts line by line or word by word.",
+      "category": "inspect",
+      "icon": "diff",
+      "keywords": "['diff', 'compare', 'difference', 'merge', 'patch']",
+      "file": "TextDiff.vue"
+    },
+    {
+      "id": "string-inspector",
+      "title": "String Inspector",
+      "description": "Count characters, words, bytes and code points.",
+      "category": "inspect",
+      "icon": "textformat",
+      "keywords": "['count', 'length', 'characters', 'words', 'bytes', 'unicode']",
+      "file": "StringInspector.vue"
+    },
+    {
+      "id": "markdown-preview",
+      "title": "Markdown Preview",
+      "description": "Live GitHub-flavored Markdown preview.",
+      "category": "inspect",
+      "icon": "markdown",
+      "keywords": "['markdown', 'md', 'readme', 'preview', 'gfm']",
+      "file": "MarkdownPreview.vue"
+    },
+    {
+      "id": "cron-parser",
+      "title": "Cron Job Parser",
+      "description": "Explain cron schedules and preview next runs.",
+      "category": "inspect",
+      "icon": "calendar",
+      "keywords": "['cron', 'crontab', 'schedule', 'job']",
+      "file": "CronParser.vue"
+    },
+    {
+      "id": "color-converter",
+      "title": "Color Converter",
+      "description": "HEX, RGB, HSL, HWB and OKLCH with contrast check.",
+      "category": "inspect",
+      "icon": "palette",
+      "keywords": "['color', 'colour', 'hex', 'rgb', 'hsl', 'oklch', 'contrast']",
+      "file": "ColorConverter.vue"
+    },
+    {
+      "id": "url-parser",
+      "title": "URL Parser",
+      "description": "Break a URL into parts and query parameters.",
+      "category": "inspect",
+      "icon": "globe",
+      "keywords": "['url', 'uri', 'query', 'params', 'parse', 'link']",
+      "file": "UrlParser.vue"
+    },
+    {
+      "id": "uuid",
+      "title": "UUID / ULID",
+      "description": "Generate and decode UUID v4, v7 and ULID.",
+      "category": "generate",
+      "icon": "fingerprint",
+      "keywords": "['uuid', 'guid', 'ulid', 'id', 'unique']",
+      "file": "UuidGenerator.vue"
+    },
+    {
+      "id": "lorem-ipsum",
+      "title": "Lorem Ipsum",
+      "description": "Placeholder words, sentences and paragraphs.",
+      "category": "generate",
+      "icon": "docText",
+      "keywords": "['lorem', 'ipsum', 'placeholder', 'dummy', 'text']",
+      "file": "LoremIpsum.vue"
+    },
+    {
+      "id": "qr-code",
+      "title": "QR Code",
+      "description": "Generate QR codes or read them from images.",
+      "category": "generate",
+      "icon": "qrcode",
+      "keywords": "['qr', 'qrcode', 'barcode', 'scan', 'reader']",
+      "file": "QrCode.vue"
+    },
+    {
+      "id": "hash-generator",
+      "title": "Hash Generator",
+      "description": "MD5, SHA-1, SHA-2, SHA-3 and HMAC.",
+      "category": "generate",
+      "icon": "hash",
+      "keywords": "['hash', 'md5', 'sha', 'sha256', 'sha512', 'hmac', 'checksum']",
+      "file": "HashGenerator.vue"
+    },
+    {
+      "id": "random-string",
+      "title": "Random String",
+      "description": "Secure random strings and passwords.",
+      "category": "generate",
+      "icon": "dice",
+      "keywords": "['random', 'password', 'string', 'token', 'secret']",
+      "file": "RandomString.vue"
+    },
+    {
+      "id": "base64",
+      "title": "Base64 String",
+      "description": "Encode and decode Base64 text, UTF-8 safe.",
+      "category": "encode",
+      "icon": "lock",
+      "keywords": "['base64', 'encode', 'decode', 'btoa', 'atob']",
+      "file": "Base64String.vue"
+    },
+    {
+      "id": "image-base64",
+      "title": "Base64 Image",
+      "description": "Images to data URIs and back.",
+      "category": "encode",
+      "icon": "photo",
+      "keywords": "['image', 'base64', 'data uri', 'png', 'jpg', 'svg']",
+      "file": "ImageBase64.vue"
+    },
+    {
+      "id": "url-encode",
+      "title": "URL Encode",
+      "description": "Percent-encode and decode URL components.",
+      "category": "encode",
+      "icon": "percent",
+      "keywords": "['url', 'encode', 'decode', 'percent', 'uri', 'escape']",
+      "file": "UrlEncode.vue"
+    },
+    {
+      "id": "html-entity",
+      "title": "HTML Entities",
+      "description": "Escape and unescape HTML entities.",
+      "category": "encode",
+      "icon": "ampersand",
+      "keywords": "['html', 'entity', 'entities', 'escape', 'unescape', 'amp']",
+      "file": "HtmlEntity.vue"
+    },
+    {
+      "id": "backslash-escape",
+      "title": "Backslash Escape",
+      "description": "Escape and unescape strings for code.",
+      "category": "encode",
+      "icon": "quote",
+      "keywords": "['escape', 'unescape', 'backslash', 'string', 'quote', 'newline']",
+      "file": "BackslashEscape.vue"
+    },
+    {
+      "id": "certificate-decoder",
+      "title": "Certificate Decoder",
+      "description": "Inspect and validate X.509 certificates: chain, hostname and private key.",
+      "category": "encode",
+      "icon": "certificate",
+      "keywords": "['certificate', 'x509', 'ssl', 'tls', 'pem', 'crt', 'validate', 'verify', 'chain', 'private key', 'checker']",
+      "file": "CertificateDecoder.vue"
+    }
+  ],
+  "sha256": {
+    "src/pages/tools/YamlToJson.vue": "906937a3fd0928005940e642cd0f664ea4f348a9bab906995f936577a88a1432",
+    "src/pages/tools/XmlBeautify.vue": "a852eebae257414f9fc31c68d9d08cfb830002d3e562803b42b1aeecffc19731",
+    "src/pages/tools/UuidGenerator.vue": "19066b4ebe5777546f2809222cdd3a322baf52041b98c94378e90becf4654e18",
+    "src/pages/tools/UrlParser.vue": "ab48dbc9a89b24312914fcd3dd658b0747c364842ea7dea68488abcf1ed1ff26",
+    "src/pages/tools/UrlEncode.vue": "378dfbad9bcffa4c8449bcd9d24ced30d3042cd9529983b6b7748821b4caaef6",
+    "src/pages/tools/UnixTime.vue": "7a3e29ff1cd3739ace1500cc670b0e9345a06ad4e50ac49dfc841295fd475fcc",
+    "src/pages/tools/TextDiff.vue": "0022200b54a853cdf99808387f14705a449bdc2bcd935d8453339914b2450936",
+    "src/pages/tools/TextCase.vue": "e0d08ffb3acfd058253265a10f40224c7489671614d3aa982b12be4560da6d54",
+    "src/pages/tools/SvgToCss.vue": "7317742f1f0a507f84c33150af7a7de7124788869cc3ddb5347c7e3f3d9ec04a",
+    "src/pages/tools/StringInspector.vue": "06d12ed29e51703f3a504b9def8e4b59be09c342d464de59075969e6353009f8",
+    "src/pages/tools/SqlFormatter.vue": "59db320e4868037c45ab2c4211d81a6b521445e52bd0b0fef67cbe0909fcc1a4",
+    "src/pages/tools/RegexTester.vue": "ad3551686098d3f97da0dd91d9a930961870a36219c2a29b79f247ad1bb9c0f2",
+    "src/pages/tools/RandomString.vue": "3a57b6fc8110e5d43542077bde2c633d99fb5b652505ca25465ea02b094239e9",
+    "src/pages/tools/QrCode.vue": "30f47afe0b0554c99bc67178b69a97b9f046dc20c463be91bc2553f117a540c6",
+    "src/pages/tools/PhpJson.vue": "fb36d1741796b48c166e96ba78170781aa282d2bb0866defb722de95541868f0",
+    "src/pages/tools/NumberBase.vue": "8636b052418c44e94cbf7f4bb24906f3185e690049abe59121936f5cf3ee9a95",
+    "src/pages/tools/MarkdownPreview.vue": "cb245595e0b6d53b268c5086643acf32641fdd41e07577bc379129efa60959fa",
+    "src/pages/tools/LoremIpsum.vue": "ce6daf05aa13fdc561f97760d25f342f33d01ea392a81d72919400deefbcbb4e",
+    "src/pages/tools/LineSort.vue": "4304157922ba82228f9fbb9fd6902ea2e4a236ee60bd80892caec8cd30e337d0",
+    "src/pages/tools/JwtDebugger.vue": "403bd4ba89394300f5f8fa86ee1561fcf044b89e7f2e140220f5d710ea86dfc3",
+    "src/pages/tools/JsonToYaml.vue": "1cad4ff0a189d3102a14fede7bce68237c841aae8d344204bb96dd022135ee1a",
+    "src/pages/tools/JsonToCsv.vue": "d8510047d3df6a3f11dd54372282a68f014b7fd75591afc7ff9b94bb4982a7cf",
+    "src/pages/tools/JsonToCode.vue": "46fcc242775e5f008309d8e26666c0353d0a8fdb8729253d37e4614bada0ee4d",
+    "src/pages/tools/JsonFormatter.vue": "43d8ef3f52b11adb72b6d816564ac0d9aee705f82447433f8ec476a01b2328f6",
+    "src/pages/tools/JsBeautify.vue": "de67d1c425735382eea652558282ea9cd6fe7c3c042cd974ee8170b6aaa11521",
+    "src/pages/tools/ImageBase64.vue": "0229e5ced626ccc283ae4cbfe7109f9f9882a3cff535146f4dc8922e986d6ef6",
+    "src/pages/tools/HtmlToJsx.vue": "63cb6cd4a5e7a752b52141850f0cf9cc730b36bead2b5e0502f5d13e3de511a5",
+    "src/pages/tools/HtmlPreview.vue": "89d1e060fce712c5eb4a2c46a1b4bc1f021c9f8ee75c9bef071d69d92391b4b9",
+    "src/pages/tools/HtmlEntity.vue": "397885018f7fe61b94cae9afe562f02220ff15a10779869b958c4e8f9eeda02b",
+    "src/pages/tools/HtmlBeautify.vue": "8ab7be55043c459a7f3f7869ffea6d6456d18c3079351a9a912654916ea9b6fe",
+    "src/pages/tools/HexAscii.vue": "bc200f17323629af364977a6a1f27c2d5b921e70cb53fdee926939c7e73b8996",
+    "src/pages/tools/HashGenerator.vue": "910b7898767f529785a02755c1b4be13645ce3b52e2a7e342540c295056854f8",
+    "src/pages/tools/ExcelToJson.vue": "ff3ba0f5fe57ea56aa22454271edc8bb3148a97abf1b6dc9af57e7feda13387b",
+    "src/pages/tools/CurlToCode.vue": "5e2fec578a519774afbc5ef9c5cd931ece285b0a052499d5cfb5c01738081a57",
+    "src/pages/tools/CsvToJson.vue": "8c858d56102be1e5cae0ce1d7ded71ae83de7ee08bb8942ef0439a93885b1069",
+    "src/pages/tools/CssBeautify.vue": "8d62c3412fc339d1778c77ebe983246f63f4b6300a4bb867276e2616611a3862",
+    "src/pages/tools/CronParser.vue": "9ee88a9feee8be8a9b9f6ea61040d77d88520c33ee6cf51650888bcd55e1ca97",
+    "src/pages/tools/ColorConverter.vue": "1872ec7d8969b875d078894b556cf2383d67903ecb74054298393a6f14658ddc",
+    "src/pages/tools/CertificateDecoder.vue": "c2ca4019d937cf924bffae73508480de6932a9d0ae618b56dfc6180b1a983fd4",
+    "src/pages/tools/Base64String.vue": "b670f48eb2e2503588182654bfcb6ddcb180fd00f77fa7621bc3c9b4ac375806",
+    "src/pages/tools/BackslashEscape.vue": "212f23f8de470672573784503ed12d63649046ca840507e5e8e96afa6a27c019",
+    "src/components/TransformTool.vue": "e238b22fc638018140e54d6813b5d7060f012bfe1e5bcdd3503349151e413aec",
+    "src/components/CodePane.vue": "224737d5a0b2ef044693f291d12f0ab9ffaddc659b6394cc4655bf78c80973b7",
+    "src/components/OptionControls.vue": "447aa329711dae925a2ca930276365667cde8174da9f5c33ccfd7657ebddb3df",
+    "src/components/ToolIcon.vue": "cd23ca284980cc68677131a7b9ee5860aa5e704ddd7885eeb0587eff8c7e9c78",
+    "src/components/AppToasts.vue": "51f01af0622316c9f091150284fb1bbf384623d33c95ca56a99b32fe717b711b",
+    "src/components/ui/Segmented.vue": "0bb4df49a858c6619bcea8483723f4032cb2a92b99678c8ac98a10648489cea1",
+    "src/components/ui/Toggle.vue": "f3d75e9e1c96793476c2f7045a578703a297dc9e6f46ad90b66539031b93fa59",
+    "src/composables/clipboard.js": "0736a250629089d825bef565a8d5ad661576dc425e573e67189de749739588c7",
+    "src/composables/useToast.js": "3d07bc68c52fb5a9ecf632f5cff14c38c2b96053839cd29607763a64434009db",
+    "src/composables/useHandoff.js": "f26cc0fed8a47836342c6b38c98f4a0e05ecb302a564d9d6e677d6bb9e398266",
+    "src/tools/certValidate.js": "679ab045b429120c42c39a8c8ef297770f523625c8a531bf6a4d93c28abdba7d",
+    "src/tools/data/cacert.pem": "a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505"
+  }
+}

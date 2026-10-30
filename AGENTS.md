@@ -28,7 +28,7 @@
 | [src/router.ts](src/router.ts)                                         | 站内无刷新导航、历史滚动恢复、运行时元信息         |
 | [src/content.ts](src/content.ts)                                       | 个人资料、项目文案和链接                           |
 | [src/games/](src/games/)                                               | 游戏目录、游戏页面、规则逻辑与游戏文案             |
-| [src/tools/](src/tools/)                                               | 工具目录、工作页、转换逻辑与工具文案               |
+| [src/tools/](src/tools/)                                               | 工具目录、工作页、上游工具源码与中文文案           |
 | [src/components/MusicDialog.vue](src/components/MusicDialog.vue)       | 音乐浮层定位、展开宽度及外观                       |
 | [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue)       | 播放器、歌词、歌单与局部样式                       |
 | [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)       | 网易云 SVG 图标                                    |
@@ -40,7 +40,7 @@
 
 站内页面由 `src/main.ts`、`src/App.vue`、`src/router.ts` 与 `src/pages.ts` 使用 Vue Router 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成各地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页面切换时保留播放器实例；导航逻辑修改后运行 `python3 scripts/check-navigation.py`，建议连接构建预览服务器。主题按钮与状态分别维护在 [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue) 和 [src/composables/useTheme.ts](src/composables/useTheme.ts)，全站共用。
 
-工具目录为 `/tool`，工具地址为 `/tools/*`。名称、分类和说明维护在 `src/tools/catalog.ts`，转换逻辑位于 `src/tools/transform.ts`，样式在 `src/style.css`。输入仅在本地处理，不上传、不持久保存；变更转换规则运行 `node scripts/check-tools.mjs`，交互或布局变更运行 `python3 scripts/check-tools-browser.py`。
+工具目录为 `/tool`，工具地址为 `/tools/*`。名称、分类和路径维护在 `src/tools/catalog.ts`，异步组件登记在 `src/tools/components.ts`；Freemium 的全部 41 个工具源码位于 `src/tools/freemium/`，共享样式在 `src/style.css`，工具专用样式随上游组件保留。来源、版本、许可证与使用限制见 `docs/tools.md` 和 `third_party/freemium/README.md`。升级时核对完整上游清单并保留许可证。输入仅在本地处理，不上传、不持久保存；变更转换规则运行 `node scripts/check-tools.mjs`，交互或布局变更运行 `python3 scripts/check-tools-browser.py`。
 
 游戏目录为 `/game`，游戏地址为 `/games/*`。名称与说明维护在 `src/games/catalog.ts`，游戏组件及纯规则逻辑位于 `src/games/`，样式在 `src/style.css`。游戏状态仅在页面内保留；更改规则运行 `node scripts/check-games.mjs`，交互或布局修改后运行 `python3 scripts/check-games-browser.py`；动效或拖拽修改还需在开发服务器运行 `python3 scripts/check-games-motion.py`，验证输入锁、取消、手机长按与减少动态效果。游戏导航沿用共享播放器与主题；不要为方向键操作注册影响全站的监听。
 

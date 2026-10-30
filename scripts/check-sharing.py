@@ -2,6 +2,8 @@
 from html.parser import HTMLParser
 from pathlib import Path
 import sys
+import json
+import subprocess
 from urllib.parse import urlparse
 
 class Head(HTMLParser):
@@ -40,18 +42,6 @@ pages = {
     '华容道 · 小游戏 · a彬彬a': 'games/huarongdao',
     '跳一跳 · 小游戏 · a彬彬a': 'games/jump',
     '网页工具 · a彬彬a': 'tool',
-    'JSON 格式化 · 网页工具 · a彬彬a': 'tools/json',
-    'Base64 编解码 · 网页工具 · a彬彬a': 'tools/base64',
-    'URL 编解码 · 网页工具 · a彬彬a': 'tools/url',
-    '时间戳转换 · 网页工具 · a彬彬a': 'tools/timestamp',
-    'UUID 生成 · 网页工具 · a彬彬a': 'tools/uuid',
-    '文本整理 · 网页工具 · a彬彬a': 'tools/text',
-    '进制转换 · 网页工具 · a彬彬a': 'tools/radix',
-    '哈希计算 · 网页工具 · a彬彬a': 'tools/hash',
-    'JWT 解析 · 网页工具 · a彬彬a': 'tools/jwt',
-    '密码生成 · 网页工具 · a彬彬a': 'tools/password',
-    'HTML 实体转换 · 网页工具 · a彬彬a': 'tools/html',
-    '颜色转换 · 网页工具 · a彬彬a': 'tools/color',
     '项目目录 · a彬彬a': 'project',
     'a彬彬a · 在代码与方块之间': '',
     'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth',
@@ -68,6 +58,9 @@ pages = {
     '503 · 世界正在稍作休息 · a彬彬a': '503',
     '504 · 远方的回应，还没到达 · a彬彬a': '504',
 }
+pages.update({t['name'] + ' · 网页工具 · a彬彬a': t['path'].lstrip('/')
+              for t in json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))})
+
 paths = [Path(sys.argv[1])] if len(sys.argv) > 1 else [Path('dist') / (f'{route}.html' if route else 'index.html') for route in pages.values()]
 for path in paths:
     html = path.read_text()

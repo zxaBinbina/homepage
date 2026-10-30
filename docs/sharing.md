@@ -54,7 +54,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 
 ## 网页工具
 
-工具目录 `/tool` 的元信息由 `site.config.ts` 提供；十二个 `/tools/*` 页面（JSON、Base64、URL、时间戳、UUID、文本、进制、哈希、JWT、密码、HTML 实体、颜色）的标题、简介来自 `src/tools/catalog.ts`。这些页面使用主页 favicon 与头像分享图片，构建生成 `tool.html` 和 `tools/*.html`，同样支持无刷新切换、原始 HTML 分享标签与规范地址重定向。`scripts/check-sharing.py` 覆盖所有工具页面。
+工具目录 `/tool` 的元信息由 `site.config.ts` 提供；Freemium 全部 41 个 `/tools/*` 页面的标题、简介和路径来自 `src/tools/catalog.ts`，完整清单见 [网页工具说明](tools.md)。`src/pages.ts` 从目录生成工具路由，构建与运行时复用这些记录，避免逐项登记时遗漏。工具沿用主页 favicon 与头像分享图片，构建生成 `tool.html` 和 `tools/*.html`，支持无刷新切换、原始 HTML 分享标签、JSON-LD、站点地图与规范地址重定向。`scripts/check-sharing.py` 通过 `scripts/list-tools.mjs` 读取目录并覆盖所有工具页面。
 
 ## 小游戏
 
