@@ -79,7 +79,7 @@ const forks = [
   },
   {
     no: '04 / 按需安装',
-    title: '四份下载，组件自选',
+    title: '按架构下载，组件自选',
     details:
       '按 Ubuntu、Fedora、openSUSE、Arch 整理下载包，保留主程序、图形界面与各桌面集成，按当前环境选择安装。',
   },
@@ -112,8 +112,8 @@ const forks = [
       <div class="gaze-note gaze-release-note">
         <b>v0.4.1-zh.2 已发布 · 2026-10-30</b>
         <p>
-          同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1
-          更新，下载整理为四份发行版压缩包，每份保留七个组件。
+          同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1 更新，已补齐 ARM64 与 Fedora 44。ARM 和
+          x86 分开下载，共八份压缩包，每份保留七个组件。安装脚本新增组件选择菜单，支持仅安装命令行。
         </p>
         <a
           class="gaze-text-link"
@@ -131,9 +131,10 @@ const forks = [
         copy-label="复制一键安装命令"
       />
       <p class="gaze-caption">
-        自动选择 Fedora 45、Ubuntu 24.04 / Linux Mint 22 或 openSUSE Tumbleweed 的 x86_64 中文版，
-        校验后安装主程序、图形界面与当前桌面集成。其他系统转用上游安装器；Arch
-        也提供手动下载包。详见
+        自动选择 Fedora 44/45、Ubuntu 24.04 的 x86_64 或 ARM64 中文版，以及 Linux Mint 22、openSUSE
+        Tumbleweed 的 x86_64
+        包。显示桌面检测结果，并在对应安装选项旁标注「推荐」，由你选择组件；最后一项为「不安装
+        GUI，仅安装命令行」。Arch 提供手动下载包，其他系统可参考上游渠道。详见
         <a class="gaze-text-link" href="/projects/gaze/guide/installation" style="margin-top: 0"
           >安装指南 →</a
         >

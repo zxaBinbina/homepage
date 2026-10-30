@@ -25,7 +25,7 @@ export const gazeGuides: GazeGuide[] = [
     title: '安装',
     group: 'start',
     description:
-      '中文版按发行版打包下载、组件选择与升级，以及上游软件源、Arch、Flatpak 等安装方式。',
+      '中文版按发行版与架构下载、安装菜单和桌面推荐、纯命令行安装，以及上游软件源、Arch、Flatpak 等安装方式。',
   },
   {
     id: 'nixos',

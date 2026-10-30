@@ -3,7 +3,7 @@
 
 # 安装
 
-**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-30）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版合并为四份压缩包，每份保留七个独立组件。
+**最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)**（2026-10-30）：同步上游 GNOME 认证重试修复与 ONNX Runtime 1.31.1，安装包修订号从 `1` 升到 `2`。下载附件按发行版与 CPU 架构分为八份压缩包，每份保留七个独立组件。
 
 ## 中文版安装：一键命令（推荐）
 
@@ -11,9 +11,31 @@
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 ```
 
-脚本只从最新发行版选择匹配系统的压缩包，校验下载与组件后，安装 `gaze-zh`、`gaze-gui` 和当前桌面对应的集成包。当前自动安装支持 **Fedora 45、Ubuntu 24.04 / Linux Mint 22、openSUSE Tumbleweed 的 x86_64 系统**。
+脚本根据系统版本与 CPU 架构匹配下载包，显示当前桌面，再展示安装菜单。**桌面检测只用于在对应选项旁标注「推荐」，最终由你选择**；无法识别桌面时也会展示相同菜单：
 
-其他系统及架构自动转用上游安装器，不会尝试安装旧发行版中同扩展名的软件包。`--yes` 和 `--no-pam` 可直接使用，其他参数会原样转交上游安装器。Arch 的中文版提供手动下载包；一键安装仍走上游 / AUR 渠道。
+1. KDE Plasma：GUI + KDE 集成
+2. GNOME：GUI + GNOME 扩展
+3. Cinnamon：GUI + Cinnamon 扩展
+4. Hyprland / Hyprlock：GUI + Hyprlock 集成
+5. Omarchy：GUI + Omarchy 集成（需已有 Omarchy 环境）
+6. 安装 GUI，不安装桌面集成
+7. **不安装 GUI，仅安装命令行**
+
+所有选项都包含 `gaze-zh` 主程序、命令行、守护进程与 PAM 模块。选择最后一项时，只安装核心包，不添加 `gaze-gui` 或桌面集成包。输入编号后，脚本校验压缩包与组件，再安装所选软件包。已有的 GUI 不会因选择命令行方案而被卸载。
+
+当前支持 **Fedora 44/45、Ubuntu 24.04 的 x86_64 与 ARM64 系统**，以及 Linux Mint 22、openSUSE Tumbleweed 的 x86_64 系统。ARM64 / AArch64 与 x86_64 / amd64 分开打包，脚本依据本机架构选择。Fedora 44 x86_64 对应 `fedora-44-x86_64`，不会使用 Fedora 45 的包。Arch 的中文版提供手动下载包；其他系统请参考下方上游渠道。没有匹配包时，脚本停止并提供安装指南链接。
+
+桌面变量缺失时，脚本从当前用户的图形登录会话读取桌面信息。普通 `curl … | sh` 调用直接显示菜单，并从终端读取选择，无需先运行其他命令。`--yes` 不会代选桌面；无人值守时通过 `--profile=kde/gnome/cinnamon/hyprlock/omarchy/gui/cli` 明确指定方案，例如仅安装命令行：
+
+```bash
+curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh -s -- --profile=cli
+```
+
+可传入 `--no-pam` 跳过 PAM 配置。排查匹配问题时也可使用可选的 `--dry-run`；它只显示检测和匹配结果，不选择组件、不安装软件或改动 PAM：
+
+```bash
+curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh -s -- --dry-run
+```
 
 ## 中文版手动下载与升级
 
@@ -22,6 +44,10 @@ curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 | 系统 / 架构                         | 下载标识                     | 包格式         |
 | ----------------------------------- | ---------------------------- | -------------- |
 | Ubuntu 24.04 / Linux Mint 22，amd64 | `ubuntu-24.04-amd64`         | DEB            |
+| Ubuntu 24.04，arm64                 | `ubuntu-24.04-arm64`         | DEB            |
+| Fedora 44，x86_64                   | `fedora-44-x86_64`           | RPM            |
+| Fedora 44，aarch64                  | `fedora-44-aarch64`          | RPM            |
+| Fedora 45，aarch64                  | `fedora-45-aarch64`          | RPM            |
 | Fedora 45，x86_64                   | `fedora-45-x86_64`           | RPM            |
 | openSUSE Tumbleweed，x86_64         | `opensuse-tumbleweed-x86_64` | RPM            |
 | Arch Linux，x86_64                  | `archlinux-x86_64`           | `.pkg.tar.zst` |
@@ -34,7 +60,7 @@ Fedora 与 openSUSE 的 RPM 使用不同依赖及 PAM 配置，请勿混用；Ub
 sha256sum -c SHA256SUMS
 ```
 
-压缩包内的 `README.md` 提供具体命令。以 Fedora 45 为例，安装或升级主程序与图形界面：
+压缩包内的 `README.md` 提供具体命令。以 Fedora 44 x86_64 的压缩包为例，安装或升级主程序与图形界面：
 
 ```bash
 sudo dnf install ./gaze-zh-0.4.1-2.x86_64.rpm ./gaze-gui-0.4.1-2.x86_64.rpm
@@ -44,7 +70,7 @@ sudo dnf install ./gaze-zh-0.4.1-2.x86_64.rpm ./gaze-gui-0.4.1-2.x86_64.rpm
 
 ### KRDP 修复范围
 
-标准发行包保留中文提示与 PAM 层的 KRDP 登录兼容逻辑。Fedora 44 / KRDP 6.7.5 专用的私有画面冻结修复库属于单独的历史合并构建，**未包含在这四份下载包中**。其源码、构建与回退说明见 [docs/krdp-fix.md](https://github.com/zxaBinbina/gaze-zh/blob/main/docs/krdp-fix.md)。
+标准发行包保留中文提示与 PAM 层的 KRDP 登录兼容逻辑。Fedora 44 / KRDP 6.7.5 专用的私有画面冻结修复库属于单独的历史合并构建，**未包含在标准下载包中**。其源码、构建与回退说明见 [docs/krdp-fix.md](https://github.com/zxaBinbina/gaze-zh/blob/main/docs/krdp-fix.md)。
 
 ## CPU 要求
 
@@ -56,7 +82,7 @@ sudo dnf install ./gaze-zh-0.4.1-2.x86_64.rpm ./gaze-gui-0.4.1-2.x86_64.rpm
 grep -qw avx2 /proc/cpuinfo && echo "AVX2 present" || echo "AVX2 missing"
 ```
 
-Gaze 的推理运行时在 x86_64 上需要 AVX2。如果你的 CPU 不支持，一行命令安装器会在改动系统之前停止；软件包安装会让 `gazed` 处于停止状态，但 CLI 和 PAM 模块仍然安装。`gaze doctor` 也会报告这一限制。刷脸认证需要一个支持 AVX2 的 CPU；详见[故障排查](/projects/gaze/guide/troubleshooting)。
+Gaze 的推理运行时在 x86_64 上需要 AVX2。如果你的 CPU 不支持，下方的上游一行命令安装器会在改动系统之前停止；软件包安装会让 `gazed` 处于停止状态，但 CLI 和 PAM 模块仍然安装。`gaze doctor` 也会报告这一限制。刷脸认证需要一个支持 AVX2 的 CPU；详见[故障排查](/projects/gaze/guide/troubleshooting)。
 
 ## 路径 A：一行命令安装器（其他发行版的官方渠道）
 

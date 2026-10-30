@@ -13,13 +13,13 @@
 
 ## 第 1 步：安装 Gaze
 
-最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)。一键安装会选择匹配系统的发行版压缩包，校验后安装主程序、GUI 与当前桌面集成；暂无适配时转用上游安装器：
+最新中文版为 [v0.4.1-zh.2](https://github.com/zxaBinbina/gaze-zh/releases/tag/v0.4.1-zh.2)。一键安装会匹配系统与 CPU 架构，显示安装菜单，并在检测到的桌面对应选项旁标注「推荐」。由你选择 GUI 与桌面集成，最后一项为「不安装 GUI，仅安装命令行」：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
 ```
 
-中文版自动安装支持 Fedora 45、Ubuntu 24.04 / Linux Mint 22、openSUSE Tumbleweed 的 x86_64 系统。Arch 另提供手动下载压缩包。其他版本和架构使用上游渠道。
+中文版自动安装支持 Fedora 44/45、Ubuntu 24.04 的 x86_64 与 ARM64，以及 Linux Mint 22、openSUSE Tumbleweed 的 x86_64。ARM 与 x86 下载包分别提供，脚本自动匹配。Arch 另提供手动下载压缩包。没有匹配包时会停止并提示参考安装指南，其他版本和架构可选择上游渠道。
 
 手动安装时，下载对应系统的压缩包，校验并解压，再按包内 `README.md` 安装主程序、可选 GUI 和一个桌面集成包；不同系统的 RPM/DEB 不可混用。组件选择、升级与 KRDP 修复范围见[安装指南](/projects/gaze/guide/installation)。
 
