@@ -1,4 +1,5 @@
-// Freemium (MIT), complete 41-tool catalog. See third_party/freemium/upstream.json.
+// Local tool inventory; source and deduplication records are in third_party/.
+import { jayToolCatalog } from './jaytools/catalog'
 export const toolCatalog = {
   'json-formatter': {
     name: 'JSON 格式化',
@@ -372,6 +373,7 @@ export const toolCatalog = {
       "Certificate Decoder ['certificate', 'x509', 'ssl', 'tls', 'pem', 'crt', 'validate', 'verify', 'chain', 'private key', 'checker']",
     path: '/tools/certificate-decoder',
   },
+  ...jayToolCatalog,
 } as const
 
 export type ToolId = keyof typeof toolCatalog

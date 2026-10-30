@@ -126,8 +126,16 @@ function enter(element: Element) {
           rel="noopener noreferrer"
           >Freemium</a
         >
+        与
+        <a href="https://github.com/jaywcjlove/tools" target="_blank" rel="noopener noreferrer"
+          >Web Tools</a
+        >
         ·
         <a href="/licenses/freemium.txt" target="_blank" rel="noopener noreferrer">MIT 开源许可</a>
+        /
+        <a href="/licenses/jaywcjlove-tools.txt" target="_blank" rel="noopener noreferrer"
+          >Web Tools 许可</a
+        >
       </p>
     </main>
     <SiteFooter />

@@ -37,7 +37,11 @@ function reload() {
         <AppToasts />
       </div>
       <p class="tool-privacy">
-        <ShieldCheck :size="15" aria-hidden="true" />在浏览器内处理，输入不上传、不保存。
+        <ShieldCheck :size="15" aria-hidden="true" />{{
+          id === 'generate-github-badges'
+            ? '在本地生成引用；打开徽章链接时，内容会发送给对应徽章服务。'
+            : '在浏览器内处理，输入不上传、不保存。'
+        }}
       </p>
     </main>
     <SiteFooter />

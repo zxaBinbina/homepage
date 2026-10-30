@@ -75,7 +75,7 @@ with sync_playwright() as p:
     page.set_viewport_size({'width': 1440, 'height': 1000})
 
     page.goto(base + '/tool')
-    expect(page.locator('.tool-card')).to_have_count(41)
+    expect(page.locator('.tool-card')).to_have_count(len(tools))
     expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('工具')
     page.get_by_role('button', name='格式整理', exact=True).click()
     expect(page.locator('.tool-card')).to_have_count(7)
@@ -85,7 +85,7 @@ with sync_playwright() as p:
     page.get_by_role('searchbox', name='搜索工具').fill('no-such-tool')
     expect(page.locator('.directory-empty')).to_be_visible()
     page.get_by_role('button', name='查看全部工具').click()
-    expect(page.locator('.tool-card')).to_have_count(41)
+    expect(page.locator('.tool-card')).to_have_count(len(tools))
 
     # Every source tool renders, responds to its sample, has metadata and fits all required widths.
     for tool in (tools if not os.environ.get('HOMEPAGE_TOOLS_FOCUS') else []):
@@ -95,6 +95,8 @@ with sync_playwright() as p:
         sample = page.get_by_role('button', name='示例', exact=True)
         if sample.count():
             sample.first.click()
+            if tool['id'] == 'js-obfuscator':
+                page.get_by_role('button', name='开始混淆', exact=True).click()
             page.wait_for_timeout(250)
             outputs = page.locator('textarea[readonly]')
             if outputs.count():
@@ -197,7 +199,7 @@ with sync_playwright() as p:
                 page.set_viewport_size({'width': width, 'height': 1000})
                 page.goto(base + '/tool')
                 page.evaluate('([p,t]) => {document.documentElement.dataset.palette=p;document.documentElement.dataset.theme=t}', [palette,theme])
-                expect(page.locator('.tool-card')).to_have_count(41)
+                expect(page.locator('.tool-card')).to_have_count(len(tools))
                 no_overflow()
                 page.screenshot(path=str(out / f'tools-{palette}-{theme}-{width}.png'), full_page=False)
                 page.locator('.tool-card').first.click()
@@ -209,7 +211,7 @@ with sync_playwright() as p:
 
     page.set_viewport_size({'width': 1440, 'height': 1000})
     page.emulate_media(reduced_motion='no-preference')
-    page.goto(base + '/tool'); expect(page.locator('.tool-card')).to_have_count(41)
+    page.goto(base + '/tool'); expect(page.locator('.tool-card')).to_have_count(len(tools))
     page.wait_for_timeout(700)
     page.get_by_role('button', name='内容生成', exact=True).click()
     leaving = page.locator('.tool-list-leave-active')
@@ -218,7 +220,7 @@ with sync_playwright() as p:
     page.get_by_role('button', name='格式转换', exact=True).click()
     page.get_by_role('button', name='全部', exact=True).click()
     page.wait_for_timeout(650)
-    expect(page.locator('.tool-card')).to_have_count(41)
+    expect(page.locator('.tool-card')).to_have_count(len(tools))
     assert page.locator('.tool-card').evaluate_all('els => els.every(el => !el.inert && Number(getComputedStyle(el).opacity) === 1)')
     page.locator('.tool-card').first.click()
     expect(page.locator('.tool-page')).to_be_visible()
@@ -231,4 +233,4 @@ with sync_playwright() as p:
     assert page.locator('.tool-heading').evaluate('el => getComputedStyle(el).animationName') == 'none'
     assert not errors, errors
     browser.close()
-print('All 41 tools, 5 widths, themes/palettes, files, QR, copy/download, privacy, editor focus and motion checks passed.')
+print('All registered tools, 5 widths, themes/palettes, files, QR, copy/download, privacy, editor focus and motion checks passed.')

@@ -1,6 +1,7 @@
 """Validate crawler metadata and sitemap coverage in the production output."""
 import json
 import os
+import subprocess
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
@@ -61,7 +62,9 @@ for file in root.rglob('*.html'):
     else:
         canonical_urls.append(expected)
 assert base in canonical_urls, 'Missing homepage'
-assert len(canonical_urls) == 86, canonical_urls
+tools = json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))
+assert len(canonical_urls) == 45 + len(tools), canonical_urls
+assert all(urljoin(base, tool['path']) in canonical_urls for tool in tools), 'Missing tool canonical URL'
 assert set(urls) == set(canonical_urls), 'Sitemap must contain all canonical pages only'
 robots = (root / 'robots.txt').read_text()
 assert 'User-agent: *\nAllow: /' in robots

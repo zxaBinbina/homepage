@@ -1,0 +1,259 @@
+{
+  "repository": "https://github.com/jaywcjlove/tools",
+  "commit": "40d5879e86ce4ad53153ac0003d42de96796232b",
+  "license": "MIT",
+  "archive": "upstream-source.tar.gz",
+  "archiveSha256": "f492c6c38764c64c21094e28208b8b8bebdcb98881362f76018b54f49a6e61e6",
+  "inventorySource": "website/src/Router.tsx",
+  "inventorySha256": "f0f39e738d1efe612d766d01ce1db7fce361649b5153b9063809fdf32816a341",
+  "tools": [
+    {
+      "upstreamId": "url-encode",
+      "source": "packages/url-encode/src/index.tsx",
+      "sha256": "36b82c140e2e6da6a99bdccb5bbb2a0f530f86162926e035779ddc9b648300cb",
+      "status": "duplicate",
+      "existingTools": ["url-encode"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "json-format",
+      "source": "packages/json-format/src/index.tsx",
+      "sha256": "5884d67513f6002fe2a8490ef698bc8db98f58250895f8c313561e3b864e53c0",
+      "status": "duplicate",
+      "existingTools": ["json-formatter"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "js-beautifier",
+      "source": "packages/js-beautifier/src/index.tsx",
+      "sha256": "068bddf9ddc7a74050ea4179e51f8cd377892550fa3f50301686e3382d4f6b0c",
+      "status": "duplicate",
+      "existingTools": ["js-beautify"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "js-obfuscator",
+      "source": "packages/js-obfuscator/src/index.tsx",
+      "sha256": "42711378628360ab9a912c155cd3719ab124856b47c50da3a2851932b04bc84e",
+      "status": "added",
+      "id": "js-obfuscator",
+      "component": "src/tools/jaytools/JsObfuscator.vue"
+    },
+    {
+      "upstreamId": "text-case",
+      "source": "packages/text-case/src/index.tsx",
+      "sha256": "f7c30f4cd542d9d95d3f595d6ceb3169e3dc408d53f0717516b42c0af9d20fc0",
+      "status": "duplicate",
+      "existingTools": ["text-case"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "image-to-base64",
+      "source": "packages/image-to-base64/src/index.tsx",
+      "sha256": "d5f8ad8ed53ba6dedf56c6129064b4186e0375b2edec2e7abf120b50ca0ffe84",
+      "status": "duplicate",
+      "existingTools": ["image-base64"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "code-to-image",
+      "source": "packages/code-to-image/src/index.tsx",
+      "sha256": "0727ad9486701a2a7dba85b07246112dfa7c26ec9acb6c30b44d3ac7c729f383",
+      "status": "added",
+      "id": "code-to-image",
+      "component": "src/tools/jaytools/CodeToImage.vue"
+    },
+    {
+      "upstreamId": "hash",
+      "source": "packages/hash/src/index.tsx",
+      "sha256": "08226af8cbc3022d6ff4639b8a3b2532f2c249cf6774e3e672f4863e1c12d16e",
+      "status": "duplicate",
+      "existingTools": ["hash-generator"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "generate-password",
+      "source": "packages/generate-password/src/index.tsx",
+      "sha256": "25bfea7d884aaa8fc7fd030a53c0e857fd7dff6aef56fd3e281b54aebd9bdc41",
+      "status": "duplicate",
+      "existingTools": ["random-string"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "html-formatter",
+      "source": "packages/html-formatter/src/index.tsx",
+      "sha256": "52cb6d25660a19f3ad995ee7a522148e8d823b7b9b0cfb2da7ceca062da1ab9d",
+      "status": "duplicate",
+      "existingTools": ["html-beautify"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "html-escape",
+      "source": "packages/html-escape/src/index.tsx",
+      "sha256": "56cf999370eff68b5de925ff0b0001336034172edd07ee4d8168a89c8451d216",
+      "status": "duplicate",
+      "existingTools": ["html-entity"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "html-to-markdown",
+      "source": "packages/html-to-markdown/src/index.tsx",
+      "sha256": "43f863a44c0f969db0d3eacff761bdc1ff71df7419495e56acb55afcaa8ce43b",
+      "status": "added",
+      "id": "html-to-markdown",
+      "component": "src/tools/jaytools/HtmlToMarkdown.vue"
+    },
+    {
+      "upstreamId": "markdown-to-html",
+      "source": "packages/markdown-to-html/src/index.tsx",
+      "sha256": "b8998b86f2f005d66bb0e990f77ce7a1fa2b9f1f7389d13bdb762ffbdbcd0c1f",
+      "status": "duplicate",
+      "existingTools": ["markdown-preview"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "base64-encoder",
+      "source": "packages/base64-encoder/src/index.tsx",
+      "sha256": "50748b5669bcbf38a3d967b024fd2db3c2277ad4e608fb4b843cf55b5da7a0a6",
+      "status": "duplicate",
+      "existingTools": ["base64"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "qrcode-generator",
+      "source": "packages/qrcode-generator/src/index.tsx",
+      "sha256": "444727ce07b4643e1da8b7d5deb8a52b173b3570b7782921dbb16bf79c8cf920",
+      "status": "duplicate",
+      "existingTools": ["qr-code"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "chinese-pinyin-conversion",
+      "source": "packages/chinese-pinyin-conversion/src/index.tsx",
+      "sha256": "79d86baef066c6744251c618222705174990f5647cbdf53e7d833e8a0bc9e164",
+      "status": "added",
+      "id": "chinese-pinyin-conversion",
+      "component": "src/tools/jaytools/ChinesePinyin.vue"
+    },
+    {
+      "upstreamId": "generate-github-badges",
+      "source": "packages/generate-github-badges/src/index.tsx",
+      "sha256": "b12d98cd1cb4c30be46e67d2d515b99c5cc53729b9048d854e2b0325a9e00b26",
+      "status": "added",
+      "id": "generate-github-badges",
+      "component": "src/tools/jaytools/GithubBadges.vue"
+    },
+    {
+      "upstreamId": "toml-to-json",
+      "source": "packages/toml-to-json/src/index.tsx",
+      "sha256": "6de2f05ed74cc8ac649f8d730aab6a54117a32f6867bb0ec237767b9b0704466",
+      "status": "added",
+      "id": "toml-to-json",
+      "component": "src/tools/jaytools/TomlToJson.vue"
+    },
+    {
+      "upstreamId": "css-easing-animation",
+      "source": "packages/css-easing-animation/src/index.tsx",
+      "sha256": "55716005a349325c9a59dd751c564fc3e69fafe5da67e017ac0e617cddafeeac",
+      "status": "added",
+      "id": "css-easing-animation",
+      "component": "src/tools/jaytools/CssEasing.vue"
+    },
+    {
+      "upstreamId": "css-formatter",
+      "source": "packages/css-formatter/src/index.tsx",
+      "sha256": "54b069a71eade86a38a2432cb82b5a69b23cae64acb5640d76559bca16e10367",
+      "status": "duplicate",
+      "existingTools": ["css-beautify"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "simple-markdown-editor",
+      "source": "packages/simple-markdown-editor/src/index.tsx",
+      "sha256": "fac642bffae20a66697bfce0c4029b29979603b8c83ac0b59df1079b0c3d457b",
+      "status": "duplicate",
+      "existingTools": ["markdown-preview"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "jwt-decoder",
+      "source": "packages/jwt-decoder/src/index.tsx",
+      "sha256": "939e117945d196bf47559478133f7894febac6007e7e5ca2e53bb37e1982b376",
+      "status": "duplicate",
+      "existingTools": ["jwt-debugger"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "json-yaml",
+      "source": "packages/json-yaml/src/index.tsx",
+      "sha256": "eb0e2e9ae382901e4c19607c5e1468163e5425e6713b0d28867f7c5ea2b0695b",
+      "status": "duplicate",
+      "existingTools": ["json-to-yaml", "yaml-to-json"],
+      "reason": "已有工具覆盖该页面的主要功能，保留现有实现。"
+    },
+    {
+      "upstreamId": "json-xml",
+      "source": "packages/json-xml/src/index.tsx",
+      "sha256": "b3e37aade21ee2a0d0713d462d216a235ef86886ef90391ebf057864452f89a6",
+      "status": "added",
+      "id": "json-xml",
+      "component": "src/tools/jaytools/JsonXml.vue"
+    },
+    {
+      "upstreamId": "json-ini",
+      "source": "packages/json-ini/src/index.tsx",
+      "sha256": "3127884f409019eaf9bfa78f0f0eaa28637d4f6584c7af13c9001d9289467e3c",
+      "status": "added",
+      "id": "json-ini",
+      "component": "src/tools/jaytools/JsonIni.vue"
+    },
+    {
+      "upstreamId": "pdf-to-img",
+      "source": "packages/pdf-to-img/src/index.tsx",
+      "sha256": "ed1616accd1b09a16c5e436b9b925afa5cdabad14b7cc170d318b177caf0f392",
+      "status": "added",
+      "id": "pdf-to-img",
+      "component": "src/tools/jaytools/PdfToImage.vue"
+    },
+    {
+      "upstreamId": "exif-viewer",
+      "source": "packages/exif-viewer/src/index.tsx",
+      "sha256": "0a93bb0c2fee2baae6154dc6f1a58348a7522a41e39d704ab775223c9182e37a",
+      "status": "added",
+      "id": "exif-viewer",
+      "component": "src/tools/jaytools/ExifViewer.vue"
+    },
+    {
+      "upstreamId": "svg-optimizer",
+      "source": "packages/svg-optimizer/src/index.tsx",
+      "sha256": "1bff1583427da464e592c31113401144fc58537c6af938a2b477dcff12aeecec",
+      "status": "added",
+      "id": "svg-optimizer",
+      "component": "src/tools/jaytools/SvgOptimizer.vue"
+    },
+    {
+      "upstreamId": "amount-in-rmb",
+      "source": "packages/amount-in-rmb/src/index.tsx",
+      "sha256": "af6522d1568399ca697141b49f896b1aba971a2b008ed53d73a3a0ed2d89a2df",
+      "status": "added",
+      "id": "amount-in-rmb",
+      "component": "src/tools/jaytools/AmountInRmb.vue"
+    },
+    {
+      "upstreamId": "standard-chinese-characters",
+      "source": "packages/standard-chinese-characters/src/index.tsx",
+      "sha256": "c7b0456e59b4514edd4305e226bc2fdd5a30f7f4c6960efa391cd89eb3301356",
+      "status": "added",
+      "id": "standard-chinese-characters",
+      "component": "src/tools/jaytools/ChineseCharacters.vue"
+    },
+    {
+      "upstreamId": "simplified-traditional-chinese",
+      "source": "packages/simplified-traditional-chinese/src/index.tsx",
+      "sha256": "5e9e9b317683928f08e4526dafd3d8a1fe6e9596afb4b41a5a71bf76d7545502",
+      "status": "added",
+      "id": "simplified-traditional-chinese",
+      "component": "src/tools/jaytools/ChineseConvert.vue"
+    }
+  ]
+}

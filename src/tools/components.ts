@@ -52,4 +52,23 @@ export const toolComponents = {
   'certificate-decoder': defineAsyncComponent(
     () => import('./freemium/pages/tools/CertificateDecoder.vue'),
   ),
+  'html-to-markdown': defineAsyncComponent(() => import('./jaytools/HtmlToMarkdown.vue')),
+  'toml-to-json': defineAsyncComponent(() => import('./jaytools/TomlToJson.vue')),
+  'json-xml': defineAsyncComponent(() => import('./jaytools/JsonXml.vue')),
+  'json-ini': defineAsyncComponent(() => import('./jaytools/JsonIni.vue')),
+  'chinese-pinyin-conversion': defineAsyncComponent(() => import('./jaytools/ChinesePinyin.vue')),
+  'simplified-traditional-chinese': defineAsyncComponent(
+    () => import('./jaytools/ChineseConvert.vue'),
+  ),
+  'standard-chinese-characters': defineAsyncComponent(
+    () => import('./jaytools/ChineseCharacters.vue'),
+  ),
+  'amount-in-rmb': defineAsyncComponent(() => import('./jaytools/AmountInRmb.vue')),
+  'code-to-image': defineAsyncComponent(() => import('./jaytools/CodeToImage.vue')),
+  'pdf-to-img': defineAsyncComponent(() => import('./jaytools/PdfToImage.vue')),
+  'exif-viewer': defineAsyncComponent(() => import('./jaytools/ExifViewer.vue')),
+  'svg-optimizer': defineAsyncComponent(() => import('./jaytools/SvgOptimizer.vue')),
+  'css-easing-animation': defineAsyncComponent(() => import('./jaytools/CssEasing.vue')),
+  'generate-github-badges': defineAsyncComponent(() => import('./jaytools/GithubBadges.vue')),
+  'js-obfuscator': defineAsyncComponent(() => import('./jaytools/JsObfuscator.vue')),
 }

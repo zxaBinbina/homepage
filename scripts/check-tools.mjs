@@ -36,10 +36,9 @@ const catalogBuild = await build({
 const { toolIds, toolCatalog } = await import(
   `data:text/javascript;base64,${Buffer.from(catalogBuild.outputFiles[0].text).toString('base64')}`
 )
-assert.deepEqual(
-  toolIds,
-  manifest.tools.map((t) => t.id),
-  'Every upstream tool must be present',
+assert.ok(
+  manifest.tools.every((t) => toolIds.includes(t.id)),
+  'Every Freemium tool must remain present',
 )
 for (const { id, file } of manifest.tools) {
   assert.equal(toolCatalog[id].path, `/tools/${id}`)
@@ -113,3 +112,4 @@ for (const source of [
 console.log(
   '41 tools match the upstream inventory; JSON, UTF-8/Base64, URL, hex, escapes, YAML, CSV, PHP, type/code generation and JavaScript checks passed.',
 )
+await import('./check-jaytools.mjs')

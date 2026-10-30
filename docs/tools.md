@@ -1,6 +1,6 @@
 # 网页工具
 
-本站以 [incentius-foss/freemium](https://github.com/incentius-foss/freemium) 的 MIT 源码替换原有 12 个工具，完整接入上游版本的 **41 个工具**。入口 `/tool`，工具均使用站内页面与延迟加载组件，源码随本站构建，不嵌入外站工具。
+本站收录 **56 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具，以及 [jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具。后者固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，源码随本站构建，不嵌入外站工具。
 
 ## 工具清单
 
@@ -48,20 +48,47 @@
 | 反斜杠转义        | `/tools/backslash-escape`    | 按编程语言格式转义与还原字符串。            |
 | 证书解析与校验    | `/tools/certificate-decoder` | 检查 X.509 证书链、主机名及私钥匹配。       |
 
+## Web Tools 新增清单
+
+| 工具             | 地址                                    | 用途                                                |
+| ---------------- | --------------------------------------- | --------------------------------------------------- |
+| HTML 转 Markdown | `/tools/html-to-markdown`               | 将网页标记转换为 Markdown，保留表格、链接和代码块。 |
+| TOML 转 JSON     | `/tools/toml-to-json`                   | 解析 TOML 配置文件，转换为结构清晰的 JSON。         |
+| JSON 与 XML      | `/tools/json-xml`                       | 在 JSON 与 XML 之间转换，保留属性与文本节点。       |
+| JSON 与 INI      | `/tools/json-ini`                       | 转换 JSON 对象与 INI 配置，整理配置文件。           |
+| 汉字转拼音       | `/tools/chinese-pinyin-conversion`      | 为中文注音，输出带声调拼音、无声调拼音或首字母。    |
+| 简繁体转换       | `/tools/simplified-traditional-chinese` | 逐字转换简体与繁体中文，保留其他文字和标点。        |
+| 通用规范汉字表   | `/tools/standard-chinese-characters`    | 查询 8105 个规范汉字、拼音与序号，按级别浏览。      |
+| 人民币大写       | `/tools/amount-in-rmb`                  | 将数字转换为中文大小写与人民币金额大写。            |
+| 代码转图片       | `/tools/code-to-image`                  | 把代码制作成可分享的图片，调整配色、字号和留白。    |
+| PDF 转图片       | `/tools/pdf-to-img`                     | 本地预览 PDF，导出单页图片或打包下载全部页面。      |
+| 图片 EXIF 查看   | `/tools/exif-viewer`                    | 读取照片中的拍摄参数、尺寸及位置等元数据。          |
+| SVG 优化         | `/tools/svg-optimizer`                  | 精简 SVG 标记与路径，调整精度并比较文件大小。       |
+| CSS 缓动曲线     | `/tools/css-easing-animation`           | 调节贝塞尔曲线，预览动画并复制 CSS。                |
+| 项目徽章生成     | `/tools/generate-github-badges`         | 生成 GitHub、npm、Docker 和自定义徽章的引用代码。   |
+| JavaScript 混淆  | `/tools/js-obfuscator`                  | 转换变量与代码结构，生成可下载的混淆代码。          |
+
 ## 输入与使用范围
 
-- 输入和选项只在当前组件内保留，不写入浏览器存储、不上传。离开工具页或刷新会清空；首次进入某个工具仍需要加载它的代码，本站没有新增离线缓存服务。
+- 输入和选项只在当前组件内保留，不写入浏览器存储。工具计算不上传输入；徽章链接仅在主动打开时向对应服务发送项目名或自定义徽章内容。离开工具页或刷新会清空；首次进入某个工具仍需要加载它的代码，本站没有新增离线缓存服务。
 - 通用文本转换上限为 100 万字符，文本文件导入上限 5 MB；哈希文件上限 20 MB。较大的 Excel 文件、图片和复杂文档仍可能占用较多内存。
 - JSON 与相关格式转换沿用上游 JavaScript 解析规则；超过安全整数范围的编号应使用字符串，重复对象键会按解析结果合并。原工具的无损 JSON 排版实现已移除。
 - HTML 在不具备同源权限的沙盒中预览，默认关闭脚本；预览内容配置 CSP，阻止网络资源和连接，图片可用 Data URI。Markdown 预览净化 HTML，不自动加载外部图片。预览是本地查看工具，不是完整网站运行环境。
 - JWT 支持解析与 HMAC 签名校验；签名正确并不等于业务授权有效。证书校验使用随构建提供的 Mozilla 根证书快照，检查链签名、有效期、主机名和私钥匹配，不联网查询吊销状态。
 - 正则表达式在 Worker 内运行，超时 1 秒会中止；离开页面会清理任务。通用转换输入改变时立即撤销旧结果；全屏编辑保留原输入，退出恢复焦点。
 
+- PDF 文件上限 30 MB，单页上限 1600 万像素；ZIP 最多 100 页、64 MB，包含最后一页。支持密码文档；密码只保留在当前组件。取消、重新读取或离开时清理解析和渲染任务，字体、CMap、图像解码 WASM 全部由本站提供。
+- EXIF 文件上限 30 MB，可包含原始照片的 GPS 信息；不自动访问地图或外部图片。SVG 最多 50 万字符、15 秒超时；JavaScript 混淆最多 10 万字符、20 秒超时，源码只转换不执行，选项改变后清除旧结果。
+- 简繁转换为逐字映射，不处理上下文歧义；拼音按词典推断，注音预览最多 3000 字。汉字表保留 8105 字，每页 120 字。金额支持 16 位整数和最多 2 位小数，以文本处理避免 Number 舍入。
+- 代码图片最多 2 万字符，支持 PNG/JPEG/SVG，位图默认 2 倍导出；JPEG 透明区域填白，SVG 使用 foreignObject。代码图片的固定深浅配色仅影响导出作品，操作区始终跟随本站主题。
+
 ## 源码与许可证
 
 上游提交固定为 [`ddae2a2ebee1354b2f69766cf673e06ef1593658`](https://github.com/incentius-foss/freemium/tree/ddae2a2ebee1354b2f69766cf673e06ef1593658)。完整上游清单与原文件 SHA-256 保存在 [upstream.json](../third_party/freemium/upstream.json)，迁入的功能位于 `src/tools/freemium/pages/tools/`。共享编辑器、表单、复制与弹层位于同目录的 `components/`、`composables/`，证书逻辑与数据位于 `tools/`。
 
 保留 [Freemium MIT 许可证](../public/licenses/freemium.txt)、[MPL-2.0](../public/licenses/MPL-2.0.txt) 和 [运行时依赖声明](../public/licenses/tools-dependencies.txt)。Mozilla 根证书数据 `cacert.pem` 的 MPL-2.0 声明保留在原文件头部；数据未修改。发布时这些许可文件随 `public/licenses/` 一并部署。更多来源信息见 [third_party/freemium/README.md](../third_party/freemium/README.md)。
+
+Web Tools 的原始归档、完整 31 项清单、15 个新增与 16 个去重映射见 [源码来源](../third_party/jaywcjlove-tools/README.md)。新增运行时代码适配为 Vue；保留 MIT 原文及 [新增依赖声明](../public/licenses/jaytools-dependencies.txt)。ExifReader（MPL-2.0）的未修改源码随站点提供，PDF.js（Apache-2.0）的附带字体与 WASM 许可随资源发布。
 
 本站适配包括中文文案、本站主题变量与 Lucide 图标、原生 CSS 布局、进入 / 退出 / 筛选切换动画、取消输入持久保存、过期结果清理和全屏焦点恢复。没有引入 Quasar、上游导航、收藏、最近记录或独立路由框架。
 
@@ -76,6 +103,7 @@ node scripts/check-tools.mjs
 npm run preview -- --port 4173
 # 在另一终端运行，需要 Python Playwright 与 Chrome / Chromium
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-tools-browser.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-jaytools-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-navigation.py
 python3 scripts/check-sharing.py
 python3 scripts/check-seo.py
