@@ -110,9 +110,9 @@ const forks = [
     </section>
     <section class="gaze-section shell gaze-reveal">
       <div class="gaze-note gaze-release-note">
-        <b>v0.5.0 · 完整界面汉化</b>
+        <b>v0.5.1 · 完整界面汉化</b>
         <p>
-          补齐图形界面、命令行与桌面设置的简体中文，保留原有排版。中文版采用独立版本号，持续同步上游。
+          认证成功、确认、错误与安装提示均补齐中文，保留原有排版。中文版采用独立版本号，持续同步上游。
           八种系统与架构组合分别下载，每份保留七个组件，支持仅安装命令行。
         </p>
         <a

@@ -13,7 +13,7 @@
 
 ## 第 1 步：安装 Gaze
 
-`v0.5.0` 提供完整的 GUI 与 CLI 中文界面。[下载最新版](https://github.com/zxaBinbina/gaze-zh/releases/latest)。一键安装会匹配系统与 CPU 架构，显示安装菜单，并在检测到的桌面对应选项旁标注「推荐」。由你选择 GUI 与桌面集成，最后一项为「不安装 GUI，仅安装命令行」：
+`v0.5.1` 提供 GUI、CLI 与 PAM 的中文认证提示；认证成功时显示“人脸已验证。”[下载最新版](https://github.com/zxaBinbina/gaze-zh/releases/latest)。一键安装会匹配系统与 CPU 架构，显示安装菜单，并在检测到的桌面对应选项旁标注「推荐」。由你选择 GUI 与桌面集成，最后一项为「不安装 GUI，仅安装命令行」：
 
 ```bash
 curl -fsSL https://zxabinbina.cc.cd/projects/gaze/install.sh | sh
