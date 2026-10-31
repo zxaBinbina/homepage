@@ -1,0 +1,321 @@
+/* Inlined into every HTML shell: available even when the app's JS or CSS is delayed. */
+:root {
+  --loading-bg: #141521;
+  --loading-panel: #1b1d2b;
+  --loading-text: #dae2ed;
+  --loading-muted: #979eaf;
+  --loading-accent: #4ea4ef;
+  --loading-border: rgba(218, 226, 237, 0.11);
+}
+:root[data-theme='light'] {
+  --loading-bg: #f4f6fa;
+  --loading-panel: #fff;
+  --loading-text: #141521;
+  --loading-muted: #626b7c;
+  --loading-accent: #2468b1;
+  --loading-border: rgba(45, 60, 129, 0.15);
+}
+:root[data-palette='hutao-red'] {
+  --loading-bg: #3a1b19;
+  --loading-panel: #4c2c2c;
+  --loading-text: #fcf0e1;
+  --loading-muted: #c7a085;
+  --loading-accent: #ed8871;
+  --loading-border: rgba(252, 240, 225, 0.14);
+}
+:root[data-theme='light'][data-palette='hutao-red'] {
+  --loading-bg: #fcf0e1;
+  --loading-panel: #fffaf3;
+  --loading-text: #3a1b19;
+  --loading-muted: #7b595e;
+  --loading-accent: #a83d33;
+  --loading-border: rgba(58, 27, 25, 0.16);
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg, var(--loading-bg));
+  color: var(--text, var(--loading-text));
+}
+#site-loading {
+  --loader-accent: var(--blue, var(--loading-accent));
+  --loader-muted: var(--muted, var(--loading-muted));
+  --loader-border: var(--border, var(--loading-border));
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 24px;
+  overflow: auto;
+  color: var(--text, var(--loading-text));
+  background: var(--bg, var(--loading-bg));
+  font-family:
+    Inter,
+    'Noto Sans SC',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  line-height: 1.6;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 220ms var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+#site-loading[hidden],
+#site-loading [hidden] {
+  display: none;
+}
+#site-loading[data-visible='true'] {
+  opacity: 1;
+}
+.site-loading-card {
+  box-sizing: border-box;
+  width: min(100%, 380px);
+  padding: 36px 28px 30px;
+  border: 1px solid var(--loader-border);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      ellipse at 50% 0,
+      color-mix(in srgb, var(--loader-accent) 8%, transparent),
+      transparent 70%
+    ),
+    var(--panel, var(--loading-panel));
+  box-shadow: 0 20px 70px var(--shadow, rgba(0, 0, 0, 0.08));
+}
+.site-loading-content {
+  translate: 0 var(--loading-content-offset, 32px);
+  transition: translate 320ms var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+[data-retry='true'] .site-loading-content {
+  translate: 0 0;
+}
+.site-loading-mark {
+  display: grid;
+  align-self: start;
+  grid-template-columns: repeat(2, 22px);
+  gap: 6px;
+  width: max-content;
+  margin: 0 auto 28px;
+  transform: rotate(-8deg);
+}
+.site-loading-mark i {
+  width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--loader-accent) 50%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--loader-accent) 18%, transparent);
+}
+.site-loading-mark i:nth-child(2) {
+  animation-delay: 120ms;
+}
+.site-loading-mark i:nth-child(3) {
+  animation-delay: 360ms;
+}
+.site-loading-mark i:nth-child(4) {
+  animation-delay: 240ms;
+  background: var(--loader-accent);
+}
+#site-loading p {
+  margin: 0;
+}
+.site-loading-label {
+  color: var(--loader-muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+#site-loading .site-loading-title {
+  margin-top: 12px;
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+#site-loading .site-loading-description {
+  margin-top: 8px;
+  min-height: 3.2em;
+  color: var(--loader-muted);
+  font-size: 13px;
+}
+.site-loading-track {
+  height: 3px;
+  margin: 26px auto 0;
+  width: 96px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--loader-accent) 13%, transparent);
+}
+.site-loading-track span {
+  display: block;
+  height: 100%;
+  width: 40%;
+  border-radius: inherit;
+  background: var(--loader-accent);
+}
+.site-loading-retry {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  width: max-content;
+  margin: 20px auto 0;
+  padding: 0 20px;
+  border: 1px solid var(--loader-border);
+  border-radius: 999px;
+  color: var(--loader-accent);
+  font-size: 13px;
+  text-decoration: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 220ms var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    visibility 0s 220ms;
+}
+[data-retry='true'] .site-loading-retry {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+.site-loading-retry:hover {
+  background: color-mix(in srgb, var(--loader-accent) 10%, transparent);
+}
+.site-loading-retry:focus-visible {
+  outline: 2px solid var(--loader-accent);
+  outline-offset: 4px;
+}
+#site-loading[data-mode='navigation'] {
+  inset: 100px 16px auto;
+  z-index: 45;
+  padding: 0;
+  overflow: visible;
+  background: none;
+  pointer-events: none;
+}
+[data-mode='navigation'] .site-loading-card {
+  --loading-content-offset: 0px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+  width: min(100%, 380px);
+  padding: 20px;
+  border-radius: 20px;
+  text-align: left;
+  pointer-events: auto;
+}
+[data-mode='navigation'] .site-loading-content {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 14px;
+}
+[data-mode='navigation'] .site-loading-mark {
+  grid-template-columns: repeat(2, 18px);
+  gap: 5px;
+  margin: 8px 0 0;
+}
+[data-mode='navigation'] .site-loading-mark i {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+[data-mode='navigation'] .site-loading-label {
+  display: none;
+}
+#site-loading[data-mode='navigation'] .site-loading-title {
+  margin: 0;
+  font-size: 16px;
+}
+#site-loading[data-mode='navigation'] .site-loading-description {
+  margin-top: 4px;
+  font-size: 12px;
+}
+[data-mode='navigation'] .site-loading-track {
+  grid-column: 2;
+  width: 72px;
+  margin: 14px 0 0;
+}
+[data-mode='navigation'] .site-loading-retry {
+  margin: 0;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  [data-mode='navigation'] .site-loading-card {
+    padding: 16px;
+    column-gap: 12px;
+  }
+  [data-mode='navigation'] .site-loading-content {
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 10px;
+  }
+  [data-mode='navigation'] .site-loading-mark {
+    grid-template-columns: repeat(2, 14px);
+    gap: 4px;
+  }
+  [data-mode='navigation'] .site-loading-mark i {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+  }
+  #site-loading[data-mode='navigation'] .site-loading-title {
+    font-size: 14px;
+  }
+  [data-mode='navigation'] .site-loading-retry {
+    padding: 0 12px;
+    font-size: 12px;
+  }
+}
+.site-loading-noscript {
+  padding: 32px;
+  color: var(--text, var(--loading-text));
+  text-align: center;
+}
+@keyframes loading-block {
+  0%,
+  65%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+@keyframes loading-track {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(360%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-visible='true'][data-state='waiting'] .site-loading-mark i {
+    animation: loading-block 1600ms var(--motion-ease, ease) infinite;
+  }
+  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(2) {
+    animation-delay: 120ms;
+  }
+  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(3) {
+    animation-delay: 360ms;
+  }
+  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(4) {
+    animation-delay: 240ms;
+  }
+  [data-visible='true'][data-state='waiting'] .site-loading-track span {
+    animation: loading-track 1600ms ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #site-loading,
+  .site-loading-content,
+  .site-loading-retry {
+    transition: none;
+  }
+}

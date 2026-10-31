@@ -47,6 +47,8 @@
 | [src/pages.ts](src/pages.ts)                                                   | 页面路径表，工具路径由工具目录自动派生             |
 | [src/content.ts](src/content.ts)                                               | 个人资料、项目文案和链接                           |
 | [src/composables/useTheme.ts](src/composables/useTheme.ts)                     | 主题状态：保存选择优先，否则跟随系统               |
+| [src/loading/](src/loading/)                                                   | 内联首屏加载样式、等待与失败状态、路由加载事件     |
+| [src/composables/usePageLoading.ts](src/composables/usePageLoading.ts)         | 工具与游戏异步正文的等待、失败和卸载清理           |
 | [src/utils/lyrics.ts](src/utils/lyrics.ts)                                     | 歌词解析与翻译合并                                 |
 | [src/data/music.json](src/data/music.json)                                     | 歌单快照，只有歌单更新任务才改动                   |
 | [src/ProjectDirectory.vue](src/ProjectDirectory.vue)                           | 项目目录页：搜索、结果计数与空状态                 |
@@ -181,6 +183,7 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 | 仅 Markdown 文档               | 对修改的文件运行 Prettier 检查，核对本地链接和命令；无需构建或浏览器测试                                                                         |
 | 页面 CSS、模板、前端逻辑或图片 | `npm run build`，检查受影响区域的深浅主题和桌面、窄屏表现                                                                                        |
 | 导航、主题、复制或整体布局     | 在开发服务器运行时执行 `python3 scripts/check-browser.py`                                                                                        |
+| 首屏与页面加载提示             | 构建后在预览服务器执行 `python3 scripts/check-loading.py`，检查慢速 / 失败资源、连续导航、主题、窄屏和减少动态效果                               |
 | 项目目录                       | `python3 scripts/check-project-directory.py`                                                                                                     |
 | 工具清单或转换规则             | `node scripts/check-tools.mjs`（已包含 `check-jaytools.mjs`）                                                                                    |
 | 工具交互或布局                 | `python3 scripts/check-tools-browser.py`；涉及 jaytools 时另运行 `python3 scripts/check-jaytools-browser.py`                                     |

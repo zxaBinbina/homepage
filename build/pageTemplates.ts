@@ -1,6 +1,7 @@
 import type { Plugin } from 'vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import ejs from 'ejs'
+import { readFileSync } from 'node:fs'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 import { pages, pageForPath, knownPageForPath, pageFile, type PageName } from '../src/pages'
 import { isErrorPage } from '../src/errors/catalog'
@@ -37,6 +38,13 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
     transformIndexHtml: {
       order: 'pre',
       handler(html, context) {
+        html = html
+          .replace('<%- loadingStyles %>', () =>
+            readFileSync(new URL('../src/loading/screen.css', import.meta.url), 'utf8'),
+          )
+          .replace('<%- loadingScript %>', () =>
+            readFileSync(new URL('../src/loading/bootstrap.js', import.meta.url), 'utf8'),
+          )
         // Vite resolves the shared entry/assets first; render metadata for every URL below.
         return build
           ? html
@@ -50,7 +58,12 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
         if (!entry || entry.type !== 'asset' || typeof entry.source !== 'string') {
           throw new Error('Missing shared HTML entry')
         }
-        const template = entry.source
+        // The critical loading shell can paint while the application CSS is downloading.
+        // main.ts waits for these styles before mounting Vue.
+        const template = entry.source.replace(
+          /<link rel="stylesheet"(?=\s|>)/g,
+          '<link rel="stylesheet" data-app-style media="print" onload="this.media=\'all\'"',
+        )
         for (const page of Object.keys(pages) as PageName[]) {
           const fileName = pageFile(page)
           // Error documents can be served at arbitrary nested URLs by the host.

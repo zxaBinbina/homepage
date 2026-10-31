@@ -23,6 +23,9 @@
         color-scheme: light;
       }
     </style>
+    <style>
+      <%- loadingStyles %>
+    </style>
     <script>
       // Set the theme before styles load to avoid a flash of the wrong color.
       let savedTheme
@@ -79,6 +82,24 @@
     <title><%= site.title %></title>
   </head>
   <body id="top" class="<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'rdp-site' : '' %>">
+    <div id="site-loading" data-mode="initial" data-state="waiting" hidden inert aria-hidden="true">
+      <div class="site-loading-card">
+        <div class="site-loading-content">
+          <div class="site-loading-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="site-loading-copy" aria-live="polite" aria-atomic="true">
+            <p class="site-loading-label">a彬彬a · 在代码与方块之间</p>
+            <p class="site-loading-title">正在搭建这一页</p>
+            <p class="site-loading-description">一点点准备，马上见面。</p>
+          </div>
+          <div class="site-loading-track" aria-hidden="true"><span></span></div>
+        </div>
+        <a class="site-loading-retry" href="" inert aria-hidden="true">重新加载</a>
+      </div>
+    </div>
+    <noscript><p class="site-loading-noscript">请启用 JavaScript 后重新加载页面。</p></noscript>
+    <script>
+      <%- loadingScript %>
+    </script>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,5 +1,12 @@
 import { nextTick } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  isNavigationFailure,
+  NavigationFailureType,
+  type RouteLocationNormalized,
+} from 'vue-router'
+import { beginPageLoading } from './loading/state'
 import { isProjectPage, isGazePage, knownPageForPath, pages, type PageName } from './pages'
 import { gazeGuides } from './gaze/catalog'
 import { isToolId, toolIds, type ToolId } from './tools/catalog'
@@ -141,12 +148,36 @@ export const router = createRouter({
   },
 })
 
-router.beforeEach((to) => {
+const navigationLoads = new WeakMap<RouteLocationNormalized, ReturnType<typeof beginPageLoading>>()
+let pendingNavigation: ReturnType<typeof beginPageLoading> | undefined
+router.beforeEach((to, from) => {
   const page = knownPageForPath(to.path)
   if (page && to.path !== pages[page]) {
     return { path: pages[page], query: to.query, hash: to.hash, replace: true }
   }
+  if (to.path !== from.path || !from.matched.length) {
+    pendingNavigation = beginPageLoading(to.fullPath, true)
+    navigationLoads.set(to, pendingNavigation)
+  } else {
+    // A same-page anchor can also cancel a different route still being downloaded.
+    pendingNavigation?.finish()
+    pendingNavigation = undefined
+  }
 })
+
+router.afterEach(async (to, _from, failure) => {
+  if (isNavigationFailure(failure, NavigationFailureType.duplicated)) {
+    pendingNavigation?.finish()
+    pendingNavigation = undefined
+    return
+  }
+  // Let the new view register any nested async content before releasing this task.
+  await nextTick()
+  const loading = navigationLoads.get(to)
+  loading?.finish()
+  if (pendingNavigation === loading) pendingNavigation = undefined
+})
+router.onError((_error, to) => navigationLoads.get(to)?.fail())
 
 router.afterEach((to, _from, failure) => {
   if (failure) return
@@ -207,7 +238,6 @@ export function navigateInternalLink(event: MouseEvent) {
   if (url.origin !== location.origin || !page) return
   event.preventDefault()
   void router.push(`${pages[page]}${url.search}${url.hash}`).catch(() => {
-    // A stale or unavailable lazy chunk can still be opened as a complete server-rendered shell.
-    location.assign(url.href)
+    // The loading shell reports failures and offers an explicit full-page retry.
   })
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onErrorCaptured, ref } from 'vue'
+import { computed } from 'vue'
+import { usePageLoading } from '../composables/usePageLoading'
 import { ArrowLeft, ShieldCheck } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
 import AppToasts from './freemium/components/AppToasts.vue'
@@ -7,11 +8,7 @@ import { toolCatalog, type ToolId } from './catalog'
 import { toolComponents } from './components'
 const props = defineProps<{ id: ToolId }>()
 const tool = computed(() => toolCatalog[props.id])
-const failed = ref(false)
-onErrorCaptured(() => {
-  failed.value = true
-  return false
-})
+const { pending, resolved, failed } = usePageLoading()
 function reload() {
   location.reload()
 }
@@ -30,9 +27,9 @@ function reload() {
           <p>工具暂时未能加载，请重新加载后再试。</p>
           <button class="button button-primary" type="button" @click="reload">重新加载</button>
         </div>
-        <Suspense v-else>
+        <Suspense v-else @pending="pending" @resolve="resolved">
           <component :is="toolComponents[id]" />
-          <template #fallback><p class="tool-load-state" role="status">正在准备工具…</p></template>
+          <template #fallback><div class="tool-load-state" aria-busy="true"></div></template>
         </Suspense>
         <AppToasts />
       </div>

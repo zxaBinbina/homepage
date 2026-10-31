@@ -120,6 +120,8 @@
 
 ## 站内页面切换
 
+首次打开与站内切页等待超过约半秒时，会显示与当前配色、深浅主题一致的方块加载动画；首屏使用居中界面，切页使用导航下方的提示卡。工具与游戏的按需内容也会显示等待状态。正常快速加载不额外停留，等待较久或资源加载失败时提供「重新加载」，并适配系统减少动态效果设置。
+
 主页、项目目录、网页工具、小游戏与 RDP 子站之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project`、`/tool`、`/tools/json` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
 
 共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。

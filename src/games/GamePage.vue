@@ -7,9 +7,11 @@ import { gameCatalog, type GameId } from './catalog'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import { useGameFit } from './useGameFit'
+import { usePageLoading } from '../composables/usePageLoading'
 
 const props = defineProps<{ id: GameId }>()
 const game = computed(() => gameCatalog[props.id])
+const { pending, resolved, failed } = usePageLoading()
 const components = {
   twenty48: defineAsyncComponent(() => import('./NumberGame.vue')),
   minesweeper: defineAsyncComponent(() => import('./MinesweeperGame.vue')),
@@ -126,11 +128,14 @@ onBeforeUnmount(() => {
             <div ref="fitFrame" class="game-play-content">
               <div ref="fitContent" class="game-fit-content">
                 <GameGuide :id="id" />
-                <component
-                  :is="components[id]"
-                  :key="id"
-                  v-bind="id === 'xiangqi' || id === 'gomoku' ? { kind: id } : {}"
-                />
+                <p v-if="failed" role="alert">游戏暂时未能加载，请重新加载后再试。</p>
+                <Suspense v-else @pending="pending" @resolve="resolved">
+                  <component
+                    :is="components[id]"
+                    :key="id"
+                    v-bind="id === 'xiangqi' || id === 'gomoku' ? { kind: id } : {}"
+                  />
+                </Suspense>
               </div>
             </div>
           </section>
