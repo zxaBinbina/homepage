@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from browser_theme import set_theme_mode, wait_theme_settled
 
 OUT = Path(__file__).resolve().parent.parent / 'artifacts'
 OUT.mkdir(exist_ok=True)
@@ -83,31 +84,29 @@ with sync_playwright() as p:
     page.mouse.move(12, 100)
     page.locator('.animated-busy-cursor').wait_for()
     assert page.locator('.animated-busy-cursor').get_attribute('src').endswith('/cursors/hutao-red/busy.gif')
-    page.get_by_role('button', name='选择配色方案').click()
     page.get_by_role('button', name='芙芙蓝').click()
     page.mouse.move(12, 100)
     page.wait_for_function("document.querySelector('.animated-busy-cursor')?.src.endsWith('/cursors/fufu-blue/busy.gif')")
     assert page.locator('.animated-busy-cursor').get_attribute('src').endswith('/cursors/fufu-blue/busy.gif')
     assert_cursor_palette(page, base_url, 'fufu-blue')
-    page.get_by_role('button', name='选择配色方案').click()
     page.get_by_role('button', name='胡桃红').click()
     page.mouse.move(12, 100)
     page.wait_for_function("document.querySelector('.animated-busy-cursor')?.src.endsWith('/cursors/hutao-red/busy.gif')")
     assert page.locator('.animated-busy-cursor').get_attribute('src').endswith('/cursors/hutao-red/busy.gif')
     assert_cursor_palette(page, base_url, 'hutao-red')
     page.locator('[data-cursor-test]').evaluate('(e) => e.remove()')
+    wait_theme_settled(page)
     page.wait_for_timeout(350)
-    palette_bg = page.locator('body').evaluate('(e) => [getComputedStyle(e).backgroundColor, getComputedStyle(e).getPropertyValue("--bg")]')
-    assert palette_bg[1] == '#3a1b19', palette_bg
+    assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(58, 27, 25)'
     assert page.locator('.primary').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(201, 71, 55)'
     assert page.locator('.browser-art').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(41, 27, 27)'
-    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--number-level-5").trim()') == '#7b595e'
-    page.get_by_role('button', name='切换浅色主题').click()
+    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--number-level-5").trim()') == 'rgb(123, 89, 94)'
+    set_theme_mode(page, 'light')
     assert page.locator('html').get_attribute('data-theme') == 'light'
     page.wait_for_timeout(350)
     assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(252, 240, 225)'
-    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--star-blue").trim()') == '#7b595e'
-    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--number-level-6").trim()') == '#a83d33'
+    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--star-blue").trim()') == 'rgb(123, 89, 94)'
+    assert page.locator('html').evaluate('(e) => getComputedStyle(e).getPropertyValue("--number-level-6").trim()') == 'rgb(168, 61, 51)'
     assert page.locator('meta[name="theme-color"]').get_attribute('content') == '#fcf0e1'
     page.reload(wait_until='networkidle')
     assert page.locator('html').get_attribute('data-theme') == 'light'
@@ -118,7 +117,7 @@ with sync_playwright() as p:
     page.wait_for_function('getComputedStyle(document.body).backgroundColor === "rgb(244, 246, 250)"')
     assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(244, 246, 250)'
     page.screenshot(path=str(OUT / 'desktop-light.png'))
-    page.get_by_role('button', name='切换深色主题').click()
+    set_theme_mode(page, 'dark')
     for section in ['home','about','projects','world','contact']:
         page.locator('#'+section).scroll_into_view_if_needed()
         page.wait_for_timeout(250)
@@ -162,7 +161,7 @@ with sync_playwright() as p:
         page.get_by_role('button', name='胡桃红').click()
         assert page.locator('html').get_attribute('data-palette') == 'hutao-red'
         current_theme = page.locator('html').get_attribute('data-theme')
-        page.get_by_role('button', name='切换浅色主题' if current_theme == 'dark' else '切换深色主题').click()
+        set_theme_mode(page, 'light' if current_theme == 'dark' else 'dark')
         assert page.locator('html').get_attribute('data-theme') != current_theme
         assert page.locator('html').get_attribute('data-palette') == 'hutao-red'
         page.wait_for_timeout(700)

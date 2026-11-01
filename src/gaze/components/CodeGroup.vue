@@ -1,30 +1,36 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import CodeBlock from './CodeBlock.vue'
+import SegmentedControl from '../../components/SegmentedControl.vue'
 
-defineProps<{ items: { label: string; code: string; language: string }[] }>()
+const props = defineProps<{ items: { label: string; code: string; language: string }[] }>()
 const active = ref(0)
+const id = useId()
+const options = computed(() =>
+  props.items.map((item, index) => ({
+    value: index,
+    label: item.label,
+    id: `${id}-tab-${index}`,
+    controls: `${id}-panel`,
+  })),
+)
 </script>
 
 <template>
   <div class="gaze-code">
-    <div
+    <SegmentedControl
+      v-model="active"
+      :options="options"
       class="gaze-code-tabs"
-      role="tablist"
-      :aria-label="`代码选项：${items.map((i) => i.label).join('、')}`"
-    >
-      <button
-        v-for="(item, index) in items"
-        :key="item.label"
-        role="tab"
-        :aria-selected="active === index"
-        :tabindex="active === index ? 0 : -1"
-        @click="active = index"
-      >
-        {{ item.label }}
-      </button>
-    </div>
+      semantics="tabs"
+      :label="`代码选项：${items.map((i) => i.label).join('、')}`"
+      wrap
+    />
     <CodeBlock
+      :id="`${id}-panel`"
+      role="tabpanel"
+      :aria-labelledby="`${id}-tab-${active}`"
+      tabindex="0"
       :code="items[active]?.code ?? ''"
       :language="items[active]?.language ?? 'text'"
       :label="items[active]?.label"

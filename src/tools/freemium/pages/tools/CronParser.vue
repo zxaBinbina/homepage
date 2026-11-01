@@ -21,19 +21,16 @@
         <span v-if="error" class="expr__err"><AppIcon name="warning" :size="16" />{{ error }}</span>
         <span v-else-if="description" class="t-title3">“{{ description }}”</span>
       </p>
-      <div class="examples" role="group" aria-label="常用示例">
-        <button
-          v-for="ex in examples"
-          :key="ex.value"
-          class="chip"
-          type="button"
-          :aria-pressed="expression.trim() === ex.value"
-          :title="ex.value"
-          @click="expression = ex.value"
-        >
-          {{ ex.label }}
-        </button>
-      </div>
+      <SegmentedControl
+        :model-value="expression.trim()"
+        :options="examples.map((ex) => ({ ...ex, title: ex.value }))"
+        class="examples"
+        item-class="chip"
+        label="常用示例"
+        semantics="buttons"
+        wrap
+        @update:model-value="expression = $event"
+      />
     </section>
 
     <div v-if="!error && parsed" class="split">
@@ -67,6 +64,7 @@
 </template>
 
 <script setup>
+import SegmentedControl from '../../../../components/SegmentedControl.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import * as cronNs from 'cron-parser'
 import ToolPage from '../../components/ToolPage.vue'
@@ -384,31 +382,7 @@ const runs = computed(() => {
   font-size: 0.9375rem;
 }
 .examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
   margin-top: 14px;
-}
-.chip {
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: var(--fill-3);
-  color: var(--label);
-  font-size: 0.8125rem;
-}
-.chip:hover {
-  background: var(--fill-2);
-}
-.chip[aria-pressed='true'] {
-  background: var(--tint);
-  color: var(--on-tint);
-  font-weight: 600;
-}
-@media (pointer: coarse) {
-  .chip {
-    min-height: 44px;
-  }
 }
 
 .block {

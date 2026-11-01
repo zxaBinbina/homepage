@@ -44,6 +44,32 @@ with sync_playwright() as p:
     expect(mode).to_have_value('precise')
     expect(run).to_be_disabled()
 
+    # Import help is opt-in, keyboard operable and preserves the current input.
+    guide = page.get_by_role('region', name='如何找到并导入对话文件', exact=True)
+    guide_button = page.locator('button[aria-controls="codex-import-guide"]')
+    expect(guide).to_have_count(0)
+    expect(guide_button).to_have_attribute('aria-expanded', 'false')
+    editor.fill('{"type":"message"}')
+    guide_button.click()
+    expect(guide).to_be_visible()
+    expect(guide_button).to_have_attribute('aria-expanded', 'true')
+    guide.get_by_role('radio', name='Windows', exact=True).click()
+    expect(guide.locator('.codex-import-platform code')).to_have_text('%USERPROFILE%\\.codex\\sessions')
+    guide.get_by_role('radio', name='macOS', exact=True).click()
+    expect(guide.locator('.codex-import-platform')).to_contain_text('Finder')
+    page.keyboard.press('ArrowRight')
+    expect(guide.get_by_role('radio', name='Linux', exact=True)).to_be_checked()
+    expect(guide.locator('.codex-import-platform')).to_contain_text('Ctrl + L')
+    guide_button.focus()
+    page.keyboard.press('Enter')
+    expect(guide).to_have_count(0)
+    expect(guide_button).to_be_focused()
+    expect(editor).to_have_value('{"type":"message"}')
+    guide_button.click()
+    expect(guide.get_by_role('radio', name='Linux', exact=True)).to_be_checked()
+    guide_button.click()
+    editor.fill('')
+
     def clean():
         run.click()
         expect(page.locator('.codex-cleaner-success')).to_contain_text('校验通过')
@@ -131,13 +157,18 @@ with sync_playwright() as p:
     mode.select_option('precise')
     clean()
     page.get_by_role('combobox', name='结果预览').select_option('10')
+    guide_button.click()
+    expect(guide).to_be_visible()
     for palette in ['fufu-blue', 'hutao-red']:
         for theme in ['light', 'dark']:
             page.evaluate('([p,t]) => {document.documentElement.dataset.palette=p;document.documentElement.dataset.theme=t}', [palette, theme])
             for width in [320, 390, 479, 481, 768, 1024, 1440]:
                 page.set_viewport_size({'width': width, 'height': 1100})
                 page.evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
-                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (palette, theme, width)
+                for system in ['Linux', 'macOS', 'Windows']:
+                    guide.get_by_role('radio', name=system, exact=True).click()
+                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (palette, theme, width, system)
+                expect(download).to_be_visible()
                 if width in [390, 1440]:
                     page.screenshot(path=str(out / f'{palette}-{theme}-{width}.png'), full_page=True)
     page.get_by_label('选择 JSONL 文件', exact=True).focus()
@@ -180,6 +211,7 @@ with sync_playwright() as p:
     page.evaluate('() => { window.Worker = window.realWorker }')
     page.goto(base + '/tools/codex-jsonl-cleaner')
     expect(editor).to_have_value('')
+    expect(guide).to_have_count(0)
     assert page.evaluate('!JSON.stringify([localStorage, sessionStorage]).includes("stale")')
 
     # The tool also works with normal motion and after a failed worker start.
@@ -196,6 +228,45 @@ with sync_playwright() as p:
     assert 'Codex 对话加密字段清理 · 网页工具 · a彬彬a' in html
     assert 'https://zxabinbina.cc.cd/tools/codex-jsonl-cleaner' in html
     assert not external, external
+
+    # Browser identities include mobile devices that mimic desktop platforms.
+    # Detection only sets the initial choice; every case remains switchable.
+    identities = [
+        ({'hint': 'Windows', 'agent': 'Mozilla/5.0 (X11; Linux x86_64)', 'platform': 'Linux x86_64'}, 'Windows'),
+        ({'agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'platform': 'Win32'}, 'Windows'),
+        ({'agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'platform': 'MacIntel'}, 'macOS'),
+        ({'hint': 'macOS', 'agent': 'Mozilla/5.0'}, 'macOS'),
+        ({'agent': 'Mozilla/5.0 (X11; Linux x86_64)', 'platform': 'Linux x86_64'}, 'Linux'),
+        ({'hint': 'Linux'}, 'Linux'),
+        ({'agent': 'Unknown browser', 'platform': ''}, 'Windows'),
+        ({'hint': 'Android', 'agent': 'Mozilla/5.0 (Linux; Android 14)', 'platform': 'Linux armv8l', 'touch': 5}, 'Windows'),
+        ({'agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', 'platform': 'iPhone'}, 'Windows'),
+        ({'agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15)', 'platform': 'MacIntel', 'touch': 5}, 'Windows'),
+        ({'hint': 'Chrome OS', 'agent': 'Mozilla/5.0 (X11; CrOS x86_64)', 'platform': 'Linux x86_64'}, 'Windows'),
+        ({'hint': 'Linux', 'mobile': True}, 'Windows'),
+    ]
+    for device, expected in identities:
+        probe = context.new_page()
+        probe.on('pageerror', lambda e: errors.append(str(e)))
+        probe.add_init_script('''(device => {
+          Object.defineProperties(navigator, {
+            userAgent: { configurable: true, get: () => device.agent || '' },
+            platform: { configurable: true, get: () => device.platform || '' },
+            maxTouchPoints: { configurable: true, get: () => device.touch || 0 },
+            userAgentData: { configurable: true, get: () => device.hint ? {
+              platform: device.hint, mobile: device.mobile || false
+            } : undefined }
+          })
+        })(%s)''' % json.dumps(device))
+        probe.goto(base + '/tools/codex-jsonl-cleaner')
+        probe.get_by_role('button', name='导入教程', exact=True).click()
+        system_choices = probe.get_by_role('radiogroup', name='教程适用系统', exact=True)
+        expect(system_choices.get_by_role('radio', name=expected, exact=True)).to_be_checked()
+        expect(probe.locator('.codex-import-platform h4')).to_have_text(expected)
+        other = 'Linux' if expected != 'Linux' else 'Windows'
+        system_choices.get_by_role('radio', name=other, exact=True).click()
+        expect(probe.locator('.codex-import-platform h4')).to_have_text(other)
+        probe.close()
     assert not errors, errors
     browser.close()
-print('Codex cleaner: modes, UTF-8 files, downloads, validation, preview, cancellation, stale results, 7 widths, 4 themes and local-only processing passed.')
+print('Codex cleaner: import guide/device detection, modes, UTF-8 files, downloads, validation, preview, cancellation, stale results, 7 widths, 4 themes and local-only processing passed.')

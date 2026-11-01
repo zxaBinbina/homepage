@@ -125,7 +125,9 @@ with sync_playwright() as p:
         button.click()
         assert page.evaluate('requests[0].stopped')
         button.click()
+        page.wait_for_function('requests.length === 2')
         page.get_by_role('button', name='重新开始', exact=True).click()
+        page.wait_for_function('requests.length === 3')
         assert page.evaluate('requests[1].stopped && requests[2].data.side===1')
         page.evaluate('''() => {
           requests[0].onmessage({data:112}); requests[1].onmessageerror();

@@ -546,24 +546,7 @@
 }
 .gaze-code-tabs {
   display: flex;
-  gap: 4px;
-  padding: 8px 12px 0;
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-}
-.gaze-code-tabs button {
-  padding: 9px 14px;
-  min-height: 40px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 12px;
-  border-bottom: 2px solid transparent;
-  border-radius: 8px 8px 0 0;
-  white-space: nowrap;
-}
-.gaze-code-tabs button[aria-selected='true'] {
-  color: var(--blue);
-  border-bottom-color: var(--blue);
+  margin: 10px 12px;
 }
 .gaze-prose table {
   display: block;
@@ -671,6 +654,15 @@
 .gaze-details summary svg {
   color: var(--blue);
   flex-shrink: 0;
+}
+.gaze-details summary[aria-expanded='true'] > svg {
+  rotate: 90deg;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gaze-details summary > svg,
+  .gaze-mobile-nav svg:last-child {
+    transition: rotate 300ms var(--motion-ease);
+  }
 }
 .gaze-details summary:focus-visible {
   outline: 2px solid var(--blue);

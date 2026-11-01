@@ -26,6 +26,15 @@ with sync_playwright() as p:
     def no_overflow():
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), page.url
 
+    def name_order():
+        assert page.locator('.tool-card h2').evaluate_all('''els => {
+          const names = els.map(el => el.textContent)
+          const sorted = [...names].sort((a, b) => a.localeCompare(b, 'zh-CN', {
+            numeric: true, sensitivity: 'base'
+          }))
+          return names.every((name, i) => name === sorted[i])
+        }'''), 'Tool names must stay sorted after filtering or searching'
+
     def resize_editor(editor, delta):
         editor.scroll_into_view_if_needed()
         box = editor.bounding_box()
@@ -76,10 +85,16 @@ with sync_playwright() as p:
 
     page.goto(base + '/tool')
     expect(page.locator('.tool-card')).to_have_count(len(tools))
+    name_order()
+    expect(page.locator('.tool-card-top .overline')).to_have_text([str(i).zfill(2) for i in range(1, len(tools) + 1)])
     expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('工具')
     page.get_by_role('button', name='格式整理', exact=True).click()
     expect(page.locator('.tool-card')).to_have_count(sum(t['category'] == '格式整理' for t in tools))
+    name_order()
     page.get_by_role('button', name='全部', exact=True).click()
+    page.get_by_role('searchbox', name='搜索工具').fill('JSON')
+    expect(page.locator('.tool-card')).to_have_count(sum('json' in f"{t['name']} {t['description']} {t['keywords']}".lower() for t in tools))
+    name_order()
     page.get_by_role('searchbox', name='搜索工具').fill('二维码')
     expect(page.locator('.tool-card')).to_have_count(1)
     page.get_by_role('searchbox', name='搜索工具').fill('no-such-tool')
@@ -202,7 +217,7 @@ with sync_playwright() as p:
                 expect(page.locator('.tool-card')).to_have_count(len(tools))
                 no_overflow()
                 page.screenshot(path=str(out / f'tools-{palette}-{theme}-{width}.png'), full_page=False)
-                page.locator('.tool-card').first.click()
+                page.locator('.tool-card[href="/tools/json-formatter"]').click()
                 expect(page.locator('.tool-page')).to_be_visible()
                 page.get_by_role('button', name='示例', exact=True).click()
                 expect(page.locator('textarea[readonly]')).not_to_have_value('')

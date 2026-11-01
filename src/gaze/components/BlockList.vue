@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AnimatedDetails from '../../components/AnimatedDetails.vue'
 import { AlertTriangle, ChevronRight, Flame, Info, Lightbulb, ShieldAlert } from 'lucide-vue-next'
 import CodeBlock from './CodeBlock.vue'
 import CodeGroup from './CodeGroup.vue'
@@ -58,13 +59,13 @@ function meta(kind: string) {
       </p>
       <BlockList :blocks="block.blocks" />
     </div>
-    <details v-else class="gaze-details">
-      <summary>
+    <AnimatedDetails v-else class="gaze-details">
+      <template #summary>
         <ChevronRight :size="16" aria-hidden="true" />{{ block.title || '展开查看' }}
-      </summary>
+      </template>
       <div class="gaze-details-body">
         <BlockList :blocks="block.blocks" />
       </div>
-    </details>
+    </AnimatedDetails>
   </template>
 </template>

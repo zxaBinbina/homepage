@@ -88,61 +88,62 @@
           </div>
         </header>
 
-        <div v-if="findOpen" class="find" role="search" :aria-label="`Find in ${label}`">
-          <AppIcon name="search" :size="15" class="find__icon" />
-          <input
-            ref="findInput"
-            v-model="findQuery"
-            class="find__field"
-            type="text"
-            placeholder="查找"
-            :aria-label="`Find in ${label}`"
-            spellcheck="false"
-            @keydown.enter.prevent="$event.shiftKey ? step(-1) : step(1)"
-            @keydown.esc.prevent.stop="closeFind"
-          />
-          <span class="find__count t-caption" aria-live="polite">{{ findStatus }}</span>
-          <button
-            class="find__case"
-            type="button"
-            :aria-pressed="findCase"
-            aria-label="区分大小写"
-            title="区分大小写"
-            @click="findCase = !findCase"
-          >
-            Aa
-          </button>
-          <button
-            class="icon-btn icon-btn--sm"
-            type="button"
-            aria-label="上一处匹配"
-            title="上一处（Shift + 回车）"
-            :disabled="!matches.length"
-            @click="step(-1)"
-          >
-            <AppIcon name="chevronUp" :size="16" />
-          </button>
-          <button
-            class="icon-btn icon-btn--sm"
-            type="button"
-            aria-label="下一处匹配"
-            title="下一处（回车）"
-            :disabled="!matches.length"
-            @click="step(1)"
-          >
-            <AppIcon name="chevronDown" :size="16" />
-          </button>
-          <button
-            class="icon-btn icon-btn--sm"
-            type="button"
-            aria-label="关闭查找"
-            title="关闭（Esc）"
-            @click="closeFind"
-          >
-            <AppIcon name="xmark" :size="15" />
-          </button>
-        </div>
-
+        <CollapsePanel :open="findOpen" lazy>
+          <div class="find" role="search" :aria-label="`Find in ${label}`">
+            <AppIcon name="search" :size="15" class="find__icon" />
+            <input
+              ref="findInput"
+              v-model="findQuery"
+              class="find__field"
+              type="text"
+              placeholder="查找"
+              :aria-label="`Find in ${label}`"
+              spellcheck="false"
+              @keydown.enter.prevent="$event.shiftKey ? step(-1) : step(1)"
+              @keydown.esc.prevent.stop="closeFind"
+            />
+            <span class="find__count t-caption" aria-live="polite">{{ findStatus }}</span>
+            <button
+              class="find__case"
+              type="button"
+              :aria-pressed="findCase"
+              aria-label="区分大小写"
+              title="区分大小写"
+              @click="findCase = !findCase"
+            >
+              Aa
+            </button>
+            <button
+              class="icon-btn icon-btn--sm"
+              type="button"
+              aria-label="上一处匹配"
+              title="上一处（Shift + 回车）"
+              :disabled="!matches.length"
+              @click="step(-1)"
+            >
+              <AppIcon name="chevronUp" :size="16" />
+            </button>
+            <button
+              class="icon-btn icon-btn--sm"
+              type="button"
+              aria-label="下一处匹配"
+              title="下一处（回车）"
+              :disabled="!matches.length"
+              @click="step(1)"
+            >
+              <AppIcon name="chevronDown" :size="16" />
+            </button>
+            <button
+              class="icon-btn icon-btn--sm"
+              type="button"
+              aria-label="关闭查找"
+              title="关闭（Esc）"
+              @click="closeFind"
+            >
+              <AppIcon name="xmark" :size="15" />
+            </button>
+          </div>
+        </CollapsePanel>
         <div class="pane__body">
           <slot>
             <div class="pane__editor">
@@ -228,6 +229,7 @@
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import AppIcon from './AppIcon.vue'
+import CollapsePanel from '../../../components/CollapsePanel.vue'
 import { useToolModal } from '../composables/useToolModal'
 import { copyText, readClipboard, downloadText, readFileAsText } from '../composables/clipboard'
 

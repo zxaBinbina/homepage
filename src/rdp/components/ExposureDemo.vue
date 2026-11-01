@@ -321,19 +321,25 @@ onBeforeUnmount(() => {
 .exposure-desktop {
   position: relative;
   isolation: isolate;
+  width: 100%;
   aspect-ratio: 16 / 10;
   min-height: 370px;
   overflow: hidden;
-  background: #1d396a;
+  background: var(--rdp-demo-sky-start);
 }
 .exposure-wallpaper {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 78% 22%, rgba(171, 212, 255, 0.72) 0 3%, transparent 3.3%),
-    radial-gradient(circle at 22% 25%, rgba(170, 210, 249, 0.4) 0 2%, transparent 2.4%),
-    linear-gradient(155deg, #162d61 0%, #2d6095 53%, #a2bfd4 100%);
+    radial-gradient(circle at 78% 22%, var(--rdp-demo-orb-one) 0 3%, transparent 3.3%),
+    radial-gradient(circle at 22% 25%, var(--rdp-demo-orb-two) 0 2%, transparent 2.4%),
+    linear-gradient(
+      155deg,
+      var(--rdp-demo-sky-start) 0%,
+      var(--rdp-demo-sky-mid) 53%,
+      var(--rdp-demo-sky-end) 100%
+    );
 }
 .exposure-wallpaper::before,
 .exposure-wallpaper::after {
@@ -341,7 +347,11 @@ onBeforeUnmount(() => {
   content: '';
   inset: auto -8% -9% -8%;
   height: 58%;
-  background: linear-gradient(145deg, rgba(18, 48, 88, 0.8), rgba(31, 93, 129, 0.2));
+  background: linear-gradient(
+    145deg,
+    var(--rdp-demo-mountain-back-start),
+    var(--rdp-demo-mountain-back-end)
+  );
   clip-path: polygon(
     0 59%,
     10% 47%,
@@ -358,7 +368,11 @@ onBeforeUnmount(() => {
 .exposure-wallpaper::after {
   inset: auto -10% -13% -10%;
   height: 43%;
-  background: linear-gradient(145deg, rgba(8, 31, 65, 0.82), rgba(29, 77, 108, 0.24));
+  background: linear-gradient(
+    145deg,
+    var(--rdp-demo-mountain-front-start),
+    var(--rdp-demo-mountain-front-end)
+  );
   clip-path: polygon(
     0 60%,
     18% 43%,
@@ -376,7 +390,7 @@ onBeforeUnmount(() => {
   width: 19%;
   aspect-ratio: 1;
   border-radius: 50% 50% 0 0;
-  background: rgba(187, 221, 241, 0.18);
+  background: color-mix(in srgb, var(--rdp-demo-sky-end) 18%, transparent);
   filter: blur(1px);
 }
 .exposure-mountain-back {
@@ -388,7 +402,7 @@ onBeforeUnmount(() => {
   right: 8%;
   bottom: 26%;
   width: 25%;
-  background: rgba(213, 237, 246, 0.13);
+  background: color-mix(in srgb, var(--rdp-demo-sky-end) 13%, transparent);
   transform: rotate(36deg) skewX(-15deg);
 }
 .exposure-star {
@@ -396,8 +410,8 @@ onBeforeUnmount(() => {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(232, 246, 255, 0.72);
-  box-shadow: 0 0 9px rgba(232, 246, 255, 0.9);
+  background: var(--rdp-demo-orb-one);
+  box-shadow: 0 0 9px var(--rdp-demo-orb-one);
 }
 .star-one {
   top: 20%;
@@ -429,11 +443,11 @@ onBeforeUnmount(() => {
   position: relative;
   width: 100%;
   padding: 8px 11px 9px;
-  border: 1px solid rgba(228, 239, 255, 0.26);
+  border: 1px solid var(--rdp-demo-notice-border);
   border-radius: 10px;
-  background: rgba(21, 31, 48, 0.96);
-  color: #edf4ff;
-  box-shadow: 0 12px 36px rgba(3, 13, 31, 0.42);
+  background: var(--rdp-demo-notice-bg);
+  color: var(--rdp-demo-notice-text);
+  box-shadow: 0 12px 36px var(--rdp-demo-notice-shadow);
   backdrop-filter: blur(18px);
 }
 .exposure-notice-head {
@@ -441,11 +455,11 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 10px;
   padding-bottom: 5px;
-  color: rgba(237, 244, 255, 0.58);
+  color: var(--rdp-demo-notice-muted);
   font-size: 9px;
 }
 .exposure-notice-app {
-  color: #dbeaff;
+  color: var(--rdp-demo-notice-app);
   font-size: 10px;
   font-weight: 600;
 }
@@ -464,16 +478,16 @@ onBeforeUnmount(() => {
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: rgba(237, 244, 255, 0.62);
+  color: var(--rdp-demo-notice-action);
 }
 .exposure-notice-actions button:hover,
 .exposure-notice-actions button:focus-visible {
-  background: rgba(237, 244, 255, 0.12);
-  color: #edf4ff;
+  background: var(--rdp-demo-notice-hover-bg);
+  color: var(--rdp-demo-notice-hover-text);
 }
 .exposure-notice-progress {
   height: 1px;
-  background: rgba(129, 201, 255, 0.9);
+  background: color-mix(in srgb, var(--blue) 90%, transparent);
   transform-origin: left;
 }
 .exposure-notice-body {
@@ -490,18 +504,18 @@ onBeforeUnmount(() => {
   height: 39px;
   flex-shrink: 0;
   border-radius: 7px;
-  background: linear-gradient(145deg, #2dc5ef, #2586d0);
-  color: #f4fbff;
-  box-shadow: inset 0 0 0 2px rgba(205, 241, 255, 0.28);
+  background: linear-gradient(145deg, var(--primary-action-hover), var(--primary-action));
+  color: var(--primary-action-text);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary-action-text) 28%, transparent);
 }
 .exposure-notice-body strong {
   display: block;
-  color: #f3f7ff;
+  color: var(--rdp-demo-notice-strong);
   font-size: 14px;
   line-height: 1.4;
 }
 .exposure-notice-body p {
-  color: rgba(237, 244, 255, 0.73);
+  color: var(--rdp-demo-notice-body);
   font-size: 10px;
   line-height: 1.55;
 }
@@ -520,12 +534,12 @@ onBeforeUnmount(() => {
   padding: 7px 13px;
   bottom: 10px;
   transform: translateX(-50%);
-  border: 1px solid rgba(228, 239, 255, 0.2);
+  border: 1px solid var(--rdp-demo-taskbar-border);
   border-radius: 18px;
-  background: rgba(15, 27, 49, 0.82);
-  color: rgba(239, 249, 255, 0.8);
+  background: var(--rdp-demo-taskbar-bg);
+  color: var(--rdp-demo-taskbar-text);
   backdrop-filter: blur(12px);
-  box-shadow: 0 10px 28px rgba(3, 13, 31, 0.38);
+  box-shadow: 0 10px 28px var(--rdp-demo-taskbar-shadow);
 }
 .exposure-taskbar-launch,
 .exposure-taskbar-status {
@@ -542,13 +556,13 @@ onBeforeUnmount(() => {
 .exposure-taskbar-time {
   min-width: 66px;
   margin-left: -6px;
-  color: #edf4ff;
+  color: var(--rdp-demo-taskbar-time);
   font-size: 11px;
   line-height: 1.05;
   text-align: right;
 }
 .exposure-taskbar-time small {
-  color: rgba(239, 249, 255, 0.62);
+  color: var(--rdp-demo-taskbar-muted);
   font-size: 8px;
 }
 .exposure-footer {
@@ -605,54 +619,6 @@ onBeforeUnmount(() => {
   display: block;
   color: var(--muted);
   font-size: 10px;
-}
-:global(html[data-theme='light'] .exposure-wallpaper) {
-  background:
-    radial-gradient(circle at 78% 22%, rgba(255, 255, 255, 0.9) 0 3%, transparent 3.3%),
-    radial-gradient(circle at 22% 25%, rgba(255, 255, 255, 0.72) 0 2%, transparent 2.4%),
-    linear-gradient(155deg, #7caed4 0%, #a9cee5 53%, #dfeaf0 100%);
-}
-:global(html[data-theme='light'] .exposure-wallpaper::before) {
-  background: linear-gradient(145deg, rgba(53, 105, 140, 0.42), rgba(91, 155, 177, 0.18));
-}
-:global(html[data-theme='light'] .exposure-wallpaper::after) {
-  background: linear-gradient(145deg, rgba(31, 76, 112, 0.48), rgba(86, 145, 167, 0.16));
-}
-:global(html[data-theme='light'] .exposure-notice) {
-  border-color: rgba(40, 77, 112, 0.2);
-  background: rgba(248, 252, 255, 0.96);
-  color: #172a3d;
-  box-shadow: 0 12px 36px rgba(30, 67, 100, 0.22);
-}
-:global(html[data-theme='light'] .exposure-notice-head) {
-  color: rgba(23, 42, 61, 0.58);
-}
-:global(html[data-theme='light'] .exposure-notice-app),
-:global(html[data-theme='light'] .exposure-notice-body strong) {
-  color: #18334c;
-}
-:global(html[data-theme='light'] .exposure-notice-actions button) {
-  color: rgba(23, 42, 61, 0.58);
-}
-:global(html[data-theme='light'] .exposure-notice-actions button:hover),
-:global(html[data-theme='light'] .exposure-notice-actions button:focus-visible) {
-  background: rgba(23, 75, 117, 0.1);
-  color: #18334c;
-}
-:global(html[data-theme='light'] .exposure-notice-body p) {
-  color: rgba(23, 42, 61, 0.7);
-}
-:global(html[data-theme='light'] .exposure-taskbar) {
-  border-color: rgba(40, 77, 112, 0.2);
-  background: rgba(244, 250, 255, 0.78);
-  color: rgba(23, 52, 76, 0.82);
-  box-shadow: 0 10px 28px rgba(30, 67, 100, 0.2);
-}
-:global(html[data-theme='light'] .exposure-taskbar-time) {
-  color: #17344e;
-}
-:global(html[data-theme='light'] .exposure-taskbar-time small) {
-  color: rgba(23, 52, 76, 0.62);
 }
 @media (prefers-reduced-motion: no-preference) {
   .exposure-notices-move {
@@ -712,13 +678,13 @@ onBeforeUnmount(() => {
 @keyframes exposure-notice-pulse {
   from {
     box-shadow:
-      inset 0 0 0 2px rgba(205, 241, 255, 0.28),
-      0 0 0 rgba(82, 178, 238, 0);
+      inset 0 0 0 2px color-mix(in srgb, var(--primary-action-text) 28%, transparent),
+      0 0 0 color-mix(in srgb, var(--blue) 0%, transparent);
   }
   to {
     box-shadow:
-      inset 0 0 0 2px rgba(205, 241, 255, 0.28),
-      0 0 14px rgba(82, 178, 238, 0.42);
+      inset 0 0 0 2px color-mix(in srgb, var(--primary-action-text) 28%, transparent),
+      0 0 14px color-mix(in srgb, var(--blue) 42%, transparent);
   }
 }
 @media (max-width: 760px) {

@@ -4,6 +4,8 @@
 
 ## 工具清单
 
+工具目录按名称升序排列，使用 `zh-CN` 本地化排序（中文按拼音，英文不区分大小写，数字按数值比较）。分类和搜索结果保持相同顺序，卡片编号对应完整排序中的位置。分类使用统一的分段胶囊和滑动选中块，窄屏下分三列显示，支持方向键、Home / End 切换。
+
 | 工具              | 地址                         | 用途                                        |
 | ----------------- | ---------------------------- | ------------------------------------------- |
 | JSON 格式化       | `/tools/json-formatter`      | 格式化、校验、排序与压缩 JSON 数据。        |
@@ -71,6 +73,10 @@
 ## Codex 对话加密字段清理
 
 地址 `/tools/codex-jsonl-cleaner`，分类「格式整理」。导入 UTF-8 JSONL 或粘贴 Codex / Codex CLI 导出的事件，每行必须是一个 JSON 对象；文件与文本上限均为 20 MB。支持 UTF-8 BOM、LF 与 CRLF，文件末尾单个换行不增加行数，内部空行会作为非法行报告。
+
+「选择文件」旁提供「导入教程」按钮，默认收起，点击后显示三步说明：按系统打开目录、在子文件夹中查找 `.jsonl` 并核对会话、返回工具选择文件和清理。Windows 默认目录为 `%USERPROFILE%\.codex\sessions`，macOS / Linux 为 `~/.codex/sessions`；归档记录位于同一根目录的 `archived_sessions`。设置了 `CODEX_HOME` 时使用自定义根目录；WSL、远程开发和容器需在实际运行 Codex 的环境中查找。教程组件在 `src/tools/codex/CodexImportGuide.vue`，位置依据 [OpenAI 官方故障排查文档](https://learn.chatgpt.com/docs/reference/troubleshooting)与[环境变量说明](https://learn.chatgpt.com/docs/config-file/environment-variables)。
+
+教程根据浏览器提供的系统信息预选 Windows、macOS 或 Linux；优先使用 UA Client Hints，缺失时读取 User-Agent 与平台信息，不请求额外权限。未知系统、Android、iPhone / iPad 和 ChromeOS 默认展示 Windows 教程，避免将移动设备误判为桌面系统。用户可手动切换，目录路径、归档路径和操作说明随选择变化；收起再展开保留手动选择，离开页面后重置。识别逻辑位于 `src/tools/codex/importPlatform.ts`。
 
 - **精确模式（默认）**：删除含 `"encrypted_content"` 或 `type` 为 `reasoning` / `Reasoning` 的整行，兼容冒号周围的空白、嵌套对象与转义后的字段名。其余行保留原文，`reasoning_effort`、`reasoning_output_tokens` 等参数与用量元数据不会单独触发删除。
 - **宽泛模式**：按原始行文本匹配 `encrypted_content` 或 `reasoning`，不区分大小写。任何位置命中都会删整行，包括元数据键和普通正文中的词语。

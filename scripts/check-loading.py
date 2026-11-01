@@ -175,7 +175,7 @@ async def main():
         await hidden(page)
         await shown(page, 'navigation')
         assert await page.evaluate('window.originalHeader === document.querySelector(".header")')
-        await page.get_by_role('button', name='切换浅色主题').click()
+        await page.locator('.theme-toggle').click()
         await expect(page.locator('html')).to_have_attribute('data-theme', 'light')
         for width in [320, 390, 768, 1024, 1440]:
             await page.set_viewport_size({'width': width, 'height': 844})

@@ -15,11 +15,11 @@
         color-scheme: light;
       }
       :root[data-palette='hutao-red'] {
-        background: #3a1b19;
+        background: var(--bg, #3a1b19);
         color-scheme: dark;
       }
       :root[data-theme='light'][data-palette='hutao-red'] {
-        background: #fcf0e1;
+        background: var(--bg, #fcf0e1);
         color-scheme: light;
       }
     </style>
@@ -36,13 +36,15 @@
       } catch {
         /* Fall back to the browser preference when storage is unavailable. */
       }
+      const initialThemeMode = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'auto'
       const initialTheme =
-        savedTheme === 'light' || savedTheme === 'dark'
-          ? savedTheme
+        initialThemeMode !== 'auto'
+          ? initialThemeMode
           : matchMedia('(prefers-color-scheme: light)').matches
             ? 'light'
             : 'dark'
       document.documentElement.dataset.theme = initialTheme
+      document.documentElement.dataset.themeMode = initialThemeMode
       const initialPalette = savedPalette === 'hutao-red' ? 'hutao-red' : 'fufu-blue'
       document.documentElement.dataset.palette = initialPalette
       document.querySelector('meta[name="theme-color"]').content =

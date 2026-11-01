@@ -248,7 +248,7 @@
 .wiki-agent summary > svg:last-child {
   margin-left: auto;
 }
-.wiki-agent[open] summary > svg:last-child {
+.wiki-agent summary[aria-expanded='true'] > svg:last-child {
   rotate: 180deg;
 }
 .wiki-agent summary b,
@@ -498,8 +498,9 @@
     border-color: var(--blue);
     transform: translateY(-3px);
   }
-  .wiki-agent[open] .wiki-agent-body {
-    animation: page-enter 0.25s var(--motion-ease);
+  .wiki-agent summary > svg:last-child,
+  .wiki-mobile-toc svg:last-child {
+    transition: rotate 300ms var(--motion-ease);
   }
 }
 @media (max-width: 1050px) {

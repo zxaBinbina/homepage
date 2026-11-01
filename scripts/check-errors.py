@@ -4,6 +4,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from playwright.sync_api import sync_playwright, expect
+from browser_theme import set_theme_mode
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'artifacts'
@@ -305,7 +306,7 @@ with sync_playwright() as p:
     page.set_viewport_size({'width': 320, 'height': 900})
     page.goto(BASE + '/500', wait_until='networkidle')
     assert_error(500)
-    page.get_by_role('button', name='切换深色主题').click()
+    set_theme_mode(page, 'dark')
     expect(page.locator('html')).to_have_attribute('data-theme', 'dark')
     page.screenshot(path=str(OUT / 'error-500-reduced-motion-320.png'), full_page=True)
     with page.expect_navigation(wait_until='networkidle', timeout=3000):

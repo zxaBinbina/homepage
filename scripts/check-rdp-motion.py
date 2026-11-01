@@ -35,7 +35,7 @@ with sync_playwright() as p:
     page.screenshot(path=str(out / 'rdp-demo-failure.png'))
     page.get_by_role('button', name='重播演示').click()
     assert demo.get_attribute('data-phase') == 'typing'
-    page.locator('.rdp-footer').scroll_into_view_if_needed()
+    page.get_by_role('contentinfo').scroll_into_view_if_needed()
     page.wait_for_timeout(700)
     state = page.locator('.demo-password').inner_text()
     page.wait_for_timeout(600)

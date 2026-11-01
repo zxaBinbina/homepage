@@ -14,6 +14,7 @@ import {
 import content from 'virtual:gaze-content'
 import { gazeGuides, gazeGuideGroups, gazeGuidePath, gazeGuide, gazeRepoUrl } from '../catalog'
 import BlockList from './BlockList.vue'
+import CollapsePanel from '../../components/CollapsePanel.vue'
 
 const props = defineProps<{ guideId: string }>()
 const doc = computed(() => content.guides[props.guideId])
@@ -108,55 +109,57 @@ onBeforeUnmount(() => {
         >
           <List :size="17" />文档目录<ChevronDown :size="16" :class="{ rotated: menuOpen }" />
         </button>
-        <div id="gaze-directory" v-show="navVisible" :inert="!navVisible">
-          <label class="gaze-search"
-            ><Search :size="15" /><input
-              v-model="query"
-              type="search"
-              placeholder="搜索文档内容…"
-              aria-label="搜索文档" /><button
-              v-if="query"
-              aria-label="清空搜索"
-              @click="query = ''"
-            >
-              <X :size="14" /></button
-          ></label>
-          <p v-if="query" class="gaze-search-count" role="status">
-            {{
-              results.length
-                ? `找到 ${results.length} 篇相关文档`
-                : '没有找到相关内容，换个关键词试试。'
-            }}
-          </p>
-          <nav aria-label="Gaze 文档目录">
-            <template v-if="query">
-              <div class="gaze-nav-group">
-                <p>搜索结果</p>
-                <a
-                  v-for="item in results"
-                  :key="item.id"
-                  :href="gazeGuidePath(item.id)"
-                  :aria-current="item.id === guide.id ? 'page' : undefined"
-                  @click="menuOpen = false"
-                  >{{ item.title }}</a
-                >
-              </div>
-            </template>
-            <template v-else>
-              <div v-for="group in gazeGuideGroups" :key="group.id" class="gaze-nav-group">
-                <p>{{ group.label }}</p>
-                <a
-                  v-for="item in gazeGuides.filter((entry) => entry.group === group.id)"
-                  :key="item.id"
-                  :href="gazeGuidePath(item.id)"
-                  :aria-current="item.id === guide.id ? 'page' : undefined"
-                  @click="menuOpen = false"
-                  >{{ item.title }}</a
-                >
-              </div>
-            </template>
-          </nav>
-        </div>
+        <CollapsePanel :open="navVisible">
+          <div id="gaze-directory" :inert="!navVisible">
+            <label class="gaze-search"
+              ><Search :size="15" /><input
+                v-model="query"
+                type="search"
+                placeholder="搜索文档内容…"
+                aria-label="搜索文档" /><button
+                v-if="query"
+                aria-label="清空搜索"
+                @click="query = ''"
+              >
+                <X :size="14" /></button
+            ></label>
+            <p v-if="query" class="gaze-search-count" role="status">
+              {{
+                results.length
+                  ? `找到 ${results.length} 篇相关文档`
+                  : '没有找到相关内容，换个关键词试试。'
+              }}
+            </p>
+            <nav aria-label="Gaze 文档目录">
+              <template v-if="query">
+                <div class="gaze-nav-group">
+                  <p>搜索结果</p>
+                  <a
+                    v-for="item in results"
+                    :key="item.id"
+                    :href="gazeGuidePath(item.id)"
+                    :aria-current="item.id === guide.id ? 'page' : undefined"
+                    @click="menuOpen = false"
+                    >{{ item.title }}</a
+                  >
+                </div>
+              </template>
+              <template v-else>
+                <div v-for="group in gazeGuideGroups" :key="group.id" class="gaze-nav-group">
+                  <p>{{ group.label }}</p>
+                  <a
+                    v-for="item in gazeGuides.filter((entry) => entry.group === group.id)"
+                    :key="item.id"
+                    :href="gazeGuidePath(item.id)"
+                    :aria-current="item.id === guide.id ? 'page' : undefined"
+                    @click="menuOpen = false"
+                    >{{ item.title }}</a
+                  >
+                </div>
+              </template>
+            </nav>
+          </div>
+        </CollapsePanel>
       </aside>
       <article ref="article" class="gaze-doc">
         <BlockList :blocks="doc.intro" />

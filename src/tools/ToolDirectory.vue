@@ -2,13 +2,20 @@
 import { computed, ref } from 'vue'
 import { ArrowUpRight, Search, X } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
+import SegmentedControl from '../components/SegmentedControl.vue'
 import AppIcon from './freemium/components/AppIcon.vue'
 import { toolCatalog, toolIds } from './catalog'
 const query = ref('')
 const category = ref('全部')
 const categories = ['全部', ...new Set(toolIds.map((id) => toolCatalog[id].category))]
+const sortedToolIds = [...toolIds].sort((a, b) =>
+  toolCatalog[a].name.localeCompare(toolCatalog[b].name, 'zh-CN', {
+    numeric: true,
+    sensitivity: 'base',
+  }),
+)
 const matches = computed(() =>
-  toolIds.filter((id) => {
+  sortedToolIds.filter((id) => {
     const tool = toolCatalog[id]
     return (
       (category.value === '全部' || tool.category === category.value) &&
@@ -52,17 +59,14 @@ function enter(element: Element) {
         <p>从整理代码到转换文件，把重复的小事交给顺手的工具。<br />不用安装，打开就能用。</p>
       </section>
       <div class="directory-toolbar">
-        <div class="tool-filters" role="group" aria-label="工具分类">
-          <button
-            v-for="item in categories"
-            :key="item"
-            type="button"
-            :aria-pressed="category === item"
-            @click="category = item"
-          >
-            {{ item }}
-          </button>
-        </div>
+        <SegmentedControl
+          v-model="category"
+          :options="categories"
+          class="tool-filters"
+          label="工具分类"
+          semantics="buttons"
+          wrap
+        />
         <div class="directory-search">
           <Search :size="17" aria-hidden="true" /><input
             v-model="query"
@@ -100,7 +104,9 @@ function enter(element: Element) {
         >
           <div class="tool-card-top">
             <span class="tool-icon"><AppIcon :name="toolCatalog[id].icon" :size="24" /></span
-            ><span class="overline">{{ String(toolIds.indexOf(id) + 1).padStart(2, '0') }}</span>
+            ><span class="overline">{{
+              String(sortedToolIds.indexOf(id) + 1).padStart(2, '0')
+            }}</span>
           </div>
           <h2>{{ toolCatalog[id].name }}</h2>
           <p>{{ toolCatalog[id].description }}</p>

@@ -61,6 +61,9 @@ async function waitForHashTarget(hash: string) {
     if (target) {
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
       const current = hashTarget(hash) || target
+      // A closing mobile directory changes the target's document position.
+      // Let disclosures settle before measuring the anchor offset.
+      if (current.closest('main')?.querySelector('.collapse-panel:not(.is-settled)')) continue
       const page = current.closest<HTMLElement>('.rdp-page')
       if (
         !page ||
@@ -130,6 +133,7 @@ export const router = createRouter({
     }
     if (savedPosition) return { ...savedPosition, behavior: 'instant' }
     const target = to.hash ? await waitForHashTarget(to.hash) : null
+    if (router.currentRoute.value.fullPath !== to.fullPath) return false
     if (target) {
       focusContent(target)
       const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0

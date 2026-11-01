@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
-import { Download, FileUp, ShieldCheck } from 'lucide-vue-next'
+import { BookOpen, Download, FileUp, ShieldCheck } from 'lucide-vue-next'
 import ToolPage from '../freemium/components/ToolPage.vue'
+import CodexImportGuide from './CodexImportGuide.vue'
+import CollapsePanel from '../../components/CollapsePanel.vue'
+import { detectImportPlatform } from './importPlatform'
 import CleanerWorker from './cleaner.worker?worker&inline'
 import { MAX_INPUT_BYTES, type CleaningMode, type CleaningResult } from './cleaner'
 
 const input = ref('')
+const showImportGuide = ref(false)
+const guidePlatform = ref(detectImportPlatform())
 const mode = ref<CleaningMode>('precise')
 const previewLines = ref(10)
 const filename = ref('')
@@ -183,10 +188,23 @@ function run() {
               @change="loadFile"
             />
           </label>
+          <button
+            class="btn"
+            :aria-expanded="showImportGuide"
+            aria-controls="codex-import-guide"
+            @click="showImportGuide = !showImportGuide"
+          >
+            <BookOpen :size="16" aria-hidden="true" />{{
+              showImportGuide ? '收起教程' : '导入教程'
+            }}
+          </button>
           <button class="btn" @click="loadSample">载入示例</button>
           <button class="btn" :disabled="!input && !busy" @click="clearInput">清空</button>
         </div>
       </div>
+      <CollapsePanel :open="showImportGuide" gap="20px" lazy>
+        <CodexImportGuide v-model="guidePlatform" />
+      </CollapsePanel>
       <textarea
         v-model="input"
         class="field codex-cleaner-editor"

@@ -26,7 +26,7 @@ with sync_playwright() as p:
         page.locator(f'[data-square="{end}"]').click()
 
     page.goto(base + '/game', wait_until='networkidle')
-    expect(page.locator('.game-card')).to_have_count(13)
+    expect(page.locator('.game-card')).to_have_count(15)
     for kind, title in [('chess','国际象棋单机版'),('go','围棋')]:
         page.locator(f'.game-card[href="/games/{kind}"]').click()
         expect(page.locator('.game-page-intro h1, .game-intro h1, h1').first).to_contain_text(title)

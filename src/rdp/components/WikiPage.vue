@@ -17,11 +17,12 @@ import {
 import content from 'virtual:rdp-wiki'
 import agentPrompt from '../../../docs/rdp-agent-deploy.md?raw'
 import WikiCodeBlock from './WikiCodeBlock.vue'
+import CollapsePanel from '../../components/CollapsePanel.vue'
+import AnimatedDetails from '../../components/AnimatedDetails.vue'
 import '../wiki.css'
 const article = ref<HTMLElement>()
 const toc = ref<HTMLElement>()
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
-const agentOpen = ref(false)
 const query = ref('')
 const active = ref(content.sections[0]?.id)
 const menuOpen = ref(false)
@@ -126,44 +127,46 @@ onBeforeUnmount(() => {
         >
           <List :size="17" />文档目录<ChevronDown :size="16" :class="{ rotated: menuOpen }" />
         </button>
-        <div id="wiki-directory" v-show="tocVisible" :inert="!tocVisible">
-          <label class="wiki-search"
-            ><Search :size="15" /><input
-              v-model="query"
-              type="search"
-              placeholder="搜索文档内容…"
-              aria-label="搜索文档" /><button
-              v-if="query"
-              aria-label="清空搜索"
-              @click="query = ''"
-            >
-              <X :size="14" /></button
-          ></label>
-          <p v-if="query" class="wiki-search-count" role="status">
-            {{
-              results.length
-                ? `找到 ${results.length} 个相关章节`
-                : '没有找到相关内容，试试“域名”或“密码”。'
-            }}
-          </p>
-          <nav aria-label="Wiki 目录">
-            <div v-for="group in groups" :key="group" class="wiki-nav-group">
-              <template v-if="results.some((section) => section.group === group)"
-                ><p>{{ group }}</p>
-                <a
-                  v-for="section in results.filter((section) => section.group === group)"
-                  :key="section.id"
-                  :href="`#${section.id}`"
-                  :aria-current="active === section.id ? 'location' : undefined"
-                  :class="{ 'wiki-step-link': section.step }"
-                  @click="menuOpen = false"
-                  ><span v-if="section.step" class="wiki-nav-number">{{ section.step }}</span
-                  >{{ section.step ? section.title.replace(/^\d+\. /, '') : section.title }}</a
-                ></template
+        <CollapsePanel :open="tocVisible">
+          <div id="wiki-directory" :inert="!tocVisible">
+            <label class="wiki-search"
+              ><Search :size="15" /><input
+                v-model="query"
+                type="search"
+                placeholder="搜索文档内容…"
+                aria-label="搜索文档" /><button
+                v-if="query"
+                aria-label="清空搜索"
+                @click="query = ''"
               >
-            </div>
-          </nav>
-        </div>
+                <X :size="14" /></button
+            ></label>
+            <p v-if="query" class="wiki-search-count" role="status">
+              {{
+                results.length
+                  ? `找到 ${results.length} 个相关章节`
+                  : '没有找到相关内容，试试“域名”或“密码”。'
+              }}
+            </p>
+            <nav aria-label="Wiki 目录">
+              <div v-for="group in groups" :key="group" class="wiki-nav-group">
+                <template v-if="results.some((section) => section.group === group)"
+                  ><p>{{ group }}</p>
+                  <a
+                    v-for="section in results.filter((section) => section.group === group)"
+                    :key="section.id"
+                    :href="`#${section.id}`"
+                    :aria-current="active === section.id ? 'location' : undefined"
+                    :class="{ 'wiki-step-link': section.step }"
+                    @click="menuOpen = false"
+                    ><span v-if="section.step" class="wiki-nav-number">{{ section.step }}</span
+                    >{{ section.step ? section.title.replace(/^\d+\. /, '') : section.title }}</a
+                  ></template
+                >
+              </div>
+            </nav>
+          </div>
+        </CollapsePanel>
       </aside>
       <article ref="article" class="rdp-doc">
         <div class="wiki-intro-note">
@@ -173,21 +176,17 @@ onBeforeUnmount(() => {
             <p>按顺序完成准备和六步部署，示例值请替换为自己的配置。</p>
           </div>
         </div>
-        <details
-          class="wiki-agent"
-          :open="agentOpen"
-          @toggle="agentOpen = ($event.target as HTMLDetailsElement).open"
-        >
-          <summary>
+        <AnimatedDetails class="wiki-agent">
+          <template #summary>
             <Code2 :size="20" /><span
               ><b>交给 Agent 部署</b><small>复制提示词并填写环境参数。</small></span
             ><ChevronDown :size="18" />
-          </summary>
+          </template>
           <div class="wiki-agent-body">
             <p>替换尖括号中的参数，密码与 Token 在服务器终端填写。</p>
             <WikiCodeBlock :code="agentPrompt" language="text" copy-label="复制部署提示词" />
           </div>
-        </details>
+        </AnimatedDetails>
         <section
           v-for="section in content.sections"
           :key="section.id"

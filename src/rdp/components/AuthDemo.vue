@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import SegmentedControl from '../../components/SegmentedControl.vue'
 import {
   Check,
   CircleX,
@@ -29,6 +30,11 @@ const methods = [
 ] as const
 type Method = (typeof methods)[number]['id']
 const method = ref<Method>('password')
+const methodOptions = methods.map((item) => ({ value: item.id, label: item.label }))
+const scenarios = [
+  { value: 'success', label: '成功流程' },
+  { value: 'failure', label: '失败流程' },
+] as const
 const failureMessage = computed(
   () =>
     ({
@@ -150,17 +156,14 @@ onBeforeUnmount(() => {
           <p>RDP Access Auth · 选择你习惯的认证方式</p>
         </div>
       </div>
-      <div class="demo-tabs" role="group" aria-label="选择模拟认证方式">
-        <button
-          v-for="item in methods"
-          :key="item.id"
-          type="button"
-          :aria-pressed="method === item.id"
-          @click="selectMethod(item.id)"
-        >
-          {{ item.label }}
-        </button>
-      </div>
+      <SegmentedControl
+        :model-value="method"
+        :options="methodOptions"
+        class="demo-tabs"
+        label="选择模拟认证方式"
+        semantics="buttons"
+        @select="selectMethod"
+      />
       <div class="demo-stage">
         <div class="demo-credential" :inert="phase === 'success' || phase === 'failure'">
           <Transition name="demo-result">
@@ -266,13 +269,14 @@ onBeforeUnmount(() => {
       <span :style="{ transform: `scaleX(${(frame + 1) / 48})` }"></span>
     </div>
     <div class="demo-controls">
-      <div class="demo-scenarios" role="group" aria-label="选择演示场景">
-        <button :aria-pressed="outcome === 'success'" @click="demonstrate('success')">
-          成功流程</button
-        ><button :aria-pressed="outcome === 'failure'" @click="demonstrate('failure')">
-          失败流程
-        </button>
-      </div>
+      <SegmentedControl
+        :model-value="outcome"
+        :options="scenarios"
+        class="demo-scenarios"
+        label="选择演示场景"
+        semantics="buttons"
+        @select="demonstrate"
+      />
       <div v-if="!reduced" class="demo-playback">
         <button
           :aria-label="paused ? '播放演示' : '暂停演示'"
@@ -361,28 +365,6 @@ onBeforeUnmount(() => {
 }
 .demo-tabs {
   display: flex;
-  gap: 4px;
-  padding: 5px;
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  background: var(--bg);
-  font-size: 11px;
-  color: var(--muted);
-}
-.demo-tabs button {
-  min-width: 0;
-  min-height: 44px;
-  color: var(--muted);
-  background: transparent;
-  font: inherit;
-  flex: 1;
-  text-align: center;
-  padding: 9px 3px;
-  border-radius: 22px;
-}
-.demo-tabs button[aria-pressed='true'] {
-  background: var(--panel-hover);
-  color: var(--blue);
 }
 .demo-stage {
   position: relative;
@@ -437,10 +419,6 @@ onBeforeUnmount(() => {
 }
 .demo-rotation code {
   color: var(--blue);
-}
-.demo-tabs button:hover {
-  color: var(--text);
-  background: var(--panel-hover);
 }
 .demo-network {
   display: flex;
@@ -649,7 +627,6 @@ onBeforeUnmount(() => {
   gap: 8px;
   padding: 4px 12px 0;
 }
-.demo-scenarios,
 .demo-playback {
   display: flex;
   gap: 4px;
@@ -668,11 +645,6 @@ onBeforeUnmount(() => {
 .demo-controls button:hover {
   color: var(--text);
   background: var(--panel-hover);
-}
-.demo-scenarios button[aria-pressed='true'] {
-  background: var(--panel-hover);
-  color: var(--blue);
-  box-shadow: inset 0 0 0 1px var(--border);
 }
 .demo-playback button {
   padding: 0;

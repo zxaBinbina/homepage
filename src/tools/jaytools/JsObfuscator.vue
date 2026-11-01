@@ -1,4 +1,5 @@
 <script setup>
+import CollapsePanel from '../../components/CollapsePanel.vue'
 // Adapted from jaywcjlove/tools packages/js-obfuscator (MIT).
 import { computed, ref, watch } from 'vue'
 import ToolPage from '../freemium/components/ToolPage.vue'
@@ -74,7 +75,12 @@ async function run() {
           <option value="all">完整默认选项</option>
         </select></label
       >
-      <button class="btn" :aria-expanded="advanced" @click="advanced = !advanced">
+      <button
+        class="btn"
+        :aria-expanded="advanced"
+        aria-controls="obfuscator-options"
+        @click="advanced = !advanced"
+      >
         自定义选项
       </button>
       <button class="btn btn--prominent" :disabled="busy || !input.trim()" @click="run">
@@ -82,12 +88,8 @@ async function run() {
       </button>
       <button v-if="busy" class="btn" @click="invalidate">取消</button>
     </template>
-    <Transition
-      name="jay-panel"
-      @before-leave="(el) => (el.inert = true)"
-      @before-enter="(el) => (el.inert = false)"
-    >
-      <div v-if="advanced" class="jay-panel">
+    <CollapsePanel :open="advanced" gap="20px" lazy>
+      <div id="obfuscator-options" class="jay-panel">
         <label class="jay-field"
           >自定义选项（JSON，覆盖当前预设）<textarea
             v-model="custom"
@@ -100,7 +102,7 @@ async function run() {
           例如 {"compact":false,"seed":42,"sourceMap":true}。支持 javascript-obfuscator 的全部选项。
         </p>
       </div>
-    </Transition>
+    </CollapsePanel>
     <div class="split">
       <CodePane
         v-model="input"

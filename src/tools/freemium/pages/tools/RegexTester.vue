@@ -19,20 +19,20 @@
         />
         <span class="pattern__slash" aria-hidden="true">/{{ flagString }}</span>
       </div>
-      <div class="flags" role="group" aria-label="标志">
-        <button
-          v-for="f in FLAGS"
-          :key="f.flag"
-          type="button"
-          class="flag"
-          :aria-pressed="flags[f.flag]"
-          :title="f.title"
-          @click="flags[f.flag] = !flags[f.flag]"
-        >
-          <span class="t-mono flag__key">{{ f.flag }}</span>
-          <span class="flag__name">{{ f.name }}</span>
-        </button>
-      </div>
+      <SegmentedControl
+        :options="FLAGS.map((f) => ({ value: f.flag, label: f.name, title: f.title }))"
+        :selected-values="FLAGS.filter((f) => flags[f.flag]).map((f) => f.flag)"
+        class="flags"
+        item-class="flag"
+        label="标志"
+        wrap
+        @select="flags[$event] = !flags[$event]"
+      >
+        <template #option="{ option }">
+          <span class="t-mono flag__key">{{ option.value }}</span>
+          <span class="flag__name">{{ option.label }}</span>
+        </template>
+      </SegmentedControl>
       <p id="re-status" class="status t-footnote" role="status">
         <span v-if="error" class="status--err"
           ><AppIcon name="warning" :size="14" />{{ error }}</span
@@ -109,6 +109,7 @@
 </template>
 
 <script setup>
+import SegmentedControl from '../../../../components/SegmentedControl.vue'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import ToolPage from '../../components/ToolPage.vue'
 import CodePane from '../../components/CodePane.vue'
@@ -357,33 +358,10 @@ const segments = computed(() => {
 }
 
 .flags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
   margin-top: 10px;
-}
-.flag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: var(--fill-3);
-  color: var(--label-2);
-  font-size: 0.8125rem;
-}
-@media (pointer: coarse) {
-  .flag {
-    min-height: 44px;
-  }
 }
 .flag__key {
   font-weight: 700;
-}
-.flag[aria-pressed='true'] {
-  background: var(--tint);
-  color: var(--on-tint);
 }
 .status {
   margin-top: 10px;

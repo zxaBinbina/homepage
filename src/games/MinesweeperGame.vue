@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import GameResult from './GameResult.vue'
+import CollapsePanel from '../components/CollapsePanel.vue'
+import SegmentedControl from '../components/SegmentedControl.vue'
 import { computed, inject, nextTick, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
@@ -352,77 +354,101 @@ function onKey(event: KeyboardEvent, index: number) {
           ><GameFullscreenButton />
         </div>
       </div>
-      <div v-if="level === 'custom'" class="mine-custom">
-        <button
-          ref="customToggle"
-          type="button"
-          class="mine-custom-toggle"
-          :aria-expanded="customExpanded"
-          aria-controls="mine-custom-form"
-          @click="customExpanded = !customExpanded"
+      <CollapsePanel :open="level === 'custom'">
+        <div class="mine-custom">
+          <button
+            ref="customToggle"
+            type="button"
+            class="mine-custom-toggle"
+            :aria-expanded="customExpanded"
+            aria-controls="mine-custom-form"
+            @click="customExpanded = !customExpanded"
+          >
+            自定义设置<ChevronDown :size="16" aria-hidden="true" />
+          </button>
+          <CollapsePanel :open="customExpanded">
+            <form
+              id="mine-custom-form"
+              class="mine-custom-form"
+              novalidate
+              @submit.prevent="applyCustom"
+            >
+              <div class="mine-custom-fields">
+                <label class="mine-custom-field">
+                  <span>棋盘边长</span>
+                  <input
+                    ref="sizeInput"
+                    v-model.number="customSize"
+                    type="number"
+                    inputmode="numeric"
+                    :min="mineLimits.minSize"
+                    :max="mineLimits.maxSize"
+                    step="1"
+                    required
+                    :aria-invalid="!!customErrors.size"
+                    :aria-describedby="customErrors.size ? 'mine-size-error' : 'mine-custom-hint'"
+                  />
+                </label>
+                <label class="mine-custom-field">
+                  <span>地雷数量</span>
+                  <input
+                    ref="minesInput"
+                    v-model.number="customMines"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    :max="customMaxMines"
+                    step="1"
+                    required
+                    :aria-invalid="!!customErrors.mines"
+                    :aria-describedby="customErrors.mines ? 'mine-count-error' : 'mine-custom-hint'"
+                  />
+                </label>
+                <button type="submit" class="game-button mine-apply">应用并开局</button>
+              </div>
+              <p id="mine-custom-hint" class="mine-custom-hint">
+                边长 {{ mineLimits.minSize }}–{{ mineLimits.maxSize }} 格<span v-if="customMaxMines"
+                  >，地雷 1–{{ customMaxMines }} 颗</span
+                >；首步及周围八格安全。应用后开始新的一局。
+              </p>
+              <p
+                v-if="customErrors.size"
+                id="mine-size-error"
+                class="mine-custom-error"
+                role="alert"
+              >
+                {{ customErrors.size }}
+              </p>
+              <p
+                v-if="customErrors.mines"
+                id="mine-count-error"
+                class="mine-custom-error"
+                role="alert"
+              >
+                {{ customErrors.mines }}
+              </p>
+            </form>
+          </CollapsePanel>
+        </div>
+      </CollapsePanel>
+      <SegmentedControl
+        v-if="touchControls"
+        :model-value="flagMode"
+        :options="[
+          { value: false, label: '翻开' },
+          { value: true, label: '插旗' },
+        ]"
+        class="mine-mode"
+        label="扫雷操作模式"
+        semantics="buttons"
+        @select="setMode"
+      >
+        <template #option="{ option }"
+          ><component :is="option.value ? Flag : MousePointer2" :size="16" aria-hidden="true" />{{
+            option.label
+          }}</template
         >
-          自定义设置<ChevronDown :size="16" aria-hidden="true" />
-        </button>
-        <form
-          v-show="customExpanded"
-          id="mine-custom-form"
-          class="mine-custom-form"
-          novalidate
-          @submit.prevent="applyCustom"
-        >
-          <div class="mine-custom-fields">
-            <label class="mine-custom-field">
-              <span>棋盘边长</span>
-              <input
-                ref="sizeInput"
-                v-model.number="customSize"
-                type="number"
-                inputmode="numeric"
-                :min="mineLimits.minSize"
-                :max="mineLimits.maxSize"
-                step="1"
-                required
-                :aria-invalid="!!customErrors.size"
-                :aria-describedby="customErrors.size ? 'mine-size-error' : 'mine-custom-hint'"
-              />
-            </label>
-            <label class="mine-custom-field">
-              <span>地雷数量</span>
-              <input
-                ref="minesInput"
-                v-model.number="customMines"
-                type="number"
-                inputmode="numeric"
-                min="1"
-                :max="customMaxMines"
-                step="1"
-                required
-                :aria-invalid="!!customErrors.mines"
-                :aria-describedby="customErrors.mines ? 'mine-count-error' : 'mine-custom-hint'"
-              />
-            </label>
-            <button type="submit" class="game-button mine-apply">应用并开局</button>
-          </div>
-          <p id="mine-custom-hint" class="mine-custom-hint">
-            边长 {{ mineLimits.minSize }}–{{ mineLimits.maxSize }} 格<span v-if="customMaxMines"
-              >，地雷 1–{{ customMaxMines }} 颗</span
-            >；首步及周围八格安全。应用后开始新的一局。
-          </p>
-          <p v-if="customErrors.size" id="mine-size-error" class="mine-custom-error" role="alert">
-            {{ customErrors.size }}
-          </p>
-          <p v-if="customErrors.mines" id="mine-count-error" class="mine-custom-error" role="alert">
-            {{ customErrors.mines }}
-          </p>
-        </form>
-      </div>
-      <div v-if="touchControls" class="mine-mode" role="group" aria-label="扫雷操作模式">
-        <button class="game-button" :aria-pressed="!flagMode" @click="setMode(false)">
-          <MousePointer2 :size="16" aria-hidden="true" />翻开</button
-        ><button class="game-button" :aria-pressed="flagMode" @click="setMode(true)">
-          <Flag :size="16" aria-hidden="true" />插旗
-        </button>
-      </div>
+      </SegmentedControl>
       <div class="mine-stage">
         <div
           class="mine-board-scroll"

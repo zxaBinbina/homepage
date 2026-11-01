@@ -1,7 +1,7 @@
 """Check the Wiki search, mobile directory, copying and Agent prompt."""
 import os
 from pathlib import Path
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:4174').rstrip('/')
 with sync_playwright() as p:
@@ -49,8 +49,8 @@ with sync_playwright() as p:
     install = page.locator('.wiki-section').filter(has=page.locator('#section-4'))
     install.get_by_role('button', name='复制代码').click()
     install_code = page.evaluate('navigator.clipboard.readText()')
-    assert 'rdp-access-auth-0.2.0-1.fc44.x86_64.rpm' in install_code
-    assert 'rdp-access-auth_0.2.0_py314_amd64.deb' in install_code
+    assert 'api.github.com/repos/zxaBinbina/rdp-access-auth/releases?per_page=1' in install_code
+    assert "asset_ext='.rpm'" in install_code and "asset_ext='.deb'" in install_code
     assert 'sha256sum -c' in install_code
     page.evaluate('Object.defineProperty(navigator, "clipboard", {value: {writeText: () => Promise.reject(new Error("blocked"))}, configurable:true})')
     install.get_by_role('button').click()
@@ -77,7 +77,7 @@ with sync_playwright() as p:
     assert toggle.get_attribute('aria-expanded') == 'false'
     assert toggle.evaluate('(el) => el === document.activeElement')
     page.locator('.wiki-agent summary').click()
-    assert page.get_by_role('button', name='复制部署提示词').is_visible()
+    expect(page.get_by_role('button', name='复制部署提示词')).to_be_visible()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors, errors
     browser.close()

@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 import wave
 from playwright.sync_api import sync_playwright
+from browser_theme import set_theme_mode
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'artifacts'
@@ -62,7 +63,8 @@ try:
         assert page.locator('.music-card').count()==0
         assert not any('/song/media/' in url or '/api/music/lyrics' in url for url in requests)
         assert page.locator('.theme-toggle').evaluate('(e)=>e.nextElementSibling.classList.contains("music-toggle")')
-        assert page.locator('.theme-toggle').get_attribute('title')=='切换浅色主题'
+        assert page.locator('.theme-toggle').get_attribute('data-mode')=='auto'
+        assert page.locator('.theme-toggle .lucide-monitor-icon').count()==1
         assert page.locator('.header-actions a.icon-button').get_attribute('title')=='GitHub'
         assert page.locator('.music-toggle').get_attribute('title')=='网易云音乐'
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
@@ -190,8 +192,8 @@ try:
         page.screenshot(path=str(OUT/'music-mobile.png'), animations='disabled')
         page.keyboard.press('Escape')
         dark_fill=page.locator('.music-toggle svg').evaluate('(e)=>getComputedStyle(e).fill')
-        page.get_by_role('button',name='切换浅色主题',exact=True).click()
-        assert page.locator('.theme-toggle').get_attribute('title')=='切换深色主题'
+        set_theme_mode(page, 'light')
+        assert page.locator('.theme-toggle .lucide-sun-icon').count()==1
         page.wait_for_function('previous => getComputedStyle(document.querySelector(".music-toggle svg")).fill !== previous', arg=dark_fill, timeout=2000)
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
         page.screenshot(path=str(OUT/'music-mobile-light.png'), animations='disabled')

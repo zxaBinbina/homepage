@@ -140,9 +140,28 @@ with sync_playwright() as p:
     page.get_by_label('图片格式').select_option('jpeg')
     expect(page.get_by_role('button',name='下载当前页',exact=True)).to_be_enabled()
     assert Image.open(download(page.get_by_role('button',name='下载当前页',exact=True))).format == 'JPEG'
+    # Hold encoding so a tiny PDF cannot finish before the cancellation click.
+    page.evaluate('''() => {
+      window.pdfToBlob = HTMLCanvasElement.prototype.toBlob;
+      window.pendingPdfEncodes = [];
+      HTMLCanvasElement.prototype.toBlob = function(callback, ...args) {
+        pdfToBlob.call(this, blob => pendingPdfEncodes.push(() => callback(blob)), ...args);
+      };
+    }''')
+    cancelled_downloads = []
+    record_cancelled_download = lambda download: cancelled_downloads.append(download)
+    page.on('download', record_cancelled_download)
     page.get_by_role('button',name='打包全部页面',exact=True).click()
+    page.wait_for_function('pendingPdfEncodes.length > 0')
     page.get_by_role('button',name='取消打包',exact=True).click()
+    page.evaluate('''() => {
+      HTMLCanvasElement.prototype.toBlob = pdfToBlob;
+      pendingPdfEncodes.splice(0).forEach(release => release());
+    }''')
     expect(page.get_by_role('button',name='打包全部页面',exact=True)).to_be_enabled()
+    page.wait_for_timeout(150)
+    assert not cancelled_downloads, 'Cancelled PDF export produced a stale download'
+    page.remove_listener('download', record_cancelled_download)
     page.get_by_label('选择 PDF').set_input_files({'name':'bad.pdf','mimeType':'application/pdf','buffer':b'bad'})
     expect(page.locator('[role="alert"]')).to_be_visible()
     expect(page.locator('.jay-pdf-preview')).to_have_count(0)

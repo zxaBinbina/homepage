@@ -36,7 +36,10 @@
 | [src/HomePage.vue](src/HomePage.vue)                                           | 个人主页结构、滚动显现、复制提示                   |
 | [src/components/SiteHeader.vue](src/components/SiteHeader.vue)                 | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
 | [src/components/SiteFooter.vue](src/components/SiteFooter.vue)                 | 全站共用页脚：品牌、版权与备案                     |
-| [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue)               | 浅色 / 深色切换按钮                                |
+| [src/components/SegmentedControl.vue](src/components/SegmentedControl.vue)     | 全站分组选项、滑动选中块与键盘操作                 |
+| [src/components/CollapsePanel.vue](src/components/CollapsePanel.vue)           | 页内展开与收起、间距过渡及焦点处理                 |
+| [src/components/AnimatedDetails.vue](src/components/AnimatedDetails.vue)       | 保留原生语义的折叠说明                             |
+| [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue)               | 深色 / 浅色 / 自动模式循环按钮                     |
 | [src/components/ColorPalettePicker.vue](src/components/ColorPalettePicker.vue) | 芙芙蓝 / 胡桃红配色选择弹窗                        |
 | [src/components/ProjectCard.vue](src/components/ProjectCard.vue)               | 项目目录卡片结构与视觉                             |
 | [src/components/MusicDialog.vue](src/components/MusicDialog.vue)               | 音乐浮层定位、展开宽度及外观                       |
@@ -46,7 +49,8 @@
 | [src/router.ts](src/router.ts)                                                 | 站内无刷新导航、历史滚动恢复、运行时元信息         |
 | [src/pages.ts](src/pages.ts)                                                   | 页面路径表，工具路径由工具目录自动派生             |
 | [src/content.ts](src/content.ts)                                               | 个人资料、项目文案和链接                           |
-| [src/composables/useTheme.ts](src/composables/useTheme.ts)                     | 主题状态：保存选择优先，否则跟随系统               |
+| [src/composables/useTheme.ts](src/composables/useTheme.ts)                     | 主题与配色状态：三种模式、持久化与跟随系统         |
+| [src/utils/themeTransition.ts](src/utils/themeTransition.ts)                   | 全局颜色过渡、连续切换与减少动态效果清理           |
 | [src/loading/](src/loading/)                                                   | 内联首屏加载样式、等待与失败状态、路由加载事件     |
 | [src/composables/usePageLoading.ts](src/composables/usePageLoading.ts)         | 工具与游戏异步正文的等待、失败和卸载清理           |
 | [src/utils/lyrics.ts](src/utils/lyrics.ts)                                     | 歌词解析与翻译合并                                 |
@@ -149,7 +153,7 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 - 页面与通用样式放在 `src/style.css`；音乐组件细节保留在对应组件的 scoped 样式内。
 - 修改前检查已有选择器和后续媒体查询覆盖，优先修改对应规则，避免通过不断追加覆盖或滥用 `!important` 解决问题。
 - 保留现有字体回退栈。不要为了匹配单张截图而默认引入外部字体请求。
-- 保持主题初始化与运行时切换一致：保存选择优先，否则跟随系统；避免首次绘制闪烁到错误主题。
+- 保持主题初始化与运行时切换一致：保存的深色 / 浅色选择优先，自动模式或未保存选择时跟随系统；避免首次绘制闪烁到错误主题。
 
 ## 布局与响应式
 
@@ -178,34 +182,36 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 
 根据改动选择检查，避免为纯文档或简单样式调整添加只复述实现的测试。修复具体行为缺陷时，必要的回归检查应能识别原始问题。
 
-| 改动范围                       | 应完成的检查                                                                                                                                     |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 仅 Markdown 文档               | 对修改的文件运行 Prettier 检查，核对本地链接和命令；无需构建或浏览器测试                                                                         |
-| 页面 CSS、模板、前端逻辑或图片 | `npm run build`，检查受影响区域的深浅主题和桌面、窄屏表现                                                                                        |
-| 导航、主题、复制或整体布局     | 在开发服务器运行时执行 `python3 scripts/check-browser.py`                                                                                        |
-| 首屏与页面加载提示             | 构建后在预览服务器执行 `python3 scripts/check-loading.py`，检查慢速 / 失败资源、连续导航、主题、窄屏和减少动态效果                               |
-| 项目目录                       | `python3 scripts/check-project-directory.py`                                                                                                     |
-| 工具清单或转换规则             | `node scripts/check-tools.mjs`（已包含 `check-jaytools.mjs`）                                                                                    |
-| 工具交互或布局                 | `python3 scripts/check-tools-browser.py`；涉及 jaytools 时另运行 `python3 scripts/check-jaytools-browser.py`                                     |
-| 游戏规则                       | `node scripts/check-games.mjs`                                                                                                                   |
-| 游戏交互或布局                 | `python3 scripts/check-games-browser.py`                                                                                                         |
-| 游戏动效、拖拽与终局           | `python3 scripts/check-games-motion.py`、`python3 scripts/check-games-options-motion.py`                                                         |
-| 经典与棋类游戏                 | `python3 scripts/check-games-classics.py`、`python3 scripts/check-games-classics-motion.py`                                                      |
-| 国际象棋与围棋                 | `node scripts/check-games-chess-go.mjs`、`python3 scripts/check-games-chess-go.py`、`python3 scripts/check-games-chess-go-motion.py`             |
-| 贪吃蛇与消灭星星               | `node scripts/check-games-arcade.mjs`、`python3 scripts/check-games-arcade.py`、`python3 scripts/check-games-arcade-motion.py`                   |
-| 华容道与跳一跳                 | `node scripts/check-games-sliding-jump.mjs`、`python3 scripts/check-games-sliding-jump.py`、`python3 scripts/check-games-sliding-jump-motion.py` |
-| 网页全屏                       | `python3 scripts/check-games-fullscreen.py`                                                                                                      |
-| 延迟加载底色与全屏过渡         | `python3 scripts/check-games-paint.py`                                                                                                           |
-| 音乐交互或布局                 | 构建后执行 `python3 scripts/check-music.py`，检查浮层、歌单与状态切换                                                                            |
-| 歌词解析或接口                 | `node scripts/check-lyrics.mjs`                                                                                                                  |
-| 歌单同步逻辑                   | `node scripts/check-music-sync.mjs`                                                                                                              |
-| 错误页                         | 构建后执行 `python3 scripts/check-errors.py`，同时检查分享元信息和 SEO                                                                           |
-| RDP 页面                       | `python3 scripts/check-rdp-pages.py`                                                                                                             |
-| RDP Wiki 搜索、复制与目录      | `python3 scripts/check-rdp-wiki.py`                                                                                                              |
-| RDP 动效                       | `python3 scripts/check-rdp-motion.py`                                                                                                            |
-| Gaze 安装器                    | `python3 scripts/check-gaze-installer.py`                                                                                                        |
-| 分享配置或 HTML 元信息         | 构建后执行 `python3 scripts/check-sharing.py`；如任务改变了默认标题或域名，同步更新相关断言                                                      |
-| 搜索引擎收录                   | `python3 scripts/check-seo.py`                                                                                                                   |
+| 改动范围                       | 应完成的检查                                                                                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 仅 Markdown 文档               | 对修改的文件运行 Prettier 检查，核对本地链接和命令；无需构建或浏览器测试                                                                                      |
+| 页面 CSS、模板、前端逻辑或图片 | `npm run build`，检查受影响区域的深浅主题和桌面、窄屏表现                                                                                                     |
+| 导航、主题、复制或整体布局     | 在开发服务器执行 `python3 scripts/check-browser.py`；主题与配色变更另在构建预览执行 `python3 scripts/check-theme.py`、`python3 scripts/check-theme-motion.py` |
+| 首屏与页面加载提示             | 构建后在预览服务器执行 `python3 scripts/check-loading.py`，检查慢速 / 失败资源、连续导航、主题、窄屏和减少动态效果                                            |
+| 项目目录                       | `python3 scripts/check-project-directory.py`                                                                                                                  |
+| 工具清单或转换规则             | `node scripts/check-tools.mjs`（已包含 `check-jaytools.mjs`）                                                                                                 |
+| 分组选项与选中块动效           | `python3 scripts/check-segmented-controls.py`，检查滑块定位、换行、键盘、筛选与减少动态效果                                                                   |
+| 页内折叠面板与展开动效         | `python3 scripts/check-disclosures.py`，检查中间高度、连续切换、焦点与减少动态效果                                                                            |
+| 工具交互或布局                 | `python3 scripts/check-tools-browser.py`；涉及 jaytools 时另运行 `python3 scripts/check-jaytools-browser.py`                                                  |
+| 游戏规则                       | `node scripts/check-games.mjs`                                                                                                                                |
+| 游戏交互或布局                 | `python3 scripts/check-games-browser.py`                                                                                                                      |
+| 游戏动效、拖拽与终局           | `python3 scripts/check-games-motion.py`、`python3 scripts/check-games-options-motion.py`                                                                      |
+| 经典与棋类游戏                 | `python3 scripts/check-games-classics.py`、`python3 scripts/check-games-classics-motion.py`                                                                   |
+| 国际象棋与围棋                 | `node scripts/check-games-chess-go.mjs`、`python3 scripts/check-games-chess-go.py`、`python3 scripts/check-games-chess-go-motion.py`                          |
+| 贪吃蛇与消灭星星               | `node scripts/check-games-arcade.mjs`、`python3 scripts/check-games-arcade.py`、`python3 scripts/check-games-arcade-motion.py`                                |
+| 华容道与跳一跳                 | `node scripts/check-games-sliding-jump.mjs`、`python3 scripts/check-games-sliding-jump.py`、`python3 scripts/check-games-sliding-jump-motion.py`              |
+| 网页全屏                       | `python3 scripts/check-games-fullscreen.py`                                                                                                                   |
+| 延迟加载底色与全屏过渡         | `python3 scripts/check-games-paint.py`                                                                                                                        |
+| 音乐交互或布局                 | 构建后执行 `python3 scripts/check-music.py`，检查浮层、歌单与状态切换                                                                                         |
+| 歌词解析或接口                 | `node scripts/check-lyrics.mjs`                                                                                                                               |
+| 歌单同步逻辑                   | `node scripts/check-music-sync.mjs`                                                                                                                           |
+| 错误页                         | 构建后执行 `python3 scripts/check-errors.py`，同时检查分享元信息和 SEO                                                                                        |
+| RDP 页面                       | `python3 scripts/check-rdp-pages.py`                                                                                                                          |
+| RDP Wiki 搜索、复制与目录      | `python3 scripts/check-rdp-wiki.py`                                                                                                                           |
+| RDP 动效                       | `python3 scripts/check-rdp-motion.py`                                                                                                                         |
+| Gaze 安装器                    | `python3 scripts/check-gaze-installer.py`                                                                                                                     |
+| 分享配置或 HTML 元信息         | 构建后执行 `python3 scripts/check-sharing.py`；如任务改变了默认标题或域名，同步更新相关断言                                                                   |
+| 搜索引擎收录                   | `python3 scripts/check-seo.py`                                                                                                                                |
 
 浏览器检查需要安装 Python Playwright（`playwright` 包），并提供 Chrome / Chromium。`HOMEPAGE_BROWSER` 指定浏览器路径，默认 `/usr/bin/google-chrome`；页面检查的 `HOMEPAGE_TEST_URL` 默认是 `http://127.0.0.1:5173`，构建预览为 `http://127.0.0.1:4173`，RDP 动效与 Wiki 脚本默认 `http://127.0.0.1:4174`。音乐检查会自行启动临时歌词服务，并访问真实音频，需要网络。截图输出位于 `artifacts/`，按范围命名：`artifacts/game-motion-*.png`、`artifacts/game-options-*.png`、`artifacts/game-classics-*.png`、`artifacts/game-arcade-*.png`、`artifacts/game-new-*.png`、`artifacts/game-fullscreen-*.png`、`artifacts/error-*.png` 等。
 
