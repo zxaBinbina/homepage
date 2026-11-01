@@ -155,6 +155,10 @@ body {
   border-radius: inherit;
   background: var(--loader-accent);
 }
+[data-state='error'] .site-loading-track span {
+  width: 100%;
+  opacity: 0.4;
+}
 .site-loading-retry {
   box-sizing: border-box;
   display: flex;
@@ -295,21 +299,71 @@ body {
     transform: translateX(360%);
   }
 }
+@keyframes loading-block-problem {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  28% {
+    transform: translateY(-6px) rotate(-6deg);
+  }
+  48% {
+    transform: translateY(4px) rotate(14deg);
+  }
+  68% {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+  100% {
+    transform: translateY(2px) rotate(4deg);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  [data-visible='true'][data-state='waiting'] .site-loading-mark i {
+  .site-loading-card {
+    translate: 0 10px;
+    scale: 0.97;
+    transition:
+      translate 220ms var(--motion-ease, ease),
+      scale 220ms var(--motion-ease, ease);
+  }
+  [data-visible='true'] .site-loading-card {
+    translate: 0 0;
+    scale: 1;
+  }
+  .site-loading-mark i {
+    transition: translate 220ms var(--motion-ease, ease);
+  }
+  [data-visible='false'] .site-loading-mark i {
+    translate: 5px 5px;
+  }
+  [data-visible='false'] .site-loading-mark i:nth-child(2) {
+    translate: -5px 5px;
+  }
+  [data-visible='false'] .site-loading-mark i:nth-child(3) {
+    translate: 5px -5px;
+  }
+  [data-visible='false'] .site-loading-mark i:nth-child(4) {
+    translate: -5px -5px;
+  }
+  [data-state='error'] .site-loading-mark i {
+    animation: loading-block-problem 660ms ease-in-out both;
+  }
+  [data-state='waiting'] .site-loading-mark i {
     animation: loading-block 1600ms var(--motion-ease, ease) infinite;
   }
-  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(2) {
+  [data-state='waiting'] .site-loading-mark i:nth-child(2) {
     animation-delay: 120ms;
   }
-  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(3) {
+  [data-state='waiting'] .site-loading-mark i:nth-child(3) {
     animation-delay: 360ms;
   }
-  [data-visible='true'][data-state='waiting'] .site-loading-mark i:nth-child(4) {
+  [data-state='waiting'] .site-loading-mark i:nth-child(4) {
     animation-delay: 240ms;
   }
-  [data-visible='true'][data-state='waiting'] .site-loading-track span {
+  [data-state='waiting'] .site-loading-track span {
     animation: loading-track 1600ms ease-in-out infinite;
+  }
+  [data-visible='false'] .site-loading-mark i,
+  [data-visible='false'] .site-loading-track span {
+    animation-play-state: paused;
   }
 }
 @media (prefers-reduced-motion: reduce) {

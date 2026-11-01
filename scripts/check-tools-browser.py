@@ -78,7 +78,7 @@ with sync_playwright() as p:
     expect(page.locator('.tool-card')).to_have_count(len(tools))
     expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_text('工具')
     page.get_by_role('button', name='格式整理', exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(7)
+    expect(page.locator('.tool-card')).to_have_count(sum(t['category'] == '格式整理' for t in tools))
     page.get_by_role('button', name='全部', exact=True).click()
     page.get_by_role('searchbox', name='搜索工具').fill('二维码')
     expect(page.locator('.tool-card')).to_have_count(1)

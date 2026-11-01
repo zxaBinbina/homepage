@@ -213,6 +213,41 @@ async def main():
         await context.close()
         print('Navigation: delay threshold, live theme, cancellation, cached routes and anchor focus passed.', flush=True)
 
+        # Error routes share the real delayed loader, including block/card exits.
+        context, page = await context_for()
+        await page.goto(BASE, wait_until='networkidle')
+        release, requested = await delay(page, r'/assets/ErrorPage-.*\.js$')
+        await navigate(page, '/404')
+        await requested.wait()
+        await shown(page, 'navigation')
+        await page.wait_for_timeout(250)
+        await page.evaluate('''() => {
+            const screen = document.querySelector('#site-loading');
+            window.loadingExitFrames = [];
+            screen.addEventListener('transitionrun', event => {
+                if (event.target !== screen || event.propertyName !== 'opacity') return;
+                const record = () => {
+                    window.loadingExitFrames.push({
+                        opacity: Number(getComputedStyle(screen).opacity),
+                        scale: Number(getComputedStyle(screen.querySelector('.site-loading-card')).scale),
+                        block: getComputedStyle(screen.querySelector('.site-loading-mark i')).translate,
+                        inert: screen.inert,
+                    });
+                    if (!screen.hidden) requestAnimationFrame(record);
+                };
+                requestAnimationFrame(record);
+            });
+        }''')
+        release.set()
+        await expect(page.locator('#error-title')).to_be_visible()
+        await hidden(page)
+        frames = await page.evaluate('window.loadingExitFrames')
+        assert any(frame['opacity'] < 0.5 and frame['scale'] < 1 for frame in frames), frames
+        assert len({frame['block'] for frame in frames}) > 3, frames
+        assert all(frame['inert'] for frame in frames), frames
+        await context.close()
+        print('Error route: delayed loading, card/block exit and inert state passed.', flush=True)
+
         # Nested async content needs feedback even after the route shell is mounted.
         for path, chunk, ready in [
             ('/tools/json-formatter', 'JsonFormatter', '.freemium-workbench textarea'),
@@ -239,8 +274,9 @@ async def main():
         print('Nested tools/games: long waits, retry target, reduced motion and focus recovery passed.', flush=True)
 
         # Entry failure and route failure must offer explicit retry, without reload loops.
-        for failure_kind in ['entry', 'stylesheet', 'route']:
-            entry = failure_kind != 'route'
+        for failure_kind in ['entry', 'stylesheet', 'route', 'error-route']:
+            entry = failure_kind in ('entry', 'stylesheet')
+            target = '/404' if failure_kind == 'error-route' else '/project'
             context, page = await context_for(failures=True)
             documents = []
             page.on('request', lambda request: documents.append(request.url) if request.resource_type == 'document' else None)
@@ -248,6 +284,7 @@ async def main():
                 'entry': r'/assets/.*\.js$',
                 'stylesheet': r'/assets/index-.*\.css$',
                 'route': r'/assets/ProjectDirectory-.*\.js$',
+                'error-route': r'/assets/ErrorPage-.*\.js$',
             }[failure_kind])
 
             async def fail(route):
@@ -259,14 +296,21 @@ async def main():
             if entry:
                 await page.goto(BASE, wait_until='commit')
             else:
-                await navigate(page, '/project')
+                await navigate(page, target)
             await expect(page.locator('#site-loading')).to_have_attribute('data-state', 'error')
             await expect(page.locator('.site-loading-retry')).to_be_visible()
             assert len(documents) == 1, documents
+            # Failure feedback is finite, and its resting blocks remain readable.
+            await page.wait_for_function('''() => {
+                const animations = document.querySelector('.site-loading-mark').getAnimations({subtree: true});
+                return animations.length === 4 && animations.every(a => a.playState === 'finished');
+            }''')
+            assert await page.locator('.site-loading-mark i').evaluate_all(
+                'els => els.every(el => el.getBoundingClientRect().width > 0)')
             await page.screenshot(path=str(OUT / f'failure-{failure_kind}.png'))
             await page.unroute(pattern, fail)
             await page.locator('.site-loading-retry').click()
-            await expect(page.locator('.hero' if entry else '.directory-toolbar')).to_be_visible()
+            await expect(page.locator('.hero' if entry else '#error-title' if failure_kind == 'error-route' else '.directory-toolbar')).to_be_visible()
             await hidden(page)
             await context.close()
         assert not errors, errors

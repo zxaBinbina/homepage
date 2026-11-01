@@ -2528,25 +2528,53 @@ h1 > span {
   height: 44px;
 }
 .error-blocks span {
+  --error-block-tilt: 0deg;
+  --error-exit-x: -14px;
+  position: relative;
   width: 26px;
   height: 26px;
+  transform: rotate(var(--error-block-tilt));
+}
+.error-blocks i {
+  display: block;
+  width: 100%;
+  height: 100%;
   border: 1px solid var(--project-hover-border);
   border-radius: 5px;
   background: color-mix(in srgb, var(--blue) 16%, var(--panel));
   box-shadow: inset -5px -5px 0 var(--project-icon-surface);
 }
 .error-blocks span:nth-child(2) {
+  --error-block-tilt: -12deg;
+  --error-exit-x: -7px;
   align-self: start;
-  transform: rotate(-12deg);
 }
 .error-blocks span:nth-child(3) {
+  --error-exit-x: 0px;
+}
+.error-blocks span:nth-child(4) {
+  --error-exit-x: 7px;
+}
+.error-blocks span:nth-child(5) {
+  --error-exit-x: 14px;
+}
+.error-blocks span:nth-child(3) i {
   border-style: dashed;
   background: transparent;
   box-shadow: none;
 }
-.error-blocks span:nth-child(5) {
+.error-blocks span:nth-child(5) i {
   background: color-mix(in srgb, var(--warm) 30%, var(--panel));
   border-color: var(--warm);
+}
+.error-blocks span:nth-child(3)::after {
+  content: '!';
+  position: absolute;
+  inset: -22px 0 auto;
+  color: var(--warm);
+  text-align: center;
+  font: 700 16px / 1 monospace;
+  opacity: 0;
 }
 .error-art-note {
   margin-top: 4px;
@@ -2628,6 +2656,7 @@ h1 > span {
     animation: error-code-enter 0.6s var(--motion-ease) 50ms both;
   }
   .error-blocks span {
+    transition: transform 0.32s var(--motion-ease);
     animation: error-block-enter 0.45s var(--motion-ease) 160ms both;
   }
   .error-blocks span:nth-child(2) {
@@ -2641,6 +2670,37 @@ h1 > span {
   }
   .error-blocks span:nth-child(5) {
     animation-delay: 320ms;
+  }
+  .error-blocks i {
+    animation: error-block-bump 1.4s ease-in-out 720ms both;
+    transform-origin: center bottom;
+  }
+  .error-blocks span:nth-child(2) i {
+    animation-name: error-block-stumble;
+  }
+  .error-blocks span:nth-child(3) i {
+    animation-name: error-block-gap;
+  }
+  .error-blocks span:nth-child(4) i {
+    animation-delay: 800ms;
+  }
+  .error-blocks span:nth-child(5) i {
+    animation-delay: 880ms;
+  }
+  .error-blocks span:nth-child(3)::after {
+    animation: error-block-notice 1.4s ease-in-out 720ms both;
+  }
+  .error-content,
+  .error-art-caption,
+  .error-art-note,
+  .error-blocks {
+    transition:
+      opacity 0.2s ease,
+      transform 0.28s var(--motion-ease);
+  }
+  .error-code,
+  .error-explore {
+    transition: transform 0.28s var(--motion-ease);
   }
   .error-content > * {
     animation: error-reveal 0.46s var(--motion-ease) 80ms both;
@@ -2666,18 +2726,37 @@ h1 > span {
     --error-entry-opacity: 1;
     --error-entry-offset: 0px;
   }
-  .error-page.page-swap-leave-active {
+  .error-page:is(.page-swap-leave-active, .is-reloading) {
+    pointer-events: none;
     transition:
-      opacity 0.18s ease,
-      translate 0.24s var(--motion-ease),
-      scale 0.24s var(--motion-ease);
+      opacity 0.22s ease 120ms,
+      translate 0.36s var(--motion-ease),
+      scale 0.36s var(--motion-ease);
   }
-  .error-page.page-swap-leave-active * {
+  .error-page:is(.page-swap-leave-active, .is-reloading) *,
+  .error-page:is(.page-swap-leave-active, .is-reloading) *::after {
     animation-play-state: paused;
   }
-  .error-page.page-swap-leave-to {
+  .error-page:is(.page-swap-leave-to, .is-reloading) {
+    opacity: 0;
     translate: 0 -6px;
     scale: 0.985;
+  }
+  .error-page:is(.page-swap-leave-to, .is-reloading) .error-blocks span {
+    transform: translate(var(--error-exit-x), 20px) rotate(calc(var(--error-block-tilt) + 12deg))
+      scale(0.65);
+  }
+  .error-page:is(.page-swap-leave-to, .is-reloading)
+    :is(.error-content, .error-art-caption, .error-art-note) {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  .error-page:is(.page-swap-leave-to, .is-reloading) :is(.error-code, .error-explore) {
+    transform: translateY(-6px) scale(0.96);
+  }
+  .error-page:is(.page-swap-leave-to, .is-reloading) .error-blocks {
+    opacity: 0;
+    transition-delay: 80ms;
   }
 }
 @keyframes error-reveal {
@@ -2710,6 +2789,69 @@ h1 > span {
     opacity: 1;
     translate: 0 0;
     scale: 1;
+  }
+}
+/* A single failed attempt at the missing block, then a quiet resting pose. */
+@keyframes error-block-stumble {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  24% {
+    transform: translate(12px, -14px) rotate(14deg);
+  }
+  38% {
+    transform: translate(18px, 9px) rotate(22deg) scaleY(0.88);
+  }
+  50% {
+    transform: translate(-5px, -5px) rotate(-16deg);
+  }
+  64% {
+    transform: translate(3px, 2px) rotate(8deg);
+  }
+  78% {
+    transform: translate(-1px, 0) rotate(-3deg);
+  }
+}
+@keyframes error-block-bump {
+  0%,
+  28%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  42% {
+    transform: translateY(-5px) rotate(-7deg);
+  }
+  58% {
+    transform: translateY(2px) rotate(5deg);
+  }
+  74% {
+    transform: translateY(0) rotate(-2deg);
+  }
+}
+@keyframes error-block-gap {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  38%,
+  58% {
+    opacity: 0.4;
+    transform: scale(0.84);
+  }
+}
+@keyframes error-block-notice {
+  0%,
+  24%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.7);
+  }
+  38%,
+  62% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
   }
 }
 @media (max-width: 760px) {
@@ -3085,6 +3227,124 @@ h1 > span {
   animation: none;
 }
 /* Web Tools adaptations share the existing workbench, controls and editor. */
+/* Codex JSONL cleaner shares the toolbox surfaces and form controls. */
+.codex-cleaner-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+}
+.codex-cleaner-toolbar,
+.codex-cleaner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.codex-cleaner-toolbar {
+  justify-content: space-between;
+}
+.codex-cleaner-toolbar h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.codex-cleaner-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(100%, 280px);
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.freemium-workbench .codex-cleaner .tool-page__options {
+  align-items: end;
+}
+.codex-cleaner-file {
+  position: relative;
+}
+.codex-cleaner-file:focus-within .btn {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.freemium-workbench .codex-cleaner .codex-cleaner-editor {
+  min-height: 220px;
+  max-height: 70vh;
+  font: 13px / 1.8 var(--font-mono);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  border: 1px solid var(--border);
+}
+.codex-cleaner-note {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.codex-cleaner-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.codex-cleaner-stats > div {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.codex-cleaner-stats dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.codex-cleaner-stats dd {
+  padding-top: 8px;
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.codex-cleaner-error {
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--status-danger) 45%, var(--border));
+  border-radius: 12px;
+  color: var(--status-danger);
+  font-size: 13px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.codex-cleaner-error ul {
+  max-height: 240px;
+  overflow: auto;
+  padding-left: 24px;
+  margin-block: 12px 0;
+}
+.codex-cleaner-success {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  color: var(--status-success);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.codex-cleaner-success svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+@media (max-width: 480px) {
+  .codex-cleaner-panel {
+    padding: 16px;
+  }
+  .codex-cleaner-stats {
+    gap: 8px;
+  }
+  .codex-cleaner-stats > div {
+    padding: 12px 8px;
+  }
+}
+
 .jay-panel {
   min-width: 0;
   padding: 24px;

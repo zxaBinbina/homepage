@@ -374,6 +374,15 @@ export const toolCatalog = {
     path: '/tools/certificate-decoder',
   },
   ...jayToolCatalog,
+  'codex-jsonl-cleaner': {
+    name: 'Codex 对话加密字段清理',
+    label: 'CODEX JSONL CLEANER',
+    description: '清理 Codex 对话 JSONL 中的加密字段与推理内容，校验后下载。',
+    category: '格式整理',
+    icon: 'lock',
+    keywords: 'Codex CLI JSONL 对话 记录 加密 脱敏 清理 encrypted_content reasoning',
+    path: '/tools/codex-jsonl-cleaner',
+  },
 } as const
 
 export type ToolId = keyof typeof toolCatalog

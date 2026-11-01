@@ -1,6 +1,6 @@
 # 网页工具
 
-本站收录 **56 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具，以及 [jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具。后者固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，源码随本站构建，不嵌入外站工具。
+本站收录 **57 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具，以及本站自制的 Codex 对话加密字段清理。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，源码随本站构建，不嵌入外站工具。
 
 ## 工具清单
 
@@ -68,6 +68,18 @@
 | 项目徽章生成     | `/tools/generate-github-badges`         | 生成 GitHub、npm、Docker 和自定义徽章的引用代码。   |
 | JavaScript 混淆  | `/tools/js-obfuscator`                  | 转换变量与代码结构，生成可下载的混淆代码。          |
 
+## Codex 对话加密字段清理
+
+地址 `/tools/codex-jsonl-cleaner`，分类「格式整理」。导入 UTF-8 JSONL 或粘贴 Codex / Codex CLI 导出的事件，每行必须是一个 JSON 对象；文件与文本上限均为 20 MB。支持 UTF-8 BOM、LF 与 CRLF，文件末尾单个换行不增加行数，内部空行会作为非法行报告。
+
+- **精确模式（默认）**：删除含 `"encrypted_content"` 或 `type` 为 `reasoning` / `Reasoning` 的整行，兼容冒号周围的空白、嵌套对象与转义后的字段名。其余行保留原文，`reasoning_effort`、`reasoning_output_tokens` 等参数与用量元数据不会单独触发删除。
+- **宽泛模式**：按原始行文本匹配 `encrypted_content` 或 `reasoning`，不区分大小写。任何位置命中都会删整行，包括元数据键和普通正文中的词语。
+- **只删字段不删行**：解析后递归删除 `encrypted_content`、`reasoning` 键，以及 `type` 为 `reasoning` / `Reasoning` 的对象。嵌套推理对象从父属性或数组中移除，顶层推理对象写成 `{}`，保留全部事件行与参数 / 用量元数据，再序列化为单行 JSON。此模式遵循 JavaScript JSON 解析规则，重复键会合并，大整数可能舍入；最多支持 256 层嵌套。
+
+先逐行校验，非法 JSON、非对象事件和无法处理的行均显示原始行号（最多展示前 100 处，统计全部错误），任何一行失败都会阻止整份文件导出，需修正后重试。成功后显示处理前后及删除行数，字段模式还显示发生清理的行数。结果可关闭预览或查看前 10 / 30 / 100 行，下载始终包含全部结果；全部行被删除时可下载空文件。输出采用 LF 换行，非空文件保留末尾换行。
+
+清理在本地 Worker 中运行，30 秒超时；取消、修改输入或模式、读取新文件及卸载都会清理旧任务和下载结果，不上传或持久保存内容。仅清理所选规则覆盖的字段和行，正文及其他字段仍会保留。自制组件、规则与 Worker 位于 `src/tools/codex/`，不修改上游源码归档，也没有新增依赖。
+
 ## 输入与使用范围
 
 - 输入和选项只在当前组件内保留，不写入浏览器存储。工具计算不上传输入；徽章链接仅在主动打开时向对应服务发送项目名或自定义徽章内容。离开工具页或刷新会清空；首次进入某个工具仍需要加载它的代码，本站没有新增离线缓存服务。
@@ -103,6 +115,7 @@ node scripts/check-tools.mjs
 npm run preview -- --port 4173
 # 在另一终端运行，需要 Python Playwright 与 Chrome / Chromium
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-tools-browser.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-codex-cleaner-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-jaytools-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-navigation.py
 python3 scripts/check-sharing.py

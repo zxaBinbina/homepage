@@ -113,3 +113,4 @@ console.log(
   '41 tools match the upstream inventory; JSON, UTF-8/Base64, URL, hex, escapes, YAML, CSV, PHP, type/code generation and JavaScript checks passed.',
 )
 await import('./check-jaytools.mjs')
+await import('./check-codex-cleaner.mjs')

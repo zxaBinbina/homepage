@@ -43,14 +43,16 @@
 
 ## 网页工具
 
-访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **56 个工具**。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
+访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **57 个工具**。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
 
-工具来源分为两部分，均为 MIT 许可：
+其中 56 个工具来自以下两个 MIT 许可项目：
 
 - **Freemium**（[incentius-foss/freemium](https://github.com/incentius-foss/freemium)）：全部 **41 个工具**的 Vue 源码已迁入 `src/tools/freemium/`，替换原有 12 个工具的实现；完整上游清单与原文件 SHA-256 保存在 [third_party/freemium/upstream.json](third_party/freemium/upstream.json)，许可证见 [third_party/freemium/LICENSE](third_party/freemium/LICENSE)。
 - **jaywcjlove/tools**（[jaywcjlove/tools](https://github.com/jaywcjlove/tools)）：固定版本共有 31 个实际工具页面，按功能排除 16 个重复项，新增 **15 个工具**，Vue 实现位于 `src/tools/jaytools/`。完整源码归档与版本说明见 [源码来源](third_party/jaywcjlove-tools/README.md)，逐项去重映射见 [upstream.json](third_party/jaywcjlove-tools/upstream.json)，许可证副本见 [public/licenses/jaywcjlove-tools.txt](public/licenses/jaywcjlove-tools.txt)。
 
 覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串和编解码。还提供 PDF 转图片、EXIF 查看、SVG 优化、代码图片、汉字拼音 / 简繁 / 字表、人民币大写、TOML / XML / INI 转换、HTML 转 Markdown、项目徽章、CSS 缓动曲线和 JavaScript 混淆。
+
+本站自制的 **Codex 对话加密字段清理**（`/tools/codex-jsonl-cleaner`）支持导入或粘贴 JSONL，以精确、宽泛或只删字段三种模式处理加密字段与推理内容；提供逐行校验、原始错误行号、前后行数统计、可选预览和 `.jsonl` 下载。默认保留推理参数与用量元数据，非法行修正前不生成下载文件；规则与边界见 [工具说明](docs/tools.md#codex-对话加密字段清理)。
 
 输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布，无新增工具后端，继续使用 Cloudflare Pages。
 
@@ -128,9 +130,9 @@
 
 ## 错误页面
 
-`/400`、`/401`、`/403`、`/404`、`/408`、`/429`、`/500`、`/502`、`/503` 与 `/504` 使用统一错误页：大号状态码、方块装饰、中文说明和胶囊按钮，沿用本站配色、深浅主题、导航与页脚。访客可返回首页、查看作品、进入工具或游戏；超时和服务异常提供「重新加载」。错误页不高亮任何导航栏目，与主页等页面切换时继续保留音乐播放器。
+`/400`、`/401`、`/403`、`/404`、`/408`、`/429`、`/500`、`/502`、`/503` 与 `/504` 使用统一错误页：大号状态码、方块装饰、中文说明和胶囊按钮，沿用本站配色、深浅主题、导航与页脚。访客可返回首页、返回上一页、查看作品、进入工具或游戏；「返回上一页」调用浏览器原生后退，与浏览器的后退按钮一致。只有能确认上一页存在时才显示该按钮；没有上一页、只有前进记录，或跨站历史等无法判断的情况一律隐藏。超时和服务异常提供「重新加载」。错误页不高亮任何导航栏目，与主页等页面切换时继续保留音乐播放器。
 
-进入时卡片、状态码、方块与文案依次出现，离开时轻微上移、缩小并淡出，与目标页面交叉过渡；动画只播放一次，尊重系统的减少动态效果设置。
+加载时显示方块等待动画；进入后卡片、状态码与文案依次出现，方块尝试跨过缺口、碰壁晃动后回落。离开或点击「重新加载」时，方块散开收小，正文淡出；站内切换与目标页面交叉过渡。碰壁反馈只播放一次，所有动效尊重系统的减少动态效果设置。
 
 未知路由保留原地址并显示 404。构建会生成相应的 `400.html` 等文件，其中 `404.html` 由 Cloudflare Pages 自动用于不存在的地址；其资源使用根路径，多级错误地址也能加载样式。其余状态页可直接访问，若要用于真实的 HTTP 错误，需要由服务器或代理配置相应错误响应；静态页面本身不会改变 HTTP 状态码，也不会替换 Cloudflare 在站点应用之外产生的拦截或故障页面。所有错误页使用 `noindex`，不进入站点地图。
 

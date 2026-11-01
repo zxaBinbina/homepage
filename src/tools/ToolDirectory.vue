@@ -119,7 +119,7 @@ function enter(element: Element) {
       >
       <p class="tools-note">在浏览器内处理，让灵感少一点等待。</p>
       <p class="tools-credit">
-        源自
+        包含本站自制工具，以及源自
         <a
           href="https://github.com/incentius-foss/freemium"
           target="_blank"

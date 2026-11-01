@@ -37,7 +37,7 @@ with sync_playwright() as p:
         expect(page.locator('.desktop-nav [aria-current="page"]')).to_have_count(0)
         expect(page.locator('meta[name="robots"]')).to_have_attribute('content', 'noindex')
         assert page.title().startswith(f'{code} · '), page.title()
-        assert page.locator('.error-actions button').count() == int(code in RETRY)
+        assert page.get_by_role('button', name='重新加载', exact=True).count() == int(code in RETRY)
 
     def settle_motion():
         page.wait_for_function('''() => {
@@ -110,8 +110,14 @@ with sync_playwright() as p:
     assert_error(403)
     page.wait_for_function('document.activeElement === document.querySelector("main")')
     assert page.evaluate('window.errorProbe.header === document.querySelector(".header")')
+    page.get_by_role('button', name='返回上一页', exact=True).click()
+    page.wait_for_url(BASE + '/#contact')
+    expect(page.locator('.hero')).to_be_visible()
+    assert page.evaluate('window.errorProbe.header === document.querySelector(".header")')
+    page.go_forward()
+    assert_error(403)
     page.get_by_role('link', name='实用工具', exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(12)
+    expect(page.locator('.tool-card').first).to_be_visible()
     page.go_back()
     assert_error(403)
     page.get_by_role('link', name='玩会儿游戏', exact=True).click()
@@ -119,10 +125,43 @@ with sync_playwright() as p:
 
     page.goto(BASE + '/503', wait_until='networkidle')
     page.evaluate('window.beforeErrorReload = true')
+    page.evaluate('''() => {
+        const root = document.querySelector('.error-page');
+        const frames = [];
+        root.addEventListener('transitionrun', event => {
+            if (event.target !== root || event.propertyName !== 'opacity') return;
+            const record = () => {
+                frames.push({opacity: Number(getComputedStyle(root).opacity), inert: root.inert});
+                sessionStorage.setItem('errorReloadFrames', JSON.stringify(frames));
+                requestAnimationFrame(record);
+            };
+            requestAnimationFrame(record);
+        });
+    }''')
     with page.expect_navigation(wait_until='networkidle'):
         page.get_by_role('button', name='重新加载').click()
     assert_error(503)
     assert page.evaluate('window.beforeErrorReload === undefined')
+    frames = page.evaluate('JSON.parse(sessionStorage.getItem("errorReloadFrames"))')
+    assert frames and any(frame['opacity'] < 0.2 for frame in frames), frames
+    assert all(frame['inert'] for frame in frames), frames
+
+    # A newer navigation must cancel a pending reload before its bundle arrives.
+    pending_routes = []
+    page.route('**/assets/ProjectDirectory-*.js', lambda route: pending_routes.append(route))
+    page.evaluate('window.cancelReloadProbe = true')
+    page.get_by_role('button', name='重新加载').evaluate('(el) => { el.click(); el.click(); }')
+    follow('/project')
+    page.wait_for_timeout(700)
+    assert pending_routes, 'Destination bundle was not delayed'
+    assert page.evaluate('window.cancelReloadProbe === true'), 'An obsolete retry interrupted navigation'
+    expect(page.locator('.error-page')).not_to_have_attribute('inert', '')
+    for pending_route in pending_routes:
+        pending_route.continue_()
+    page.unroute('**/assets/ProjectDirectory-*.js')
+    expect(page.locator('.directory-toolbar')).to_be_visible()
+    page.wait_for_timeout(500)
+    assert page.evaluate('window.cancelReloadProbe === true'), 'An obsolete retry reloaded the new page'
 
     # Cover all themes and each layout breakpoint, including both sides of the split.
     for palette in ('fufu-blue', 'hutao-red'):
@@ -165,7 +204,17 @@ with sync_playwright() as p:
     # Observe the real first-load entrance, including frames before it finishes.
     page.add_init_script('''
         window.errorFrames = [];
+        window.problemFrames = [];
         document.addEventListener('animationstart', event => {
+            if (event.target.matches('.error-blocks span:nth-child(2) i')) {
+                const block = event.target;
+                const record = () => {
+                    window.problemFrames.push(getComputedStyle(block).transform);
+                    if (block.isConnected && block.getAnimations().some(a => a.playState === 'running'))
+                        requestAnimationFrame(record);
+                };
+                requestAnimationFrame(record);
+            }
             if (!event.target.matches('.error-card')) return;
             const card = event.target;
             const record = () => {
@@ -184,6 +233,7 @@ with sync_playwright() as p:
     frames = page.evaluate('window.errorFrames')
     assert any(frame['opacity'] < 0.95 for frame in frames), frames
     assert any(frame['translate'] not in ('none', '0px', '0px 0px') for frame in frames), frames
+    assert len(set(page.evaluate('window.problemFrames'))) > 10, 'Missing block problem motion'
     expect(page.locator('.error-card')).to_have_css('opacity', '1')
     # Keep the second block's original tilt while its independent entry motion runs.
     assert page.locator('.error-blocks span').nth(1).evaluate('(el) => getComputedStyle(el).transform') != 'none'
@@ -193,6 +243,13 @@ with sync_playwright() as p:
         }
     }''')
     page.screenshot(path=str(OUT / 'error-entry-200ms-1440.png'), full_page=True)
+    page.evaluate('document.querySelector(".error-page").getAnimations({subtree: true}).forEach(animation => animation.finish())')
+    page.evaluate('''() => {
+        for (const animation of document.querySelector('.error-page').getAnimations({subtree: true})) {
+            animation.pause(); animation.currentTime = 1280;
+        }
+    }''')
+    page.screenshot(path=str(OUT / 'error-block-problem-1280ms-1440.png'), full_page=True)
     page.evaluate('document.querySelector(".error-page").getAnimations({subtree: true}).forEach(animation => animation.finish())')
 
     page.evaluate('window.motionHeader = document.querySelector(".header")')
@@ -207,7 +264,8 @@ with sync_playwright() as p:
                 const record = () => {
                     if (!error.isConnected) return;
                     const style = getComputedStyle(error);
-                    window.exitFrames.push({opacity: Number(style.opacity), scale: Number(style.scale), inert: error.inert});
+                    window.exitFrames.push({opacity: Number(style.opacity), scale: Number(style.scale), inert: error.inert,
+                        block: getComputedStyle(error.querySelector('.error-blocks span')).transform});
                     requestAnimationFrame(record);
                 };
                 requestAnimationFrame(record);
@@ -218,6 +276,7 @@ with sync_playwright() as p:
         frames = page.evaluate('window.exitFrames')
         assert any(frame['opacity'] < 0.9 and frame['scale'] < 1 for frame in frames), frames
         assert all(frame['inert'] for frame in frames), 'Departing page can still receive input'
+        assert len({frame['block'] for frame in frames}) > 3, 'Blocks did not move during exit'
         expect(page.locator('.error-page')).to_have_count(1)
         settle_motion()
         page.wait_for_function('document.activeElement === document.querySelector("main")')
@@ -239,7 +298,7 @@ with sync_playwright() as p:
     assert_error(500)
     settle_motion()
     expect(page.locator('.error-card')).to_have_css('opacity', '1')
-    assert page.locator('.error-card, .error-code, .error-blocks span, .error-content > *').evaluate_all(
+    assert page.locator('.error-card, .error-code, .error-blocks span, .error-blocks i, .error-content > *').evaluate_all(
         'els => els.every(el => getComputedStyle(el).animationName === "none")')
 
     page.emulate_media(reduced_motion='reduce')
@@ -249,9 +308,79 @@ with sync_playwright() as p:
     page.get_by_role('button', name='切换深色主题').click()
     expect(page.locator('html')).to_have_attribute('data-theme', 'dark')
     page.screenshot(path=str(OUT / 'error-500-reduced-motion-320.png'), full_page=True)
+    with page.expect_navigation(wait_until='networkidle', timeout=3000):
+        page.get_by_role('button', name='重新加载').click()
+    assert_error(500)
     assert not errors, errors
     assert not failed_assets, failed_assets
     assert not audio_requests, audio_requests
+
+    # Hide Back without a previous entry, including when only forward entries remain.
+    # Opening the destination directly avoids Playwright's initial about:blank history entry.
+    with page.expect_popup() as new_tab:
+        page.evaluate("window.open('/404', '_blank')")
+    back_page = new_tab.value
+    back_page.emulate_media(reduced_motion='reduce')
+    back_page.wait_for_load_state('networkidle')
+    assert back_page.evaluate('history.length') == 1
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    assert back_page.url == BASE + '/404'
+    expect(back_page.get_by_role('link', name='返回首页', exact=True)).to_be_enabled()
+    expect(back_page.locator('.error-page')).not_to_have_attribute('inert', '')
+    back_page.reload(wait_until='networkidle')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    # Hash changes reuse the same error component, so visibility must update in place.
+    back_page.evaluate('''() => {
+        window.firstErrorPage = document.querySelector('.error-page');
+        const link = document.createElement('a');
+        link.href = '/404#main'; document.body.append(link); link.click(); link.remove();
+    }''')
+    back_page.wait_for_url(BASE + '/404#main')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_be_visible()
+    assert back_page.evaluate('window.firstErrorPage === document.querySelector(".error-page")')
+    back_page.get_by_role('button', name='返回上一页', exact=True).click()
+    back_page.wait_for_url(BASE + '/404')
+    assert back_page.evaluate('history.length') > 1
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    back_page.reload(wait_until='networkidle')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    back_page.get_by_role('link', name='返回首页', exact=True).click()
+    back_page.wait_for_url(BASE + '/')
+    back_page.go_back()
+    back_page.wait_for_url(BASE + '/404')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+
+    # An opaque cross-origin entry is uncertain even when the inferred position is positive.
+    previous = 'https://previous.example/history?from=error#position'
+    back_page.route('https://previous.example/**', lambda route: route.fulfill(
+        content_type='text/html', body='<h1>Previous page</h1>',
+    ))
+    back_page.goto(previous)
+    back_page.goto(BASE + '/500', wait_until='networkidle')
+    assert back_page.evaluate('history.length > 1 && history.state.position > 0')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    back_page.go_back()
+    back_page.wait_for_url(previous)
+    expect(back_page.get_by_role('heading', name='Previous page')).to_be_visible()
+
+    # Without Navigation API, require a concrete prior route instead of a numeric guess.
+    back_page.add_init_script("Object.defineProperty(window, 'navigation', {value: undefined})")
+    back_page.goto(BASE + '/404', wait_until='networkidle')
+    assert back_page.evaluate('history.length > 1 && history.state.position > 0')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_have_count(0)
+    back_page.get_by_role('link', name='返回首页', exact=True).click()
+    back_page.wait_for_url(BASE + '/')
+    back_page.evaluate('''() => {
+        const link = document.createElement('a');
+        link.href = '/503'; document.body.append(link); link.click(); link.remove();
+    }''')
+    back_page.wait_for_url(BASE + '/503')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_be_visible()
+    back_page.reload(wait_until='networkidle')
+    expect(back_page.get_by_role('button', name='返回上一页', exact=True)).to_be_visible()
+    back_page.get_by_role('button', name='返回上一页', exact=True).click()
+    back_page.wait_for_url(BASE + '/')
+    back_page.close()
     browser.close()
 
 print('Error checks passed: 10 routes, aliases, nested 404 document, recovery, metadata, focus, themes, responsive layouts, entrance/exit motion, rapid switches and reduced motion.')
