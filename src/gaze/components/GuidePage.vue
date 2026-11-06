@@ -198,15 +198,15 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 .gaze-source {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-alt-9);
   font-size: 12px;
   color: var(--muted);
-  padding-block: 12px;
+  padding-block: var(--space-sm);
   flex-shrink: 0;
 }
 .gaze-source:hover {
@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
 @media (max-width: 760px) {
   .gaze-title-row {
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-sm);
   }
 }
 </style>

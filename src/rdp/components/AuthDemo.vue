@@ -300,7 +300,7 @@ onBeforeUnmount(() => {
 .auth-demo {
   min-width: 0;
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   background: var(--panel);
   box-shadow: 0 24px 65px var(--shadow);
   overflow: hidden;
@@ -309,8 +309,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 8px 16px;
+  gap: var(--space-alt-10);
+  padding: var(--space-xs) var(--space-md);
   border-bottom: 1px solid var(--border);
   font-size: 11px;
   color: var(--muted);
@@ -318,11 +318,11 @@ onBeforeUnmount(() => {
 .demo-toolbar > span:nth-child(2) {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-alt-7);
 }
 .demo-dots {
   display: flex;
-  gap: 5px;
+  gap: var(--space-alt-5);
 }
 .demo-dots i {
   width: 6px;
@@ -332,21 +332,21 @@ onBeforeUnmount(() => {
   opacity: 0.35;
 }
 .demo-badge {
-  padding: 3px 8px;
+  padding: var(--space-alt-3) var(--space-xs);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   font-size: 10px;
   white-space: nowrap;
 }
 .demo-scene {
   position: relative;
-  padding: 16px 20px;
+  padding: var(--space-md) var(--space-lg);
 }
 .demo-heading {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 .demo-shield {
   width: 43px;
@@ -361,7 +361,7 @@ onBeforeUnmount(() => {
 .demo-heading p {
   color: var(--muted);
   font-size: 11px;
-  margin-top: 4px;
+  margin-top: var(--space-2xs);
 }
 .demo-tabs {
   display: flex;
@@ -369,23 +369,23 @@ onBeforeUnmount(() => {
 .demo-stage {
   position: relative;
   min-height: 270px;
-  padding-top: 1px;
+  padding-top: var(--space-alt-1);
 }
 .demo-credential {
   position: relative;
   min-height: 110px;
-  padding-top: 1px;
+  padding-top: var(--space-alt-1);
 }
 .demo-passkey {
   display: grid;
   grid-template-columns: 32px 1fr;
   align-items: center;
   justify-items: center;
-  gap: 4px;
-  margin-top: 10px;
-  padding: 8px 10px;
+  gap: var(--space-2xs);
+  margin-top: var(--space-alt-10);
+  padding: var(--space-xs) var(--space-alt-10);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-alt-14);
   background: var(--bg);
   text-align: center;
   color: var(--blue);
@@ -402,20 +402,20 @@ onBeforeUnmount(() => {
   color: var(--muted);
 }
 .demo-method-note {
-  margin-top: 10px;
+  margin-top: var(--space-alt-10);
   line-height: 1.8;
 }
 .demo-rotation {
-  padding: 10px;
+  padding: var(--space-alt-10);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   margin-bottom: 0;
   width: 100%;
   font-size: 12px;
 }
 .demo-rotation p {
   font-size: 11px;
-  margin: 4px 0;
+  margin: var(--space-2xs) 0;
 }
 .demo-rotation code {
   color: var(--blue);
@@ -424,11 +424,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 9px 12px;
+  gap: var(--space-xs);
+  padding: var(--space-alt-9) var(--space-sm);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-top: 8px;
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-xs);
   color: var(--muted);
   font-size: 11px;
 }
@@ -442,27 +442,27 @@ onBeforeUnmount(() => {
   inset: 0;
   z-index: 1;
   display: flex;
-  gap: 9px;
+  gap: var(--space-alt-9);
   align-items: center;
-  margin-top: 16px;
-  padding: 12px;
+  margin-top: var(--space-md);
+  padding: var(--space-sm);
   border: 1px solid color-mix(in srgb, var(--status-danger) 25%, transparent);
   background: var(--panel);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   color: var(--status-danger);
 }
 .demo-error h3 {
   font-size: 13px;
-  margin: 0 0 3px;
+  margin: 0 0 var(--space-alt-3);
 }
 .demo-error p {
   font-size: 11px;
   margin: 0;
 }
 .demo-address {
-  padding: 8px 12px;
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   color: var(--blue);
   background: var(--bg);
   font: 12px monospace;
@@ -471,32 +471,32 @@ onBeforeUnmount(() => {
   margin-bottom: 0;
 }
 .demo-field {
-  margin-top: 16px;
+  margin-top: var(--space-md);
   font-size: 11px;
   color: var(--muted);
 }
 .demo-input {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-alt-10);
   height: 43px;
-  padding: 0 13px;
+  padding: 0 var(--space-alt-13);
   border: 1px solid var(--border);
   background: var(--bg);
-  border-radius: 9px;
-  margin-top: 6px;
+  border-radius: var(--radius-alt-9);
+  margin-top: var(--space-alt-6);
   color: var(--text);
   font: 13px monospace;
 }
 .demo-temporary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr)) 36px;
-  gap: 6px;
+  gap: var(--space-alt-6);
   align-items: center;
 }
 .demo-temporary .demo-input {
   justify-content: center;
-  padding-inline: 4px;
+  padding-inline: var(--space-2xs);
 }
 .demo-eye {
   display: grid;
@@ -507,7 +507,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
   background: transparent;
   color: var(--muted);
-  border-radius: 9px;
+  border-radius: var(--radius-alt-9);
   margin-left: auto;
 }
 .demo-eye:hover {
@@ -518,7 +518,7 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 .demo-password {
-  padding-right: 3px;
+  padding-right: var(--space-alt-3);
 }
 .demo-password {
   border-color: var(--blue);
@@ -533,29 +533,29 @@ onBeforeUnmount(() => {
   width: 1px;
   height: 14px;
   background: var(--blue);
-  margin-left: 2px;
+  margin-left: var(--space-alt-2);
 }
 .demo-submit {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-xs);
   min-height: 43px;
   background: var(--primary-action);
   color: var(--primary-action-text);
-  border-radius: 22px;
+  border-radius: var(--radius-alt-22);
   font-size: 12px;
   font-weight: 600;
-  margin-top: 10px;
+  margin-top: var(--space-alt-10);
 }
 .demo-alternative {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: var(--space-alt-7);
   color: var(--muted);
   font-size: 11px;
-  margin-top: 8px;
+  margin-top: var(--space-xs);
 }
 .demo-result {
   position: absolute;
@@ -564,25 +564,25 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  gap: 7px;
+  padding: var(--space-sm);
+  gap: var(--space-alt-7);
   text-align: center;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-alt-18);
   background: var(--panel);
   box-shadow: 0 12px 40px var(--shadow);
 }
 .demo-result-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-alt-10);
 }
 .demo-result-icon {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--demo-status) 12%, transparent);
   color: var(--demo-status);
   margin-bottom: 0;
@@ -602,7 +602,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-xs);
   margin: 0;
   color: var(--demo-status);
   font-size: 12px;
@@ -624,23 +624,23 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 4px 12px 0;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-sm) 0;
 }
 .demo-playback {
   display: flex;
-  gap: 4px;
+  gap: var(--space-2xs);
 }
 .demo-controls button {
   min-width: 44px;
   min-height: 44px;
-  border-radius: 22px;
+  border-radius: var(--radius-alt-22);
   background: transparent;
   color: var(--muted);
   display: grid;
   place-items: center;
   font-size: 11px;
-  padding: 0 12px;
+  padding: 0 var(--space-sm);
 }
 .demo-controls button:hover {
   color: var(--text);
@@ -651,14 +651,14 @@ onBeforeUnmount(() => {
 }
 .demo-caption {
   font-size: 11px;
-  padding: 6px 16px 12px;
+  padding: var(--space-alt-6) var(--space-md) var(--space-sm);
   color: var(--text);
   min-height: 54px;
 }
 .demo-caption span {
   display: block;
   color: var(--muted);
-  margin-top: 4px;
+  margin-top: var(--space-2xs);
   font-size: 10px;
 }
 .demo-result-enter-active,
@@ -713,20 +713,20 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 480px) {
   .demo-scene {
-    padding: 16px;
+    padding: var(--space-md);
   }
   .demo-heading h2 {
     font-size: 16px;
   }
   .demo-toolbar {
-    padding: 8px 14px;
+    padding: var(--space-xs) var(--space-alt-14);
   }
   .demo-controls {
-    padding-inline: 10px;
-    gap: 2px;
+    padding-inline: var(--space-alt-10);
+    gap: var(--space-alt-2);
   }
   .demo-controls button {
-    padding-inline: 10px;
+    padding-inline: var(--space-alt-10);
   }
   .demo-playback {
     gap: 0;

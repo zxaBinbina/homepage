@@ -164,20 +164,20 @@ onBeforeUnmount(() => {
   overflow-x: hidden;
   overscroll-behavior: contain;
   border: 1px solid var(--border);
-  border-radius: 17px;
+  border-radius: var(--radius-alt-17);
   background: var(--panel);
 }
 .music-popover-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 13px 9px 17px;
+  padding: var(--space-alt-10) var(--space-alt-13) var(--space-alt-9) var(--space-alt-17);
   border-bottom: 1px solid var(--border);
 }
 .music-popover-header h2 {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
   font-size: 12px;
   font-weight: 600;
 }
@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
 .music-popover-header button {
   width: 28px;
   height: 28px;
-  border-radius: 9px;
+  border-radius: var(--radius-alt-9);
 }
 /* Keep the native popover in the top layer until its exit completes. */
 @starting-style {

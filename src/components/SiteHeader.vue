@@ -15,6 +15,7 @@ const props = withDefaults(
 )
 const asset = (name: string) => `/images/${name}`
 const menuOpen = ref(false)
+const menuToggle = ref<HTMLButtonElement>()
 const musicTrigger = ref<HTMLButtonElement>()
 const musicOpen = ref(false)
 const musicPlaying = ref(false)
@@ -40,7 +41,10 @@ function openMusic() {
   menuOpen.value = false
 }
 function onKey(event: KeyboardEvent) {
-  if (event.key === 'Escape') menuOpen.value = false
+  if (event.key === 'Escape' && menuOpen.value) {
+    menuOpen.value = false
+    menuToggle.value?.focus()
+  }
 }
 onMounted(() => document.addEventListener('keydown', onKey))
 onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
@@ -101,6 +105,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
       ><span class="nav-divider"></span
       ><a :href="navHref('contact')" class="nav-contact">打个招呼</a
       ><button
+        ref="menuToggle"
         class="icon-button mobile-toggle"
         :aria-expanded="menuOpen"
         aria-controls="mobile-nav"

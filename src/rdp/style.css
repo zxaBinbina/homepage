@@ -15,13 +15,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--space-lg);
   width: min(1020px, calc(100% - 48px));
   margin-top: 0;
-  padding: 10px 22px;
+  padding: var(--space-alt-10) var(--space-alt-22);
   transform: translateX(-50%);
   border: 1px solid var(--border);
-  border-radius: 40px;
+  border-radius: var(--radius-shell);
   background: var(--glass);
   backdrop-filter: blur(24px) saturate(150%);
   box-shadow: 0 8px 24px var(--shadow);
@@ -49,7 +49,7 @@
 .rdp-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-sm);
   font-size: 17px;
   letter-spacing: -0.5px;
 }
@@ -65,12 +65,12 @@
 .rdp-header nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-xl);
   font-size: 13px;
 }
 .rdp-header nav a:not(.icon-button) {
-  padding: 8px 14px;
-  border-radius: 24px;
+  padding: var(--space-xs) var(--space-alt-14);
+  border-radius: var(--radius-xl);
 }
 .rdp-header nav a[aria-current] {
   color: var(--blue);
@@ -79,13 +79,13 @@
 .rdp-nav-tools {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-alt-7);
 }
 .rdp-eyebrow {
   font: 11px/1.7 monospace;
   letter-spacing: 2px;
   color: var(--blue);
-  margin-bottom: 22px;
+  margin-bottom: var(--space-alt-22);
 }
 .rdp-hero {
   display: grid;
@@ -107,23 +107,23 @@
   color: var(--muted);
   font-size: 16px;
   line-height: 1.95;
-  margin-top: 24px;
+  margin-top: var(--space-xl);
 }
 .rdp-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 32px;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xl);
 }
 .rdp-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  padding: 12px 24px;
+  gap: var(--space-alt-28);
+  padding: var(--space-sm) var(--space-xl);
   min-height: 48px;
   border: 1px solid var(--border);
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   font-size: 14px;
   font-weight: 600;
 }
@@ -141,7 +141,7 @@
 .rdp-caption {
   font-size: 11px;
   color: var(--muted);
-  margin-top: 26px;
+  margin-top: var(--space-alt-26);
 }
 .rdp-section {
   padding-block: 66px;
@@ -155,14 +155,14 @@
 .rdp-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  margin-top: 34px;
+  gap: var(--space-lg);
+  margin-top: var(--space-alt-34);
 }
 .rdp-card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 28px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-alt-28);
 }
 .rdp-card-icon {
   color: var(--blue);
@@ -171,7 +171,7 @@
 }
 .rdp-card h3 {
   font-size: 20px;
-  margin: 30px 0 12px;
+  margin: var(--space-alt-30) 0 var(--space-sm);
 }
 .rdp-card p,
 .rdp-facts p {
@@ -196,11 +196,11 @@
 .rdp-exposure-note {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-top: 28px;
-  padding: 14px 16px;
+  gap: var(--space-alt-10);
+  margin-top: var(--space-alt-28);
+  padding: var(--space-alt-14) var(--space-md);
   border-left: 3px solid var(--status-danger);
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--panel);
   color: var(--muted);
   font-size: 12px;
@@ -208,7 +208,7 @@
 }
 .rdp-exposure-note > svg {
   color: var(--status-danger);
-  margin-top: 3px;
+  margin-top: var(--space-alt-3);
 }
 .rdp-exposure-note b {
   color: var(--text);
@@ -219,11 +219,11 @@
 .rdp-text-link {
   display: inline-block;
   color: var(--blue);
-  padding-block: 12px;
-  margin-top: 15px;
+  padding-block: var(--space-sm);
+  margin-top: var(--space-alt-15);
 }
 .rdp-facts article {
-  padding-block: 22px;
+  padding-block: var(--space-alt-22);
   border-bottom: 1px solid var(--border);
 }
 .rdp-facts article:first-child {
@@ -231,25 +231,25 @@
 }
 .rdp-facts b {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-xs);
   font-size: 17px;
 }
 .rdp-deploy-card {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: var(--space-2xl);
   justify-content: space-between;
-  padding: 38px;
+  padding: var(--space-alt-38);
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
 }
 .rdp-deploy-card h2 {
   font-size: 28px;
 }
 .rdp-deploy-card p:not(.rdp-eyebrow) {
   color: var(--muted);
-  margin-top: 18px;
+  margin-top: var(--space-alt-18);
   font-size: 14px;
 }
 .rdp-deploy-card .rdp-button {
@@ -257,13 +257,13 @@
 }
 .rdp-note {
   border-left: 3px solid var(--blue);
-  border-radius: 0 12px 12px 0;
-  padding: 20px 24px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--space-lg) var(--space-xl);
   background: var(--panel);
   font-size: 14px;
 }
 .rdp-note p {
-  margin-block: 10px 0;
+  margin-block: var(--space-alt-10) 0;
   color: var(--muted);
 }
 /* Keep entry and hover motion independent; content remains visible without animations. */
@@ -329,16 +329,16 @@
 }
 @media (max-width: 1050px) {
   .rdp-hero {
-    gap: 32px;
+    gap: var(--space-2xl);
   }
   .rdp-split {
-    gap: 44px;
+    gap: var(--space-alt-44);
   }
   .rdp-exposure-section {
-    gap: 42px;
+    gap: var(--space-alt-42);
   }
   .rdp-card {
-    padding: 22px;
+    padding: var(--space-alt-22);
   }
   .rdp-deploy-card {
     flex-direction: column;
@@ -351,17 +351,17 @@
   }
   .rdp-header {
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 16px;
+    gap: var(--space-alt-10);
+    padding: var(--space-alt-10) var(--space-md);
     top: 13px;
   }
   .rdp-header nav {
-    gap: 20px;
+    gap: var(--space-lg);
   }
   .rdp-hero {
     grid-template-columns: 1fr;
-    padding-block: 55px;
-    gap: 40px;
+    padding-block: var(--space-alt-55);
+    gap: var(--space-alt-40);
   }
   .rdp-page h1 {
     letter-spacing: -1px;
@@ -370,18 +370,18 @@
     grid-template-columns: 1fr;
   }
   .rdp-card h3 {
-    margin-top: 18px;
+    margin-top: var(--space-alt-18);
   }
   .rdp-split {
     grid-template-columns: 1fr;
-    gap: 34px;
+    gap: var(--space-alt-34);
   }
   .rdp-exposure-section {
     grid-template-columns: 1fr;
-    gap: 34px;
+    gap: var(--space-alt-34);
   }
   .rdp-section {
-    padding-block: 44px;
+    padding-block: var(--space-alt-44);
   }
 }
 @media (max-width: 480px) {
@@ -389,16 +389,16 @@
     padding-top: 128px;
   }
   .rdp-header {
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     width: calc(100% - 24px);
   }
   .rdp-header nav {
     width: 100%;
     justify-content: space-between;
-    gap: 10px;
+    gap: var(--space-alt-10);
   }
   .rdp-deploy-card {
-    padding: 24px;
+    padding: var(--space-xl);
   }
   .rdp-lead {
     font-size: 15px;

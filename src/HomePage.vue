@@ -67,7 +67,9 @@ onBeforeUnmount(() => {
       <div class="hero-glow"></div>
       <div class="shell hero-top">
         <div class="eyebrow">
-          <span class="status-dot"></span> HELLO, WORLD. I'M Z X A B I N B I N A
+          <span class="status-dot" aria-hidden="true"></span>
+          <span aria-hidden="true">HELLO, WORLD. I'M Z X A B I N B I N A</span>
+          <span class="sr-only">HELLO, WORLD. I'M ZXABINBINA</span>
         </div>
         <h1>在代码与方块之间，<br /><span>创造一点不一样。</span></h1>
         <p class="hero-description">
@@ -97,7 +99,7 @@ onBeforeUnmount(() => {
           />
           <div class="landscape-shade"></div>
           <div class="image-label">
-            <span class="mini-cross">+</span> A LITTLE WORLD, BUILT WITH LOVE
+            <span class="mini-cross" aria-hidden="true">+</span> A LITTLE WORLD, BUILT WITH LOVE
           </div>
           <div class="landscape-bottom">
             <div>
@@ -110,7 +112,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <div class="image-caption">
-          <span>MY WORLD, ONE BLOCK AT A TIME.</span><span>01 / PERSONAL SPACE</span>
+          <span>MY WORLD, ONE BLOCK AT A TIME.</span><span>00 / PERSONAL SPACE</span>
         </div>
       </div>
     </section>
