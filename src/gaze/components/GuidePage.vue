@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
 .gaze-source {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-alt-9);
+  gap: var(--space-xs);
   font-size: 12px;
   color: var(--muted);
   padding-block: var(--space-sm);

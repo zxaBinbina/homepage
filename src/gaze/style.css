@@ -20,7 +20,7 @@
   gap: var(--space-lg);
   width: min(1020px, calc(100% - 48px));
   margin-top: 0;
-  padding: var(--space-alt-10) var(--space-alt-22);
+  padding: var(--space-sm) var(--space-xl);
   transform: translateX(-50%);
   border: 1px solid var(--border);
   border-radius: var(--radius-shell);
@@ -51,7 +51,7 @@
   font-size: 13px;
 }
 .gaze-header nav a:not(.icon-button) {
-  padding: var(--space-xs) var(--space-alt-14);
+  padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-xl);
 }
 .gaze-header nav a[aria-current] {
@@ -61,7 +61,7 @@
 .gaze-nav-tools {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
+  gap: var(--space-xs);
 }
 .gaze-content-enter-active,
 .gaze-content-leave-active {
@@ -87,7 +87,7 @@
   font: 11px/1.7 monospace;
   letter-spacing: 2px;
   color: var(--blue);
-  margin-bottom: var(--space-alt-22);
+  margin-bottom: var(--space-xl);
 }
 .gaze-hero {
   display: grid;
@@ -122,7 +122,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
   padding: var(--space-sm) var(--space-xl);
   min-height: 48px;
   border: 1px solid var(--border);
@@ -144,7 +144,7 @@
 .gaze-caption {
   font-size: 11px;
   color: var(--muted);
-  margin-top: var(--space-alt-26);
+  margin-top: var(--space-xl);
 }
 .gaze-section {
   padding-block: 66px;
@@ -159,7 +159,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-lg);
-  margin-top: var(--space-alt-34);
+  margin-top: var(--space-2xl);
 }
 .gaze-grid a {
   display: block;
@@ -178,7 +178,7 @@
 }
 .gaze-card h3 {
   font-size: 20px;
-  margin: var(--space-alt-30) 0 var(--space-sm);
+  margin: var(--space-2xl) 0 var(--space-sm);
 }
 .gaze-card p {
   color: var(--muted);
@@ -188,8 +188,8 @@
 .gaze-card-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-alt-7);
-  margin-top: var(--space-alt-18);
+  gap: var(--space-xs);
+  margin-top: var(--space-lg);
   color: var(--blue);
   font-size: 12px;
 }
@@ -211,23 +211,23 @@
   margin-block: 0 var(--space-2xl);
 }
 .gaze-note p {
-  margin-block: var(--space-alt-10) 0;
+  margin-block: var(--space-sm) 0;
   color: var(--muted);
 }
 .gaze-pipeline {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-alt-10);
-  margin-top: var(--space-alt-30);
-  padding: var(--space-alt-22) var(--space-xl);
+  gap: var(--space-sm);
+  margin-top: var(--space-2xl);
+  padding: var(--space-xl) var(--space-xl);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--panel);
   font-size: 12px;
 }
 .gaze-pipeline span {
-  padding: var(--space-xs) var(--space-alt-14);
+  padding: var(--space-xs) var(--space-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg);
@@ -241,7 +241,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-lg);
-  margin-top: var(--space-alt-34);
+  margin-top: var(--space-2xl);
 }
 .gaze-deploy-card {
   display: flex;
@@ -258,7 +258,7 @@
 }
 .gaze-deploy-card p:not(.gaze-eyebrow) {
   color: var(--muted);
-  margin-top: var(--space-alt-18);
+  margin-top: var(--space-lg);
   font-size: 14px;
 }
 .gaze-deploy-card .gaze-button {
@@ -268,7 +268,7 @@
   display: inline-block;
   color: var(--blue);
   padding-block: var(--space-sm);
-  margin-top: var(--space-alt-15);
+  margin-top: var(--space-md);
 }
 /* 文档页 */
 .gaze-doc-title {
@@ -277,11 +277,11 @@
 .gaze-breadcrumb {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
   color: var(--muted);
   font: 11px monospace;
   letter-spacing: 1px;
-  margin-bottom: var(--space-alt-26);
+  margin-bottom: var(--space-xl);
 }
 .gaze-breadcrumb svg {
   color: var(--blue);
@@ -293,7 +293,7 @@
   font-size: clamp(32px, 3.5vw, 46px);
 }
 .gaze-doc-title .gaze-lead {
-  margin-top: var(--space-alt-14);
+  margin-top: var(--space-md);
   font-size: 15px;
 }
 .gaze-doc-layout {
@@ -308,7 +308,7 @@
   top: 108px;
   max-height: calc(100dvh - 128px);
   overflow-y: auto;
-  padding: var(--space-alt-6) var(--space-sm) var(--space-sm) var(--space-alt-2);
+  padding: var(--space-xs) var(--space-sm) var(--space-sm) var(--space-2xs);
   font-size: 12px;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -342,11 +342,11 @@
 .gaze-search {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-9);
+  gap: var(--space-xs);
   min-height: 44px;
   padding: 0 var(--space-sm);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--muted);
 }
@@ -389,16 +389,16 @@
   font-size: 11px;
   letter-spacing: 1px;
   font-weight: 600;
-  margin: var(--space-alt-26) var(--space-alt-10) var(--space-alt-10);
+  margin: var(--space-xl) var(--space-sm) var(--space-sm);
   color: var(--muted);
 }
 .gaze-sidebar nav a {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
   min-height: 38px;
-  padding: var(--space-xs) var(--space-alt-10);
-  border-radius: var(--radius-alt-9);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-xs);
   color: var(--muted);
   border-left: 2px solid transparent;
   line-height: 1.65;
@@ -422,17 +422,17 @@
   display: none;
 }
 .gaze-doc-section {
-  padding-block: var(--space-alt-38) var(--space-alt-6);
+  padding-block: var(--space-alt-38) var(--space-xs);
 }
 .gaze-doc-section + .gaze-doc-section {
-  margin-top: var(--space-alt-22);
+  margin-top: var(--space-xl);
   border-top: 1px solid var(--border);
 }
 .gaze-doc-section-kicker {
   font-size: 10px;
   letter-spacing: 1px;
   color: var(--muted);
-  margin-bottom: var(--space-alt-5);
+  margin-bottom: var(--space-2xs);
 }
 .gaze-doc .gaze-doc-heading {
   font-size: clamp(23px, 2.3vw, 29px);
@@ -453,8 +453,8 @@
   padding-left: var(--space-xl);
 }
 .gaze-prose li {
-  margin-block: var(--space-alt-10);
-  padding-left: var(--space-alt-3);
+  margin-block: var(--space-sm);
+  padding-left: var(--space-2xs);
 }
 .gaze-prose li::marker {
   color: var(--blue);
@@ -468,7 +468,7 @@
 .gaze-prose h4,
 .gaze-prose h5,
 .gaze-prose h6 {
-  margin-block: var(--space-alt-30) var(--space-alt-6);
+  margin-block: var(--space-2xl) var(--space-xs);
   line-height: 1.5;
 }
 .gaze-prose h3 {
@@ -478,10 +478,10 @@
   font-size: 16px;
 }
 .gaze-prose code {
-  padding: var(--space-alt-3) var(--space-alt-6);
+  padding: var(--space-2xs) var(--space-xs);
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-5);
+  border-radius: var(--radius-2xs);
   font-size: 0.86em;
 }
 .gaze-doc code {
@@ -490,7 +490,7 @@
 .gaze-code {
   margin-block: var(--space-lg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-14);
+  border-radius: var(--radius-md);
   background: var(--section);
   overflow: hidden;
 }
@@ -498,7 +498,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-sm) 0 var(--space-alt-18);
+  padding: 0 var(--space-sm) 0 var(--space-lg);
   border-bottom: 1px solid var(--border);
   font-size: 11px;
   color: var(--muted);
@@ -512,7 +512,7 @@
 .gaze-code-toolbar button {
   min-height: 44px;
   min-width: 64px;
-  padding: 0 var(--space-alt-10);
+  padding: 0 var(--space-sm);
   background: transparent;
   color: var(--muted);
   font-size: 11px;
@@ -538,7 +538,7 @@
   outline-offset: -3px;
 }
 .gaze-copy-message {
-  padding: var(--space-alt-10) var(--space-alt-18);
+  padding: var(--space-sm) var(--space-lg);
   margin: 0;
   color: var(--blue);
   font-size: 12px;
@@ -546,7 +546,7 @@
 }
 .gaze-code-tabs {
   display: flex;
-  margin: var(--space-alt-10) var(--space-sm);
+  margin: var(--space-sm) var(--space-sm);
 }
 .gaze-prose table {
   display: block;
@@ -559,7 +559,7 @@
 .gaze-prose th,
 .gaze-prose td {
   text-align: left;
-  padding: var(--space-alt-13) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--border);
   min-width: 110px;
 }
@@ -568,23 +568,23 @@
 }
 .gaze-prose blockquote {
   margin-block: var(--space-lg);
-  padding: var(--space-2xs) var(--space-alt-18);
+  padding: var(--space-2xs) var(--space-lg);
   border-left: 3px solid var(--border);
   color: var(--muted);
 }
 .gaze-admonition {
-  margin-block: var(--space-alt-22);
+  margin-block: var(--space-xl);
   border: 1px solid var(--border);
   border-left-width: 3px;
-  border-radius: 0 var(--radius-alt-14) var(--radius-alt-14) 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: var(--panel);
-  padding: var(--space-alt-18) var(--space-alt-22);
+  padding: var(--space-lg) var(--space-xl);
   font-size: 14px;
 }
 .gaze-admonition-title {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-9);
+  gap: var(--space-xs);
   font-weight: 600;
   font-size: 13px;
   margin-bottom: var(--space-xs);
@@ -633,16 +633,16 @@
   margin-block: var(--space-sm);
 }
 .gaze-details {
-  margin-block: var(--space-alt-22);
+  margin-block: var(--space-xl);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-14);
+  border-radius: var(--radius-md);
   background: var(--panel);
 }
 .gaze-details summary {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
-  padding: var(--space-md) var(--space-alt-22);
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
   cursor: var(--cursor-link);
   list-style: none;
   font-size: 14px;
@@ -667,22 +667,22 @@
 .gaze-details summary:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 3px;
-  border-radius: var(--radius-alt-14);
+  border-radius: var(--radius-md);
 }
 .gaze-details-body {
-  padding: 0 var(--space-alt-22) var(--space-alt-18);
+  padding: 0 var(--space-xl) var(--space-lg);
 }
 .gaze-doc-nav {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-alt-14);
+  gap: var(--space-md);
   margin-top: var(--space-alt-44);
 }
 .gaze-doc-nav a {
   display: flex;
   flex-direction: column;
-  gap: var(--space-alt-6);
-  padding: var(--space-lg) var(--space-alt-22);
+  gap: var(--space-xs);
+  padding: var(--space-lg) var(--space-xl);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--panel);
@@ -709,7 +709,7 @@
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
-  gap: var(--space-alt-14);
+  gap: var(--space-md);
   background: var(--panel);
 }
 .gaze-doc-bottom > svg {
@@ -721,7 +721,7 @@
 .gaze-doc-bottom p {
   color: var(--muted);
   font-size: 12px;
-  margin-top: var(--space-alt-3);
+  margin-top: var(--space-2xs);
 }
 .gaze-doc-bottom a {
   display: flex;
@@ -737,7 +737,7 @@
 .gaze-scan {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-22);
+  border-radius: var(--radius-xl);
   background: var(--panel);
   box-shadow: 0 12px 32px var(--shadow);
   overflow: hidden;
@@ -783,8 +783,8 @@
 .gaze-scan-status {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
-  padding: var(--space-md) var(--space-alt-22);
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
   border-top: 1px solid var(--border);
   font-size: 13px;
 }
@@ -797,7 +797,7 @@
 }
 .gaze-scan-dots {
   display: flex;
-  gap: var(--space-alt-5);
+  gap: var(--space-2xs);
   margin-left: auto;
 }
 .gaze-scan-dots span {
@@ -894,7 +894,7 @@
     gap: var(--space-alt-44);
   }
   .gaze-card {
-    padding: var(--space-alt-22);
+    padding: var(--space-xl);
   }
   .gaze-fork-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -917,8 +917,8 @@
   }
   .gaze-header {
     flex-wrap: wrap;
-    gap: var(--space-alt-10);
-    padding: var(--space-alt-10) var(--space-md);
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
     top: 13px;
   }
   .gaze-header nav {
@@ -937,11 +937,11 @@
     grid-template-columns: 1fr;
   }
   .gaze-card h3 {
-    margin-top: var(--space-alt-18);
+    margin-top: var(--space-lg);
   }
   .gaze-split {
     grid-template-columns: 1fr;
-    gap: var(--space-alt-34);
+    gap: var(--space-2xl);
   }
   .gaze-section {
     padding-block: var(--space-alt-44);
@@ -951,7 +951,7 @@
   }
   .gaze-doc-layout {
     grid-template-columns: 1fr;
-    gap: var(--space-alt-22);
+    gap: var(--space-xl);
   }
   .gaze-sidebar {
     position: static;
@@ -962,7 +962,7 @@
   .gaze-mobile-nav {
     display: flex;
     align-items: center;
-    gap: var(--space-alt-10);
+    gap: var(--space-sm);
     width: 100%;
     min-height: 48px;
     padding: var(--space-sm) var(--space-md);
@@ -981,13 +981,13 @@
     margin-top: var(--space-sm);
     padding: var(--space-md);
     border: 1px solid var(--border);
-    border-radius: var(--radius-alt-14);
+    border-radius: var(--radius-md);
   }
   .gaze-sidebar nav a {
     min-height: 44px;
   }
   .gaze-doc-section {
-    padding-top: var(--space-alt-30);
+    padding-top: var(--space-2xl);
   }
   .gaze-doc {
     font-size: 14px;
@@ -1007,7 +1007,7 @@
   .gaze-header nav {
     width: 100%;
     justify-content: space-between;
-    gap: var(--space-alt-10);
+    gap: var(--space-sm);
   }
   .gaze-deploy-card {
     padding: var(--space-xl);

@@ -17,7 +17,7 @@
 }
 .downloads-hero .rdp-button {
   flex-shrink: 0;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
 }
 .downloads-toolbar {
   display: flex;
@@ -34,9 +34,9 @@
   gap: var(--space-xs);
 }
 .downloads-retry {
-  padding: var(--space-alt-9) var(--space-alt-13);
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--text);
 }
@@ -51,7 +51,7 @@
   min-height: 220px;
   padding: var(--space-2xl);
   border: 1px dashed var(--border);
-  border-radius: var(--radius-alt-14);
+  border-radius: var(--radius-md);
   color: var(--muted);
   text-align: center;
 }
@@ -72,12 +72,12 @@
 }
 .release-list {
   display: grid;
-  gap: var(--space-alt-22);
+  gap: var(--space-xl);
 }
 .release-card {
   padding: var(--space-alt-28);
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-14);
+  border-radius: var(--radius-md);
   background: var(--panel);
 }
 .release-header {
@@ -89,14 +89,14 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
 }
 .release-title-line h2 {
   font-size: 24px;
   line-height: 1.35;
 }
 .release-badge {
-  padding: var(--space-alt-3) var(--space-xs);
+  padding: var(--space-2xs) var(--space-xs);
   border: 1px solid color-mix(in srgb, var(--warm) 55%, transparent);
   border-radius: var(--radius-pill);
   color: var(--warm);
@@ -107,7 +107,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-sm);
-  margin-top: var(--space-alt-9);
+  margin-top: var(--space-xs);
   color: var(--muted);
   font-size: 12px;
 }
@@ -118,7 +118,7 @@
 .release-meta span {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-alt-5);
+  gap: var(--space-2xs);
 }
 .release-link {
   display: inline-flex;
@@ -128,7 +128,7 @@
   height: 42px;
   flex-shrink: 0;
   border: 1px solid var(--border);
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
   color: var(--muted);
 }
 .release-link:hover {
@@ -136,8 +136,8 @@
   background: var(--panel-hover);
 }
 .release-description {
-  margin-top: var(--space-alt-22);
-  padding: var(--space-md) var(--space-alt-18);
+  margin-top: var(--space-xl);
+  padding: var(--space-md) var(--space-lg);
   border-left: 3px solid var(--blue);
   background: var(--panel-hover);
   color: var(--muted);
@@ -151,13 +151,13 @@
   font-style: italic;
 }
 .release-assets {
-  margin-top: var(--space-alt-26);
+  margin-top: var(--space-xl);
 }
 .release-assets-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-alt-9);
+  margin-bottom: var(--space-xs);
   color: var(--muted);
   font-size: 12px;
 }
@@ -169,9 +169,9 @@
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr) auto 22px;
   align-items: center;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
   min-height: 52px;
-  padding: var(--space-alt-9) var(--space-alt-10);
+  padding: var(--space-xs) var(--space-sm);
   border-top: 1px solid var(--border);
   color: var(--text);
 }
@@ -191,7 +191,7 @@
   white-space: nowrap;
 }
 .release-assets-empty {
-  padding: var(--space-alt-14) 0 var(--space-2xs);
+  padding: var(--space-md) 0 var(--space-2xs);
   color: var(--muted);
   font-size: 13px;
 }
@@ -205,7 +205,7 @@
     width: 100%;
   }
   .release-card {
-    padding: var(--space-alt-22) var(--space-alt-18);
+    padding: var(--space-xl) var(--space-lg);
   }
   .release-asset {
     grid-template-columns: 22px minmax(0, 1fr) 22px;

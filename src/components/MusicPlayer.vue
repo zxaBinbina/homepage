@@ -568,7 +568,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
   letter-spacing: 0.5px;
   line-height: 1;
-  padding: var(--space-alt-3) var(--space-alt-5);
+  padding: var(--space-2xs) var(--space-2xs);
   color: #c39762;
   border: 1px solid #93756270;
   border-radius: var(--radius-2xs);
@@ -581,8 +581,8 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 .music-lyrics {
-  margin-top: var(--space-alt-19);
-  padding-top: var(--space-alt-17);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
   overflow: hidden;
   border-top: 1px solid var(--border);
 }
@@ -596,7 +596,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--space-alt-13);
+  gap: var(--space-sm);
   color: var(--muted);
   font-size: 12px;
   letter-spacing: 0.4px;
@@ -610,21 +610,21 @@ onBeforeUnmount(() => {
   color: var(--blue);
   border: 1px solid var(--border);
   background: transparent;
-  padding: var(--space-alt-7) var(--space-alt-14);
-  border-radius: var(--radius-alt-15);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
 }
 .lyric-lines {
   position: relative;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--space-alt-30) var(--space-xs);
+  padding: var(--space-2xl) var(--space-xs);
   mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
 }
 .lyric-line {
   display: block;
   text-align: center;
   width: 100%;
-  padding: var(--space-alt-9) var(--space-xs);
+  padding: var(--space-xs) var(--space-xs);
   background: transparent;
   color: var(--muted);
   font-size: 13px;
@@ -658,7 +658,7 @@ onBeforeUnmount(() => {
 }
 .music-card {
   margin-top: 0;
-  padding: var(--space-alt-22) var(--space-alt-25) var(--space-alt-18);
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
   border: 0;
   border-radius: 0;
   background: linear-gradient(110deg, var(--music-card-glow), transparent 70%), var(--panel);
@@ -666,7 +666,7 @@ onBeforeUnmount(() => {
 .music-heading {
   display: flex;
   justify-content: space-between;
-  gap: var(--space-alt-15);
+  gap: var(--space-md);
   margin-bottom: var(--space-lg);
   font-size: 11px;
   color: var(--muted);
@@ -675,7 +675,7 @@ onBeforeUnmount(() => {
 .music-heading > a {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
+  gap: var(--space-xs);
 }
 .music-heading > span > svg {
   color: var(--blue);
@@ -692,7 +692,7 @@ onBeforeUnmount(() => {
   position: relative;
   width: 76px;
   height: 76px;
-  border-radius: var(--radius-alt-13);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   flex-shrink: 0;
   display: grid;
@@ -724,7 +724,7 @@ onBeforeUnmount(() => {
 .music-label {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
+  gap: var(--space-xs);
   font-size: 9px;
   color: var(--blue);
   letter-spacing: 0.8px;
@@ -733,7 +733,7 @@ onBeforeUnmount(() => {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  margin: var(--space-alt-6) 0 var(--space-2xs);
+  margin: var(--space-xs) 0 var(--space-2xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -750,13 +750,13 @@ onBeforeUnmount(() => {
 .music-volume {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
 }
 .music-controls {
   gap: var(--space-sm);
 }
 .music-extra {
-  gap: var(--space-alt-14);
+  gap: var(--space-md);
   margin-left: var(--space-sm);
 }
 .music-icon-button {
@@ -767,7 +767,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   background: transparent;
   color: var(--muted);
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 .music-icon-button:hover,
@@ -796,17 +796,17 @@ onBeforeUnmount(() => {
   stroke-width: 1.5;
 }
 .music-list-button {
-  gap: var(--space-alt-5);
+  gap: var(--space-2xs);
   width: auto;
   min-width: 45px;
-  padding: 0 var(--space-alt-5);
+  padding: 0 var(--space-2xs);
 }
 .music-list-button > span {
   font-size: 9px;
   font-variant-numeric: tabular-nums;
 }
 .music-volume {
-  gap: var(--space-alt-2);
+  gap: var(--space-2xs);
 }
 .music-volume input {
   width: 56px;
@@ -820,7 +820,7 @@ input[type='range'] {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-top: var(--space-alt-17);
+  margin-top: var(--space-md);
   color: var(--muted);
   font-size: 9px;
   font-variant-numeric: tabular-nums;
@@ -891,13 +891,13 @@ input[type='range'] {
   display: flex;
   align-items: center;
   height: 11px;
-  gap: var(--space-alt-2);
+  gap: var(--space-2xs);
 }
 .music-equalizer i {
   width: 2px;
   height: 4px;
   background: var(--blue);
-  border-radius: var(--radius-alt-2);
+  border-radius: var(--radius-2xs);
 }
 .music-equalizer i:nth-child(2) {
   height: 9px;
@@ -917,13 +917,13 @@ input[type='range'] {
 .music-playlist {
   margin-top: var(--space-md);
   border-top: 1px solid var(--border);
-  padding-top: var(--space-alt-13);
+  padding-top: var(--space-sm);
 }
 .music-list-heading {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-13);
-  margin-bottom: var(--space-alt-10);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 .music-list-heading > span {
   font-size: 11px;
@@ -937,8 +937,8 @@ input[type='range'] {
 .music-search {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
-  padding: var(--space-xs) var(--space-alt-10);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-xs);
   color: var(--muted);
@@ -967,10 +967,10 @@ input[type='range'] {
   align-items: center;
   width: 100%;
   text-align: left;
-  gap: var(--space-alt-14);
+  gap: var(--space-md);
   background: transparent;
   border-radius: var(--radius-xs);
-  padding: var(--space-alt-11) var(--space-sm);
+  padding: var(--space-sm) var(--space-sm);
   color: var(--text);
 }
 .music-track:hover {
@@ -1013,7 +1013,7 @@ input[type='range'] {
   text-align: center;
   color: var(--muted);
   font-size: 12px;
-  padding: var(--space-alt-25);
+  padding: var(--space-xl);
 }
 .music-card input:focus-visible,
 .music-track-list:focus-visible {
@@ -1039,10 +1039,10 @@ input[type='range'] {
   }
   .music-extra {
     margin-left: 0;
-    gap: var(--space-alt-7);
+    gap: var(--space-xs);
   }
   .music-main {
-    gap: var(--space-alt-15);
+    gap: var(--space-md);
   }
   .music-info h3 {
     font-size: 14px;
@@ -1055,18 +1055,18 @@ input[type='range'] {
   }
   .music-main {
     flex-wrap: wrap;
-    gap: var(--space-alt-14);
+    gap: var(--space-md);
   }
   .music-cover {
     width: 60px;
     height: 60px;
-    border-radius: var(--radius-alt-11);
+    border-radius: var(--radius-sm);
   }
   .music-info {
     flex-basis: calc(100% - 74px);
   }
   .music-controls {
-    margin-top: var(--space-alt-2);
+    margin-top: var(--space-2xs);
   }
   .music-extra {
     margin-left: auto;
@@ -1077,7 +1077,7 @@ input[type='range'] {
   }
   .music-heading {
     font-size: 10px;
-    gap: var(--space-alt-10);
+    gap: var(--space-sm);
   }
   .music-heading > a {
     font-size: 9px;
@@ -1090,11 +1090,11 @@ input[type='range'] {
     height: 40px;
   }
   .music-progress {
-    margin-top: var(--space-alt-13);
+    margin-top: var(--space-sm);
   }
   .music-list-heading {
     flex-wrap: wrap;
-    gap: var(--space-alt-9);
+    gap: var(--space-xs);
   }
   .music-list-heading > span {
     flex-basis: 100%;
@@ -1107,7 +1107,7 @@ input[type='range'] {
     width: 100%;
   }
   .music-track {
-    padding: var(--space-alt-10) var(--space-alt-6);
+    padding: var(--space-sm) var(--space-xs);
     gap: var(--space-xs);
   }
   .music-track-title {
@@ -1125,11 +1125,11 @@ input[type='range'] {
   }
 }
 .music-card.is-compact {
-  padding: var(--space-alt-14) var(--space-md) var(--space-alt-15);
+  padding: var(--space-md) var(--space-md) var(--space-md);
 }
 .music-card.is-compact .music-heading {
   font-size: 9px;
-  margin-bottom: var(--space-alt-14);
+  margin-bottom: var(--space-md);
   gap: var(--space-xs);
 }
 .music-card.is-compact .music-heading > a {
@@ -1143,7 +1143,7 @@ input[type='range'] {
 .music-card.is-compact .music-cover {
   width: 52px;
   height: 52px;
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
 }
 .music-card.is-compact .music-info {
   min-width: 0;
@@ -1164,7 +1164,7 @@ input[type='range'] {
   grid-column: 1 / -1;
   grid-row: 2;
   justify-self: start;
-  gap: var(--space-alt-6);
+  gap: var(--space-xs);
   margin: 0;
 }
 .music-card.is-compact .music-extra {
@@ -1195,7 +1195,7 @@ input[type='range'] {
   height: 36px;
 }
 .music-card.is-compact .music-progress {
-  margin-top: var(--space-alt-11);
+  margin-top: var(--space-sm);
   gap: var(--space-xs);
 }
 .music-card.is-compact .music-lyrics {
@@ -1205,11 +1205,11 @@ input[type='range'] {
 }
 .music-card.is-compact .lyric-placeholder {
   font-size: 11px;
-  gap: var(--space-alt-9);
+  gap: var(--space-xs);
 }
 .music-card.is-compact .lyric-line {
   font-size: 12px;
-  padding: var(--space-alt-7) var(--space-2xs);
+  padding: var(--space-xs) var(--space-2xs);
 }
 .music-card.is-compact .music-list-heading {
   flex-wrap: wrap;
@@ -1229,8 +1229,8 @@ input[type='range'] {
   max-height: 200px;
 }
 .music-card.is-compact .music-track {
-  padding: var(--space-alt-9) var(--space-alt-5);
-  gap: var(--space-alt-7);
+  padding: var(--space-xs) var(--space-2xs);
+  gap: var(--space-xs);
 }
 .music-card.is-compact .music-track-title {
   font-size: 11px;
@@ -1244,7 +1244,7 @@ input[type='range'] {
 }
 .music-card.is-compact .music-player-body {
   min-width: 0;
-  padding: var(--space-alt-14) var(--space-md) var(--space-alt-15);
+  padding: var(--space-md) var(--space-md) var(--space-md);
 }
 /* The popover animates its width; keep the body from reflowing during that transition. */
 .music-card.is-compact:not(.playlist-overlay) .music-player-body {
@@ -1261,7 +1261,7 @@ input[type='range'] {
   height: 340px;
   max-height: calc(var(--panel-height, 600px) - 50px);
   margin: 0;
-  padding: var(--space-alt-13) var(--space-sm);
+  padding: var(--space-sm) var(--space-sm);
   border-top: 0;
   border-left: 1px solid var(--border);
   background: var(--panel);

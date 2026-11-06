@@ -293,9 +293,9 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: var(--space-alt-14);
+  gap: var(--space-md);
   min-height: 42px;
-  padding: var(--space-xs) var(--space-alt-14);
+  padding: var(--space-xs) var(--space-md);
   border-bottom: 1px solid var(--border);
   color: var(--muted);
   font-size: 11px;
@@ -308,7 +308,7 @@ onBeforeUnmount(() => {
 .exposure-taskbar-launch {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
+  gap: var(--space-xs);
 }
 .exposure-window-title {
   color: var(--text);
@@ -442,9 +442,9 @@ onBeforeUnmount(() => {
 .exposure-notice {
   position: relative;
   width: 100%;
-  padding: var(--space-xs) var(--space-alt-11) var(--space-alt-9);
+  padding: var(--space-xs) var(--space-sm) var(--space-xs);
   border: 1px solid var(--rdp-demo-notice-border);
-  border-radius: var(--radius-alt-10);
+  border-radius: var(--radius-sm);
   background: var(--rdp-demo-notice-bg);
   color: var(--rdp-demo-notice-text);
   box-shadow: 0 12px 36px var(--rdp-demo-notice-shadow);
@@ -453,8 +453,8 @@ onBeforeUnmount(() => {
 .exposure-notice-head {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-10);
-  padding-bottom: var(--space-alt-5);
+  gap: var(--space-sm);
+  padding-bottom: var(--space-2xs);
   color: var(--rdp-demo-notice-muted);
   font-size: 9px;
 }
@@ -466,7 +466,7 @@ onBeforeUnmount(() => {
 .exposure-notice-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-2);
+  gap: var(--space-2xs);
   margin-left: auto;
 }
 .exposure-notice-actions button {
@@ -476,7 +476,7 @@ onBeforeUnmount(() => {
   height: 20px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-alt-5);
+  border-radius: var(--radius-2xs);
   background: transparent;
   color: var(--rdp-demo-notice-action);
 }
@@ -493,9 +493,9 @@ onBeforeUnmount(() => {
 .exposure-notice-body {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-alt-11);
+  gap: var(--space-sm);
   margin-top: 0;
-  padding-top: var(--space-alt-10);
+  padding-top: var(--space-sm);
 }
 .exposure-notice-icon {
   display: grid;
@@ -503,7 +503,7 @@ onBeforeUnmount(() => {
   width: 39px;
   height: 39px;
   flex-shrink: 0;
-  border-radius: var(--radius-alt-7);
+  border-radius: var(--radius-xs);
   background: linear-gradient(145deg, var(--primary-action-hover), var(--primary-action));
   color: var(--primary-action-text);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary-action-text) 28%, transparent);
@@ -520,7 +520,7 @@ onBeforeUnmount(() => {
   line-height: 1.55;
 }
 .exposure-notice-body strong + p {
-  margin-top: var(--space-alt-5);
+  margin-top: var(--space-2xs);
 }
 .exposure-taskbar {
   position: absolute;
@@ -531,11 +531,11 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   width: min(92%, 620px);
   min-height: 50px;
-  padding: var(--space-alt-7) var(--space-alt-13);
+  padding: var(--space-xs) var(--space-sm);
   bottom: 10px;
   transform: translateX(-50%);
   border: 1px solid var(--rdp-demo-taskbar-border);
-  border-radius: var(--radius-alt-18);
+  border-radius: var(--radius-lg);
   background: var(--rdp-demo-taskbar-bg);
   color: var(--rdp-demo-taskbar-text);
   backdrop-filter: blur(12px);
@@ -543,7 +543,7 @@ onBeforeUnmount(() => {
 }
 .exposure-taskbar-launch,
 .exposure-taskbar-status {
-  gap: var(--space-alt-13);
+  gap: var(--space-sm);
 }
 .exposure-launcher {
   display: block;
@@ -570,7 +570,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-sm);
-  padding: var(--space-alt-10) var(--space-alt-14) var(--space-2xs);
+  padding: var(--space-sm) var(--space-md) var(--space-2xs);
 }
 .exposure-state {
   min-width: 0;
@@ -591,7 +591,7 @@ onBeforeUnmount(() => {
 }
 .exposure-controls {
   display: flex;
-  gap: var(--space-alt-3);
+  gap: var(--space-2xs);
   flex-shrink: 0;
 }
 .exposure-controls button {
@@ -610,7 +610,7 @@ onBeforeUnmount(() => {
 }
 .exposure-caption {
   min-height: 44px;
-  padding: var(--space-2xs) var(--space-alt-14) var(--space-sm);
+  padding: var(--space-2xs) var(--space-md) var(--space-sm);
   color: var(--text);
   font-size: 11px;
   line-height: 1.6;
@@ -704,7 +704,7 @@ onBeforeUnmount(() => {
     grid-column: 1 / -1;
     grid-row: 2;
     margin-top: -6px;
-    padding-left: var(--space-alt-21);
+    padding-left: var(--space-lg);
   }
   .exposure-desktop {
     min-height: 310px;
@@ -715,12 +715,12 @@ onBeforeUnmount(() => {
     width: min(210px, calc(100% - 34px));
   }
   .exposure-notice {
-    padding: var(--space-alt-6) var(--space-xs) var(--space-alt-7);
+    padding: var(--space-xs) var(--space-xs) var(--space-xs);
     border-radius: var(--radius-xs);
   }
   .exposure-notice-head {
-    gap: var(--space-alt-6);
-    padding-bottom: var(--space-alt-3);
+    gap: var(--space-xs);
+    padding-bottom: var(--space-2xs);
   }
   .exposure-notice-app {
     font-size: 9px;
@@ -731,7 +731,7 @@ onBeforeUnmount(() => {
   }
   .exposure-notice-body {
     gap: var(--space-xs);
-    padding-top: var(--space-alt-7);
+    padding-top: var(--space-xs);
   }
   .exposure-notice-icon {
     width: 30px;
@@ -746,11 +746,11 @@ onBeforeUnmount(() => {
     line-height: 1.35;
   }
   .exposure-notice-body strong + p {
-    margin-top: var(--space-alt-3);
+    margin-top: var(--space-2xs);
   }
   .exposure-taskbar {
     width: calc(100% - 16px);
-    padding-inline: var(--space-alt-9);
+    padding-inline: var(--space-xs);
   }
   .exposure-taskbar-launch,
   .exposure-taskbar-status {
@@ -763,11 +763,11 @@ onBeforeUnmount(() => {
     align-items: flex-start;
   }
   .exposure-state {
-    gap: var(--space-alt-5);
+    gap: var(--space-2xs);
   }
   .exposure-state > span:last-child {
     width: 100%;
-    padding-left: var(--space-alt-11);
+    padding-left: var(--space-sm);
   }
 }
 </style>

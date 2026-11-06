@@ -18,7 +18,7 @@
   gap: var(--space-lg);
   width: min(1020px, calc(100% - 48px));
   margin-top: 0;
-  padding: var(--space-alt-10) var(--space-alt-22);
+  padding: var(--space-sm) var(--space-xl);
   transform: translateX(-50%);
   border: 1px solid var(--border);
   border-radius: var(--radius-shell);
@@ -69,7 +69,7 @@
   font-size: 13px;
 }
 .rdp-header nav a:not(.icon-button) {
-  padding: var(--space-xs) var(--space-alt-14);
+  padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-xl);
 }
 .rdp-header nav a[aria-current] {
@@ -79,13 +79,13 @@
 .rdp-nav-tools {
   display: flex;
   align-items: center;
-  gap: var(--space-alt-7);
+  gap: var(--space-xs);
 }
 .rdp-eyebrow {
   font: 11px/1.7 monospace;
   letter-spacing: 2px;
   color: var(--blue);
-  margin-bottom: var(--space-alt-22);
+  margin-bottom: var(--space-xl);
 }
 .rdp-hero {
   display: grid;
@@ -141,7 +141,7 @@
 .rdp-caption {
   font-size: 11px;
   color: var(--muted);
-  margin-top: var(--space-alt-26);
+  margin-top: var(--space-xl);
 }
 .rdp-section {
   padding-block: 66px;
@@ -156,7 +156,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-lg);
-  margin-top: var(--space-alt-34);
+  margin-top: var(--space-2xl);
 }
 .rdp-card {
   background: var(--panel);
@@ -171,7 +171,7 @@
 }
 .rdp-card h3 {
   font-size: 20px;
-  margin: var(--space-alt-30) 0 var(--space-sm);
+  margin: var(--space-2xl) 0 var(--space-sm);
 }
 .rdp-card p,
 .rdp-facts p {
@@ -196,9 +196,9 @@
 .rdp-exposure-note {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-alt-10);
+  gap: var(--space-sm);
   margin-top: var(--space-alt-28);
-  padding: var(--space-alt-14) var(--space-md);
+  padding: var(--space-md) var(--space-md);
   border-left: 3px solid var(--status-danger);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--panel);
@@ -208,7 +208,7 @@
 }
 .rdp-exposure-note > svg {
   color: var(--status-danger);
-  margin-top: var(--space-alt-3);
+  margin-top: var(--space-2xs);
 }
 .rdp-exposure-note b {
   color: var(--text);
@@ -220,10 +220,10 @@
   display: inline-block;
   color: var(--blue);
   padding-block: var(--space-sm);
-  margin-top: var(--space-alt-15);
+  margin-top: var(--space-md);
 }
 .rdp-facts article {
-  padding-block: var(--space-alt-22);
+  padding-block: var(--space-xl);
   border-bottom: 1px solid var(--border);
 }
 .rdp-facts article:first-child {
@@ -249,7 +249,7 @@
 }
 .rdp-deploy-card p:not(.rdp-eyebrow) {
   color: var(--muted);
-  margin-top: var(--space-alt-18);
+  margin-top: var(--space-lg);
   font-size: 14px;
 }
 .rdp-deploy-card .rdp-button {
@@ -263,7 +263,7 @@
   font-size: 14px;
 }
 .rdp-note p {
-  margin-block: var(--space-alt-10) 0;
+  margin-block: var(--space-sm) 0;
   color: var(--muted);
 }
 /* Keep entry and hover motion independent; content remains visible without animations. */
@@ -338,7 +338,7 @@
     gap: var(--space-alt-42);
   }
   .rdp-card {
-    padding: var(--space-alt-22);
+    padding: var(--space-xl);
   }
   .rdp-deploy-card {
     flex-direction: column;
@@ -351,8 +351,8 @@
   }
   .rdp-header {
     flex-wrap: wrap;
-    gap: var(--space-alt-10);
-    padding: var(--space-alt-10) var(--space-md);
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
     top: 13px;
   }
   .rdp-header nav {
@@ -370,15 +370,15 @@
     grid-template-columns: 1fr;
   }
   .rdp-card h3 {
-    margin-top: var(--space-alt-18);
+    margin-top: var(--space-lg);
   }
   .rdp-split {
     grid-template-columns: 1fr;
-    gap: var(--space-alt-34);
+    gap: var(--space-2xl);
   }
   .rdp-exposure-section {
     grid-template-columns: 1fr;
-    gap: var(--space-alt-34);
+    gap: var(--space-2xl);
   }
   .rdp-section {
     padding-block: var(--space-alt-44);
@@ -395,7 +395,7 @@
   .rdp-header nav {
     width: 100%;
     justify-content: space-between;
-    gap: var(--space-alt-10);
+    gap: var(--space-sm);
   }
   .rdp-deploy-card {
     padding: var(--space-xl);
