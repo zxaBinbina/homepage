@@ -1,0 +1,191 @@
+[
+  {
+    "id": "sirius-and-harry",
+    "filename": "小天狼星陪哈利长大(别名_哈利波特：与教父同行) 圣诞蛋糕刀 1-272章.txt",
+    "sha256": "407cd39eef03136f4b28ac2f55e3e87853daf08673b7a05843f7c2e3d5d716f3",
+    "filenameEnd": 272,
+    "sourceChapterCount": 272,
+    "chapterCount": 272,
+    "numberedChapterCount": 272,
+    "appendixCount": 0,
+    "groups": {
+      "main": 272,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 272,
+    "outOfOrder": false
+  },
+  {
+    "id": "tom-at-hogwarts",
+    "filename": "带着Tom勇闯霍格沃茨 一颗小花芽 1-397章.txt",
+    "sha256": "d57d075c81927464e1c010aee6126ab587dacfbbd164107095edba74aad219d8",
+    "filenameEnd": 397,
+    "sourceChapterCount": 363,
+    "chapterCount": 395,
+    "numberedChapterCount": 363,
+    "appendixCount": 30,
+    "groups": {
+      "main": 363,
+      "extra": 32,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 1,
+    "collapsedHeadings": 0,
+    "missing": [
+      330
+    ],
+    "repeated": [],
+    "lastNumber": 364,
+    "outOfOrder": false
+  },
+  {
+    "id": "angel-at-hogwarts",
+    "filename": "Hp：天使降临魔法世界(别名_穿越hp之开局拥有天使模板) 一颗小花芽 1-148章.txt",
+    "sha256": "c38380661ef4159d43eb1d3b146a710ca94abecff9e188154714c0441771a3e7",
+    "filenameEnd": 148,
+    "sourceChapterCount": 148,
+    "chapterCount": 153,
+    "numberedChapterCount": 128,
+    "appendixCount": 20,
+    "groups": {
+      "main": 128,
+      "extra": 25,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 148,
+    "outOfOrder": true
+  },
+  {
+    "id": "furina-at-hogwarts",
+    "filename": "HP什么芙宁娜来到哈利波特了 以花作礼 1-102章.txt",
+    "sha256": "7ff726cdc5c206c17294b6c739b969f85b02ef28f6d01cf5093eac13ebfc305b",
+    "filenameEnd": 102,
+    "sourceChapterCount": 102,
+    "chapterCount": 102,
+    "numberedChapterCount": 102,
+    "appendixCount": 0,
+    "groups": {
+      "main": 102,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [
+      45,
+      46,
+      88
+    ],
+    "repeated": [
+      11,
+      43
+    ],
+    "lastNumber": 103,
+    "outOfOrder": true
+  },
+  {
+    "id": "minecraft-martial-arts",
+    "filename": "我的世界之武艺年代 但愿入长久 1-9章.txt",
+    "sha256": "69840ab7fa90227e2d1fad1aaa623e8e08bc1677f5ae15a1c9b130802ff5898e",
+    "filenameEnd": 9,
+    "sourceChapterCount": 9,
+    "chapterCount": 9,
+    "numberedChapterCount": 9,
+    "appendixCount": 0,
+    "groups": {
+      "main": 9,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 1,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 9,
+    "outOfOrder": false
+  },
+  {
+    "id": "hidden-professor",
+    "filename": "隐藏在霍格沃茨当教授.txt",
+    "sha256": "8c58f4bea6fbce150a48b17f901dbfa56b5f59871e0a63147df84561c08d2a83",
+    "filenameEnd": null,
+    "sourceChapterCount": 655,
+    "chapterCount": 656,
+    "numberedChapterCount": 643,
+    "appendixCount": 12,
+    "groups": {
+      "main": 643,
+      "extra": 12,
+      "notes": 1
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 2,
+    "missing": [
+      327,
+      526
+    ],
+    "repeated": [
+      237,
+      525,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "lastNumber": 643,
+    "outOfOrder": true
+  },
+  {
+    "id": "anomaly-investigations",
+    "filename": "异案调查组 未知作者 1-546章.txt",
+    "sha256": "3403d408431ad9f3f2587581522186cd3cbc3db9f9bf5b938ab45ce75d901fc8",
+    "filenameEnd": 546,
+    "sourceChapterCount": 546,
+    "chapterCount": 546,
+    "numberedChapterCount": 546,
+    "appendixCount": 0,
+    "groups": {
+      "main": 546,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [
+      58,
+      267,
+      300,
+      364,
+      401,
+      482,
+      537
+    ],
+    "repeated": [],
+    "lastNumber": 553,
+    "outOfOrder": false
+  }
+]

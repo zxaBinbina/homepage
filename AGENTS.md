@@ -57,6 +57,8 @@
 | [src/data/music.json](src/data/music.json)                                     | 歌单快照，只有歌单更新任务才改动                   |
 | [src/ProjectDirectory.vue](src/ProjectDirectory.vue)                           | 项目目录页：搜索、结果计数与空状态                 |
 | [src/games/](src/games/)                                                       | 游戏目录、游戏页面、规则逻辑与游戏文案             |
+| [src/books/](src/books/)                                                       | 小说书架、阅读器、书目、进度、书签与设置           |
+| [public/books/](public/books/)                                                 | 从 TXT 导入的章节目录与正文分块                    |
 | [src/tools/](src/tools/)                                                       | 工具目录、工作页、上游工具源码与中文文案           |
 | [src/rdp/](src/rdp/)                                                           | RDP 子站页面、样式与 Wiki 阅读布局                 |
 | [src/gaze/](src/gaze/)                                                         | Gaze 子站页面、指南内容与摘要                      |
@@ -100,6 +102,12 @@
 变更清单或转换规则运行 `node scripts/check-tools.mjs`，该入口已包含 `check-jaytools.mjs`，无需重复执行；归档校验需要系统提供 `tar`。交互或布局变更运行 `python3 scripts/check-tools-browser.py`，涉及 jaytools 时再运行 `python3 scripts/check-jaytools-browser.py`，检查真实文件、图片与 ZIP 导出、取消、主题、响应式和动效。后者还需要 Python Pillow（`PIL`），截图与下载结果位于 `artifacts/jaytools/`。
 
 私人网页浏览器是本地工具规则的例外：前端位于 `src/tools/browser/`，后端独立维护在同级 `../bin-api/`，通过密码保护的 Cloudflare Worker 访问目标网站。代理运行环境仅注册在 `browse.zxabinbina.cc.cd`，不能把其 Service Worker 注册到个人主页或 API 域名。保留临时会话、关闭与到期清理、来源校验、私网地址阻止及密钥不落前端的边界。新增后端 API 按 `src/modules/` 分模块维护；后端检查、联调与部署命令见该项目 README。不要将实际无法验证的第三方登录、视频或云游戏报告为通过。
+
+### 小说书架
+
+书架路径为 `/book`，阅读地址为 `/books/*`，书目从 `src/books/library.json` 派生。页面、封面组件、浏览器进度、书签、排版设置和搜索在 `src/books/`，样式在 `src/style.css`；来源核对、导入与封面替换流程见 [docs/books.md](docs/books.md)。使用 `node scripts/import-books.mjs <TXT目录或文件> ...` 导入，不直接编辑正文分块，也不修改原始 TXT；人工书名别名、作者、简介和封面维护在 `src/books/overrides.json`。原文标题与位置保留在目录数据中；正文、番外和附记按组生成统一显示编号，独立标题的附加内容可以拆成目录项。损坏文本显式标记，不补写；调整分组保留旧进度和书签迁移。
+
+进度按书存入访客浏览器；保留段落恢复、离开前立即保存、存储失败提示、请求取消与过期结果隔离。新增书目或调整导入规则后运行 `node scripts/check-books.mjs`；阅读器或布局变化构建后执行 `python3 scripts/check-books-browser.py`。全屏或动效变化另执行 `python3 scripts/check-books-motion.py`；涉及导航、分享和 SEO 时另执行对应公共检查。
 
 ### 小游戏
 
@@ -191,6 +199,7 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 | 导航、主题、复制或整体布局     | 在开发服务器执行 `python3 scripts/check-browser.py`；主题与配色变更另在构建预览执行 `python3 scripts/check-theme.py`、`python3 scripts/check-theme-motion.py` |
 | 首屏与页面加载提示             | 构建后在预览服务器执行 `python3 scripts/check-loading.py`，检查慢速 / 失败资源、连续导航、主题、窄屏和减少动态效果                                            |
 | 项目目录                       | `python3 scripts/check-project-directory.py`                                                                                                                  |
+| 小说导入与阅读进度             | `node scripts/check-books.mjs`；前端变更构建后执行 `python3 scripts/check-books-browser.py`                                                                   |
 | 工具清单或转换规则             | `node scripts/check-tools.mjs`（已包含 `check-jaytools.mjs`）                                                                                                 |
 | 分组选项与选中块动效           | `python3 scripts/check-segmented-controls.py`，检查滑块定位、换行、键盘、筛选与减少动态效果                                                                   |
 | 页内折叠面板与展开动效         | `python3 scripts/check-disclosures.py`，检查中间高度、连续切换、焦点与减少动态效果                                                                            |

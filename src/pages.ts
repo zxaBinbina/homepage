@@ -2,6 +2,11 @@ import { toolCatalog, toolIds, type ToolId } from './tools/catalog'
 /** One route table for Vue page selection and generated sharing documents. */
 import { gazeGuides, gazeGuidePath } from './gaze/catalog'
 import { errorPaths } from './errors/catalog'
+import { books, bookPage, bookPath, type BookPageName } from './books/catalog'
+
+const bookPages = Object.fromEntries(
+  books.map((book) => [bookPage(book), bookPath(book)]),
+) as Record<BookPageName, string>
 
 const gazeGuidePages = Object.fromEntries(
   gazeGuides.map((guide) => [`gaze.${guide.id}`, gazeGuidePath(guide.id)]),
@@ -11,11 +16,12 @@ const toolPages = Object.fromEntries(toolIds.map((id) => [id, toolCatalog[id].pa
   [Id in ToolId]: `/tools/${Id}`
 }
 
-export const pages = {
+const staticPages = {
   home: '/',
   directory: '/project',
   tools: '/tool',
   games: '/game',
+  bookshelf: '/book',
   twenty48: '/games/2048',
   minesweeper: '/games/minesweeper',
   solitaire: '/games/solitaire',
@@ -39,6 +45,10 @@ export const pages = {
   ...errorPaths,
   ...gazeGuidePages,
 } as const
+export const pages: typeof staticPages & Record<BookPageName, string> = {
+  ...staticPages,
+  ...bookPages,
+}
 export type PageName = keyof typeof pages
 export function isProjectPage(page: unknown) {
   return page === 'rdp' || page === 'wiki' || page === 'downloads'

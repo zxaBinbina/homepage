@@ -63,7 +63,10 @@ for file in root.rglob('*.html'):
         canonical_urls.append(expected)
 assert base in canonical_urls, 'Missing homepage'
 tools = json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))
-assert len(canonical_urls) == 45 + len(tools), canonical_urls
+books = json.loads(Path('src/books/library.json').read_text())
+assert len(canonical_urls) == 46 + len(tools) + len(books), canonical_urls
+assert urljoin(base, 'book') in canonical_urls
+assert all(urljoin(base, 'books/' + book['id']) in canonical_urls for book in books)
 assert all(urljoin(base, tool['path']) in canonical_urls for tool in tools), 'Missing tool canonical URL'
 assert set(urls) == set(canonical_urls), 'Sitemap must contain all canonical pages only'
 robots = (root / 'robots.txt').read_text()

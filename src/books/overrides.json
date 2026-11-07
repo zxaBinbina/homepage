@@ -1,0 +1,64 @@
+[
+  {
+    "match": "小天狼星陪哈利长大",
+    "id": "sirius-and-harry",
+    "category": "魔法世界",
+    "description": "在哈利十一岁的暑假，教父从天而降。沿着熟悉的时间线，走进另一种可能的魔法世界。",
+    "cover": "/images/books/sirius-and-harry.webp",
+    "coverSource": "https://fanqienovel.com/page/7414536961186090046"
+  },
+  {
+    "match": "带着Tom勇闯霍格沃茨",
+    "id": "tom-at-hogwarts",
+    "category": "魔法世界",
+    "description": "带着 Tom 走进霍格沃茨，在校园日常、友情与师生相处之间，开启一段新的冒险。",
+    "cover": "/images/books/tom-at-hogwarts.webp",
+    "coverSource": "https://fanqienovel.com/page/7458939401544944664",
+    "alias": "谢邀，已成为HP教授！"
+  },
+  {
+    "match": "Hp：天使降临魔法世界",
+    "id": "angel-at-hogwarts",
+    "category": "魔法世界",
+    "description": "一场意外之后，林安娜带着天使模板来到魔法世界。故事从霍格沃茨的校园生活开始。",
+    "cover": "/images/books/angel-at-hogwarts.webp",
+    "coverSource": "https://fanqienovel.com/page/7416991673764301886"
+  },
+  {
+    "match": "HP什么芙宁娜来到哈利波特了",
+    "id": "furina-at-hogwarts",
+    "category": "魔法世界",
+    "description": "审判落幕后，芙宁娜意外来到哈利·波特的世界，开始一段属于自己的魔法旅程。",
+    "cover": "/images/books/furina-at-hogwarts.webp",
+    "coverSource": "https://fanqienovel.com/page/7623777016352869401"
+  },
+  {
+    "match": "我的世界之武艺年代",
+    "id": "minecraft-martial-arts",
+    "category": "方块冒险",
+    "description": "林野点进一个意外出现的界面，来到以武艺为尊的方块世界。熟悉的方块，陌生的江湖。",
+    "cover": "/images/books/minecraft-martial-arts.webp",
+    "coverSource": "https://fanqienovel.com/page/7552509074315693081"
+  },
+  {
+    "match": "隐藏在霍格沃茨当教授",
+    "id": "hidden-professor",
+    "title": "霍格沃茨的教授是黑魔王很正常嘛",
+    "alias": "隐藏在霍格沃茨当教授",
+    "author": "白白了开水",
+    "category": "魔法世界",
+    "description": "从德姆斯特朗毕业后，特维尔·福利走进霍格沃茨，成为一名教授。精通黑魔法的他隐藏自己的力量，在教学与布局之间，寻找改变巫师世界的道路。",
+    "cover": "/images/books/hidden-professor.webp",
+    "coverSource": "",
+    "extraFromChapter": 644
+  },
+  {
+    "match": "异案调查组",
+    "id": "anomaly-investigations",
+    "category": "悬疑探险",
+    "description": "从一件失踪的古着开始，走进一桩桩异案，探寻日常表象之下的秘密。",
+    "cover": "/images/books/anomaly-investigations.webp",
+    "coverSource": "https://fanqienovel.com/page/7450405098930326590",
+    "author": "失控编辑部"
+  }
+]

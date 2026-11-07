@@ -59,3 +59,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 ## 小游戏
 
 游戏目录 `/game` 的元信息由 `site.config.ts` 提供；十三个 `/games/*` 页面（2048、扫雷、纸牌接龙、俄罗斯方块、数独、中国象棋、五子棋、贪吃蛇、消灭星星、华容道、跳一跳、国际象棋单机版、围棋）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。
+
+## 小说书架
+
+书架 `/book` 和七个 `/books/*` 阅读页从 `src/books/library.json` 派生路由，标题、简介由 `site.config.ts` 统一生成，沿用主页头像分享图片。书架为 `CollectionPage`，阅读页为 `WebPage`；章节查询参数不进入 canonical 或站点地图。构建生成 `book.html` 与对应的 `books/*.html`，分享与 SEO 检查覆盖这些地址。封面图和 TXT 来源见 [书架维护说明](books.md)。

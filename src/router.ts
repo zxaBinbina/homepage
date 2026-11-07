@@ -12,11 +12,14 @@ import { gazeGuides } from './gaze/catalog'
 import { isToolId, toolIds, type ToolId } from './tools/catalog'
 import { isGameId } from './games/catalog'
 import { isErrorPage } from './errors/catalog'
+import { isBookPage } from './books/catalog'
+import { waitForReaderNavigation } from './books/readingNavigation'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
 
 const components = {
   home: () => import('./HomePage.vue'),
   directory: () => import('./ProjectDirectory.vue'),
+  bookshelf: () => import('./books/BookShelf.vue'),
   tools: () => import('./tools/ToolDirectory.vue'),
   ...(Object.fromEntries(toolIds.map((id) => [id, () => import('./tools/ToolPage.vue')])) as Record<
     ToolId,
@@ -105,16 +108,22 @@ export const router = createRouter({
       meta: isToolId(name) ? { tool: name } : {},
       alias:
         name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
-      component: isErrorPage(name) ? () => import('./errors/ErrorPage.vue') : components[name],
+      component: isErrorPage(name)
+        ? () => import('./errors/ErrorPage.vue')
+        : isBookPage(name)
+          ? () => import('./books/BookReader.vue')
+          : components[name],
       props: isErrorPage(name)
         ? { error: name }
-        : isGazePage(name)
-          ? { guide: name === 'gaze' ? null : name.slice(5) }
-          : isProjectPage(name)
-            ? { view: name }
-            : isToolId(name) || isGameId(name)
-              ? { id: name }
-              : undefined,
+        : isBookPage(name)
+          ? { id: name.slice(5) }
+          : isGazePage(name)
+            ? { guide: name === 'gaze' ? null : name.slice(5) }
+            : isProjectPage(name)
+              ? { view: name }
+              : isToolId(name) || isGameId(name)
+                ? { id: name }
+                : undefined,
     })),
     {
       path: '/:pathMatch(.*)*',
@@ -130,6 +139,15 @@ export const router = createRouter({
       const main = await waitForMain()
       if (router.currentRoute.value.fullPath !== to.fullPath) return false
       focusContent(main)
+    }
+    if (isBookPage(to.name)) {
+      if (savedPosition) {
+        await waitForReaderNavigation(to.fullPath)
+        if (router.currentRoute.value.fullPath !== to.fullPath) return false
+        return { ...savedPosition, behavior: 'instant' }
+      }
+      // Normal entry restores the local bookmark; in-page links still use standard focus.
+      if (!to.hash) return false
     }
     if (savedPosition) return { ...savedPosition, behavior: 'instant' }
     const target = to.hash ? await waitForHashTarget(to.hash) : null

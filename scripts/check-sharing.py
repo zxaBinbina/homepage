@@ -27,6 +27,7 @@ class Head(HTMLParser):
         if self.in_title: self.title += data
 
 pages = {
+    '我的书架 · a彬彬a': 'book',
     '小游戏 · a彬彬a': 'game',
     '2048 · 小游戏 · a彬彬a': 'games/2048',
     '扫雷 · 小游戏 · a彬彬a': 'games/minesweeper',
@@ -60,6 +61,9 @@ pages = {
 }
 pages.update({t['name'] + ' · 网页工具 · a彬彬a': t['path'].lstrip('/')
               for t in json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))})
+
+books = json.loads(Path('src/books/library.json').read_text())
+pages.update({book['title'] + ' · 我的书架 · a彬彬a': 'books/' + book['id'] for book in books})
 
 paths = [Path(sys.argv[1])] if len(sys.argv) > 1 else [Path('dist') / (f'{route}.html' if route else 'index.html') for route in pages.values()]
 for path in paths:

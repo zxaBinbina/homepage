@@ -7,7 +7,10 @@ import ThemeToggle from './ThemeToggle.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
 const props = withDefaults(
-  defineProps<{ home?: boolean; active?: 'home' | 'projects' | 'tools' | 'games' | null }>(),
+  defineProps<{
+    home?: boolean
+    active?: 'home' | 'projects' | 'tools' | 'games' | 'books' | null
+  }>(),
   {
     home: false,
     active: 'home',
@@ -25,6 +28,7 @@ const nav = [
   { id: 'projects', label: '项目' },
   { id: 'tools', label: '工具' },
   { id: 'games', label: '游戏' },
+  { id: 'books', label: '书架' },
   { id: 'world', label: '悠哉世界' },
 ]
 function navHref(id: string) {
@@ -32,6 +36,7 @@ function navHref(id: string) {
   if (id === 'world') return profile.server
   if (id === 'tools') return '/tool'
   if (id === 'games') return '/game'
+  if (id === 'books') return '/book'
   return id === 'projects' ? '/project' : `${props.home ? '' : '/'}#${id}`
 }
 function isActive(id: string) {

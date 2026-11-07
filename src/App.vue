@@ -10,20 +10,24 @@ import { navigateInternalLink } from './router'
 import { isProjectPage, isGazePage } from './pages'
 import { isGameId } from './games/catalog'
 import { isToolId } from './tools/catalog'
+import { isBookPage } from './books/catalog'
 const route = useRoute()
 const project = computed(() => isProjectPage(route.name))
 const gaze = computed(() => isGazePage(route.name))
-// 个人主页、目录、工具与游戏共用全站统一导航；Gaze 与 RDP 子站各用项目导航。
+const reading = computed(() => isBookPage(route.name))
+// 主页、目录、工具、游戏与书架共用导航；Gaze 与 RDP 子站各用项目导航。
 const activeNav = computed(() =>
   route.name === 'home'
     ? 'home'
     : route.name === 'directory'
       ? 'projects'
-      : route.name === 'games' || isGameId(route.name)
-        ? 'games'
-        : route.name === 'tools' || isToolId(route.name)
-          ? 'tools'
-          : null,
+      : route.name === 'bookshelf' || isBookPage(route.name)
+        ? 'books'
+        : route.name === 'games' || isGameId(route.name)
+          ? 'games'
+          : route.name === 'tools' || isToolId(route.name)
+            ? 'tools'
+            : null,
 )
 onMounted(() => document.addEventListener('click', navigateInternalLink))
 onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))
@@ -31,7 +35,10 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
 <template>
   <AnimatedCursor />
   <a class="skip-link" href="#main">跳至内容</a>
-  <div class="app-header-transition" :class="{ 'is-project': project || gaze }">
+  <div
+    class="app-header-transition"
+    :class="{ 'is-project': project || gaze, 'is-reader': reading }"
+  >
     <Transition name="header-swap">
       <div v-if="!project && !gaze" class="header-layer" key="unified-header">
         <SiteHeader :home="route.name === 'home'" :active="activeNav" />

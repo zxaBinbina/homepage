@@ -3,6 +3,7 @@ import { isToolId, toolCatalog } from './src/tools/catalog'
 import { isGameId, gameCatalog } from './src/games/catalog'
 import { gazeGuide } from './src/gaze/catalog'
 import { errorCatalog, isErrorPage } from './src/errors/catalog'
+import { isBookPage, bookForPage } from './src/books/catalog'
 export const siteContent = {
   title: 'a彬彬a · 在代码与方块之间',
   description:
@@ -17,6 +18,10 @@ export const siteContent = {
 }
 
 const projectPages = {
+  bookshelf: {
+    title: '我的书架 · a彬彬a',
+    description: '分享我读过的网络小说。挑一本慢慢看，支持在线阅读、章节目录与自动保存阅读进度。',
+  },
   games: {
     title: '小游戏 · a彬彬a',
     description:
@@ -78,19 +83,24 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
             title: `${errorCatalog[page].code} · ${errorCatalog[page].title} · a彬彬a`,
             description: errorCatalog[page].description,
           }
-        : isToolId(page)
+        : isBookPage(page)
           ? {
-              title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
-              description: toolCatalog[page].description,
+              title: `${bookForPage(page).title} · 我的书架 · a彬彬a`,
+              description: bookForPage(page).description,
             }
-          : isGameId(page)
+          : isToolId(page)
             ? {
-                title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
-                description: gameCatalog[page].description,
+                title: `${toolCatalog[page].name} · 网页工具 · a彬彬a`,
+                description: toolCatalog[page].description,
               }
-            : isGazePage(page)
-              ? gazePageMeta(page)
-              : projectPages[page]
+            : isGameId(page)
+              ? {
+                  title: `${gameCatalog[page].name} · 小游戏 · a彬彬a`,
+                  description: gameCatalog[page].description,
+                }
+              : isGazePage(page)
+                ? gazePageMeta(page)
+                : projectPages[page]
   const image = isGazePage(page)
     ? {
         image: 'images/gaze-share.png',
@@ -137,7 +147,7 @@ export function createStructuredData(baseUrl = siteContent.url, page: PageName =
       },
       {
         '@type':
-          page === 'directory' || page === 'tools' || page === 'games'
+          page === 'directory' || page === 'tools' || page === 'games' || page === 'bookshelf'
             ? 'CollectionPage'
             : 'WebPage',
         '@id': `${meta.url}#webpage`,

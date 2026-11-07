@@ -1,10 +1,13 @@
 """Verify same-origin navigation on the dev or production preview server."""
 import io
+import json
+import subprocess
 import os
 import wave
 from playwright.sync_api import sync_playwright, expect
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:5173').rstrip('/')
+tool_count = len(json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs'])))
 audio = io.BytesIO()
 with wave.open(audio, 'wb') as wav:
     wav.setnchannels(1)
@@ -68,14 +71,26 @@ with sync_playwright() as p:
     page.wait_for_function('document.activeElement === document.querySelector("main")')
     page.wait_for_function('scrollY === 0')
 
+    page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='书架', exact=True).click()
+    expect(page.locator('.book-card')).to_have_count(7)
+    metadata('/book')
+    page.locator('.book-card-bottom a').first.click()
+    expect(page.locator('.reader-text-layout')).to_be_visible()
+    metadata('/books/sirius-and-harry')
+    assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
+    assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
+    page.locator('.reader-back').click()
+    expect(page.locator('.book-card')).to_have_count(7)
+    metadata('/book')
+
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='工具', exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(57)
+    expect(page.locator('.tool-card')).to_have_count(tool_count)
     metadata('/tool')
     page.locator('.tool-card[href="/tools/json-formatter"]').click()
     expect(page.locator('.tool-main')).to_be_visible()
     metadata('/tools/json-formatter')
     page.get_by_role('link', name='全部工具', exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(57)
+    expect(page.locator('.tool-card')).to_have_count(tool_count)
     page.locator('.tool-card[href="/tools/color-converter"]').click()
     expect(page.locator('.tool-main h1')).to_have_text('颜色转换')
     metadata('/tools/color-converter')
