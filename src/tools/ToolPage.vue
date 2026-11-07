@@ -35,9 +35,11 @@ function reload() {
       </div>
       <p class="tool-privacy">
         <ShieldCheck :size="15" aria-hidden="true" />{{
-          id === 'generate-github-badges'
-            ? '在本地生成引用；打开徽章链接时，内容会发送给对应徽章服务。'
-            : '在浏览器内处理，输入不上传、不保存。'
+          id === 'web-browser'
+            ? '网页请求通过私人中转服务发送至目标网站；结束会话会清理浏览环境的数据。'
+            : id === 'generate-github-badges'
+              ? '在本地生成引用；打开徽章链接时，内容会发送给对应徽章服务。'
+              : '在浏览器内处理，输入不上传、不保存。'
         }}
       </p>
     </main>

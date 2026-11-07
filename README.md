@@ -43,7 +43,7 @@
 
 ## 网页工具
 
-访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **57 个工具**。目录按名称升序排列，中文使用拼音顺序，搜索和分类筛选后继续保持该顺序。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
+访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **58 个工具**。目录按名称升序排列，中文使用拼音顺序，搜索和分类筛选后继续保持该顺序。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
 
 其中 56 个工具来自以下两个 MIT 许可项目：
 
@@ -54,7 +54,9 @@
 
 本站自制的 **Codex 对话加密字段清理**（`/tools/codex-jsonl-cleaner`）支持导入或粘贴 JSONL，以精确、宽泛或只删字段三种模式处理加密字段与推理内容；提供逐行校验、原始错误行号、前后行数统计、可选预览和 `.jsonl` 下载。「选择文件」旁的「导入教程」按钮可展开文件查找与导入步骤，按访问设备预选 Windows、macOS 或 Linux，无法判断时默认 Windows，也可手动切换。默认保留推理参数与用量元数据，非法行修正前不生成下载文件；规则与边界见 [工具说明](docs/tools.md#codex-对话加密字段清理)。
 
-输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布，无新增工具后端，继续使用 Cloudflare Pages。
+本站自制的 **网页浏览器**（`/tools/web-browser`）提供密码保护的临时中转会话、网址导航、Bing / 云原神 / 抖音快捷入口及设备尺寸、横竖屏、缩放与 User-Agent 模拟。仅支持 Windows / Linux 上的 Chrome、Edge，移动设备显示说明页面。独立后端位于同级 `../bin-api/`，使用 Cloudflare Worker；接口与浏览内容分别使用 `api.zxabinbina.cc.cd` 和 `browse.zxabinbina.cc.cd`。网页请求和表单数据会经中转发送至目标网站，网站兼容性与云游戏实时链路需实际验证，详见 [工具说明](docs/tools.md#私人网页浏览器)。
+
+其余工具的输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布。个人主页继续使用 Cloudflare Pages，网页浏览器的 Worker 单独部署。
 
 目录、中文操作界面、Lucide 图标、深浅主题与芙芙蓝 / 胡桃红配色保持一致；保留共享播放器与页脚，加入卡片错峰进入、筛选退出 / 重排和页面切换动画。完整地址、使用限制与维护说明见 [网页工具说明](docs/tools.md)。
 
@@ -175,6 +177,25 @@ npm run preview
 ```
 
 `build` 先执行 Vue / TypeScript 类型检查，再生成 `dist/`；预览地址默认是 `http://127.0.0.1:4173`。
+
+## 公开仓库与本地文件
+
+源码、文档、锁文件、第三方源码归档与许可证保留在仓库中。依赖、构建产物、Wrangler 本地状态、Python 缓存、日志、测试截图和浏览器会话数据由 [.gitignore](.gitignore) 排除；本地协作工具的状态目录也不提交。
+
+本地环境文件 `.env`、`.env.*`、`.dev.vars*` 和 `.secrets/` 不提交，只有不含凭据的 `.example` 示例保留。与 `../bin-api` 联调时，可把 [.env.example](.env.example) 复制为 `.env.local`；使用线上中转时无需创建此文件。`VITE_*` 会进入浏览器代码，不能放密码、签名密钥或 Cloudflare API Token。中转密码及 Worker 密钥由 `bin-api` 管理，不复制到本仓库。
+
+`wrangler.toml` 中的 KV namespace ID 与站点域名属于部署标识，不是访问凭据，保留它们以维持现有 Pages 绑定。使用自己的 Cloudflare 项目时替换为自己的 namespace ID。Cloudflare 登录凭据使用 Wrangler 登录或部署环境的 Secret 配置。
+
+上传前可检查待提交文件与排除效果：
+
+```bash
+git status --short
+git add --dry-run .
+git diff --cached --stat
+git check-ignore -v .env.local .dev.vars .secrets/access.txt artifacts/example.png
+```
+
+`.gitignore` 只影响尚未跟踪的文件，不能从已有提交中删除内容；仓库整理时已取消跟踪 `scripts/__pycache__/`，本地缓存仍可保留。通过 Git 提交和推送时遵循这些排除规则；GitHub 网页拖拽上传或直接压缩整个工作目录不会自动遵循，勿将本地目录整体打包上传。若真实凭据曾进入历史提交，需先撤销或轮换，再单独处理历史，不能仅添加排除规则。
 
 ## 验证
 

@@ -1,6 +1,7 @@
 import { defineAsyncComponent } from 'vue'
 
 export const toolComponents = {
+  'web-browser': defineAsyncComponent(() => import('./browser/BrowserTool.vue')),
   'codex-jsonl-cleaner': defineAsyncComponent(() => import('./codex/CodexJsonlCleaner.vue')),
   'json-formatter': defineAsyncComponent(() => import('./freemium/pages/tools/JsonFormatter.vue')),
   'html-beautify': defineAsyncComponent(() => import('./freemium/pages/tools/HtmlBeautify.vue')),

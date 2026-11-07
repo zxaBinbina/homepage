@@ -210,7 +210,7 @@ with sync_playwright() as p:
     assert leaving.count() and leaving.evaluate_all('els => els.every(el => el.inert)')
     expect(page.get_by_label('左侧文字')).to_be_visible()
     page.get_by_role('link',name='全部工具',exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(57)
+    expect(page.locator('.tool-card')).to_have_count(58)
     page.get_by_role('searchbox',name='搜索工具').fill('CSS 缓动')
     expect(page.locator('.tool-card:not(.tool-list-leave-active)')).to_have_count(1)
     page.locator('.tool-card:not(.tool-list-leave-active)').click()

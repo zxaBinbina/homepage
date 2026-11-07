@@ -39,7 +39,7 @@ assert.deepEqual(
 assert.equal(hash(source(manifest.inventorySource)), manifest.inventorySha256)
 assert.equal(routes.length, 31)
 const { toolIds, toolCatalog } = await moduleAt('src/tools/catalog.ts')
-assert.equal(toolIds.length, 57)
+assert.equal(toolIds.length, 58)
 assert.equal(manifest.tools.filter((t) => t.status === 'added').length, 15)
 assert.equal(manifest.tools.filter((t) => t.status === 'duplicate').length, 16)
 assert.equal(new Set(toolIds.map((id) => toolCatalog[id].path)).size, toolIds.length)

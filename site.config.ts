@@ -25,7 +25,7 @@ const projectPages = {
   tools: {
     title: '网页工具 · a彬彬a',
     description:
-      '41 个浏览器本地工具：代码格式化、JSON / YAML / CSV / Excel 转换、二维码、正则测试、证书检查、哈希与随机生成，输入不上传、不保存。',
+      '代码格式化、文件转换、二维码、正则测试等本地工具，以及支持密码访问与设备模拟的私人网页浏览器。',
   },
   directory: {
     title: '项目目录 · a彬彬a',

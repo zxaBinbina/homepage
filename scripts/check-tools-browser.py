@@ -21,7 +21,7 @@ with sync_playwright() as p:
 
     def open_tool(id):
         page.goto(base + '/tools/' + id)
-        expect(page.locator('.tool-page')).to_be_visible()
+        expect(page.locator('.browser-login' if id == 'web-browser' else '.tool-page')).to_be_visible()
 
     def no_overflow():
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), page.url

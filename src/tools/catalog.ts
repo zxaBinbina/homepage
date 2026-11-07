@@ -1,6 +1,15 @@
 // Local tool inventory; source and deduplication records are in third_party/.
 import { jayToolCatalog } from './jaytools/catalog'
 export const toolCatalog = {
+  'web-browser': {
+    name: '网页浏览器',
+    label: 'WEB BROWSER',
+    description: '通过私人中转浏览网页，支持网址导航与设备模拟，仅限桌面端使用。',
+    category: '检查调试',
+    icon: 'globe',
+    keywords: '网页 代理 中转 浏览器 浏览 Bing 云原神 抖音 设备模拟 browser proxy',
+    path: '/tools/web-browser',
+  },
   'json-formatter': {
     name: 'JSON 格式化',
     label: 'JSON FORMATTER',

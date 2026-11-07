@@ -123,7 +123,7 @@ function enter(element: Element) {
           <button type="button" @click="reset">查看全部工具</button>
         </div></Transition
       >
-      <p class="tools-note">在浏览器内处理，让灵感少一点等待。</p>
+      <p class="tools-note">常用工具在本地处理；私人网页浏览器通过中转服务访问网站。</p>
       <p class="tools-credit">
         包含本站自制工具，以及源自
         <a

@@ -99,6 +99,8 @@
 
 变更清单或转换规则运行 `node scripts/check-tools.mjs`，该入口已包含 `check-jaytools.mjs`，无需重复执行；归档校验需要系统提供 `tar`。交互或布局变更运行 `python3 scripts/check-tools-browser.py`，涉及 jaytools 时再运行 `python3 scripts/check-jaytools-browser.py`，检查真实文件、图片与 ZIP 导出、取消、主题、响应式和动效。后者还需要 Python Pillow（`PIL`），截图与下载结果位于 `artifacts/jaytools/`。
 
+私人网页浏览器是本地工具规则的例外：前端位于 `src/tools/browser/`，后端独立维护在同级 `../bin-api/`，通过密码保护的 Cloudflare Worker 访问目标网站。代理运行环境仅注册在 `browse.zxabinbina.cc.cd`，不能把其 Service Worker 注册到个人主页或 API 域名。保留临时会话、关闭与到期清理、来源校验、私网地址阻止及密钥不落前端的边界。新增后端 API 按 `src/modules/` 分模块维护；后端检查、联调与部署命令见该项目 README。不要将实际无法验证的第三方登录、视频或云游戏报告为通过。
+
 ### 小游戏
 
 游戏目录为 `/game`，游戏地址为 `/games/*`。名称与说明维护在 `src/games/catalog.ts`，游戏组件及纯规则逻辑位于 `src/games/`，样式在 `src/style.css`。
