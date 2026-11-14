@@ -4,6 +4,7 @@ import { ArrowRight, BookOpen, Grid2X2, List, Search, X } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
 import SegmentedControl from '../components/SegmentedControl.vue'
 import BookCover from './BookCover.vue'
+import BookCollectionCover from './BookCollectionCover.vue'
 import BookDetails from './BookDetails.vue'
 import BookCollectionDialog from './BookCollectionDialog.vue'
 import {
@@ -196,7 +197,8 @@ function reset() {
           :data-book-id="book.id"
         >
           <div class="book-card-cover">
-            <BookCover :book="book" :number="shelfEntries.indexOf(book) + 1" />
+            <BookCollectionCover v-if="isCollection(book)" :collection="book" />
+            <BookCover v-else :book="book" :number="shelfEntries.indexOf(book) + 1" />
           </div>
           <div class="book-card-info">
             <p class="book-category">
@@ -220,7 +222,9 @@ function reset() {
             <p class="book-author">{{ book.author }}</p>
             <p v-if="book.translator" class="book-translator">译者：{{ book.translator }}</p>
             <p class="book-description">{{ book.description }}</p>
-            <p v-if="book.alias" class="book-alias">又名《{{ book.alias }}》</p>
+            <p v-if="book.alias && !isCollection(book)" class="book-alias">
+              又名《{{ book.alias }}》
+            </p>
             <div class="book-card-bottom">
               <div v-if="entryStates[book.id]!.started" class="book-card-progress">
                 <span class="book-progress-track" aria-hidden="true"

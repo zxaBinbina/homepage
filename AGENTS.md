@@ -107,7 +107,7 @@
 
 书架路径为 `/book`，阅读地址为 `/books/*`，书目从 `src/books/library.json` 派生。页面、封面组件、浏览器进度、书签、排版设置和搜索在 `src/books/`，样式在 `src/style.css`；来源核对、导入与封面替换流程见 [docs/books.md](docs/books.md)。使用 `node scripts/import-books.mjs <TXT目录或文件> ...` 导入，不直接编辑正文分块，也不修改原始 TXT；人工书名别名、作者、简介和封面维护在 `src/books/overrides.json`。原文标题与位置保留在目录数据中；正文、番外和附记按组生成统一显示编号，独立标题的附加内容可以拆成目录项。损坏文本显式标记，不补写；调整分组保留旧进度和书签迁移。
 
-组合书架在 `src/books/collections.json` 中维护，分册仍独立登记在 `library.json`；书架显示组合，阅读路由、正文、进度和书签按册保留。组合选择窗口位于 `BookCollectionDialog.vue`，作者、译者及完整简介分别通过 `overrides.json` 的 `author`、`translator` 与 `synopsis` 配置；新增或调整组合后另运行 `python3 scripts/check-books-collections.py`。
+组合书架在 `src/books/collections.json` 中维护，分册仍独立登记在 `library.json`；书架显示组合，阅读路由、正文、进度和书签按册保留。组合选择窗口位于 `BookCollectionDialog.vue`，作者、译者及完整简介分别通过 `overrides.json` 的 `author`、`translator` 与 `synopsis` 配置；新增或调整组合后另运行 `python3 scripts/check-books-collections.py`。叠放封面和悬停 / 长按预览位于 `BookCollectionCover.vue`，修改其交互后运行 `python3 scripts/check-books-cover-preview.py`。
 
 进度按书存入访客浏览器；保留段落恢复、离开前立即保存、存储失败提示、请求取消与过期结果隔离。新增书目或调整导入规则后运行 `node scripts/check-books.mjs`；阅读器或布局变化构建后执行 `python3 scripts/check-books-browser.py`。全屏或动效变化另执行 `python3 scripts/check-books-motion.py`；涉及导航、分享和 SEO 时另执行对应公共检查。
 

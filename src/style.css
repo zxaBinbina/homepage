@@ -8393,6 +8393,23 @@ h1 > span {
   border: 1px solid var(--border);
   border-left: 3px solid rgb(0 0 0 / 12%);
 }
+.book-collection-cover {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  pointer-events: none;
+}
+.book-collection-cover > .book-cover {
+  position: absolute;
+  width: 70%;
+  top: 20%;
+  left: 6%;
+  transform: translate(calc(var(--cover-offset) * 25.714%), calc(var(--cover-offset) * -14.286%))
+    rotate(calc(-6deg + var(--cover-offset) * 12deg));
+  box-shadow: -1px 2px 5px var(--shadow);
+  transition: transform 360ms var(--motion-ease);
+}
 .book-cover-type {
   display: flex;
   flex-direction: column;
@@ -8618,7 +8635,8 @@ h1 > span {
   gap: var(--space-xl);
   padding-right: var(--space-xl);
 }
-.book-details-heading > .book-cover {
+.book-details-heading > .book-cover,
+.book-details-heading > .book-collection-cover {
   width: 124px;
   flex-shrink: 0;
 }
@@ -9931,7 +9949,8 @@ h1 > span {
     gap: var(--space-md);
     padding-right: var(--space-xs);
   }
-  .book-details-heading > .book-cover {
+  .book-details-heading > .book-cover,
+  .book-details-heading > .book-collection-cover {
     width: 82px;
   }
   .book-details-heading h2 {
@@ -9972,6 +9991,7 @@ h1 > span {
 }
 @media (prefers-reduced-motion: reduce) {
   .book-card,
+  .book-collection-cover > .book-cover,
   .reader-root,
   .reader-panel,
   .book-details,

@@ -2,6 +2,7 @@
 import { nextTick, ref, shallowRef } from 'vue'
 import { ArrowRight, X } from 'lucide-vue-next'
 import BookCover from './BookCover.vue'
+import BookCollectionCover from './BookCollectionCover.vue'
 import { bookLength, bookPath, type BookCollection } from './catalog'
 import { progressPercent, type ReadingProgress } from './progress'
 import { useBookDialog } from './useBookMotion'
@@ -43,7 +44,7 @@ defineExpose({ open })
       </button>
       <div class="book-details-scroll">
         <div class="book-details-heading">
-          <BookCover :book="collection" />
+          <BookCollectionCover :collection="collection" />
           <div>
             <p class="overline">{{ collection.volumes.length }} 册组合</p>
             <h2 id="book-collection-title">{{ collection.title }}</h2>
