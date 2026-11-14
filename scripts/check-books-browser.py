@@ -80,7 +80,7 @@ with sync_playwright() as p:
     page.get_by_role('radio', name='在读', exact=True).click()
     expect(page.locator('.book-card')).to_have_count(0)
     page.get_by_role('radio', name='未读', exact=True).click()
-    expect(page.locator('.book-card')).to_have_count(7)
+    expect(page.locator('.book-card')).to_have_count(len(books))
     page.get_by_role('radio', name='全部', exact=True).click()
     page.get_by_role('button', name='列表视图').click()
     expect(page.locator('.library-grid')).to_have_class('library-grid is-list')
@@ -243,7 +243,7 @@ with sync_playwright() as p:
     expect(page.locator('main')).to_be_focused()
     page.locator('[data-paragraph="10"]').evaluate('(e)=>scrollTo({top:scrollY+e.getBoundingClientRect().top-88,behavior:"instant"})')
     page.locator('.reader-back').click()
-    expect(page.locator('.book-card')).to_have_count(7)
+    expect(page.locator('.book-card')).to_have_count(len(books))
     assert stored()['paragraph'] == 10, stored()
     first_saved = stored().copy()
     page.locator('.book-card-bottom a').nth(1).click()
@@ -350,7 +350,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(250)
     page.locator('.reader-back').click()
     page.get_by_role('radio', name='已读', exact=True).click()
-    expect(page.locator('.book-card h2')).to_contain_text(['异案调查组'])
+    expect(page.locator('.book-card h2')).to_contain_text([books[-1]['title']])
 
     # Missing resources and late results never overwrite the saved position.
     target = books[0]
@@ -370,7 +370,7 @@ with sync_playwright() as p:
     page.goto(f'{base}/books/{target["id"]}?chapter=30', wait_until='domcontentloaded')
     expect(page.get_by_text('正在打开书页…', exact=True)).to_be_visible()
     page.locator('.reader-back').click()
-    expect(page.locator('.book-card')).to_have_count(7)
+    expect(page.locator('.book-card')).to_have_count(len(books))
     page.locator('.book-card-bottom a').nth(4).click()
     ready()
     for pending in delayed:

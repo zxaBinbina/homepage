@@ -82,6 +82,35 @@ for (const [number, original] of groupedFixture.chapters.entries()) {
 
 const books = JSON.parse(await readFile('src/books/library.json', 'utf8'))
 assert.equal(new Set(books.map((b) => b.id)).size, books.length)
+const notes = JSON.parse(await readFile('src/books/author-notes.json', 'utf8'))
+assert.deepEqual(Object.keys(notes).sort(), books.map((b) => b.id).sort())
+const noteSource = (await readFile('src/books/authorNotes.ts', 'utf8')).replace(
+  "import reviewed from './author-notes.json'",
+  `const reviewed = ${JSON.stringify(notes)}`,
+)
+const noteCode = ts.transpileModule(noteSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext },
+}).outputText
+const { authorNoteRanges, inlineNoteRanges, readingBlocks, inlineParts } = await import(
+  `data:text/javascript;base64,${Buffer.from(noteCode).toString('base64')}`
+)
+const sample = ['正文甲', '作者留言', '正文乙']
+assert.deepEqual(
+  readingBlocks(sample, [[1, 2]]).map((b) => b.note),
+  [false, true, false],
+)
+for (const malformed of [
+  [-1, 1],
+  [1, 99],
+  [2, 1],
+  [NaN, 2],
+  [0.5, 2],
+]) {
+  assert.deepEqual(readingBlocks(sample, [malformed]), readingBlocks(sample, []))
+  assert.deepEqual(inlineParts('正文和注释', [malformed]), inlineParts('正文和注释', []))
+}
+assert.deepEqual(authorNoteRanges({ ...books[0], revision: 'stale' }, 128), [])
+assert.deepEqual(inlineNoteRanges({ ...books[7], revision: 'stale' }, 296, 1), [])
 let sections = 0
 for (const book of books) {
   const base = `public/books/${book.id}/${book.revision}`
@@ -126,10 +155,81 @@ for (const book of books) {
     content.push(...chunk)
   }
   assert.equal(content.length, book.chapterCount)
+  const annotation = notes[book.id]
+  assert.equal(annotation.revision, book.revision, `${book.id}: review notes after reimporting`)
+  let previousNote = [-1, 0, 0]
+  for (const range of annotation.ranges) {
+    assert.equal(range.length, 3)
+    assert.ok(range.every(Number.isInteger))
+    const [chapter, from, to] = range
+    assert.ok(
+      chapter >= 0 &&
+        chapter < content.length &&
+        from >= 0 &&
+        from < to &&
+        to <= content[chapter].length,
+    )
+    assert.ok(
+      chapter > previousNote[0] || (chapter === previousNote[0] && from >= previousNote[2]),
+      `${book.id}: overlapping notes`,
+    )
+    previousNote = range
+  }
+  let previousInline = [-1, -1, 0, 0]
+  for (const range of annotation.inline) {
+    assert.equal(range.length, 4)
+    assert.ok(range.every(Number.isInteger))
+    const [chapter, paragraph, from, to] = range
+    const text = content[chapter]?.[paragraph]
+    assert.ok(text && from >= 0 && from < to && to <= text.length)
+    assert.ok(
+      chapter > previousInline[0] ||
+        (chapter === previousInline[0] &&
+          (paragraph > previousInline[1] ||
+            (paragraph === previousInline[1] && from >= previousInline[3]))),
+    )
+    assert.match(text.slice(from, to), /^[（(](?:PS|注|此神奇动物|读者)/)
+    previousInline = range
+  }
   for (const [i, paragraphs] of content.entries()) {
     assert.equal(paragraphs.length, index.chapters[i].paragraphs)
     assert.ok(paragraphs.every((p) => typeof p === 'string' && p.length && !p.includes('\0')))
     characters += paragraphs.join('').length
+    // Folding never deletes, renumbers, rewrites or reorders a source paragraph.
+    const blocks = readingBlocks(paragraphs, authorNoteRanges(book, i))
+    assert.deepEqual(
+      blocks.flatMap((block) => block.paragraphs),
+      paragraphs.map((text, number) => ({ text, number })),
+    )
+    for (const [p, text] of paragraphs.entries())
+      assert.equal(
+        inlineParts(text, inlineNoteRanges(book, i, p))
+          .map((part) => part.text)
+          .join(''),
+        text,
+      )
+    if (book.id === 'furina-at-hogwarts' && i === 15) {
+      assert.deepEqual(
+        blocks.filter((b) => b.note).map((b) => b.paragraphs.map((p) => p.text)),
+        [['——', '清明节快乐']],
+      )
+      assert.equal(blocks[0].paragraphs.at(-1).number, 22)
+    }
+    if (book.id === 'sirius-and-harry' && i === 135)
+      assert.ok(
+        blocks.some(
+          (b) =>
+            !b.note && b.paragraphs.some((p) => p.number === 47 && p.text.includes('节日快乐')),
+        ),
+      )
+    if (book.id === 'backroons-escape' && i === 135)
+      assert.ok(
+        blocks.some(
+          (b) =>
+            !b.note &&
+            b.paragraphs.some((p) => p.number === 67 && p.text.includes('以下为level69')),
+        ),
+      )
   }
   assert.equal(characters, book.characterCount)
   sections += content.length
@@ -267,5 +367,5 @@ assert.equal(writeSettings(customSettings), false)
 assert.deepEqual(readBookmarks(book), [])
 assert.equal(writeBookmarks(book, [bookmark]), false)
 console.log(
-  `${books.length} books / ${sections} sections: parser edge cases, all chapter chunks, corruption markers and progress/bookmark isolation and settings validation passed.`,
+  `${books.length} books / ${sections} sections: parser edge cases, all chapter chunks, author-note boundaries and exact text, corruption markers, progress/bookmark isolation and settings validation passed.`,
 )

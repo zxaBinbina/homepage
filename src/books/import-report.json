@@ -187,5 +187,51 @@
     "repeated": [],
     "lastNumber": 553,
     "outOfOrder": false
+  },
+  {
+    "id": "backrooms-exploration-notes",
+    "filename": "番茄《Backrooms后室探索笔记》.txt",
+    "sha256": "8d8cbd42f50527140ccfc1a47030ff63e7804e72382b3cc734eb1fff52efcd45",
+    "filenameEnd": null,
+    "sourceChapterCount": 913,
+    "chapterCount": 913,
+    "numberedChapterCount": 913,
+    "appendixCount": 0,
+    "groups": {
+      "main": 913,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 913,
+    "outOfOrder": false
+  },
+  {
+    "id": "backroons-escape",
+    "filename": "番茄《Backroons后室逃脱》.txt",
+    "sha256": "4068a6e40aa215ac26e77f1a92b730f618de2f8413a3f2930f7d3a52eb5151d7",
+    "filenameEnd": null,
+    "sourceChapterCount": 212,
+    "chapterCount": 215,
+    "numberedChapterCount": 212,
+    "appendixCount": 2,
+    "groups": {
+      "main": 212,
+      "extra": 2,
+      "notes": 1
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 1,
+    "missing": [
+      148
+    ],
+    "repeated": [],
+    "lastNumber": 213,
+    "outOfOrder": false
   }
 ]

@@ -27,6 +27,9 @@ import {
 import SegmentedControl from '../components/SegmentedControl.vue'
 import CollapsePanel from '../components/CollapsePanel.vue'
 import BookCover from './BookCover.vue'
+import ReaderParagraph from './ReaderParagraph.vue'
+import ReaderAuthorNote from './ReaderAuthorNote.vue'
+import { authorNoteRanges, inlineNoteRanges, readingBlocks, highlightText } from './authorNotes'
 import { useReaderFocus } from './useReaderFocus'
 import { useBookDialog, useBookFade } from './useBookMotion'
 import { books, bookLength, chapterPath, type ChapterIndex } from './catalog'
@@ -72,6 +75,9 @@ const panelTabs = [
   { value: 'info', label: '简介' },
 ] as const
 const currentEntry = computed(() => index.value?.chapters[chapter.value])
+const noteRanges = computed(() => authorNoteRanges(book, chapter.value))
+const blocks = computed(() => readingBlocks(paragraphs.value, noteRanges.value))
+const expandedNotes = ref(new Set<number>())
 const parentEntry = computed(() => {
   const parent = currentEntry.value?.parentChapter
   return parent != null ? index.value?.chapters[parent] : undefined
@@ -185,6 +191,8 @@ let ready = false,
   firstOpen = true,
   disposed = false,
   openLastPage = false
+let pendingNoteLayout:
+  { request: number; token: number; from: number; summary?: HTMLElement } | undefined
 let saveTimer: ReturnType<typeof setTimeout> | undefined,
   noticeTimer: ReturnType<typeof setTimeout> | undefined,
   resizeTimer: ReturnType<typeof setTimeout> | undefined
@@ -231,31 +239,44 @@ function readingLine() {
 }
 function capturePosition(): ReadingProgress | null {
   if (!ready || !article.value || !paragraphs.value.length) return null
-  const nodes = Array.from(article.value.querySelectorAll<HTMLElement>('[data-paragraph]'))
+  const nodes = Array.from(article.value.querySelectorAll<HTMLElement>('[data-paragraph]')).filter(
+    (node) =>
+      !node.closest('[inert], details:not([open])') &&
+      Array.from(node.getClientRects()).some((rect) => rect.width > 0 && rect.height > 0),
+  )
+  if (!nodes.length) return null
   let paragraph = 0,
     offset = 0,
     endVisible = false
   if (settings.value.mode === 'pages' && viewport.value) {
     const bounds = viewport.value.getBoundingClientRect()
-    outer: for (const [n, node] of nodes.entries()) {
+    let found = false
+    outer: for (const node of nodes) {
       const rects = Array.from(node.getClientRects())
       for (const [part, rect] of rects.entries())
         if (rect.right > bounds.left + 2 && rect.left < bounds.right - 2) {
-          paragraph = n
+          paragraph = Number(node.dataset.paragraph)
           offset = part / rects.length
+          found = true
           break outer
         }
+    }
+    if (!found) {
+      const previous = [...nodes]
+        .reverse()
+        .find((node) => Array.from(node.getClientRects()).some((rect) => rect.left < bounds.left))
+      paragraph = Number((previous || nodes[0]!).dataset.paragraph)
+      offset = previous ? 1 : 0
     }
     endVisible = pageNumber.value === pageCount.value - 1
   } else {
     const line = readingLine()
-    paragraph = nodes.findIndex((node) => node.getBoundingClientRect().bottom > line)
-    if (paragraph < 0) paragraph = nodes.length - 1
-    const rect = nodes[paragraph].getBoundingClientRect()
+    const node = nodes.find((node) => node.getBoundingClientRect().bottom > line) || nodes.at(-1)!
+    paragraph = Number(node.dataset.paragraph)
+    const rect = node.getBoundingClientRect()
     offset = Math.max(0, Math.min(1, (line - rect.top) / Math.max(1, rect.height)))
     endVisible =
-      nodes[nodes.length - 1].getBoundingClientRect().bottom <=
-      innerHeight - (focused.value ? 28 : 76)
+      article.value.getBoundingClientRect().bottom <= innerHeight - (focused.value ? 28 : 76)
   }
   return {
     version: 1,
@@ -264,7 +285,7 @@ function capturePosition(): ReadingProgress | null {
     title: title.value,
     paragraph,
     offset,
-    fraction: endVisible ? 1 : (paragraph + offset) / nodes.length,
+    fraction: endVisible ? 1 : (paragraph + offset) / paragraphs.value.length,
     updatedAt: Date.now(),
   }
 }
@@ -306,22 +327,25 @@ async function measureLayout() {
       : 1
 }
 function restorePosition(position: Position | null) {
-  const node =
+  let node =
     position &&
     article.value?.querySelector<HTMLElement>(
       `[data-paragraph="${Math.min(position.paragraph, paragraphs.value.length - 1)}"]`,
     )
+  if (node?.closest('[inert], details:not([open])'))
+    node = node.closest('.reader-author-note')?.querySelector<HTMLElement>('summary') || null
   if (settings.value.mode === 'pages') {
     window.scrollTo({ top: 0, behavior: 'instant' })
-    if (node && viewport.value && (position.paragraph || position.offset)) {
+    if (node && position && viewport.value && (position.paragraph || position.offset)) {
       const rects = Array.from(node.getClientRects())
       const rect = rects[Math.min(rects.length - 1, Math.floor(position.offset * rects.length))]
+      if (!rect) return
       const x = rect.left - viewport.value.getBoundingClientRect().left + viewport.value.scrollLeft
       setPage(Math.floor((x + 2) / (pageWidth.value + GAP)))
     } else setPage(0)
   } else {
     viewport.value?.scrollTo({ left: 0, behavior: 'instant' })
-    if (node && (position.paragraph || position.offset)) {
+    if (node && position && (position.paragraph || position.offset)) {
       const rect = node.getBoundingClientRect()
       window.scrollTo({
         top: Math.max(0, scrollY + rect.top + rect.height * position.offset - readingLine()),
@@ -336,6 +360,7 @@ async function loadChapter() {
   const finish = beginReaderNavigation(route.fullPath)
   finishNavigation = finish
   const token = ++request
+  pendingNoteLayout = undefined
   controller?.abort()
   const pending = new AbortController()
   controller = pending
@@ -395,6 +420,15 @@ async function loadChapter() {
       expandedChapters.value.add(currentEntry.value.parentChapter)
     if (currentEntry.value?.appendix) expandedChapters.value.add(-1)
     paragraphs.value = text
+    expandedNotes.value = new Set(
+      noteRanges.value
+        .filter(
+          ([from, to]) =>
+            currentEntry.value?.group === 'notes' ||
+            (restore && restore.paragraph >= from && restore.paragraph < to),
+        )
+        .map(([from]) => from),
+    )
     loading.value = false
     await measureLayout()
     await Promise.allSettled(
@@ -446,6 +480,42 @@ async function updateSettings(patch: Partial<ReaderSettings>) {
   restorePosition(layoutAnchor)
   ready = true
   layoutAnchor = null
+  savePosition()
+}
+function toggleNote(from: number, open: boolean) {
+  if (loading.value || error.value || disposed) return
+  const summary = article.value?.querySelector<HTMLElement>(`[data-note-start="${from}"] > summary`)
+  if (!open && summary?.parentElement?.contains(document.activeElement))
+    summary.focus({ preventScroll: true })
+  pendingNoteLayout = { request, token: ++layoutRequest, from, summary: summary || undefined }
+  ready = false
+  const expanded = new Set(expandedNotes.value)
+  if (open) expanded.add(from)
+  else expanded.delete(from)
+  expandedNotes.value = expanded
+}
+async function settleNote(from: number) {
+  const pending = pendingNoteLayout
+  if (!pending || pending.from !== from || pending.request !== request) return
+  await measureLayout()
+  if (
+    disposed ||
+    pending !== pendingNoteLayout ||
+    pending.request !== request ||
+    pending.token !== layoutRequest ||
+    loading.value ||
+    error.value
+  )
+    return
+  if (settings.value.mode === 'pages' && pending.summary?.isConnected && viewport.value) {
+    const rect = pending.summary.getClientRects()[0]
+    if (rect) {
+      const x = rect.left - viewport.value.getBoundingClientRect().left + viewport.value.scrollLeft
+      setPage(Math.floor((x + 2) / (pageWidth.value + GAP)))
+    }
+  }
+  pendingNoteLayout = undefined
+  ready = true
   savePosition()
 }
 function beginSwipe(event: PointerEvent) {
@@ -507,7 +577,7 @@ function onKey(event: KeyboardEvent) {
   ) {
     if (
       event.target instanceof HTMLElement &&
-      event.target.closest('button,a') &&
+      event.target.closest('button,a,summary') &&
       event.key === ' '
     )
       return
@@ -652,22 +722,6 @@ function selectChapter(event: MouseEvent, number: number) {
     event.preventDefault()
     void closePanel().then(chapterStart)
   } else void closePanel()
-}
-function highlighted(text: string) {
-  if (!highlight.value) return [{ text, match: false }]
-  const needle = highlight.value.toLocaleLowerCase(),
-    lower = text.toLocaleLowerCase(),
-    parts: { text: string; match: boolean }[] = []
-  let offset = 0,
-    at = lower.indexOf(needle)
-  while (at >= 0) {
-    if (at > offset) parts.push({ text: text.slice(offset, at), match: false })
-    parts.push({ text: text.slice(at, at + needle.length), match: true })
-    offset = at + needle.length
-    at = lower.indexOf(needle, offset)
-  }
-  if (offset < text.length) parts.push({ text: text.slice(offset), match: false })
-  return parts
 }
 function onResize() {
   clearTimeout(resizeTimer)
@@ -910,18 +964,35 @@ onBeforeUnmount(() => {
               </h1>
               <span class="reader-chapter-divider" aria-hidden="true"></span>
             </header>
-            <p
-              v-for="(paragraph, number) in paragraphs"
-              :key="`${chapter}-${number}`"
-              class="reader-paragraph"
-              :data-paragraph="number"
-              tabindex="-1"
-            >
-              <template v-for="(part, n) in highlighted(paragraph)" :key="n"
-                ><mark v-if="part.match">{{ part.text }}</mark
-                ><template v-else>{{ part.text }}</template></template
+            <template v-for="block in blocks" :key="`${chapter}-${block.from}`">
+              <ReaderAuthorNote
+                v-if="block.note"
+                :from="block.from"
+                :open="expandedNotes.has(block.from)"
+                :paged="settings.mode === 'pages'"
+                @update:open="toggleNote(block.from, $event)"
+                @settled="settleNote(block.from)"
               >
-            </p>
+                <ReaderParagraph
+                  v-for="paragraph in block.paragraphs"
+                  :key="paragraph.number"
+                  :text="paragraph.text"
+                  :number="paragraph.number"
+                  :highlight="highlight"
+                  :notes="inlineNoteRanges(book, chapter, paragraph.number)"
+                />
+              </ReaderAuthorNote>
+              <template v-else>
+                <ReaderParagraph
+                  v-for="paragraph in block.paragraphs"
+                  :key="paragraph.number"
+                  :text="paragraph.text"
+                  :number="paragraph.number"
+                  :highlight="highlight"
+                  :notes="inlineNoteRanges(book, chapter, paragraph.number)"
+                />
+              </template>
+            </template>
             <p v-if="chapter === book.chapterCount - 1" class="reader-end">
               已读到这份文本的最后一章。<br /><span>回到书架，再遇见一个故事。</span>
             </p>
@@ -1215,7 +1286,7 @@ onBeforeUnmount(() => {
               @click="closePanel"
               ><strong>{{ index?.chapters[result.chapter]?.title }}</strong>
               <p>
-                <template v-for="(part, n) in highlighted(result.excerpt)" :key="n"
+                <template v-for="(part, n) in highlightText(result.excerpt, highlight)" :key="n"
                   ><mark v-if="part.match">{{ part.text }}</mark
                   ><template v-else>{{ part.text }}</template></template
                 >

@@ -152,5 +152,49 @@
     "revision": "8ca4ae069484",
     "chunkSize": 24,
     "sourceNote": ""
+  },
+  {
+    "id": "backrooms-exploration-notes",
+    "title": "Backrooms后室探索笔记",
+    "alias": "",
+    "author": "云中语l",
+    "category": "悬疑探险",
+    "description": "探险家林寻收到一份后室生存指南，带着装备进入现实边界之外的空间，在诡谲层级与未知实体之间寻找前路。",
+    "cover": "/images/books/backrooms-exploration-notes.webp",
+    "coverSource": "https://fanqienovel.com/search/Backroons%E5%90%8E%E5%AE%A4%E9%80%83%E8%84%B1",
+    "chapterCount": 913,
+    "numberedChapterCount": 913,
+    "appendixCount": 0,
+    "groups": {
+      "main": 913,
+      "extra": 0,
+      "notes": 0
+    },
+    "characterCount": 1966056,
+    "revision": "bd8f3d4fb69e",
+    "chunkSize": 24,
+    "sourceNote": ""
+  },
+  {
+    "id": "backroons-escape",
+    "title": "Backroons后室逃脱",
+    "alias": "Backrooms后室逃脱",
+    "author": "深井之水",
+    "category": "悬疑探险",
+    "description": "一个神秘按钮和巨额奖金，将主角送进后室。面对层级、实体与迷宫般的空间，他一边求生，一边寻找返回现实的出口。",
+    "cover": "/images/books/backroons-escape.webp",
+    "coverSource": "https://fanqienovel.com/search/Backroons%E5%90%8E%E5%AE%A4%E9%80%83%E8%84%B1",
+    "chapterCount": 215,
+    "numberedChapterCount": 212,
+    "appendixCount": 2,
+    "groups": {
+      "main": 212,
+      "extra": 2,
+      "notes": 1
+    },
+    "characterCount": 485196,
+    "revision": "e31c56eccb0f",
+    "chunkSize": 24,
+    "sourceNote": ""
   }
 ]

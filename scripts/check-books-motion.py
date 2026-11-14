@@ -55,7 +55,7 @@ with sync_playwright() as p:
  page.get_by_role('button',name='专注阅读',exact=True).click()
  page.wait_for_function('!!document.fullscreenElement')
  page.locator('.reader-back').evaluate('(e)=>e.click()')
- expect(page.locator('.book-card')).to_have_count(7)
+ expect(page.locator('.book-card')).to_have_count(len(books))
  page.wait_for_function('!document.fullscreenElement')
  expect(page.locator('.book-card h2')).not_to_contain_text(['盗墓笔记之秦王帝陵'])
  # Chapter-attached skits are collapsed, unnumbered and do not shift the next chapter.
@@ -141,7 +141,7 @@ with sync_playwright() as p:
  old_revision=next(rev for rev,items in index['migrations'].items() if len(items)==363)
  saved={'version':1,'revision':old_revision,'chapter':362,'title':'第364章 大结局（二合一）','paragraph':2000,'offset':.1,'fraction':.95,'updatedAt':1}
  page.locator('.reader-back').click()
- expect(page.locator('.book-card')).to_have_count(7)
+ expect(page.locator('.book-card')).to_have_count(len(books))
  page.evaluate('(v)=>{localStorage.setItem("homepage-reading:tom-at-hogwarts",JSON.stringify(v));localStorage.setItem("homepage-bookmarks:tom-at-hogwarts",JSON.stringify([{...v,id:"old",excerpt:"原书签"}]))}',saved)
  page.goto(base+'/books/tom-at-hogwarts',wait_until='networkidle');ready()
  expect(page.locator('h1')).to_have_text('番外之埃及之旅 4')
@@ -154,7 +154,7 @@ with sync_playwright() as p:
   if len(items)==395 and json.loads(Path(f'public/books/{book["id"]}/{rev}-index.json').read_text())['chapters'][363]['number']==1)
  saved={'version':1,'revision':grouped_revision,'chapter':363,'title':'番外 1 · 假如斯内普同意了邀请','paragraph':8,'offset':.2,'fraction':.1,'updatedAt':1}
  page.locator('.reader-back').click()
- expect(page.locator('.book-card')).to_have_count(7)
+ expect(page.locator('.book-card')).to_have_count(len(books))
  page.evaluate('(v)=>{localStorage.setItem("homepage-reading:tom-at-hogwarts",JSON.stringify(v));localStorage.setItem("homepage-bookmarks:tom-at-hogwarts",JSON.stringify([{...v,id:"grouped",excerpt:"分组版书签"}]))}',saved)
  page.goto(base+'/books/tom-at-hogwarts',wait_until='networkidle');ready()
  expect(page.locator('h1')).to_have_text('番外之假如斯内普同意了邀请')

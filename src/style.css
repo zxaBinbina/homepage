@@ -8889,6 +8889,68 @@ h1 > span {
   outline: 1px dashed var(--reading-accent);
   outline-offset: 4px;
 }
+.reader-author-note {
+  margin-block: var(--space-sm) var(--space-xl);
+  border: 1px solid var(--reading-border);
+  border-radius: var(--radius-sm);
+  background: var(--reading-surface);
+  color: var(--reading-muted);
+}
+.reader-author-note > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-md);
+  list-style: none;
+  font-size: max(14px, 0.75em);
+  line-height: 1.7;
+  cursor: pointer;
+  break-inside: avoid;
+  break-after: avoid;
+}
+.reader-author-note > summary::-webkit-details-marker {
+  display: none;
+}
+.reader-author-note > summary:hover {
+  color: var(--reading-accent);
+}
+.reader-author-note > summary > svg {
+  flex: 0 0 auto;
+}
+.reader-note-action {
+  margin-left: auto;
+  font-size: 12px;
+}
+.reader-note-chevron {
+  transition: transform 300ms var(--motion-ease);
+}
+.reader-note-chevron.is-open {
+  transform: rotate(180deg);
+}
+.reader-note-content {
+  padding: var(--space-sm) var(--space-md) var(--space-xs);
+  font-size: max(14px, 0.85em);
+  line-height: 1.85;
+}
+.reader-note-content .reader-paragraph {
+  text-indent: 0;
+}
+.reader-inline-note {
+  display: block;
+  margin-block: var(--space-xs);
+  padding-left: var(--space-sm);
+  border-left: 2px solid var(--reading-border);
+  color: var(--reading-muted);
+  font-size: max(14px, 0.85em);
+  line-height: 1.85;
+  text-indent: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-note-chevron {
+    transition: none;
+  }
+}
 .reader-end {
   text-align: center;
   border-top: 1px solid var(--reading-border);

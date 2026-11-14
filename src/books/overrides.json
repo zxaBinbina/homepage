@@ -60,5 +60,26 @@
     "cover": "/images/books/anomaly-investigations.webp",
     "coverSource": "https://fanqienovel.com/page/7450405098930326590",
     "author": "失控编辑部"
+  },
+  {
+    "match": "番茄《Backrooms后室探索笔记》",
+    "id": "backrooms-exploration-notes",
+    "title": "Backrooms后室探索笔记",
+    "author": "云中语l",
+    "category": "悬疑探险",
+    "description": "探险家林寻收到一份后室生存指南，带着装备进入现实边界之外的空间，在诡谲层级与未知实体之间寻找前路。",
+    "cover": "/images/books/backrooms-exploration-notes.webp",
+    "coverSource": "https://fanqienovel.com/search/Backroons%E5%90%8E%E5%AE%A4%E9%80%83%E8%84%B1"
+  },
+  {
+    "match": "番茄《Backroons后室逃脱》",
+    "id": "backroons-escape",
+    "title": "Backroons后室逃脱",
+    "alias": "Backrooms后室逃脱",
+    "author": "深井之水",
+    "category": "悬疑探险",
+    "description": "一个神秘按钮和巨额奖金，将主角送进后室。面对层级、实体与迷宫般的空间，他一边求生，一边寻找返回现实的出口。",
+    "cover": "/images/books/backroons-escape.webp",
+    "coverSource": "https://fanqienovel.com/search/Backroons%E5%90%8E%E5%AE%A4%E9%80%83%E8%84%B1"
   }
 ]

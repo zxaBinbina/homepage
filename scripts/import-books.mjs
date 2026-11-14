@@ -5,8 +5,10 @@ import { fileURLToPath } from 'node:url'
 import { parseBook, organizeChapters, chapterMigration } from './book-parser.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
-const sources = process.argv.slice(2)
-if (!sources.length) throw new Error('用法：node scripts/import-books.mjs <TXT目录或文件> ...')
+const merge = process.argv.includes('--merge')
+const sources = process.argv.slice(2).filter((argument) => argument !== '--merge')
+if (!sources.length)
+  throw new Error('用法：node scripts/import-books.mjs [--merge] <TXT目录或文件> ...')
 const overrides = JSON.parse(await readFile(join(root, 'src/books/overrides.json'), 'utf8'))
 const files = []
 for (const source of sources) {
@@ -27,13 +29,25 @@ const chunkSize = 24
 const previousBooks = JSON.parse(
   await readFile(join(root, 'src/books/library.json'), 'utf8').catch(() => '[]'),
 )
+const previousReport = merge
+  ? JSON.parse(await readFile(join(root, 'src/books/import-report.json'), 'utf8'))
+  : []
 for (const config of overrides) {
+  const previous = previousBooks.find((entry) => entry.id === config.id)
   const matches = candidates.filter(
     (path) =>
       basename(path) === config.match + '.txt' ||
       basename(path).startsWith(config.match + ' ') ||
       basename(path).startsWith(config.match + '('),
   )
+  if (merge && !matches.length && previous) {
+    const entry = previousReport.find((entry) => entry.id === config.id)
+    if (!entry) throw new Error(`${config.match}：缺少已有导入报告，无法保留`)
+    books.push(previous)
+    report.push(entry)
+    console.log(`保留已有书目：${previous.title}`)
+    continue
+  }
   if (matches.length !== 1)
     throw new Error(`${config.match}：需要唯一的源文件，找到 ${matches.length} 份`)
   const source = matches[0]
@@ -69,7 +83,6 @@ for (const config of overrides) {
   const directory = join(root, 'public/books', config.id)
   await mkdir(directory, { recursive: true })
   const writeJson = (name, value) => writeFile(join(directory, name), JSON.stringify(value) + '\n')
-  const previous = previousBooks.find((entry) => entry.id === config.id)
   const oldIndex =
     previous &&
     JSON.parse(await readFile(join(directory, `${previous.revision}-index.json`), 'utf8'))
