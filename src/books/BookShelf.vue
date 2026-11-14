@@ -5,13 +5,23 @@ import SiteFooter from '../components/SiteFooter.vue'
 import SegmentedControl from '../components/SegmentedControl.vue'
 import BookCover from './BookCover.vue'
 import BookDetails from './BookDetails.vue'
-import { books, bookPath, bookLength, type Book } from './catalog'
+import BookCollectionDialog from './BookCollectionDialog.vue'
+import {
+  books,
+  bookPath,
+  bookLength,
+  shelfEntries,
+  entryBooks,
+  isCollection,
+  type ShelfEntry,
+} from './catalog'
 import { readProgress, progressPercent, type ReadingProgress } from './progress'
 const query = ref(''),
   status = ref('all'),
   sort = ref('collection'),
   view = ref<'cards' | 'list'>('cards')
 const details = ref<InstanceType<typeof BookDetails>>()
+const collectionDialog = ref<InstanceType<typeof BookCollectionDialog>>()
 const progress = ref<Record<string, ReadingProgress | null>>({})
 const filters = [
   { value: 'all', label: '全部' },
@@ -22,26 +32,63 @@ const filters = [
 function refreshProgress() {
   progress.value = Object.fromEntries(books.map((book) => [book.id, readProgress(book)]))
 }
-function readingStatus(book: Book) {
-  const value = progress.value[book.id]
-  return !value ? 'unread' : progressPercent(book, value) >= 100 ? 'finished' : 'reading'
+const entryStates = computed(() =>
+  Object.fromEntries(
+    shelfEntries.map((entry) => {
+      const members = entryBooks(entry)
+      const started = members.some((book) => progress.value[book.id])
+      const finished = members.every(
+        (book) => progress.value[book.id] && progressPercent(book, progress.value[book.id]!) >= 100,
+      )
+      const total = members.reduce((sum, book) => sum + book.chapterCount, 0)
+      const percent = Math.floor(
+        members.reduce(
+          (sum, book) =>
+            sum +
+            (progress.value[book.id] ? progressPercent(book, progress.value[book.id]!) : 0) *
+              book.chapterCount,
+          0,
+        ) / total,
+      )
+      const updatedAt = Math.max(...members.map((book) => progress.value[book.id]?.updatedAt || 0))
+      return [
+        entry.id,
+        {
+          started,
+          percent,
+          updatedAt,
+          status: !started ? 'unread' : finished ? 'finished' : 'reading',
+        },
+      ]
+    }),
+  ),
+)
+function openEntry(entry: ShelfEntry) {
+  if (isCollection(entry)) void collectionDialog.value?.open(entry)
+  else void details.value?.open(entry)
 }
 refreshProgress()
 onMounted(() => window.addEventListener('storage', refreshProgress))
 onBeforeUnmount(() => window.removeEventListener('storage', refreshProgress))
 const matches = computed(() => {
   const term = query.value.trim().toLocaleLowerCase()
-  const matches = books.filter(
-    (book) =>
-      [book.title, book.alias, book.author, book.category]
+  const matches = shelfEntries.filter(
+    (entry) =>
+      [
+        entry.title,
+        entry.alias,
+        entry.author,
+        entry.category,
+        ...entryBooks(entry).flatMap((book) => [book.title, book.alias, book.translator]),
+      ]
         .join(' ')
         .toLocaleLowerCase()
         .includes(term) &&
-      (status.value === 'all' || readingStatus(book) === status.value),
+      (status.value === 'all' || entryStates.value[entry.id]!.status === status.value),
   )
   if (sort.value === 'recent')
     return matches.sort(
-      (a, b) => (progress.value[b.id]?.updatedAt || 0) - (progress.value[a.id]?.updatedAt || 0),
+      (a, b) => entryStates.value[b.id]!.updatedAt - entryStates.value[a.id]!.updatedAt,
     )
   if (sort.value === 'title') return matches.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'))
   return matches
@@ -64,7 +111,7 @@ function reset() {
         <div>
           <p class="overline">A SMALL LIBRARY</p>
           <h1>
-            我的书架<span>{{ books.length }} 本</span>
+            我的书架<span>{{ shelfEntries.length }} 部 · {{ books.length }} 册</span>
           </h1>
           <p>读过的故事，和你分享。挑一本，慢慢看。</p>
         </div>
@@ -106,8 +153,8 @@ function reset() {
         <p role="status">
           {{
             query.trim() || status !== 'all'
-              ? `找到 ${matches.length} 本小说`
-              : `全部 ${books.length} 本小说`
+              ? `找到 ${matches.length} 部作品`
+              : `全部 ${shelfEntries.length} 部作品`
           }}
         </p>
         <div>
@@ -141,36 +188,55 @@ function reset() {
         </div>
       </div>
       <div v-if="matches.length" class="library-grid" :class="{ 'is-list': view === 'list' }">
-        <article v-for="book in matches" :key="book.id" class="book-card">
+        <article
+          v-for="book in matches"
+          :key="book.id"
+          class="book-card"
+          :class="{ 'is-collection': isCollection(book) }"
+          :data-book-id="book.id"
+        >
           <div class="book-card-cover">
-            <BookCover :book="book" :number="books.indexOf(book) + 1" />
+            <BookCover :book="book" :number="shelfEntries.indexOf(book) + 1" />
           </div>
           <div class="book-card-info">
             <p class="book-category">
               {{ book.category
-              }}<span :title="bookLength(book)">{{ book.numberedChapterCount }} 章</span>
+              }}<span v-if="isCollection(book)">{{ book.volumes.length }} 册组合</span
+              ><span v-else :title="bookLength(book)">{{ book.numberedChapterCount }} 章</span>
             </p>
             <h2>
               <button
                 class="book-card-details"
                 type="button"
-                :aria-label="`查看《${book.title}》的详情`"
+                :aria-label="
+                  isCollection(book) ? `选择《${book.title}》的分册` : `查看《${book.title}》的详情`
+                "
                 aria-haspopup="dialog"
-                @click="details?.open(book)"
+                @click="openEntry(book)"
               >
                 {{ book.title }}
               </button>
             </h2>
             <p class="book-author">{{ book.author }}</p>
+            <p v-if="book.translator" class="book-translator">译者：{{ book.translator }}</p>
             <p class="book-description">{{ book.description }}</p>
             <p v-if="book.alias" class="book-alias">又名《{{ book.alias }}》</p>
             <div class="book-card-bottom">
-              <div v-if="progress[book.id]" class="book-card-progress">
+              <div v-if="entryStates[book.id]!.started" class="book-card-progress">
                 <span class="book-progress-track" aria-hidden="true"
-                  ><i :style="{ width: `${progressPercent(book, progress[book.id]!)}%` }"></i></span
-                ><span>{{ progressPercent(book, progress[book.id]!) }}%</span>
+                  ><i :style="{ width: `${entryStates[book.id]!.percent}%` }"></i></span
+                ><span>{{ entryStates[book.id]!.percent }}%</span>
               </div>
-              <a :href="bookPath(book)"
+              <button
+                v-if="isCollection(book)"
+                type="button"
+                class="book-collection-open"
+                aria-haspopup="dialog"
+                @click="openEntry(book)"
+              >
+                选择分册<ArrowRight :size="16" />
+              </button>
+              <a v-else :href="bookPath(book)"
                 >{{ progress[book.id] ? '继续阅读' : '开始阅读' }}<ArrowRight :size="16"
               /></a>
             </div>
@@ -186,6 +252,9 @@ function reset() {
         收录章节以当前文本为准。阅读进度、书签与设置仅保存在当前浏览器。
       </p>
     </main>
-    <SiteFooter /><BookDetails ref="details" />
+    <SiteFooter /><BookDetails ref="details" /><BookCollectionDialog
+      ref="collectionDialog"
+      :progress="progress"
+    />
   </div>
 </template>

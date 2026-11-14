@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { BookOpen, Sparkles } from 'lucide-vue-next'
 import type { Book } from './catalog'
-defineProps<{ book: Book; number?: number }>()
+defineProps<{ book: Pick<Book, 'title' | 'author' | 'category' | 'cover'>; number?: number }>()
 const failed = ref(false)
 </script>
 

@@ -8483,6 +8483,12 @@ h1 > span {
   font-size: 12px;
   color: var(--muted);
 }
+.book-translator {
+  margin-top: var(--space-2xs);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
 .book-description {
   margin-top: var(--space-md);
   color: var(--muted);
@@ -8503,7 +8509,8 @@ h1 > span {
   margin-top: auto;
   padding-top: var(--space-md);
 }
-.book-card-bottom a {
+.book-card-bottom a,
+.book-card-bottom .book-collection-open {
   position: relative;
   z-index: 2;
   display: inline-flex;
@@ -8516,6 +8523,9 @@ h1 > span {
   font-size: 12px;
   background: transparent;
   padding: 0;
+}
+.book-card.is-collection .book-category span {
+  color: var(--blue);
 }
 .book-card-progress {
   display: flex;
@@ -8673,6 +8683,76 @@ h1 > span {
   margin-bottom: var(--space-sm);
   color: var(--muted);
   font-size: 12px;
+}
+.book-collection-intro {
+  margin-top: var(--space-xl);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.book-collection-label {
+  margin-block: var(--space-xl) var(--space-md);
+  font-size: 15px;
+  font-weight: 500;
+}
+.book-volume-list {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+.book-volume {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: var(--bg);
+}
+.book-volume:hover {
+  border-color: var(--blue);
+  background: var(--interactive-hover);
+}
+.book-volume > .book-cover {
+  grid-row: span 2;
+}
+.book-volume-info {
+  min-width: 0;
+}
+.book-volume-number {
+  color: var(--blue);
+  font-size: 10px;
+}
+.book-volume h4 {
+  margin-block: var(--space-2xs);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.book-volume-info p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.book-volume-action {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--blue);
+  font-size: 12px;
+}
+.book-volume-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin-top: var(--space-xs);
 }
 .book-details-progress strong {
   font-weight: 400;

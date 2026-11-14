@@ -1,0 +1,21 @@
+[
+  {
+    "id": "harry-potter",
+    "title": "哈利·波特",
+    "alias": "哈利波特（分册）",
+    "author": "J.K.罗琳",
+    "translator": "苏农、马爱农和马爱新",
+    "category": "魔法世界",
+    "description": "自幼父母双亡的孤儿哈利·波特在 11 岁收到霍格沃茨魔法学校的录取通知，从此与罗恩、赫敏一起，在七个学年里一步步揭开父母之死与自身命运的真相，最终完成对伏地魔的决战。系列主题可概括为「爱、牺牲与选择」。",
+    "cover": "/images/books/harry-potter-philosophers-stone-hd.webp",
+    "volumes": [
+      "harry-potter-philosophers-stone",
+      "harry-potter-chamber-of-secrets",
+      "harry-potter-prisoner-of-azkaban",
+      "harry-potter-goblet-of-fire",
+      "harry-potter-order-of-the-phoenix",
+      "harry-potter-half-blood-prince",
+      "harry-potter-deathly-hallows"
+    ]
+  }
+]

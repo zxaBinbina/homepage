@@ -233,5 +233,159 @@
     "repeated": [],
     "lastNumber": 213,
     "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-philosophers-stone",
+    "filename": "哈利·波特与魔法石.txt",
+    "sha256": "ef073f7d6e288ab6455de90529b9a92e35b7b73597eaf477332df123349ef545",
+    "filenameEnd": null,
+    "sourceChapterCount": 17,
+    "chapterCount": 17,
+    "numberedChapterCount": 17,
+    "appendixCount": 0,
+    "groups": {
+      "main": 17,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 17,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-chamber-of-secrets",
+    "filename": "哈利·波特与密室.txt",
+    "sha256": "7c7017b54e46ec58e514b8cb7ef25d2f42efd03c4511b3d53ea0286a16edefe8",
+    "filenameEnd": null,
+    "sourceChapterCount": 18,
+    "chapterCount": 18,
+    "numberedChapterCount": 18,
+    "appendixCount": 0,
+    "groups": {
+      "main": 18,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 18,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-prisoner-of-azkaban",
+    "filename": "哈利·波特与阿兹卡班的囚徒.txt",
+    "sha256": "907652a68fa32fb23141da57d8fbbd1d89647a80d97549ef118a8f6b9b2781b6",
+    "filenameEnd": null,
+    "sourceChapterCount": 22,
+    "chapterCount": 22,
+    "numberedChapterCount": 22,
+    "appendixCount": 0,
+    "groups": {
+      "main": 22,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 22,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-goblet-of-fire",
+    "filename": "哈利·波特与火焰杯.txt",
+    "sha256": "18a295030da61a8bcbbb24946ff242152ff2bac9b94accacb37ac9f23bbbe058",
+    "filenameEnd": null,
+    "sourceChapterCount": 37,
+    "chapterCount": 37,
+    "numberedChapterCount": 37,
+    "appendixCount": 0,
+    "groups": {
+      "main": 37,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 37,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-order-of-the-phoenix",
+    "filename": "哈利·波特与凤凰社.txt",
+    "sha256": "19cc441940ea3adf925facf4e0689e1c67e89842c0a632be1668814ebe071358",
+    "filenameEnd": null,
+    "sourceChapterCount": 38,
+    "chapterCount": 38,
+    "numberedChapterCount": 38,
+    "appendixCount": 0,
+    "groups": {
+      "main": 38,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 38,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-half-blood-prince",
+    "filename": "哈利·波特与混血王子.txt",
+    "sha256": "3fe1ccf144fe4c91c284c652f2128d780c8139cc1ecff0706f0e7646eed21b4d",
+    "filenameEnd": null,
+    "sourceChapterCount": 30,
+    "chapterCount": 30,
+    "numberedChapterCount": 30,
+    "appendixCount": 0,
+    "groups": {
+      "main": 30,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 30,
+    "outOfOrder": false
+  },
+  {
+    "id": "harry-potter-deathly-hallows",
+    "filename": "哈利·波特与死亡圣器.txt",
+    "sha256": "4548d5c21132219b83d47a6e3e65e01d3e12e3564cf71dfb7c297afd594a232a",
+    "filenameEnd": null,
+    "sourceChapterCount": 36,
+    "chapterCount": 36,
+    "numberedChapterCount": 36,
+    "appendixCount": 0,
+    "groups": {
+      "main": 36,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 36,
+    "outOfOrder": false
   }
 ]

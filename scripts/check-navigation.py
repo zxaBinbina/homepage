@@ -3,10 +3,15 @@ import io
 import json
 import subprocess
 import os
+from pathlib import Path
 import wave
 from playwright.sync_api import sync_playwright, expect
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:5173').rstrip('/')
+books = json.loads(Path('src/books/library.json').read_text())
+collections = json.loads(Path('src/books/collections.json').read_text())
+grouped_ids = {id for collection in collections for id in collection['volumes']}
+shelf_count = sum(b['id'] not in grouped_ids for b in books) + len(collections)
 tool_count = len(json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs'])))
 audio = io.BytesIO()
 with wave.open(audio, 'wb') as wav:
@@ -72,7 +77,7 @@ with sync_playwright() as p:
     page.wait_for_function('scrollY === 0')
 
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='书架', exact=True).click()
-    expect(page.locator('.book-card')).to_have_count(7)
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     metadata('/book')
     page.locator('.book-card-bottom a').first.click()
     expect(page.locator('.reader-text-layout')).to_be_visible()
@@ -80,7 +85,7 @@ with sync_playwright() as p:
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
     assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
     page.locator('.reader-back').click()
-    expect(page.locator('.book-card')).to_have_count(7)
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     metadata('/book')
 
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='工具', exact=True).click()

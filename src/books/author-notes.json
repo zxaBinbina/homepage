@@ -278,5 +278,40 @@
       [214, 70, 137]
     ],
     "inline": [[75, 42, 7, 30]]
+  },
+  "harry-potter-philosophers-stone": {
+    "revision": "4d93e183605b",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-chamber-of-secrets": {
+    "revision": "a7116be73334",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-prisoner-of-azkaban": {
+    "revision": "6a6e1fcc3af3",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-goblet-of-fire": {
+    "revision": "1e7c9b95ce0a",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-order-of-the-phoenix": {
+    "revision": "ff7397ce4c5f",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-half-blood-prince": {
+    "revision": "fd22d16ea4ef",
+    "ranges": [],
+    "inline": []
+  },
+  "harry-potter-deathly-hallows": {
+    "revision": "c2b1f7023189",
+    "ranges": [],
+    "inline": []
   }
 }

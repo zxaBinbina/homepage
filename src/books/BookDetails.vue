@@ -86,6 +86,7 @@ defineExpose({ open })
             <p class="overline">{{ book.category }}</p>
             <h2 id="book-details-title">{{ book.title }}</h2>
             <p>{{ book.author }}</p>
+            <p v-if="book.translator">译者：{{ book.translator }}</p>
             <p v-if="book.alias" class="book-details-alias">又名《{{ book.alias }}》</p>
             <span
               >{{ bookLength(book) }} · {{ (book.characterCount / 10000).toFixed(1) }} 万字</span

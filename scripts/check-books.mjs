@@ -82,6 +82,37 @@ for (const [number, original] of groupedFixture.chapters.entries()) {
 
 const books = JSON.parse(await readFile('src/books/library.json', 'utf8'))
 assert.equal(new Set(books.map((b) => b.id)).size, books.length)
+const collections = JSON.parse(await readFile('src/books/collections.json', 'utf8'))
+const groupedIds = collections.flatMap((collection) => collection.volumes)
+assert.equal(new Set(groupedIds).size, groupedIds.length, 'Each volume belongs to one collection')
+assert.equal(
+  new Set([...books.map((b) => b.id), ...collections.map((c) => c.id)]).size,
+  books.length + collections.length,
+)
+for (const collection of collections) {
+  assert.ok(collection.volumes.length > 1)
+  assert.ok(collection.volumes.every((id) => books.some((b) => b.id === id)))
+}
+const catalogSource = (await readFile('src/books/catalog.ts', 'utf8'))
+  .replace("import library from './library.json'", `const library = ${JSON.stringify(books)}`)
+  .replace(
+    "import collectionMetadata from './collections.json'",
+    `const collectionMetadata = ${JSON.stringify(collections)}`,
+  )
+const catalogCode = ts.transpileModule(catalogSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext },
+}).outputText
+const { shelfEntries, entryBooks, isBookPage } = await import(
+  `data:text/javascript;base64,${Buffer.from(catalogCode).toString('base64')}`
+)
+assert.equal(shelfEntries.length, books.length - groupedIds.length + collections.length)
+assert.deepEqual(
+  shelfEntries.flatMap(entryBooks).map((b) => b.id),
+  books.map((b) => b.id),
+)
+assert.ok(shelfEntries.every((entry) => !groupedIds.includes(entry.id)))
+assert.ok(collections.every((collection) => !isBookPage(`book.${collection.id}`)))
+const overrides = JSON.parse(await readFile('src/books/overrides.json', 'utf8'))
 const notes = JSON.parse(await readFile('src/books/author-notes.json', 'utf8'))
 assert.deepEqual(Object.keys(notes).sort(), books.map((b) => b.id).sort())
 const noteSource = (await readFile('src/books/authorNotes.ts', 'utf8')).replace(
@@ -115,6 +146,13 @@ let sections = 0
 for (const book of books) {
   const base = `public/books/${book.id}/${book.revision}`
   const index = JSON.parse(await readFile(`${base}-index.json`, 'utf8'))
+  const config = overrides.find((config) => config.id === book.id)
+  if (config.synopsis) {
+    assert.deepEqual(index.synopsis, config.synopsis)
+    assert.equal(book.description, config.synopsis[0])
+    assert.equal(book.translator, config.translator)
+    assert.ok(config.synopsis.every((p) => typeof p === 'string' && p.length > 0))
+  }
   assert.equal(index.chapters.length, book.chapterCount)
   const counts = { main: 0, extra: 0, notes: 0 }
   let numbered = 0

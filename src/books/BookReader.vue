@@ -1300,6 +1300,7 @@ onBeforeUnmount(() => {
             <div>
               <h3>{{ book.title }}</h3>
               <p>{{ book.author }}</p>
+              <p v-if="book.translator">译者：{{ book.translator }}</p>
               <span>{{ book.category }} · {{ bookLength(book) }}</span>
               <p v-if="book.alias">又名《{{ book.alias }}》</p>
             </div>

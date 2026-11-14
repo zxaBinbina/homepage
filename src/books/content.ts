@@ -6,6 +6,7 @@ export async function fetchBookJson(book: Book, part: string | number, signal: A
   return response.json()
 }
 export function bookSynopsis(book: Book, index?: ChapterIndex) {
+  if (index?.synopsis?.length) return index.synopsis
   const preface = index?.preface || []
   const start = preface.findIndex((line) => /^简介\s*[:：]$/.test(line))
   return start >= 0 && preface.length > start + 1 ? preface.slice(start + 1) : [book.description]

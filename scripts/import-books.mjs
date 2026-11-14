@@ -77,7 +77,7 @@ for (const config of overrides) {
     ]),
   )
   const revision = createHash('sha256')
-    .update(JSON.stringify({ preface, chapters, chunkSize }))
+    .update(JSON.stringify({ preface, chapters, chunkSize, synopsis: config.synopsis }))
     .digest('hex')
     .slice(0, 12)
   const directory = join(root, 'public/books', config.id)
@@ -106,6 +106,7 @@ for (const config of overrides) {
   }
   await writeJson(`${revision}-index.json`, {
     preface,
+    synopsis: config.synopsis,
     migrations,
     chapters: chapters.map(({ paragraphs, ...chapter }) => ({
       ...chapter,
@@ -122,6 +123,7 @@ for (const config of overrides) {
     title,
     alias,
     author: config.author || author,
+    translator: config.translator || '',
     category: config.category,
     description: config.description,
     cover: config.cover,

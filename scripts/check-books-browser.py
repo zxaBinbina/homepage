@@ -7,6 +7,10 @@ from playwright.sync_api import sync_playwright, expect
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:4173').rstrip('/')
 books = json.loads(Path('src/books/library.json').read_text())
+collections = json.loads(Path('src/books/collections.json').read_text())
+grouped_ids = {id for collection in collections for id in collection['volumes']}
+standalone = [book for book in books if book['id'] not in grouped_ids]
+shelf_count = len(standalone) + len(collections)
 out = Path('artifacts/books')
 out.mkdir(parents=True, exist_ok=True)
 key = 'homepage-reading:' + books[0]['id']
@@ -66,7 +70,7 @@ with sync_playwright() as p:
         page.screenshot(path=str(path), full_page=True)
 
     page.goto(base + '/book', wait_until='networkidle')
-    expect(page.locator('.book-card')).to_have_count(len(books))
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     assert not downloads, 'Shelf fetched novel text eagerly'
     page.evaluate('window.booksHeader = document.querySelector(".header")')
     search = page.get_by_role('searchbox', name='搜索小说', exact=True)
@@ -80,12 +84,12 @@ with sync_playwright() as p:
     page.get_by_role('radio', name='在读', exact=True).click()
     expect(page.locator('.book-card')).to_have_count(0)
     page.get_by_role('radio', name='未读', exact=True).click()
-    expect(page.locator('.book-card')).to_have_count(len(books))
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     page.get_by_role('radio', name='全部', exact=True).click()
     page.get_by_role('button', name='列表视图').click()
     expect(page.locator('.library-grid')).to_have_class('library-grid is-list')
     page.get_by_role('combobox', name='书架排序').select_option('title')
-    assert page.locator('.book-card h2').all_text_contents() != [b['title'] for b in books]
+    assert page.locator('.book-card h2').all_text_contents() != [b['title'] for b in standalone] + [c['title'] for c in collections]
     page.get_by_role('combobox', name='书架排序').select_option('collection')
     page.get_by_role('button', name='卡片视图').click()
     # Physical clicks on every visible part, including padding, reach one details button.
@@ -99,7 +103,7 @@ with sync_playwright() as p:
             x = box['x'] + (box['width'] / 2 if selector else 24)
             y = box['y'] + (box['height'] / 2 if selector else box['height'] - 16)
             page.mouse.click(x, y)
-            expect(page.locator('.book-details')).to_be_visible()
+            expect(page.locator('.book-details:not(.book-collection-dialog)')).to_be_visible()
             expect(page.locator('.book-details-synopsis')).to_contain_text('在哈利的11岁暑假，教父从天而降。')
             assert page.url.endswith('/book')
             page.keyboard.press('Escape')
@@ -131,7 +135,7 @@ with sync_playwright() as p:
         for selector in ['.book-card-cover', '.book-description', None]:
             box = touch_card.locator(selector).bounding_box() if selector else touch_card.bounding_box()
             touch_page.touchscreen.tap(box['x'] + (box['width'] / 2 if selector else 24), box['y'] + (box['height'] / 2 if selector else box['height'] - 16))
-            expect(touch_page.locator('.book-details')).to_be_visible()
+            expect(touch_page.locator('.book-details:not(.book-collection-dialog)')).to_be_visible()
             expect(touch_page.locator('#book-details-title')).to_have_text(books[0]['title'])
             touch_page.get_by_role('button', name='关闭书籍详情', exact=True).tap()
         touch_card.locator('.book-card-bottom a').tap()
@@ -243,7 +247,7 @@ with sync_playwright() as p:
     expect(page.locator('main')).to_be_focused()
     page.locator('[data-paragraph="10"]').evaluate('(e)=>scrollTo({top:scrollY+e.getBoundingClientRect().top-88,behavior:"instant"})')
     page.locator('.reader-back').click()
-    expect(page.locator('.book-card')).to_have_count(len(books))
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     assert stored()['paragraph'] == 10, stored()
     first_saved = stored().copy()
     page.locator('.book-card-bottom a').nth(1).click()
@@ -346,11 +350,14 @@ with sync_playwright() as p:
             assert stored('homepage-reading:' + book['id'])['chapter'] == number - 1
             assert page.locator('.reader-paragraph').count() > 0
         expect(page.locator('.reader-end')).to_be_attached()
+    last_standalone = standalone[-1]
+    page.goto(f'{base}/books/{last_standalone["id"]}?chapter={last_standalone["chapterCount"]}', wait_until='networkidle')
+    ready()
     page.evaluate('scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')
     page.wait_for_timeout(250)
     page.locator('.reader-back').click()
     page.get_by_role('radio', name='已读', exact=True).click()
-    expect(page.locator('.book-card h2')).to_contain_text([books[-1]['title']])
+    expect(page.locator('.book-card h2')).to_contain_text([last_standalone['title']])
 
     # Missing resources and late results never overwrite the saved position.
     target = books[0]
@@ -370,7 +377,7 @@ with sync_playwright() as p:
     page.goto(f'{base}/books/{target["id"]}?chapter=30', wait_until='domcontentloaded')
     expect(page.get_by_text('正在打开书页…', exact=True)).to_be_visible()
     page.locator('.reader-back').click()
-    expect(page.locator('.book-card')).to_have_count(len(books))
+    expect(page.locator('.book-card')).to_have_count(shelf_count)
     page.locator('.book-card-bottom a').nth(4).click()
     ready()
     for pending in delayed:
@@ -428,7 +435,7 @@ with sync_playwright() as p:
                     if not card.locator('.book-card-progress').count():
                         continue
                     # Read both boxes in one frame while viewport scroll restoration may run.
-                    bounds = card.evaluate('e=>({progress:e.querySelector(".book-card-progress").getBoundingClientRect().toJSON(),link:e.querySelector(".book-card-bottom a").getBoundingClientRect().toJSON(),track:e.querySelector(".book-progress-track").getBoundingClientRect().width})')
+                    bounds = card.evaluate('e=>({progress:e.querySelector(".book-card-progress").getBoundingClientRect().toJSON(),link:e.querySelector(".book-card-bottom a,.book-collection-open").getBoundingClientRect().toJSON(),track:e.querySelector(".book-progress-track").getBoundingClientRect().width})')
                     progress_box, link_box = bounds['progress'], bounds['link']
                     assert abs(progress_box['y'] + progress_box['height'] / 2 - link_box['y'] - link_box['height'] / 2) < 1, (width, layout, progress_box, link_box)
                     assert progress_box['x'] + progress_box['width'] <= link_box['x'], (width, layout)
