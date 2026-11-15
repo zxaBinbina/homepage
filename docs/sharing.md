@@ -1,6 +1,6 @@
 # 微信与 QQ 分享元信息
 
-`site.config.ts` 是个人主页、项目目录、网页工具、小游戏与 RDP 子站 的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
+`site.config.ts` 是个人主页、项目目录、网页工具、小游戏、万象导航与 RDP 子站的标题、简介、域名和分享封面的统一配置来源。默认域名为 `https://zxabinbina.cc.cd/`，沿用原页面的 title 和 description。
 
 `vite.config.ts` 注册 `build/pageTemplates.ts` 插件，使用 EJS 渲染唯一的 `index.html` 基础模板。开发时按请求地址注入元信息，构建时根据 `src/pages.ts` 自动生成所有已注册 URL 的 HTML；页面结构由 `.vue` 模板维护。标签在开发服务器返回 HTML、生产构建生成 HTML 时注入，直接出现在页面源码中，不依赖 Vue 挂载或浏览器执行 JavaScript。`<%= … %>` 会转义属性中的特殊字符。
 
@@ -15,10 +15,10 @@
 
 分享图片按页面分组：
 
-| 页面范围                           | 分享图片                                         | 格式与尺寸      |
-| ---------------------------------- | ------------------------------------------------ | --------------- |
-| 个人主页、项目目录、工具与游戏页面 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
-| RDP 官网、Wiki 与下载页            | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
+| 页面范围                                 | 分享图片                                         | 格式与尺寸      |
+| ---------------------------------------- | ------------------------------------------------ | --------------- |
+| 个人主页、项目目录、工具、游戏与万象导航 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
+| RDP 官网、Wiki 与下载页                  | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
 
 头像原文件 `avatar.png` 实际为 JPEG；分享专用的 `share-avatar.jpg` 是它的原样副本，使用正确扩展名以匹配服务器响应格式。更新头像时同步更新该副本。OG 图片地址、格式、尺寸和替代文字统一由 `site.config.ts` 提供，QQ 图片与 JSON-LD 同步使用相同图片，站内切换时也同步更新。原 Minecraft `share-cover.jpg` 继续用于 README 展示。
 
@@ -63,3 +63,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 ## 小说书架
 
 书架 `/book` 和七个 `/books/*` 阅读页从 `src/books/library.json` 派生路由，标题、简介由 `site.config.ts` 统一生成，沿用主页头像分享图片。书架为 `CollectionPage`，阅读页为 `WebPage`；章节查询参数不进入 canonical 或站点地图。构建生成 `book.html` 与对应的 `books/*.html`，分享与 SEO 检查覆盖这些地址。封面图和 TXT 来源见 [书架维护说明](books.md)。
+
+## 万象导航
+
+`/myriad` 的标题和简介由 `site.config.ts` 提供，沿用主页 favicon 与头像分享图片。构建生成 `myriad.html`，canonical、Open Graph、QQ 标签、JSON-LD 与 sitemap 由公共构建逻辑统一生成，站内导航同步更新相同元信息。`scripts/check-sharing.py` 检查该页面的原始 HTML，`scripts/check-seo.py` 明确检查其规范地址和站点地图记录。

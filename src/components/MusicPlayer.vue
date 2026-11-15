@@ -24,6 +24,7 @@ const props = withDefaults(
     compact?: boolean
     overlayPlaylist?: boolean
     playOnMount?: boolean
+    suspended?: boolean
   }>(),
   {
     active: true,
@@ -223,7 +224,7 @@ function reportError() {
 }
 async function play() {
   const element = audio.value
-  if (!element) return
+  if (!element || props.suspended) return
   const request = ++playRequest
   error.value = ''
   loading.value = true
@@ -239,6 +240,17 @@ async function play() {
     } else reportError()
   }
 }
+watch(
+  () => props.suspended,
+  (suspended) => {
+    if (!suspended) return
+    ++playRequest
+    audio.value?.pause()
+    loading.value = false
+    playing.value = false
+  },
+  { flush: 'sync' },
+)
 function togglePlay() {
   if (playing.value || loading.value) {
     ++playRequest

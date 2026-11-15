@@ -20,6 +20,7 @@ const components = {
   home: () => import('./HomePage.vue'),
   directory: () => import('./ProjectDirectory.vue'),
   bookshelf: () => import('./books/BookShelf.vue'),
+  myriad: () => import('./myriad/MyriadPage.vue'),
   tools: () => import('./tools/ToolDirectory.vue'),
   ...(Object.fromEntries(toolIds.map((id) => [id, () => import('./tools/ToolPage.vue')])) as Record<
     ToolId,
@@ -150,6 +151,8 @@ export const router = createRouter({
       if (!to.hash) return false
     }
     if (savedPosition) return { ...savedPosition, behavior: 'instant' }
+    if (to.name === 'myriad' && to.hash.startsWith('#search?'))
+      return changedPage ? { top: 0, behavior: 'instant' } : false
     const target = to.hash ? await waitForHashTarget(to.hash) : null
     if (router.currentRoute.value.fullPath !== to.fullPath) return false
     if (target) {

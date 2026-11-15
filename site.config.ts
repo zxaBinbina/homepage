@@ -18,6 +18,11 @@ export const siteContent = {
 }
 
 const projectPages = {
+  myriad: {
+    title: '万象导航 · a彬彬a',
+    description:
+      '你的上网起点，一页尽万象。自定义快捷方式、分组与小组件，浏览热榜和 RSS；访客数据保存在当前浏览器。',
+  },
   bookshelf: {
     title: '我的书架 · a彬彬a',
     description: '分享我读过的网络小说。挑一本慢慢看，支持在线阅读、章节目录与自动保存阅读进度。',

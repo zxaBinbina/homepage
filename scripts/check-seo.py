@@ -68,7 +68,10 @@ for file in root.rglob('*.html'):
 assert base in canonical_urls, 'Missing homepage'
 tools = json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))
 books = json.loads(Path('src/books/library.json').read_text())
-assert len(canonical_urls) == 46 + len(tools) + len(books), canonical_urls
+assert len(canonical_urls) == 47 + len(tools) + len(books), canonical_urls
+myriad_url = urljoin(base, 'myriad')
+assert myriad_url in canonical_urls, 'Missing Myriad canonical URL'
+assert myriad_url in urls, 'Missing Myriad sitemap URL'
 assert urljoin(base, 'book') in canonical_urls
 assert all(urljoin(base, 'books/' + book['id']) in canonical_urls for book in books)
 assert all(urljoin(base, tool['path']) in canonical_urls for tool in tools), 'Missing tool canonical URL'

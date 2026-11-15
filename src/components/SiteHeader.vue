@@ -9,7 +9,8 @@ import NeteaseIcon from './NeteaseIcon.vue'
 const props = withDefaults(
   defineProps<{
     home?: boolean
-    active?: 'home' | 'projects' | 'tools' | 'games' | 'books' | null
+    myriad?: boolean
+    active?: 'home' | 'projects' | 'tools' | 'games' | 'books' | 'myriad' | null
   }>(),
   {
     home: false,
@@ -29,6 +30,7 @@ const nav = [
   { id: 'tools', label: '工具' },
   { id: 'games', label: '游戏' },
   { id: 'books', label: '书架' },
+  { id: 'myriad', label: '万象导航' },
   { id: 'world', label: '悠哉世界' },
 ]
 function navHref(id: string) {
@@ -37,6 +39,7 @@ function navHref(id: string) {
   if (id === 'tools') return '/tool'
   if (id === 'games') return '/game'
   if (id === 'books') return '/book'
+  if (id === 'myriad') return '/myriad'
   return id === 'projects' ? '/project' : `${props.home ? '' : '/'}#${id}`
 }
 function isActive(id: string) {
@@ -87,6 +90,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
       <ColorPalettePicker />
       <ThemeToggle />
       <button
+        v-if="!myriad"
         ref="musicTrigger"
         class="icon-button music-toggle"
         :class="{ 'is-playing': musicPlaying }"
@@ -146,6 +150,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   </header>
   <MusicDialog
     :anchor="musicTrigger"
+    :suspended="myriad"
     @playing="musicPlaying = $event"
     @track="musicTrack = $event"
     @opened="musicOpen = $event"

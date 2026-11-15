@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { X } from 'lucide-vue-next'
 import MusicPlayer from './MusicPlayer.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
 
-const props = defineProps<{ anchor?: HTMLElement }>()
+const props = defineProps<{ anchor?: HTMLElement; suspended?: boolean }>()
 const emit = defineEmits<{
   playing: [value: boolean]
   opened: [value: boolean]
@@ -64,6 +64,13 @@ function beforeToggle(event: Event) {
   }
   emit('opened', opened.value)
 }
+watch(
+  () => props.suspended,
+  (suspended) => {
+    if (suspended) close()
+  },
+  { flush: 'sync' },
+)
 function close() {
   popover.value?.hidePopover()
 }
@@ -107,7 +114,8 @@ onBeforeUnmount(() => {
           v-if="mounted"
           compact
           play-on-mount
-          :active="opened"
+          :active="opened && !suspended"
+          :suspended="suspended"
           :overlay-playlist="overlayPlaylist"
           @playing="emit('playing', $event)"
           @track="emit('track', $event)"

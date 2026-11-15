@@ -758,6 +758,41 @@ button:disabled {
   transform: none;
   animation: none;
 }
+.app-header-transition.is-myriad {
+  opacity: 0;
+  translate: 0 calc(-100% - var(--space-xl));
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    translate 0.25s var(--motion-ease);
+}
+.app-header-transition.is-myriad.is-revealed,
+.app-header-transition.is-myriad:focus-within {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-header-transition.is-myriad {
+    transition: none;
+  }
+}
+.myriad-main {
+  min-height: 100dvh;
+}
+.myriad-main > .myriad {
+  --font-sans: inherit;
+}
+.myriad-main .m-toolbar {
+  top: var(--space-2xl);
+}
+@media (max-width: 760px) {
+  .app-header-transition.is-myriad {
+    opacity: 1;
+    translate: 0 0;
+    pointer-events: auto;
+  }
+}
 .header-swap-enter-active,
 .header-swap-leave-active {
   transition:

@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@peculiar/x509": "1.14.3",
+    "@zxabinbina/myriad-core": "0.1.0",
+    "@zxabinbina/myriad-ui": "0.1.0",
     "chess.js": "^1.4.0",
     "cron-parser": "5.10.2",
     "crypto-js": "4.2.0",

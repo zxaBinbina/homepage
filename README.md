@@ -258,3 +258,13 @@ Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出�
 Gaze 官方图标 [gaze.svg](public/images/gaze.svg) 来自 [Gundu Labs 官方仓库](https://github.com/gundulabs/gaze/blob/main/packaging/gui/com.gundulabs.Gaze.svg)，原样保留，版权归 2026 Gundu Labs，遵循 [GPL-3.0-or-later](public/images/gaze.LICENSE.txt)；该第三方素材不适用本站代码许可证。
 
 Freemium、jaywcjlove/tools 与固定 MIT 发布版的 XCPDF V7.3 采用 MIT 许可；其运行时依赖及附带资源遵循各自许可证，包括 Apache-2.0、BSD 与 MPL-2.0。许可证副本、依赖声明与 ExifReader 对应源码随 `public/licenses/` 发布，PDF.js 附带资源的许可随 `/tool-assets/pdfjs/` 发布；完整来源说明见 [网页工具说明](docs/tools.md#源码与许可证)。
+
+## 万象导航
+
+`/myriad` 是桌面浏览器的访客导航页，复用 `@zxabinbina/myriad-core` / `@zxabinbina/myriad-ui`。支持本机快捷方式与分组、小组件、JSON 导入导出、公开热榜 / RSS 与正文预览；数据单独保存在 `homepage.myriad.visitor.*`，不接入个人同步、私有搜索或服务密钥。网站没有登录入口。
+
+进入时主页导航自动收起，鼠标移到顶端或键盘焦点进入导航时显示；音乐暂停并隐藏入口，返回保留曲目与进度且不自动续播。宽度不超过 760px 时只显示手机提示页，不加载桌面组件。
+
+公开 Worker 默认 `https://myriad.zxabinbina.cc.cd`，可用 `VITE_MYRIAD_PUBLIC_API` 调整，仅访问免费公开接口。两个共享包已公开发布 0.1.0，主页使用正式 npm 版本，执行 npm ci 即可独立安装，不需要相邻 myriad 仓库。开发共享包时可临时换用 file: 引用，并先在 myriad 执行 npm run build:packages；不要将本地路径依赖推送到部署分支。
+
+验收：构建后运行 `HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-myriad.py`，并运行导航、主题、加载回归。

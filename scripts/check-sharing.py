@@ -27,6 +27,7 @@ class Head(HTMLParser):
         if self.in_title: self.title += data
 
 pages = {
+    '万象导航 · a彬彬a': 'myriad',
     '我的书架 · a彬彬a': 'book',
     '小游戏 · a彬彬a': 'game',
     '2048 · 小游戏 · a彬彬a': 'games/2048',

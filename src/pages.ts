@@ -22,6 +22,7 @@ const staticPages = {
   tools: '/tool',
   games: '/game',
   bookshelf: '/book',
+  myriad: '/myriad',
   twenty48: '/games/2048',
   minesweeper: '/games/minesweeper',
   solitaire: '/games/solitaire',

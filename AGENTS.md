@@ -250,3 +250,13 @@ npx prettier --check README.md AGENTS.md DESIGN.md
 - `AGENTS.md` 维护协作流程、修改位置和验证要求，避免重复复制整套设计参数。
 
 修改设计约定、使用命令或文件职责时，同步更新对应文档；局部实现调整不必重写无关章节。完成后简要说明改动、验证结果和实际限制。报告浏览器验证时区分本次结果与旧截图；保留用户已有修改，不将无关文件混入本次工作。
+
+## 万象导航接入
+
+页面外壳为 `src/myriad/MyriadPage.vue`，桌面包与访客平台适配为 `src/myriad/MyriadDesktop.vue`，路由 / 元信息由 `pages.ts`、`router.ts` 与 `site.config.ts` 统一维护。共享包锁定公共 npm `@zxabinbina/myriad-core@0.1.0` / `@zxabinbina/myriad-ui@0.1.0`，无需相邻源码仓库。宿主显式导入 `@zxabinbina/myriad-ui/style.css`。网站隐藏登录已按用户要求取消。
+
+访客数据使用独立 `homepage.myriad.visitor.` 前缀，不接入个人同步或服务密钥；免费公开 Worker 地址可通过 `VITE_MYRIAD_PUBLIC_API` 修改。保留书架 / 阅读器既有路由、滚动恢复与导航隐藏逻辑；进入万象暂停音乐并保留播放器实例，离开不自动续播。
+
+改动后运行构建与 `scripts/check-myriad.py`，验证访客存储 / 凭据隔离、公开请求、JSON 导入导出、音乐暂停、导航键盘显示、搜索历史与手机提示页；共享导航 / 主题 / 加载仍运行原有回归，分享与 SEO 检查需同时覆盖万象、书架和既有工具页面。
+
+2026-11-15：万象接入从 `start_page/homepage` 旧快照逐处合并到本仓库，保留新版书架 / 阅读器、信创 PDF 工具箱与既有 CSS。正式 npm 依赖构建、34 项 M5 浏览器检查、导航 / 主题 / 动效 / 加载回归、分享与 SEO 检查均通过；全站 164 个规范页面和 10 个 noindex 错误页通过。用户级 `myriad-homepage-preview.service` 已切换到本仓库，地址仍是 `http://127.0.0.1:4173/myriad`。本次万象改动尚未提交或推送。
