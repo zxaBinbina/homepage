@@ -32,8 +32,8 @@ with sync_playwright() as p:
     def front(target, source, selector='[data-book-id="harry-potter"] .book-collection-cover'):
         target.wait_for_function('''({source,selector})=>Array.from(document.querySelector(selector).children).some(cover=>getComputedStyle(cover).zIndex==='7'&&cover.querySelector('img').getAttribute('src')===source)''', arg={'source':source,'selector':selector}, timeout=2200)
 
-    def point(card):
-        bounds = card.locator('.book-card-cover').bounding_box()
+    def point(card, selector='.book-card-cover'):
+        bounds = card.locator(selector).bounding_box()
         return {'x': bounds['x'] + bounds['width'] / 2, 'y': bounds['y'] + bounds['height'] / 2}
 
     card = shelf(page)
@@ -61,6 +61,7 @@ with sync_playwright() as p:
     page.emulate_media(reduced_motion='no-preference')
     page.mouse.move(0, 0)
 
+    page.emulate_media(reduced_motion='reduce')
     for width in [320, 390, 768, 1024, 1440]:
         page.set_viewport_size({'width': width, 'height': 900})
         for theme in ['dark', 'light']:
@@ -76,6 +77,8 @@ with sync_playwright() as p:
                     card.screenshot(path=str(out / f'hp-stack-{theme}-{width}-{layout}.png'))
 
     page.set_viewport_size({'width': 1440, 'height': 900})
+    page.emulate_media(color_scheme='dark')
+    page.emulate_media(reduced_motion='no-preference')
     page.get_by_role('button', name='卡片视图', exact=True).click()
     card.scroll_into_view_if_needed()
     pos = point(card)
@@ -85,7 +88,8 @@ with sync_playwright() as p:
     dialog_cover = dialog.locator('.book-collection-cover')
     expect(dialog_cover.locator('img')).to_have_count(7)
     assert dialog_cover.locator('img').evaluate_all('images=>images.map(img=>img.getAttribute("src"))') == covers
-    dialog_cover.hover(force=True)
+    dialog_pos = point(dialog, '.book-collection-cover')
+    page.mouse.move(dialog_pos['x'], dialog_pos['y'])
     front(page, covers[1], '.book-collection-dialog .book-collection-cover')
     page.wait_for_timeout(380)
     dialog.screenshot(path=str(out / 'hp-stack-dialog-preview-dark-1440.png'))
@@ -118,22 +122,34 @@ with sync_playwright() as p:
     touch.wait_for_timeout(1400)
     front(touch, covers[0])
     touch.touchscreen.tap(pos['x'], pos['y'])
-    expect(touch.locator('.book-collection-dialog')).to_be_visible()
+    touch_dialog = touch.locator('.book-collection-dialog')
+    expect(touch_dialog).to_be_visible()
+    touch.wait_for_timeout(260)
+    dialog_pos = point(touch_dialog, '.book-collection-cover')
+    cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{**dialog_pos, 'id': 3}]})
+    front(touch, covers[1], '.book-collection-dialog .book-collection-cover')
+    touch.wait_for_timeout(380)
+    touch_dialog.screenshot(path=str(out / 'hp-stack-dialog-preview-touch-390.png'))
+    cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []})
+    front(touch, covers[0], '.book-collection-dialog .book-collection-cover')
+    expect(touch_dialog).to_be_visible()
     touch.get_by_role('button', name='关闭分册选择', exact=True).tap()
     expect(touch.locator('.book-collection-dialog')).not_to_be_visible()
 
+    touch.get_by_role('searchbox', name='搜索小说', exact=True).fill('')
     card.scroll_into_view_if_needed()
     pos = point(card)
     scroll_before = touch.evaluate('scrollY')
     cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{**pos, 'id': 2}]})
     touch.wait_for_timeout(60)
+    direction = 1 if scroll_before > 40 else -1
     for distance in [20, 45, 80]:
-        cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': pos['x'], 'y': pos['y'] - distance, 'id': 2}]})
+        cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': pos['x'], 'y': pos['y'] + direction * distance, 'id': 2}]})
         touch.wait_for_timeout(50)
     cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []})
     touch.wait_for_timeout(1400)
     front(touch, covers[0])
-    assert touch.evaluate('scrollY') > scroll_before, 'Cover prevented native touch scrolling'
+    assert abs(touch.evaluate('scrollY') - scroll_before) > 10, 'Cover prevented native touch scrolling'
     expect(touch.locator('.book-collection-dialog')).not_to_be_visible()
     assert not errors, errors
     browser.close()

@@ -45,6 +45,10 @@ error_codes = {400, 401, 403, 404, 408, 429, 500, 502, 503, 504}
 error_files = {f'{code}.html' for code in error_codes}
 for file in root.rglob('*.html'):
     doc = Document(file.read_text())
+    if file.relative_to(root).as_posix() == 'tool-assets/xcpdf/runtime.html':
+        assert doc.robots == ['noindex'] and not doc.canonical, file
+        assert urljoin(base, 'tool-assets/xcpdf/runtime.html') not in urls
+        continue
     route = file.relative_to(root).as_posix().removesuffix('.html')
     error = file.relative_to(root).as_posix() in error_files
     expected = urljoin(base, '' if route == 'index' else route)

@@ -1,0 +1,226 @@
+{
+  "name": "信创PDF工具箱（XCPDF）",
+  "author": "相声的技术备忘录 / wallechfox",
+  "version": "7.3",
+  "repository": "https://github.com/wallechfox/offline-pdf-tools",
+  "commit": "98424086829730f3dd7313a8871bbbbb49e80cd8",
+  "license": "MIT",
+  "sha256": "80dc72dabeee647753e371d5fb864240cce83fdb167c35356e90b66cbc2756dc",
+  "tools": [
+    {
+      "id": "pdf-merge",
+      "name": "PDF 常规合并",
+      "panel": "tab-merge"
+    },
+    {
+      "id": "pdf-merge-alternating",
+      "name": "PDF 交替合并",
+      "panel": "tab-merge-alt"
+    },
+    {
+      "id": "pdf-split",
+      "name": "PDF 常规拆分",
+      "panel": "tab-split"
+    },
+    {
+      "id": "pdf-split-bookmarks",
+      "name": "PDF 按书签拆分",
+      "panel": "tab-split-bookmark"
+    },
+    {
+      "id": "pdf-explode-bookmarks",
+      "name": "PDF 按书签拆成独立文件",
+      "panel": "tab-split-bookmark-explode"
+    },
+    {
+      "id": "pdf-reorder",
+      "name": "PDF 页面重排",
+      "panel": "tab-manage"
+    },
+    {
+      "id": "pdf-reverse",
+      "name": "PDF 页面倒序",
+      "panel": "tab-reverse"
+    },
+    {
+      "id": "pdf-pad-even",
+      "name": "PDF 补齐空白页",
+      "panel": "tab-pad-even"
+    },
+    {
+      "id": "pdf-delete-pages",
+      "name": "PDF 删除页面",
+      "panel": "tab-delete"
+    },
+    {
+      "id": "pdf-remove-blank-pages",
+      "name": "PDF 自动删除空白页",
+      "panel": "tab-remove-blank"
+    },
+    {
+      "id": "pdf-rotate",
+      "name": "PDF 页面批量旋转",
+      "panel": "tab-rotate"
+    },
+    {
+      "id": "pdf-rotate-pages",
+      "name": "PDF 页面逐页旋转",
+      "panel": "tab-rotate-single"
+    },
+    {
+      "id": "pdf-impose",
+      "name": "PDF 页面拼版",
+      "panel": "tab-impose"
+    },
+    {
+      "id": "pdf-booklet",
+      "name": "PDF 小册子排版",
+      "panel": "tab-booklet"
+    },
+    {
+      "id": "pdf-split-booklet",
+      "name": "PDF 小册子拆分",
+      "panel": "tab-booklet-split"
+    },
+    {
+      "id": "pdf-resize",
+      "name": "PDF 统一页面大小",
+      "panel": "tab-unify"
+    },
+    {
+      "id": "pdf-split-spread",
+      "name": "PDF 拆分对开页",
+      "panel": "tab-split-book"
+    },
+    {
+      "id": "pdf-deskew",
+      "name": "PDF 倾斜校正",
+      "panel": "tab-skew"
+    },
+    {
+      "id": "pdf-crop-margins",
+      "name": "PDF 裁剪白边",
+      "panel": "tab-crop-margin"
+    },
+    {
+      "id": "pdf-blank",
+      "name": "生成空白 PDF",
+      "panel": "tab-blank"
+    },
+    {
+      "id": "pdf-to-images",
+      "name": "PDF 转图片（信创工具箱）",
+      "panel": "tab-convert"
+    },
+    {
+      "id": "pdf-images-to-pdf",
+      "name": "图片转 PDF",
+      "panel": "tab-img2pdf"
+    },
+    {
+      "id": "pdf-extract-text",
+      "name": "PDF 提取文本",
+      "panel": "tab-pdf2txt"
+    },
+    {
+      "id": "pdf-flatten",
+      "name": "PDF 扁平化",
+      "panel": "tab-flatten"
+    },
+    {
+      "id": "pdf-extract-images",
+      "name": "PDF 提取图片",
+      "panel": "tab-extract-images"
+    },
+    {
+      "id": "pdf-filters",
+      "name": "PDF 页面滤镜",
+      "panel": "tab-filter"
+    },
+    {
+      "id": "pdf-blueprint",
+      "name": "PDF 工程蓝图",
+      "panel": "tab-blueprint"
+    },
+    {
+      "id": "pdf-scan-effect",
+      "name": "PDF 模拟扫描件",
+      "panel": "tab-scan-effect"
+    },
+    {
+      "id": "pdf-page-numbers",
+      "name": "PDF 添加页码",
+      "panel": "tab-pagenum"
+    },
+    {
+      "id": "pdf-bates",
+      "name": "PDF Bates 编页",
+      "panel": "tab-bates"
+    },
+    {
+      "id": "pdf-text-watermark",
+      "name": "PDF 文字水印",
+      "panel": "tab-watermark-text"
+    },
+    {
+      "id": "pdf-image-watermark",
+      "name": "PDF 图片水印",
+      "panel": "tab-watermark-image"
+    },
+    {
+      "id": "pdf-stamp",
+      "name": "PDF 添加图章",
+      "panel": "tab-stamp"
+    },
+    {
+      "id": "pdf-seam-stamp",
+      "name": "PDF 扇形骑缝章",
+      "panel": "tab-perf-stamp"
+    },
+    {
+      "id": "pdf-annotate",
+      "name": "PDF 批注",
+      "panel": "tab-mark"
+    },
+    {
+      "id": "pdf-redact",
+      "name": "PDF 涂黑",
+      "panel": "tab-redact"
+    },
+    {
+      "id": "pdf-metadata",
+      "name": "PDF 文档信息",
+      "panel": "tab-meta"
+    },
+    {
+      "id": "pdf-signature-info",
+      "name": "PDF CA 签章查看",
+      "panel": "tab-ca-sign"
+    },
+    {
+      "id": "pdf-edit-bookmarks",
+      "name": "PDF 添加与编辑书签",
+      "panel": "tab-bookmark-editor"
+    },
+    {
+      "id": "pdf-remove-bookmarks",
+      "name": "PDF 删除书签",
+      "panel": "tab-remove-bookmarks"
+    },
+    {
+      "id": "pdf-compress",
+      "name": "PDF 压缩",
+      "panel": "tab-compress"
+    },
+    {
+      "id": "pdf-decrypt",
+      "name": "PDF 解密",
+      "panel": "tab-unlock"
+    },
+    {
+      "id": "pdf-encrypt",
+      "name": "PDF 加密",
+      "panel": "tab-encrypt"
+    }
+  ]
+}

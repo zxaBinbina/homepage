@@ -4485,6 +4485,60 @@ h1 > span {
   }
 }
 
+.xcpdf-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.xcpdf-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.xcpdf-reset:hover {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.xcpdf-frame-wrap {
+  position: relative;
+  min-width: 0;
+}
+.xcpdf-frame-wrap iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+.xcpdf-wait {
+  position: absolute;
+  inset: 24px 0 auto;
+  text-align: center;
+  color: var(--muted);
+}
+.xcpdf-error {
+  color: var(--status-danger);
+}
+.xcpdf-credit {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.xcpdf-credit a {
+  color: var(--blue);
+}
+.xcpdf-credit svg {
+  vertical-align: middle;
+}
+
 /* Freemium MIT components use local aliases of the existing site tokens. No upstream global reset. */
 .freemium-workbench {
   --bg-2: var(--panel);

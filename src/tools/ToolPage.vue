@@ -6,6 +6,7 @@ import SiteFooter from '../components/SiteFooter.vue'
 import AppToasts from './freemium/components/AppToasts.vue'
 import { toolCatalog, type ToolId } from './catalog'
 import { toolComponents } from './components'
+import { isXcpdfToolId } from './xcpdf/catalog'
 const props = defineProps<{ id: ToolId }>()
 const tool = computed(() => toolCatalog[props.id])
 const { pending, resolved, failed } = usePageLoading()
@@ -28,7 +29,7 @@ function reload() {
           <button class="button button-primary" type="button" @click="reload">重新加载</button>
         </div>
         <Suspense v-else @pending="pending" @resolve="resolved">
-          <component :is="toolComponents[id]" />
+          <component :is="toolComponents[id]" v-bind="isXcpdfToolId(id) ? { toolId: id } : {}" />
           <template #fallback><div class="tool-load-state" aria-busy="true"></div></template>
         </Suspense>
         <AppToasts />

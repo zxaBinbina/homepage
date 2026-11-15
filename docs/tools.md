@@ -1,6 +1,6 @@
 # 网页工具
 
-本站收录 **58 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
+本站收录 **101 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具、[XCPDF V7.3](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)（固定 MIT 发布版）的全部 43 项功能，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
 
 ## 工具清单
 
@@ -70,6 +70,64 @@
 | 项目徽章生成     | `/tools/generate-github-badges`         | 生成 GitHub、npm、Docker 和自定义徽章的引用代码。   |
 | JavaScript 混淆  | `/tools/js-obfuscator`                  | 转换变量与代码结构，生成可下载的混淆代码。          |
 
+## 信创 PDF 工具箱
+
+完整接入用户提供的《信创PDF工具箱V7.3-43项功能-单文件版.html》，作者为相声的技术备忘录（wallechfox）。本站保留已有 PDF 转图片工具，并为 XCPDF 的 43 项功能分别提供站内地址；目录按「PDF 页面」「PDF 转换」「PDF 编辑」筛选，也可搜索「PDF」「信创」或「XCPDF」。
+
+| 工具                     | 地址                            |
+| ------------------------ | ------------------------------- |
+| PDF 常规合并             | `/tools/pdf-merge`              |
+| PDF 交替合并             | `/tools/pdf-merge-alternating`  |
+| PDF 常规拆分             | `/tools/pdf-split`              |
+| PDF 按书签拆分           | `/tools/pdf-split-bookmarks`    |
+| PDF 按书签拆成独立文件   | `/tools/pdf-explode-bookmarks`  |
+| PDF 页面重排             | `/tools/pdf-reorder`            |
+| PDF 页面倒序             | `/tools/pdf-reverse`            |
+| PDF 补齐空白页           | `/tools/pdf-pad-even`           |
+| PDF 删除页面             | `/tools/pdf-delete-pages`       |
+| PDF 自动删除空白页       | `/tools/pdf-remove-blank-pages` |
+| PDF 页面批量旋转         | `/tools/pdf-rotate`             |
+| PDF 页面逐页旋转         | `/tools/pdf-rotate-pages`       |
+| PDF 页面拼版             | `/tools/pdf-impose`             |
+| PDF 小册子排版           | `/tools/pdf-booklet`            |
+| PDF 小册子拆分           | `/tools/pdf-split-booklet`      |
+| PDF 统一页面大小         | `/tools/pdf-resize`             |
+| PDF 拆分对开页           | `/tools/pdf-split-spread`       |
+| PDF 倾斜校正             | `/tools/pdf-deskew`             |
+| PDF 裁剪白边             | `/tools/pdf-crop-margins`       |
+| 生成空白 PDF             | `/tools/pdf-blank`              |
+| PDF 转图片（信创工具箱） | `/tools/pdf-to-images`          |
+| 图片转 PDF               | `/tools/pdf-images-to-pdf`      |
+| PDF 提取文本             | `/tools/pdf-extract-text`       |
+| PDF 扁平化               | `/tools/pdf-flatten`            |
+| PDF 提取图片             | `/tools/pdf-extract-images`     |
+| PDF 页面滤镜             | `/tools/pdf-filters`            |
+| PDF 工程蓝图             | `/tools/pdf-blueprint`          |
+| PDF 模拟扫描件           | `/tools/pdf-scan-effect`        |
+| PDF 添加页码             | `/tools/pdf-page-numbers`       |
+| PDF Bates 编页           | `/tools/pdf-bates`              |
+| PDF 文字水印             | `/tools/pdf-text-watermark`     |
+| PDF 图片水印             | `/tools/pdf-image-watermark`    |
+| PDF 添加图章             | `/tools/pdf-stamp`              |
+| PDF 扇形骑缝章           | `/tools/pdf-seam-stamp`         |
+| PDF 批注                 | `/tools/pdf-annotate`           |
+| PDF 涂黑                 | `/tools/pdf-redact`             |
+| PDF 文档信息             | `/tools/pdf-metadata`           |
+| PDF CA 签章查看          | `/tools/pdf-signature-info`     |
+| PDF 添加与编辑书签       | `/tools/pdf-edit-bookmarks`     |
+| PDF 删除书签             | `/tools/pdf-remove-bookmarks`   |
+| PDF 压缩                 | `/tools/pdf-compress`           |
+| PDF 解密                 | `/tools/pdf-decrypt`            |
+| PDF 加密                 | `/tools/pdf-encrypt`            |
+
+提供的 HTML 与上游提交 `98424086829730f3dd7313a8871bbbbb49e80cd8`（2026-11-05）的文件 SHA-256 完全一致，当时仓库许可证为 MIT。上游于 2026-11-06 改为非开源许可；本站归档和标注仅对应已获 MIT 许可的固定版本，不将当前主分支标为 MIT。原文件、43 项映射与许可证保存在 [third_party/xcpdf/](../third_party/xcpdf/README.md)，发布许可见 [MIT 原文](../public/licenses/xcpdf.txt)及[第三方声明](../public/licenses/xcpdf-dependencies.txt)。
+
+操作区由 `src/tools/xcpdf/XcpdfTool.vue` 管理；`build/xcpdf.ts` 从未改动的上游归档生成本地运行资源，保留 PDF 处理引擎，通过独立沙盒适配本站主题。界面颜色映射维护在 `build/xcpdfUiTheme.ts`，构建样式与运行时动态列表、提示、结果共用，文档画布和导出色板保持实际颜色。每项工具只显示对应操作面板，共用本站导航、播放器、标题和页脚；取消清空与来源许可集中在操作区下方。原工具箱首页、收藏入口和独立导航不在页面中显示。运行库仅在打开相应工具后读取，不从 CDN 加载，也不新增后端或 Service Worker。
+
+所有文档、密码和结果只保留在运行中的沙盒，无法读取本站浏览器存储；CSP 阻止网络连接与表单提交，文件不上传。取消并清空、切换工具或离开页面会丢弃整个运行环境及工作线程，旧任务不能继续下载。单个文件上限 30 MB；大型文件和高分辨率导出仍受浏览器内存限制。
+
+文本提取只读取现有文字层，不包含 OCR；扫描件没有文字层时无法直接提取文字。CA 签章查看展示签名与证书字段，不校验证书信任、撤销状态或法律效力。解密需要正确的打开密码；添加水印、批注、压缩、涂黑等修改可能使原数字签名失效。涂黑导出会栅格化页面，使用前后应核对实际遮盖范围。部分扫描件操作会将页面转换为图片，文字可选性、书签和页面尺寸以对应工具说明及实际导出为准。
+
 ## 私人网页浏览器
 
 地址 `/tools/web-browser`，分类「检查调试」。主页只提供中文操作界面，中转后端独立维护在同级 `../bin-api/`。`api.zxabinbina.cc.cd` 提供 `/v1/auth/*` 与 `/v1/proxy/*` 模块，`browse.zxabinbina.cc.cd` 承载隔离浏览环境；目标网页不能直接访问主页界面的 DOM。
@@ -111,7 +169,7 @@
 - JWT 支持解析与 HMAC 签名校验；签名正确并不等于业务授权有效。证书校验使用随构建提供的 Mozilla 根证书快照，检查链签名、有效期、主机名和私钥匹配，不联网查询吊销状态。
 - 正则表达式在 Worker 内运行，超时 1 秒会中止；离开页面会清理任务。通用转换输入改变时立即撤销旧结果；全屏编辑保留原输入，退出恢复焦点。
 
-- PDF 文件上限 30 MB，单页上限 1600 万像素；ZIP 最多 100 页、64 MB，包含最后一页。支持密码文档；密码只保留在当前组件。取消、重新读取或离开时清理解析和渲染任务，字体、CMap、图像解码 WASM 全部由本站提供。
+- Web Tools 的 PDF 转图片文件上限 30 MB，单页上限 1600 万像素；ZIP 最多 100 页、64 MB，包含最后一页。支持密码文档；密码只保留在当前组件。取消、重新读取或离开时清理解析和渲染任务，字体、CMap、图像解码 WASM 全部由本站提供。
 - EXIF 文件上限 30 MB，可包含原始照片的 GPS 信息；不自动访问地图或外部图片。SVG 最多 50 万字符、15 秒超时；JavaScript 混淆最多 10 万字符、20 秒超时，源码只转换不执行，选项改变后清除旧结果。
 - 简繁转换为逐字映射，不处理上下文歧义；拼音按词典推断，注音预览最多 3000 字。汉字表保留 8105 字，每页 120 字。金额支持 16 位整数和最多 2 位小数，以文本处理避免 Number 舍入。
 - 代码图片最多 2 万字符，支持 PNG/JPEG/SVG，位图默认 2 倍导出；JPEG 透明区域填白，SVG 使用 foreignObject。代码图片的固定深浅配色仅影响导出作品，操作区始终跟随本站主题。
@@ -139,6 +197,7 @@ npm run preview -- --port 4173
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-tools-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-codex-cleaner-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-jaytools-browser.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-xcpdf-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-navigation.py
 python3 scripts/check-sharing.py
 python3 scripts/check-seo.py

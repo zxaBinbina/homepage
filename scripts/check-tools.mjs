@@ -114,3 +114,5 @@ console.log(
 )
 await import('./check-jaytools.mjs')
 await import('./check-codex-cleaner.mjs')
+
+await import('./check-xcpdf.mjs')

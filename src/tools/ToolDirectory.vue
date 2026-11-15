@@ -136,11 +136,22 @@ function enter(element: Element) {
         <a href="https://github.com/jaywcjlove/tools" target="_blank" rel="noopener noreferrer"
           >Web Tools</a
         >
+        与
+        <a
+          href="https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8"
+          target="_blank"
+          rel="noopener noreferrer"
+          >信创 PDF 工具箱</a
+        >
         ·
         <a href="/licenses/freemium.txt" target="_blank" rel="noopener noreferrer">MIT 开源许可</a>
         /
         <a href="/licenses/jaywcjlove-tools.txt" target="_blank" rel="noopener noreferrer"
           >Web Tools 许可</a
+        >
+        /
+        <a href="/licenses/xcpdf.txt" target="_blank" rel="noopener noreferrer"
+          >信创 PDF 工具箱 MIT 许可</a
         >
       </p>
     </main>

@@ -7,6 +7,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { pageTemplates } from './build/pageTemplates'
 import { toolAssets } from './build/toolAssets'
+import { xcpdfAssets } from './build/xcpdf'
 import { siteContent } from './site.config'
 import { lyricsResponse } from './server/lyrics'
 import type { IncomingMessage, ServerResponse } from 'node:http'
@@ -74,6 +75,7 @@ export default defineConfig(({ mode, command }) => {
       },
       pageTemplates(env.SITE_URL, command === 'build'),
       toolAssets(),
+      xcpdfAssets(),
       vue(),
     ],
     base: './',

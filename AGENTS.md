@@ -94,12 +94,15 @@
 
 - `src/tools/freemium/`：Freemium（MIT）迁入的全部上游工具源码。
 - `src/tools/jaytools/`：jaywcjlove/tools（MIT）补充工具的 Vue 实现与本地资源。
+- `src/tools/xcpdf/`：信创 PDF 工具箱 V7.3 的独立工具目录、沙盒消息桥和主题适配；原始 MIT 发布版归档在 `third_party/xcpdf/`，开发与构建资源由 `build/xcpdf.ts` 生成。
 
 共享样式在 `src/style.css`（`.freemium-workbench` 与 `.jay-*` 范围），Freemium 组件的专用样式随组件保留。来源、版本、许可证与使用限制见 [docs/tools.md](docs/tools.md)、[Freemium 来源说明](third_party/freemium/README.md) 与 [Web Tools 来源说明](third_party/jaywcjlove-tools/README.md)。升级时核对完整上游清单，更新固定版本、源码归档、校验值与逐项去重映射，保留原始许可证。更新 jaytools 依赖后运行 `node scripts/update-jaytools-notices.mjs`，并核对依赖声明、补充许可证与 ExifReader 对应源码。
 
 工具计算仅在浏览器内处理输入，不上传、不持久保存；项目徽章的引用代码在本地生成，只有主动打开远程徽章链接时才向对应服务发送项目名或徽章文字。保留计算任务的取消、过期结果隔离与卸载清理。PDF.js 的字体、CMap、WASM 与附带许可证由 `build/toolAssets.ts` 在开发和构建时提供本地资源；新增工具无需应用后端，浏览器 Web Worker 不改变 Cloudflare Pages 部署方式。
 
 变更清单或转换规则运行 `node scripts/check-tools.mjs`，该入口已包含 `check-jaytools.mjs`，无需重复执行；归档校验需要系统提供 `tar`。交互或布局变更运行 `python3 scripts/check-tools-browser.py`，涉及 jaytools 时再运行 `python3 scripts/check-jaytools-browser.py`，检查真实文件、图片与 ZIP 导出、取消、主题、响应式和动效。后者还需要 Python Pillow（`PIL`），截图与下载结果位于 `artifacts/jaytools/`。
+
+信创 PDF 工具箱的 43 项功能固定为 2026-11-05 的 MIT 发布版，上游新版本的许可需另行核对，不直接修改原始 HTML 归档。修改其目录或资源生成逻辑运行 `node scripts/check-xcpdf.mjs`（已纳入 `check-tools.mjs`）；交互与样式修改构建后运行 `python3 scripts/check-xcpdf-browser.py`，验证文件导入、实际 PDF / 图片 / ZIP / TXT 导出、加密解密、主题、窄屏及取消清理。
 
 私人网页浏览器是本地工具规则的例外：前端位于 `src/tools/browser/`，后端独立维护在同级 `../bin-api/`，通过密码保护的 Cloudflare Worker 访问目标网站。代理运行环境仅注册在 `browse.zxabinbina.cc.cd`，不能把其 Service Worker 注册到个人主页或 API 域名。保留临时会话、关闭与到期清理、来源校验、私网地址阻止及密钥不落前端的边界。新增后端 API 按 `src/modules/` 分模块维护；后端检查、联调与部署命令见该项目 README。不要将实际无法验证的第三方登录、视频或云游戏报告为通过。
 

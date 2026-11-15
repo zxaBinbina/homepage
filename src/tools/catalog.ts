@@ -1,5 +1,6 @@
 // Local tool inventory; source and deduplication records are in third_party/.
 import { jayToolCatalog } from './jaytools/catalog'
+import { xcpdfToolCatalog } from './xcpdf/catalog'
 export const toolCatalog = {
   'web-browser': {
     name: '网页浏览器',
@@ -383,6 +384,7 @@ export const toolCatalog = {
     path: '/tools/certificate-decoder',
   },
   ...jayToolCatalog,
+  ...xcpdfToolCatalog,
   'codex-jsonl-cleaner': {
     name: 'Codex 对话加密字段清理',
     label: 'CODEX JSONL CLEANER',
