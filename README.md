@@ -265,6 +265,6 @@ Freemium、jaywcjlove/tools 与固定 MIT 发布版的 XCPDF V7.3 采用 MIT 许
 
 进入时主页导航自动收起，鼠标移到顶端或键盘焦点进入导航时显示；音乐暂停并隐藏入口，返回保留曲目与进度且不自动续播。宽度不超过 760px 时只显示手机提示页，不加载桌面组件。
 
-公开 Worker 默认 `https://myriad.zxabinbina.cc.cd`，可用 `VITE_MYRIAD_PUBLIC_API` 调整，仅访问免费公开接口。两个共享包已公开发布 0.1.0，主页使用正式 npm 版本，执行 npm ci 即可独立安装，不需要相邻 myriad 仓库。开发共享包时可临时换用 file: 引用，并先在 myriad 执行 npm run build:packages；不要将本地路径依赖推送到部署分支。
+公开 Worker 默认 `https://myriad.zxabinbina.cc.cd`，可用 `VITE_MYRIAD_PUBLIC_API` 调整，仅访问免费公开接口。core 0.1.0 与 UI 0.1.1 已公开发布，主页使用正式 npm 版本，执行 npm ci 即可独立安装，不需要相邻 myriad 仓库。开发共享包时可临时换用 file: 引用，并先在 myriad 执行 npm run build:packages；不要将本地路径依赖推送到部署分支。
 
 验收：构建后运行 `HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-myriad.py`，并运行导航、主题、加载回归。

@@ -13,7 +13,7 @@ const platform: MyriadPlatform = {
   kind: 'web',
   guest: true,
   embedded: true,
-  version: '0.1.0',
+  version: '0.1.1',
   repoUrl: 'https://github.com/zxaBinbina/myriad',
   storage: createLocalStorageAdapter('homepage.myriad.visitor.'),
   publicApiBase: import.meta.env.VITE_MYRIAD_PUBLIC_API || 'https://myriad.zxabinbina.cc.cd',
