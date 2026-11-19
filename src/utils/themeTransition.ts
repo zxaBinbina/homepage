@@ -1,4 +1,5 @@
-const duration = 1000
+/* UI-FIX P1-4 / P2-6 · 主题过渡由 1000ms 收敛到 400ms，消除循环切换时的长时间闪烁。 */
+const duration = 400
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 let colorProperties: string[] | undefined
 let active: Animation | undefined

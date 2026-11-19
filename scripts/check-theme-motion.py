@@ -29,7 +29,8 @@ def sample(page, button, selectors):
 
 
 def assert_progress(result, keys):
-    assert 900 <= result['duration'] <= 1200, result['duration']
+    # UI-FIX P1-4 / P2-6 · 过渡收敛到 400ms，避免循环切换时长时间闪烁。
+    assert 300 <= result['duration'] <= 500, result['duration']
     frames = result['frames']
     middle = min(frames, key=lambda frame: abs(frame['time'] - 500))
     for key in keys:

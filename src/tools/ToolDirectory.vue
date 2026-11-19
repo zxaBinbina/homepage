@@ -14,6 +14,10 @@ const sortedToolIds = [...toolIds].sort((a, b) =>
     sensitivity: 'base',
   }),
 )
+/* UI-FIX P2-8 · 长列表之外补一组常用入口，减少翻找成本。从 toolIds 过滤以保留键类型。 */
+const quickToolIds = toolIds.filter((id) =>
+  ['json-formatter', 'qr-code', 'color-converter', 'regex-tester', 'base64'].includes(id),
+)
 const matches = computed(() =>
   sortedToolIds.filter((id) => {
     const tool = toolCatalog[id]
@@ -78,6 +82,13 @@ function enter(element: Element) {
             <X :size="16" aria-hidden="true" />
           </button>
         </div>
+      </div>
+      <!-- UI-FIX P2-8 · 常用工具快捷入口，不占用 .tool-card 计数。 -->
+      <div class="quick-tools" aria-label="常用工具">
+        <span class="quick-tools-label">常用</span>
+        <a v-for="id in quickToolIds" :key="id" :href="toolCatalog[id].path" class="quick-tool">{{
+          toolCatalog[id].name
+        }}</a>
       </div>
       <p class="tools-count" role="status">
         {{

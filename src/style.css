@@ -1,10 +1,14 @@
 :root {
+  /* UI-FIX P1-7 · 不请求外部字体，显式声明各平台中文黑体优先，避免未加载字体造成字重/字距漂移。 */
   font-family:
-    Inter,
-    'Noto Sans SC',
     -apple-system,
     BlinkMacSystemFont,
+    'PingFang SC',
+    'HarmonyOS Sans SC',
+    'Microsoft YaHei',
+    'Noto Sans SC',
     'Segoe UI',
+    system-ui,
     sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -12,6 +16,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* UI-FIX P0-1 / P2-1 / P3-5 · 字号刻度与强调色语义别名集中定义。 */
+  --text-xs: 12px; /* 信息性辅助文字下限 */
+  --text-sm: 14px; /* 正文与描述 */
+  --text-base: 16px; /* 基准正文 */
+  --text-lg: 18px; /* 导语层 */
+  --accent: var(--blue); /* 强调色语义别名，新组件优先引用 */
   --cursor-normal: url('/cursors/fufu-blue/normal.png') 3 4, auto;
   --cursor-link: url('/cursors/fufu-blue/link.png') 13 4, pointer;
   --cursor-text: url('/cursors/fufu-blue/text.png') 16 16, text;
@@ -660,7 +670,8 @@ img {
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--blue);
-  outline-offset: 5px;
+  /* UI-FIX P3-2 · 导航图标密集处 5px 偏移易被相邻元素遮挡，收至 3px。 */
+  outline-offset: 3px;
 }
 h1,
 h2,
@@ -990,7 +1001,7 @@ button:disabled {
 .palette-popover-title {
   padding: var(--space-2xs) var(--space-xs) var(--space-xs);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.06em;
 }
 .palette-options {
@@ -1081,7 +1092,7 @@ button:disabled {
   justify-content: center;
   gap: var(--space-xs);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
   font-weight: 500;
 }
@@ -1095,9 +1106,11 @@ button:disabled {
 h1 {
   font-size: clamp(40px, 4.8vw, 65px);
   line-height: 1.3;
-  letter-spacing: -2px;
+  /* UI-FIX P0-3 · 中文标题取消负字距，避免标点粘连；字重降至 700 提升跨平台一致性。 */
+  letter-spacing: 0;
+  font-feature-settings: 'halt' 1;
   margin: var(--space-xl) 0 var(--space-xl);
-  font-weight: 800;
+  font-weight: 700;
 }
 h1 > span {
   color: var(--blue);
@@ -1112,9 +1125,12 @@ h1 > span {
   -webkit-text-fill-color: transparent;
 }
 .hero-description {
-  font-size: 14px;
+  /* UI-FIX P1-3 · 补 18px 导语层，缓和 65px 标题到正文的 4.6 倍跳变。 */
+  font-size: var(--text-lg);
   color: var(--muted);
-  line-height: 1.95;
+  line-height: 1.7;
+  max-width: 46ch;
+  margin-inline: auto;
 }
 .hero-description strong {
   font-weight: 500;
@@ -1168,7 +1184,7 @@ h1 > span {
   gap: var(--space-md);
   margin: var(--space-xl) 0 var(--space-alt-39);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.2px;
 }
 .hero-notes span {
@@ -1186,7 +1202,8 @@ h1 > span {
   position: relative;
 }
 .landscape {
-  height: 430px;
+  /* UI-FIX P1-3 · 降低横幅高度，让项目区标题进入常见 900px 视口。 */
+  height: 360px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -1198,7 +1215,8 @@ h1 > span {
   height: 100%;
   object-fit: cover;
   object-position: center 55%;
-  transition: transform 1.3s;
+  /* UI-FIX P2-6 · 悬停缩放由 1300ms 收敛到 500ms，与全站动效语言一致。 */
+  transition: transform 0.5s var(--motion-ease);
 }
 .landscape:hover > img {
   transform: scale(1.025);
@@ -1216,9 +1234,14 @@ h1 > span {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 9px;
-  letter-spacing: 1.8px;
-  text-shadow: 0 1px 8px #141521;
+  /* UI-FIX P2-7 · 亮天空上的白字标签补半透明实底与模糊，保证可读。 */
+  padding: var(--space-2xs) var(--space-xs);
+  background: rgba(10, 15, 28, 0.55);
+  border-radius: var(--radius-2xs);
+  backdrop-filter: blur(6px);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-shadow: 0 1px 4px #141521;
 }
 .mini-cross {
   font-size: 18px;
@@ -1235,13 +1258,13 @@ h1 > span {
   color: #fff;
 }
 .overline {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
   font-weight: 500;
 }
 .landscape-bottom .overline {
   color: #d0dbe8;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
 }
 .landscape-bottom p {
@@ -1268,7 +1291,7 @@ h1 > span {
   justify-content: space-between;
   align-items: center;
   margin-top: var(--space-md);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.4px;
   color: var(--muted);
 }
@@ -1283,7 +1306,7 @@ h1 > span {
   align-items: center;
   gap: var(--space-xl);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
 }
 .line {
@@ -1360,7 +1383,7 @@ h1 > span {
 }
 .about-aside > .overline {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
 }
 .about-aside > div {
   display: flex;
@@ -1382,7 +1405,7 @@ h1 > span {
 }
 .about-aside small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
   margin-top: var(--space-xs);
   letter-spacing: 0.7px;
@@ -1481,7 +1504,7 @@ h1 > span {
   z-index: 2;
 }
 .project-role {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .project-role > span {
@@ -1493,13 +1516,19 @@ h1 > span {
   font-size: 24px;
   font-weight: 600;
   margin: var(--space-xs) 0 var(--space-sm);
-  letter-spacing: -0.6px;
+  /* UI-FIX P0-3 · 中文项目名取消负字距。 */
+  letter-spacing: 0;
 }
 .project-content > p {
-  font-size: 12px;
-  line-height: 1.95;
+  /* UI-FIX P2-5 · 三行截断替代固定 47px 描述区，长短文案密度一致。 */
+  font-size: var(--text-sm);
+  line-height: 1.7;
   color: var(--muted);
-  min-height: 47px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 .project-bottom {
   margin-top: var(--space-alt-27);
@@ -1517,11 +1546,11 @@ h1 > span {
   padding: var(--space-2xs) var(--space-xs);
   border-radius: var(--radius-2xs);
   background: var(--tag-surface);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--muted);
 }
 .project-link {
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -1667,7 +1696,7 @@ h1 > span {
 .warm-text {
   color: #b09a88;
   letter-spacing: 1px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .world-heading {
   text-align: center;
@@ -1678,7 +1707,7 @@ h1 > span {
   border-radius: var(--radius-md);
 }
 .world-heading > span {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 2.6px;
   color: var(--muted);
 }
@@ -1730,7 +1759,7 @@ h1 > span {
   gap: var(--space-xs);
   align-items: center;
   color: #d3d9dc;
-  font-size: 11px;
+  font-size: 13px;
   border: 1px solid #ffffff2a;
   border-radius: var(--radius-lg);
   padding: var(--space-xs) var(--space-sm);
@@ -1773,7 +1802,7 @@ h1 > span {
 .address-button small {
   display: block;
   color: #adb6c3;
-  font-size: 9px;
+  font-size: 12px;
   margin-bottom: var(--space-2xs);
   letter-spacing: 1px;
 }
@@ -1804,7 +1833,7 @@ h1 > span {
   font-weight: 500;
 }
 .world-features p {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   margin-top: var(--space-sm);
   line-height: 1.8;
@@ -1813,7 +1842,7 @@ h1 > span {
   display: flex;
   justify-content: center;
   margin-top: var(--space-2xs);
-  font-size: 11px;
+  font-size: 13px;
 }
 .contact-section {
   text-align: center;
@@ -1830,7 +1859,7 @@ h1 > span {
 }
 .contact-section .overline {
   color: var(--blue);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 2.4px;
 }
 .contact-section h2 {
@@ -1869,7 +1898,7 @@ h1 > span {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -1909,11 +1938,11 @@ h1 > span {
   gap: 0;
 }
 .footer p {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .footer > a:last-child {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -1968,7 +1997,8 @@ h1 > span {
     padding-top: 178px;
   }
   .landscape {
-    height: 470px;
+    /* UI-FIX P1-3 */
+    height: 400px;
   }
   .hero-notes {
     margin-bottom: var(--space-alt-45);
@@ -2025,7 +2055,8 @@ h1 > span {
     right: 70px;
   }
   .landscape {
-    height: 390px;
+    /* UI-FIX P1-3 */
+    height: 340px;
   }
 }
 @media (max-width: 760px) {
@@ -2107,12 +2138,13 @@ h1 > span {
     padding-top: 128px;
   }
   .eyebrow {
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 1px;
   }
   h1 {
     font-size: clamp(32px, 6.5vw, 49px);
-    letter-spacing: -1.4px;
+    /* UI-FIX P0-3 · 窄屏同样取消中文负字距。 */
+    letter-spacing: 0;
     margin-top: var(--space-xl);
   }
   .hero-description {
@@ -2129,7 +2161,7 @@ h1 > span {
   }
   .hero-notes {
     gap: var(--space-xs);
-    font-size: 9px;
+    font-size: 12px;
     margin-bottom: var(--space-2xl);
   }
   .hero-notes span {
@@ -2139,7 +2171,8 @@ h1 > span {
     width: 12px;
   }
   .landscape {
-    height: 320px;
+    /* UI-FIX P1-3 */
+    height: 300px;
     border-radius: var(--radius-md);
   }
   .landscape > img {
@@ -2148,7 +2181,7 @@ h1 > span {
   .image-label {
     top: 15px;
     left: 17px;
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.8px;
   }
   .landscape-bottom {
@@ -2160,14 +2193,14 @@ h1 > span {
     font-size: 17px;
   }
   .landscape-bottom .overline {
-    font-size: 9px;
+    font-size: 12px;
   }
   .round-link {
     width: 37px;
     height: 37px;
   }
   .image-caption {
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.6px;
     flex-wrap: wrap;
     gap: var(--space-2xs);
@@ -2180,7 +2213,7 @@ h1 > span {
     padding-bottom: var(--space-alt-60);
   }
   .section-label {
-    font-size: 9px;
+    font-size: 12px;
     gap: var(--space-md);
     letter-spacing: 1.5px;
   }
@@ -2203,7 +2236,7 @@ h1 > span {
     padding: var(--space-md) 0;
   }
   .about-aside small {
-    font-size: 11px;
+    font-size: 13px;
   }
   .projects-section {
     padding: var(--space-alt-55) 0;
@@ -2243,7 +2276,7 @@ h1 > span {
     font-size: 12px;
   }
   .project-role {
-    font-size: 10px;
+    font-size: 12px;
   }
   .project-role > span {
     margin: 0 var(--space-2xs);
@@ -2291,7 +2324,7 @@ h1 > span {
     padding: var(--space-alt-55) 0;
   }
   .warm-text {
-    font-size: 9px;
+    font-size: 12px;
   }
   .world-heading {
     padding: var(--space-alt-35) 0 var(--space-alt-27);
@@ -2313,7 +2346,7 @@ h1 > span {
     margin-top: var(--space-xl);
   }
   .world-card-content p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .world-actions {
     gap: var(--space-md);
@@ -2335,7 +2368,7 @@ h1 > span {
     font-size: 13px;
   }
   .world-features p {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.9;
     margin-top: var(--space-xs);
   }
@@ -2346,7 +2379,7 @@ h1 > span {
     font-size: 34px;
   }
   .contact-section .overline {
-    font-size: 9px;
+    font-size: 12px;
   }
   .email-link {
     font-size: 21px;
@@ -2357,7 +2390,7 @@ h1 > span {
   .contact-links a {
     padding: var(--space-sm) var(--space-sm);
     gap: var(--space-xs);
-    font-size: 10px;
+    font-size: 12px;
   }
   .contact-links a > svg:last-child {
     margin-left: 0;
@@ -2373,7 +2406,7 @@ h1 > span {
     order: 3;
     width: 100%;
     text-align: center;
-    font-size: 10px;
+    font-size: 12px;
   }
   .footer .brand {
     font-size: 14px;
@@ -2404,18 +2437,18 @@ h1 > span {
     display: none;
   }
   .nav-contact {
-    font-size: 11px;
+    font-size: 13px;
     padding: var(--space-sm) var(--space-sm);
   }
   .hero {
     padding-top: 121px;
   }
   .hero-description {
-    font-size: 11px;
+    font-size: 13px;
   }
   .hero-notes {
     gap: var(--space-xs);
-    font-size: 9px;
+    font-size: 12px;
   }
   .hero-notes > i:last-of-type,
   .hero-notes > span:last-child {
@@ -2425,17 +2458,18 @@ h1 > span {
     gap: var(--space-xs);
   }
   .button {
-    font-size: 11px;
+    font-size: 13px;
     padding: var(--space-sm) var(--space-md);
   }
   .landscape {
-    height: 250px;
+    /* UI-FIX P1-3 */
+    height: 230px;
   }
   .landscape-bottom p {
     font-size: 15px;
   }
   .landscape-bottom .overline {
-    font-size: 9px;
+    font-size: 12px;
   }
   .landscape-bottom {
     left: 16px;
@@ -2443,7 +2477,7 @@ h1 > span {
     bottom: 16px;
   }
   .image-label {
-    font-size: 9px;
+    font-size: 12px;
   }
   .project-grid {
     grid-template-columns: 1fr;
@@ -2469,17 +2503,17 @@ h1 > span {
     align-items: center;
   }
   .project-link {
-    font-size: 10px;
+    font-size: 12px;
   }
   .tags {
     gap: var(--space-2xs);
   }
   .tags span {
-    font-size: 9px;
+    font-size: 12px;
     padding: var(--space-2xs) var(--space-xs);
   }
   .project-role {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .voxel-art {
@@ -2535,7 +2569,7 @@ h1 > span {
     font-size: 12px;
   }
   .world-features p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .warm-text {
     display: none;
@@ -2589,7 +2623,7 @@ h1 > span {
   align-items: center;
   gap: var(--space-lg);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .footer-info > a {
   border-left: 1px solid var(--border);
@@ -2606,7 +2640,7 @@ h1 > span {
     justify-content: center;
     flex-wrap: wrap;
     gap: var(--space-sm);
-    font-size: 9px;
+    font-size: 12px;
   }
   .footer .footer-info p {
     width: auto;
@@ -2635,6 +2669,226 @@ h1 > span {
 @media (max-width: 380px) {
   .header .brand > span {
     display: none;
+  }
+}
+
+/* ==========================================================================
+   UI-FIX · UI 评审修复集中补充规则（2026-11-19）
+   对应评审报告 P0–P3 与 DESIGN.md 第 4 / 5 / 7 / 8 / 9 节。
+   此块位于主页断点之后，按 CSS 层叠覆盖同名规则；不改动工具 / 游戏 / 书架样式。
+   所有本次改动均以「UI-FIX」注释标记，可用该关键字检索定位。
+   ========================================================================== */
+
+/* UI-FIX P1-2 · 首屏双 CTA 拉开主次：主按钮加箭头与字重，次按钮降为 ghost。 */
+.hero-buttons .primary {
+  font-weight: 600;
+  padding-inline: var(--space-2xl);
+}
+.hero-buttons .primary::after {
+  content: '→';
+  font-size: 1.05em;
+  line-height: 1;
+}
+.hero-buttons .secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* UI-FIX P0-1 · 正文与描述统一引用字号刻度。 */
+.section-heading p,
+.world-heading p,
+.world-card-content p,
+.about-aside small,
+.contact-links a,
+.nav-contact,
+.address-button {
+  font-size: var(--text-sm);
+}
+
+/* UI-FIX P1-1 · 项目名上移后，收紧标题下留白，角色短句作为独立辅助行。 */
+.project-content :is(h2, h3) {
+  margin-bottom: var(--space-xs);
+}
+.project-content .project-role {
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+/* UI-FIX P2-8 · 工具目录常用入口：胶囊快捷链接，不参与 .tool-card 计数。 */
+.quick-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-lg);
+  /* UI-FIX P2-8 · 与下方结果计数留出呼吸间距。 */
+  margin-bottom: var(--space-md);
+}
+.quick-tools-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+}
+.quick-tool {
+  padding: var(--space-2xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  transition:
+    border-color 0.2s var(--motion-ease),
+    color 0.2s var(--motion-ease);
+}
+.quick-tool:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* UI-FIX P3-3 · 键盘聚焦整卡时，操作提示与悬停同样变蓝。 */
+.project-card:focus-visible .project-link {
+  color: var(--blue);
+}
+
+/* UI-FIX P0-4 · 导航末尾的聚合入口弱化，避免与站内核心栏目等权。 */
+.desktop-nav a:last-child {
+  color: var(--muted);
+  opacity: 0.72;
+  font-size: 12px;
+}
+.desktop-nav a:last-child:hover,
+.desktop-nav a:last-child.active {
+  opacity: 1;
+}
+
+/* UI-FIX P3-4 · 首屏邮箱文字链，默认隐藏，仅在移动端常驻。 */
+.hero-email {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-lg);
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.hero-email:hover {
+  color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  /* UI-FIX P0-2 · 三项特色在窄屏改为单列横排条目：图标在左、标题与说明在右。 */
+  .world-features {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+    padding: var(--space-alt-28) 0;
+  }
+  .world-features > div {
+    padding-left: var(--space-alt-43);
+  }
+  .world-features svg {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 22px;
+    margin-bottom: 0;
+  }
+  .world-features h3 {
+    font-size: 14px;
+  }
+  .world-features p {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-top: var(--space-2xs);
+  }
+
+  /* UI-FIX P2-3 · 移动端图标按钮直接满足 44x44，不再依赖 ::before 扩区。 */
+  .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+  .icon-button::before {
+    display: none;
+  }
+
+  /* UI-FIX P0-1 · 窄屏正文不小于 15px，信息性文字不小于 12px。 */
+  .hero-description,
+  .project-content > p,
+  .section-heading p,
+  .world-heading p,
+  .world-card-content p {
+    font-size: 15px;
+  }
+  .eyebrow,
+  .section-label,
+  .hero-notes,
+  .image-label,
+  .image-caption,
+  .landscape-bottom .overline,
+  .project-role,
+  .tags span,
+  .project-link,
+  .footer p,
+  .contact-links a,
+  .contact-section .overline,
+  .warm-text,
+  .address-button small {
+    font-size: 12px;
+  }
+  .button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* UI-FIX P1-2 · 主按钮在窄屏通栏，次按钮不再与其并排争宽。 */
+  .hero-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-buttons .button {
+    width: 100%;
+  }
+  .hero-description {
+    font-size: 15px;
+  }
+  /* UI-FIX P3-4 · 隐藏「打个招呼」后，首屏补一个直接联系入口。 */
+  .hero-email {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 360px) {
+  /* UI-FIX P1-5 · 320px 收纳纯装饰的外链入口、压缩英文标语间距，避免导航拥挤与折行。 */
+  .nav-travel {
+    display: none;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.4px;
+  }
+  /* UI-FIX P1-5 · 320px 首屏横幅文案限两行并留出右侧箭头安全区。 */
+  .landscape-bottom p {
+    font-size: 17px;
+    line-height: 1.5;
+    max-width: calc(100% - 64px);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .landscape-bottom {
+    right: 16px;
+  }
+  .round-link {
+    flex: 0 0 45px;
+  }
+  .hero-buttons .button {
+    font-size: 14px;
   }
 }
 
