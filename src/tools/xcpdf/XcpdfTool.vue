@@ -144,19 +144,6 @@ onBeforeUnmount(() => {
       <button class="xcpdf-reset" type="button" @click="reset">
         <RotateCcw :size="14" aria-hidden="true" />取消并清空
       </button>
-      <p class="xcpdf-credit">
-        源自
-        <a
-          href="https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8"
-          target="_blank"
-          rel="noopener noreferrer"
-          >相声的技术备忘录 · XCPDF <ExternalLink :size="12" aria-hidden="true"
-        /></a>
-        · <a href="/licenses/xcpdf.txt" target="_blank" rel="noopener noreferrer">MIT 开源许可</a> ·
-        <a href="/licenses/xcpdf-dependencies.txt" target="_blank" rel="noopener noreferrer"
-          >第三方声明</a
-        >
-      </p>
     </div>
   </section>
 </template>

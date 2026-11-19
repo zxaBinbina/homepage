@@ -201,7 +201,7 @@ export const xcpdfToolCatalog = {
     panel: 'tab-blank',
   },
   'pdf-to-images': {
-    name: 'PDF 转图片（信创工具箱）',
+    name: 'PDF 转图片',
     label: 'PDF TO IMAGES',
     description: '高清预览并导出 PDF 页面，支持单张图片与批量下载。',
     category: 'PDF 转换',

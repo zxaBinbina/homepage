@@ -74,51 +74,51 @@
 
 完整接入用户提供的《信创PDF工具箱V7.3-43项功能-单文件版.html》，作者为相声的技术备忘录（wallechfox）。本站保留已有 PDF 转图片工具，并为 XCPDF 的 43 项功能分别提供站内地址；目录按「PDF 页面」「PDF 转换」「PDF 编辑」筛选，也可搜索「PDF」「信创」或「XCPDF」。
 
-| 工具                     | 地址                            |
-| ------------------------ | ------------------------------- |
-| PDF 常规合并             | `/tools/pdf-merge`              |
-| PDF 交替合并             | `/tools/pdf-merge-alternating`  |
-| PDF 常规拆分             | `/tools/pdf-split`              |
-| PDF 按书签拆分           | `/tools/pdf-split-bookmarks`    |
-| PDF 按书签拆成独立文件   | `/tools/pdf-explode-bookmarks`  |
-| PDF 页面重排             | `/tools/pdf-reorder`            |
-| PDF 页面倒序             | `/tools/pdf-reverse`            |
-| PDF 补齐空白页           | `/tools/pdf-pad-even`           |
-| PDF 删除页面             | `/tools/pdf-delete-pages`       |
-| PDF 自动删除空白页       | `/tools/pdf-remove-blank-pages` |
-| PDF 页面批量旋转         | `/tools/pdf-rotate`             |
-| PDF 页面逐页旋转         | `/tools/pdf-rotate-pages`       |
-| PDF 页面拼版             | `/tools/pdf-impose`             |
-| PDF 小册子排版           | `/tools/pdf-booklet`            |
-| PDF 小册子拆分           | `/tools/pdf-split-booklet`      |
-| PDF 统一页面大小         | `/tools/pdf-resize`             |
-| PDF 拆分对开页           | `/tools/pdf-split-spread`       |
-| PDF 倾斜校正             | `/tools/pdf-deskew`             |
-| PDF 裁剪白边             | `/tools/pdf-crop-margins`       |
-| 生成空白 PDF             | `/tools/pdf-blank`              |
-| PDF 转图片（信创工具箱） | `/tools/pdf-to-images`          |
-| 图片转 PDF               | `/tools/pdf-images-to-pdf`      |
-| PDF 提取文本             | `/tools/pdf-extract-text`       |
-| PDF 扁平化               | `/tools/pdf-flatten`            |
-| PDF 提取图片             | `/tools/pdf-extract-images`     |
-| PDF 页面滤镜             | `/tools/pdf-filters`            |
-| PDF 工程蓝图             | `/tools/pdf-blueprint`          |
-| PDF 模拟扫描件           | `/tools/pdf-scan-effect`        |
-| PDF 添加页码             | `/tools/pdf-page-numbers`       |
-| PDF Bates 编页           | `/tools/pdf-bates`              |
-| PDF 文字水印             | `/tools/pdf-text-watermark`     |
-| PDF 图片水印             | `/tools/pdf-image-watermark`    |
-| PDF 添加图章             | `/tools/pdf-stamp`              |
-| PDF 扇形骑缝章           | `/tools/pdf-seam-stamp`         |
-| PDF 批注                 | `/tools/pdf-annotate`           |
-| PDF 涂黑                 | `/tools/pdf-redact`             |
-| PDF 文档信息             | `/tools/pdf-metadata`           |
-| PDF CA 签章查看          | `/tools/pdf-signature-info`     |
-| PDF 添加与编辑书签       | `/tools/pdf-edit-bookmarks`     |
-| PDF 删除书签             | `/tools/pdf-remove-bookmarks`   |
-| PDF 压缩                 | `/tools/pdf-compress`           |
-| PDF 解密                 | `/tools/pdf-decrypt`            |
-| PDF 加密                 | `/tools/pdf-encrypt`            |
+| 工具                   | 地址                            |
+| ---------------------- | ------------------------------- |
+| PDF 常规合并           | `/tools/pdf-merge`              |
+| PDF 交替合并           | `/tools/pdf-merge-alternating`  |
+| PDF 常规拆分           | `/tools/pdf-split`              |
+| PDF 按书签拆分         | `/tools/pdf-split-bookmarks`    |
+| PDF 按书签拆成独立文件 | `/tools/pdf-explode-bookmarks`  |
+| PDF 页面重排           | `/tools/pdf-reorder`            |
+| PDF 页面倒序           | `/tools/pdf-reverse`            |
+| PDF 补齐空白页         | `/tools/pdf-pad-even`           |
+| PDF 删除页面           | `/tools/pdf-delete-pages`       |
+| PDF 自动删除空白页     | `/tools/pdf-remove-blank-pages` |
+| PDF 页面批量旋转       | `/tools/pdf-rotate`             |
+| PDF 页面逐页旋转       | `/tools/pdf-rotate-pages`       |
+| PDF 页面拼版           | `/tools/pdf-impose`             |
+| PDF 小册子排版         | `/tools/pdf-booklet`            |
+| PDF 小册子拆分         | `/tools/pdf-split-booklet`      |
+| PDF 统一页面大小       | `/tools/pdf-resize`             |
+| PDF 拆分对开页         | `/tools/pdf-split-spread`       |
+| PDF 倾斜校正           | `/tools/pdf-deskew`             |
+| PDF 裁剪白边           | `/tools/pdf-crop-margins`       |
+| 生成空白 PDF           | `/tools/pdf-blank`              |
+| PDF 转图片             | `/tools/pdf-to-images`          |
+| 图片转 PDF             | `/tools/pdf-images-to-pdf`      |
+| PDF 提取文本           | `/tools/pdf-extract-text`       |
+| PDF 扁平化             | `/tools/pdf-flatten`            |
+| PDF 提取图片           | `/tools/pdf-extract-images`     |
+| PDF 页面滤镜           | `/tools/pdf-filters`            |
+| PDF 工程蓝图           | `/tools/pdf-blueprint`          |
+| PDF 模拟扫描件         | `/tools/pdf-scan-effect`        |
+| PDF 添加页码           | `/tools/pdf-page-numbers`       |
+| PDF Bates 编页         | `/tools/pdf-bates`              |
+| PDF 文字水印           | `/tools/pdf-text-watermark`     |
+| PDF 图片水印           | `/tools/pdf-image-watermark`    |
+| PDF 添加图章           | `/tools/pdf-stamp`              |
+| PDF 扇形骑缝章         | `/tools/pdf-seam-stamp`         |
+| PDF 批注               | `/tools/pdf-annotate`           |
+| PDF 涂黑               | `/tools/pdf-redact`             |
+| PDF 文档信息           | `/tools/pdf-metadata`           |
+| PDF CA 签章查看        | `/tools/pdf-signature-info`     |
+| PDF 添加与编辑书签     | `/tools/pdf-edit-bookmarks`     |
+| PDF 删除书签           | `/tools/pdf-remove-bookmarks`   |
+| PDF 压缩               | `/tools/pdf-compress`           |
+| PDF 解密               | `/tools/pdf-decrypt`            |
+| PDF 加密               | `/tools/pdf-encrypt`            |
 
 提供的 HTML 与上游提交 `98424086829730f3dd7313a8871bbbbb49e80cd8`（2026-11-05）的文件 SHA-256 完全一致，当时仓库许可证为 MIT。上游于 2026-11-06 改为非开源许可；本站归档和标注仅对应已获 MIT 许可的固定版本，不将当前主分支标为 MIT。原文件、43 项映射与许可证保存在 [third_party/xcpdf/](../third_party/xcpdf/README.md)，发布许可见 [MIT 原文](../public/licenses/xcpdf.txt)及[第三方声明](../public/licenses/xcpdf-dependencies.txt)。
 

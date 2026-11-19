@@ -109,7 +109,7 @@
     },
     {
       "id": "pdf-to-images",
-      "name": "PDF 转图片（信创工具箱）",
+      "name": "PDF 转图片",
       "panel": "tab-convert"
     },
     {
