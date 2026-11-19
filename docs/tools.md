@@ -1,6 +1,6 @@
 # 网页工具
 
-本站收录 **101 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具、[XCPDF V7.3](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)（固定 MIT 发布版）的全部 43 项功能，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
+本站收录 **105 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具、[XCPDF V7.3](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)（固定 MIT 发布版）的全部 43 项功能，另有 PDF 转办公格式与 Markdown 四个工具，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
 
 ## 工具清单
 
@@ -128,6 +128,27 @@
 
 文本提取只读取现有文字层，不包含 OCR；扫描件没有文字层时无法直接提取文字。CA 签章查看展示签名与证书字段，不校验证书信任、撤销状态或法律效力。解密需要正确的打开密码；添加水印、批注、压缩、涂黑等修改可能使原数字签名失效。涂黑导出会栅格化页面，使用前后应核对实际遮盖范围。部分扫描件操作会将页面转换为图片，文字可选性、书签和页面尺寸以对应工具说明及实际导出为准。
 
+## PDF 转办公格式与 Markdown
+
+新增四个工具，分类为「PDF 转换」，可搜索 Word、Excel、PowerPoint、Markdown 或办公格式。
+
+| 工具              | 地址                       | 输出与模式                                                      |
+| ----------------- | -------------------------- | --------------------------------------------------------------- |
+| PDF 转 Word       | `/tools/pdf-to-word`       | `.docx`，可编辑文字、标题、列表和表格；也可选择整页图片。       |
+| PDF 转 Excel      | `/tools/pdf-to-excel`      | `.xlsx`，仅表格或全部文字；每页一个工作表或合并工作表。         |
+| PDF 转 PowerPoint | `/tools/pdf-to-powerpoint` | `.pptx`，默认每页一张图片；也可选择可编辑文字。                 |
+| PDF 转 Markdown   | `/tools/pdf-to-markdown`   | `.md`，标题、文字列表与表格；可保留页间注释，预览、复制和下载。 |
+
+共享组件位于 `src/tools/pdfconvert/PdfConvertTool.vue`，PDF.js 解析与渲染使用本站字体、CMap 和 WASM；生成器按输出格式加载。文字分析迁入 [opendocsg/pdf2md 0.4.0](https://github.com/opendocsg/pdf2md/tree/5d3a505928bd3216a303c669457e61696d7fd6ed)（MIT），Word 与 PowerPoint 生成分别使用 docx 9.16.0、PptxGenJS 4.0.1（MIT），Excel 复用现有 SheetJS。固定源码、SHA-256、适配说明见 [来源归档](../third_party/pdf-convert/README.md)，发布声明见 [pdf-convert.txt](../public/licenses/pdf-convert.txt)。依赖更新后运行 `node scripts/update-pdf-convert-notices.mjs`。
+
+文件上限 30 MB；可输入开始页与结束页，结束页留空时转换至末页。文字模式每次最多 300 页，Word / PowerPoint 图片模式最多 100 页。图片宽度可选 1200 / 1800 像素，单页最多 600 万像素、总图片最多 60 MB、最终结果最多 80 MB；任务总超时两分钟。取消并清空会清除文件、密码和结果，修改选项或离开页面会终止旧任务。文件生成在可终止的 Web Worker 中进行，不上传文件，不保存输入或密码。
+
+文字模式只读取已有文字层，不含 OCR，图片、矢量图形和背景不导出。没有文字层时显示说明；部分页面缺少文字层时，结果提示对应页数。扫描件可选 Word / PowerPoint 的整页图片模式，图中的文字不可编辑。Word 可编辑模式重排内容，保留标题、文字列表和表格，不承诺原版面；图片模式将页面图像放在 Word 页内。PowerPoint 文字模式只保留文字与大致位置，以替代字体和固定文字颜色排版；图片模式按原页比例适配首张幻灯片尺寸。
+
+表格按文字间距和列起点识别，至少需要三行且列数、起点相近；不读取边框结构。两行表格、右对齐列、复杂多栏、合并单元格、跨页及单元格内换行可能无法准确识别，需核对输出，或使用 Excel「全部文字」。全部文字按识别到的段落置于首列；重复页眉与页脚保留。PDF 将项目符号绘制为图形时无法恢复文字列表。默认把 Excel 单元格保留为文字；开启数字识别后只转换普通小数及三位分组数字，保留前导零、日期、长编号和超过 15 位的数值，公式样式文字也作为普通文本写入。
+
+Markdown 预览最多 5 万字符；复制和下载包含全部结果。转换不会执行提取的 Markdown。下载后应核对内容及排版；数字签名、书签、批注、嵌入文件与原 PDF 的交互结构不迁移。
+
 ## 私人网页浏览器
 
 地址 `/tools/web-browser`，分类「检查调试」。主页只提供中文操作界面，中转后端独立维护在同级 `../bin-api/`。`api.zxabinbina.cc.cd` 提供 `/v1/auth/*` 与 `/v1/proxy/*` 模块，`browse.zxabinbina.cc.cd` 承载隔离浏览环境；目标网页不能直接访问主页界面的 DOM。
@@ -195,6 +216,7 @@ node scripts/check-tools.mjs
 npm run preview -- --port 4173
 # 在另一终端运行，需要 Python Playwright 与 Chrome / Chromium
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-tools-browser.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-pdf-convert-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-codex-cleaner-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-jaytools-browser.py
 HOMEPAGE_TEST_URL=http://127.0.0.1:4173 python3 scripts/check-xcpdf-browser.py

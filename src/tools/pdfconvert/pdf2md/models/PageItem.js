@@ -1,0 +1,12 @@
+// Adapted from opendocsg/pdf2md (MIT), converted to ES modules. See third_party/pdf-convert/.
+// A abstract PageItem class, can be TextItem, LineItem or LineItemBlock
+export default class PageItem {
+  constructor (options) {
+    if (this.constructor === PageItem) {
+      throw new TypeError('Can not construct abstract class.')
+    }
+    this.type = options.type
+    this.annotation = options.annotation
+    this.parsedElements = options.parsedElements
+  }
+}

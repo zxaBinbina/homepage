@@ -1,0 +1,181 @@
+{
+  "repository": "https://github.com/opendocsg/pdf2md",
+  "commit": "5d3a505928bd3216a303c669457e61696d7fd6ed",
+  "version": "0.4.0",
+  "license": "MIT",
+  "checkedAt": "2026-11-19",
+  "archive": "pdf2md-source.tar.gz",
+  "archiveSha256": "f240310b805aae0b0f0c2cca4fb85b6acc8f509eed10373f3f8bc223b13fd3b7",
+  "files": [
+    {
+      "source": "lib/models/Annotation.js",
+      "sha256": "c120950cf35595561277edf99ed252e8fc75fc1f334da2c25be2277ae38831a5",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/Annotation.js"
+    },
+    {
+      "source": "lib/models/HeadlineFinder.js",
+      "sha256": "64a1741a2685dcf2fc9e1683717cdf8c5b646942360f0eca32c1e2c8280181a2",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/HeadlineFinder.js"
+    },
+    {
+      "source": "lib/models/LineConverter.js",
+      "sha256": "7a2f6775deb3ce3cac6c31b92756a685d26c3681cda1eadd6c438fa7ff5c924a",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/LineConverter.js"
+    },
+    {
+      "source": "lib/models/LineItem.js",
+      "sha256": "393e77fce3b26e861809dab0f77fc6befbcd9891e5a8214cbea661f64ee08d1b",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/LineItem.js"
+    },
+    {
+      "source": "lib/models/LineItemBlock.js",
+      "sha256": "6a48fd93030d06b30fa3d5d77ca3bc2c2dc9861703c90c8bf6b5b7b3711337fd",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/LineItemBlock.js"
+    },
+    {
+      "source": "lib/models/Page.js",
+      "sha256": "559de694ec72aa054889b90e713d6c930a248ca67423d4aa9ec41ddd60acb9f2",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/Page.js"
+    },
+    {
+      "source": "lib/models/PageItem.js",
+      "sha256": "1f72f5f92a4288204d1c8b44305e290f651dbe7ad13b1bbadaa509bb65d2ad13",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/PageItem.js"
+    },
+    {
+      "source": "lib/models/ParseResult.js",
+      "sha256": "5bdebdfbac41a85f2936c8370a8b7a967033308ed95ed9168910be13aae24c36",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/ParseResult.js"
+    },
+    {
+      "source": "lib/models/ParsedElements.js",
+      "sha256": "0d5739850c7aee68af1b66983e3af5bdbb468a0fc054470608febda98d12e625",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/ParsedElements.js"
+    },
+    {
+      "source": "lib/models/StashingStream.js",
+      "sha256": "b257aec87900d1c46c9b2a339eae8fd79a5a775c8d824356e90c4ddb5a5234ee",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/StashingStream.js"
+    },
+    {
+      "source": "lib/models/TextItem.js",
+      "sha256": "ec86fe57384e6fc6dea595bbe3abb1effbe75f622dcd4890b854f8b0b3720109",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/TextItem.js"
+    },
+    {
+      "source": "lib/models/TextItemLineGrouper.js",
+      "sha256": "b846655b6910d266939c62c76ef756685843978bd39209e664cf00900b16318f",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/TextItemLineGrouper.js"
+    },
+    {
+      "source": "lib/models/Word.js",
+      "sha256": "4c5de36e5daf88013663c5a45d88c9ce1837572e60dced9db275c5a523c70426",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/Word.js"
+    },
+    {
+      "source": "lib/models/markdown/BlockType.js",
+      "sha256": "eefdf16f39f4df15685576bd988035cfd6154027bb7eca9282cfc1c5ea457fed",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/markdown/BlockType.js"
+    },
+    {
+      "source": "lib/models/markdown/WordFormat.js",
+      "sha256": "c16cefd9668dbfe54062fe77756281dbe4368f3c3a03fed87187ad5dd7005557",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/markdown/WordFormat.js"
+    },
+    {
+      "source": "lib/models/markdown/WordType.js",
+      "sha256": "a1fc5d8984bd44018d32351856edd558a0e94c55c782b6655ca8c90c557d1399",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/markdown/WordType.js"
+    },
+    {
+      "source": "lib/models/transformations/ToLineItemBlockTransformation.js",
+      "sha256": "a89ee5a8d08fe379bdce0892f5fa17002603d8b6b637cea6b1a64151fe697bec",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/ToLineItemBlockTransformation.js"
+    },
+    {
+      "source": "lib/models/transformations/ToLineItemTransformation.js",
+      "sha256": "cbdb471e163d92203b12d6f03efe26e93088d874aa6babf50f1dc123e998644f",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/ToLineItemTransformation.js"
+    },
+    {
+      "source": "lib/models/transformations/ToTextItemTransformation.js",
+      "sha256": "c60c15f838b4fd9ef62e9795f3b0021b6ee04a21c4673b3cf83b94fae0773939",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/ToTextItemTransformation.js"
+    },
+    {
+      "source": "lib/models/transformations/Transformation.js",
+      "sha256": "e80fb575ef99ef2907083e72cc9cb992a5b8d34f915143bc23fb1edb7244f11b",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/Transformation.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/CompactLines.js",
+      "sha256": "bb1046311b2a587922c13564bdcceed09a63c33e7c7b024a280636d99e84ce38",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/CompactLines.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/DetectHeaders.js",
+      "sha256": "ac200743ab509da4274cff0850e9f3e33c14455860614326c031111da9feb520",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/DetectHeaders.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/DetectListItems.js",
+      "sha256": "860eaa37678b4ab21f895d8989e20435e9516c572081a026a57329c2c147d3db",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/DetectListItems.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/DetectTOC.js",
+      "sha256": "0f5f5d8c215c9fc27b361999a19c73c417b0629fd79c501b0ac5bf284f9c1007",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/DetectTOC.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/RemoveRepetitiveElements.js",
+      "sha256": "f984efa463c55d5800e9edbd3d2dc24078e0817f069946c06978499bcb37f9b5",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/RemoveRepetitiveElements.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item/VerticalToHorizontal.js",
+      "sha256": "67177a47c485f89d4cf7086f608e71b9c51b4e010770fa7f2c9495bd3979042c",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item/VerticalToHorizontal.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item-block/DetectCodeQuoteBlocks.js",
+      "sha256": "8d4e638b8f1b63393504d87675c228629084ac1bfe018609ff0d01cb9eb3f7d2",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item-block/DetectCodeQuoteBlocks.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item-block/DetectListLevels.js",
+      "sha256": "a4b380fd4f91a9208a2615cd4a81591b6c06f0cd9d179772a8d7efac0b6414f5",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item-block/DetectListLevels.js"
+    },
+    {
+      "source": "lib/models/transformations/line-item-block/GatherBlocks.js",
+      "sha256": "a29d92b6fccf56683c1a1626e020ae6ae2c53f09681383c805b3377063d811c7",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/line-item-block/GatherBlocks.js"
+    },
+    {
+      "source": "lib/models/transformations/text-item/CalculateGlobalStats.js",
+      "sha256": "13277e209d2a12eca1dca62c6c49625863392c2fd81fb8ad7098cae4647b27a0",
+      "adapted": "src/tools/pdfconvert/pdf2md/models/transformations/text-item/CalculateGlobalStats.js"
+    },
+    {
+      "source": "lib/util/page-item-functions.js",
+      "sha256": "644d1d2a91cd1c45fb3185f10e66362b40dea5c63006122f32f666bb87f8d447",
+      "adapted": "src/tools/pdfconvert/pdf2md/util/page-item-functions.js"
+    },
+    {
+      "source": "lib/util/page-number-functions.js",
+      "sha256": "34d4848bf05d7a01881ba37eb64ca8c8c04ecece9a99c318107102a1c90d839f",
+      "adapted": "src/tools/pdfconvert/pdf2md/util/page-number-functions.js"
+    },
+    {
+      "source": "lib/util/string-functions.js",
+      "sha256": "f78c69c0a4814e4b484c266d066c44938a90f99a193ae17a71baa2f8c8da86db",
+      "adapted": "src/tools/pdfconvert/pdf2md/util/string-functions.js"
+    },
+    {
+      "source": "lib/util/transformations.js",
+      "sha256": "d5d80f5fb4468af98da479c979d8b9ac2572b3ca6d01bfab7418a8cd9f2ae52e",
+      "adapted": "src/tools/pdfconvert/pdf2md/util/transformations.js"
+    }
+  ]
+}

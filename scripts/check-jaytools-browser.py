@@ -173,6 +173,7 @@ with sync_playwright() as p:
     handle.focus(); page.keyboard.press('ArrowRight')
     expect(page.get_by_label('x1',exact=True)).to_have_value('0.35')
     handle.evaluate("el => el.scrollIntoView({block:'center'})")
+    page.evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
     box = handle.bounding_box()
     page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2); page.mouse.down(); page.mouse.move(box['x']+50,box['y']+50); page.mouse.up()
     assert page.get_by_label('x1',exact=True).input_value() != '0.35'
@@ -210,7 +211,7 @@ with sync_playwright() as p:
     assert leaving.count() and leaving.evaluate_all('els => els.every(el => el.inert)')
     expect(page.get_by_label('左侧文字')).to_be_visible()
     page.get_by_role('link',name='全部工具',exact=True).click()
-    expect(page.locator('.tool-card')).to_have_count(101)
+    expect(page.locator('.tool-card')).to_have_count(105)
     page.get_by_role('searchbox',name='搜索工具').fill('CSS 缓动')
     expect(page.locator('.tool-card:not(.tool-list-leave-active)')).to_have_count(1)
     page.locator('.tool-card:not(.tool-list-leave-active)').click()

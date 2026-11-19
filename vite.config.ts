@@ -35,6 +35,7 @@ export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, cwd(), 'SITE_')
   return {
     define: { 'import.meta.env.SITE_URL': JSON.stringify(env.SITE_URL || siteContent.url) },
+    worker: { format: 'es' },
     plugins: [
       {
         name: 'rdp-wiki-content',

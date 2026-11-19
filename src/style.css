@@ -1,15 +1,8 @@
 :root {
   /* UI-FIX P1-7 · 不请求外部字体，显式声明各平台中文黑体优先，避免未加载字体造成字重/字距漂移。 */
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'PingFang SC',
-    'HarmonyOS Sans SC',
-    'Microsoft YaHei',
-    'Noto Sans SC',
-    'Segoe UI',
-    system-ui,
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei',
+    'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -4482,6 +4475,30 @@ h1 > span {
   border: 1px solid color-mix(in srgb, var(--status-danger) 35%, transparent);
   border-radius: 12px;
   color: var(--status-danger);
+  overflow-wrap: anywhere;
+}
+.pdfconv-panel,
+.pdfconv-result {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+.pdfconv-panel > .jay-note {
+  margin-top: 0;
+}
+.freemium-workbench textarea.field.pdfconv-preview {
+  width: 100%;
+  min-width: 0;
+  min-height: 320px;
+  resize: vertical;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pdfconv-status {
+  color: var(--blue);
+  overflow-wrap: anywhere;
+}
+.pdfconv-result > p {
   overflow-wrap: anywhere;
 }
 .jay-panel-enter-active,

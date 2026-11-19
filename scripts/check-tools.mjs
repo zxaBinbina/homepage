@@ -116,3 +116,4 @@ await import('./check-jaytools.mjs')
 await import('./check-codex-cleaner.mjs')
 
 await import('./check-xcpdf.mjs')
+await import('./check-pdf-convert.mjs')

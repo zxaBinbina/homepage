@@ -1,6 +1,8 @@
 import { defineAsyncComponent } from 'vue'
 import { xcpdfToolIds, type XcpdfToolId } from './xcpdf/catalog'
 
+const pdfConvertComponent = defineAsyncComponent(() => import('./pdfconvert/PdfConvertTool.vue'))
+
 const xcpdfComponent = defineAsyncComponent(() => import('./xcpdf/XcpdfTool.vue'))
 const xcpdfComponents = Object.fromEntries(
   xcpdfToolIds.map((id) => [id, xcpdfComponent]),
@@ -8,6 +10,10 @@ const xcpdfComponents = Object.fromEntries(
 
 export const toolComponents = {
   ...xcpdfComponents,
+  'pdf-to-word': pdfConvertComponent,
+  'pdf-to-excel': pdfConvertComponent,
+  'pdf-to-powerpoint': pdfConvertComponent,
+  'pdf-to-markdown': pdfConvertComponent,
   'web-browser': defineAsyncComponent(() => import('./browser/BrowserTool.vue')),
   'codex-jsonl-cleaner': defineAsyncComponent(() => import('./codex/CodexJsonlCleaner.vue')),
   'json-formatter': defineAsyncComponent(() => import('./freemium/pages/tools/JsonFormatter.vue')),

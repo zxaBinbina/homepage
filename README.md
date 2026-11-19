@@ -57,7 +57,7 @@
 
 ## 网页工具
 
-访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **101 个工具**。目录按名称升序排列，中文使用拼音顺序，搜索和分类筛选后继续保持该顺序。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
+访问 `/tool`，或点击导航「工具」，可按分类和关键词查找全部 **105 个工具**。目录按名称升序排列，中文使用拼音顺序，搜索和分类筛选后继续保持该顺序。工具目录以 `src/tools/catalog.ts` 为准，页面与分享标签、站点地图均由该目录派生，构建生成 `tool.html` 与 `tools/*.html`。
 
 其中 99 个工具来自以下三个 MIT 许可项目：
 
@@ -67,6 +67,8 @@
 - **信创 PDF 工具箱 XCPDF V7.3**（[wallechfox/offline-pdf-tools](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)）：完整接入 **43 项功能**，按「PDF 页面 / PDF 转换 / PDF 编辑」分类提供独立入口，包括合并拆分、拼版、页面整理、图片与文本提取、水印、图章、批注、文档信息及加密解密。提供的单文件 HTML 与 2026-11-05 MIT 发布版校验值完全一致；本站固定这一版本，许可证见 [MIT 原文](public/licenses/xcpdf.txt)。每项操作区沿用网站四套主题，保留本地处理和取消清空；完整地址与限制见 [工具说明](docs/tools.md#信创-pdf-工具箱)。
 
 覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串和编解码。还提供 PDF 转图片、EXIF 查看、SVG 优化、代码图片、汉字拼音 / 简繁 / 字表、人民币大写、TOML / XML / INI 转换、HTML 转 Markdown、项目徽章、CSS 缓动曲线和 JavaScript 混淆。
+
+新增 **PDF 转 Word / Excel / PowerPoint / Markdown** 四个工具，均在浏览器内处理。Word 可导出可编辑的文字与表格，或以整页图片保留画面；Excel 提取对齐表格，也可导出全部文字；PowerPoint 选择整页图片或可编辑文字；Markdown 整理标题、列表与表格，并提供预览、复制和下载。支持打开密码、指定页码和取消清空；文字模式不含 OCR，扫描件可使用 Word / PowerPoint 的图片模式。文字分析复用 MIT 许可的 pdf2md，完整来源与限制见 [工具说明](docs/tools.md#pdf-转办公格式与-markdown)。
 
 本站自制的 **Codex 对话加密字段清理**（`/tools/codex-jsonl-cleaner`）支持导入或粘贴 JSONL，以精确、宽泛或只删字段三种模式处理加密字段与推理内容；提供逐行校验、原始错误行号、前后行数统计、可选预览和 `.jsonl` 下载。「选择文件」旁的「导入教程」按钮可展开文件查找与导入步骤，按访问设备预选 Windows、macOS 或 Linux，无法判断时默认 Windows，也可手动切换。默认保留推理参数与用量元数据，非法行修正前不生成下载文件；规则与边界见 [工具说明](docs/tools.md#codex-对话加密字段清理)。
 
