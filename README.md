@@ -68,7 +68,7 @@
 
 覆盖代码格式化、JSON / YAML / CSV / Excel 转换、文本整理、进制与时间、JWT / 正则 / 证书检查、Markdown / HTML 预览、二维码生成与识别、哈希、UUID / ULID、随机字符串和编解码。还提供 PDF 转图片、EXIF 查看、SVG 优化、代码图片、汉字拼音 / 简繁 / 字表、人民币大写、TOML / XML / INI 转换、HTML 转 Markdown、项目徽章、CSS 缓动曲线和 JavaScript 混淆。
 
-新增 **PDF 转 Word / Excel / PowerPoint / Markdown** 四个工具，均在浏览器内处理。Word 可导出可编辑的文字与表格，或以整页图片保留画面；Excel 提取对齐表格，也可导出全部文字；PowerPoint 选择整页图片或可编辑文字；Markdown 整理标题、列表与表格，并提供预览、复制和下载。支持打开密码、指定页码和取消清空；文字模式不含 OCR，扫描件可使用 Word / PowerPoint 的图片模式。文字分析复用 MIT 许可的 pdf2md，完整来源与限制见 [工具说明](docs/tools.md#pdf-转办公格式与-markdown)。
+新增 **PDF 转 Word / Excel / PowerPoint / Markdown** 四个工具，均在浏览器内处理。Word 可导出可编辑的文字与表格，或以整页图片保留画面；Excel 提取对齐表格，也可导出全部文字；PowerPoint 选择整页图片或可编辑文字；Markdown 整理标题、列表与表格，并提供阅读 / 源码预览、复制和下载。Word / Excel / PowerPoint 预览使用浏览器内的 ONLYOFFICE 引擎直接打开生成文件，保留办公软件的分页、工作表、幻灯片缩略图与缩放界面，支持只读全屏查看。支持打开密码、指定页码和取消清空；文字模式不含 OCR，扫描件可使用 Word / PowerPoint 的图片模式。文字分析复用 MIT 许可的 pdf2md，完整来源与限制见 [工具说明](docs/tools.md#pdf-转办公格式与-markdown)。
 
 本站自制的 **Codex 对话加密字段清理**（`/tools/codex-jsonl-cleaner`）支持导入或粘贴 JSONL，以精确、宽泛或只删字段三种模式处理加密字段与推理内容；提供逐行校验、原始错误行号、前后行数统计、可选预览和 `.jsonl` 下载。「选择文件」旁的「导入教程」按钮可展开文件查找与导入步骤，按访问设备预选 Windows、macOS 或 Linux，无法判断时默认 Windows，也可手动切换。默认保留推理参数与用量元数据，非法行修正前不生成下载文件；规则与边界见 [工具说明](docs/tools.md#codex-对话加密字段清理)。
 
@@ -259,7 +259,7 @@ Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出�
 
 Gaze 官方图标 [gaze.svg](public/images/gaze.svg) 来自 [Gundu Labs 官方仓库](https://github.com/gundulabs/gaze/blob/main/packaging/gui/com.gundulabs.Gaze.svg)，原样保留，版权归 2026 Gundu Labs，遵循 [GPL-3.0-or-later](public/images/gaze.LICENSE.txt)；该第三方素材不适用本站代码许可证。
 
-Freemium、jaywcjlove/tools 与固定 MIT 发布版的 XCPDF V7.3 采用 MIT 许可；其运行时依赖及附带资源遵循各自许可证，包括 Apache-2.0、BSD 与 MPL-2.0。许可证副本、依赖声明与 ExifReader 对应源码随 `public/licenses/` 发布，PDF.js 附带资源的许可随 `/tool-assets/pdfjs/` 发布；完整来源说明见 [网页工具说明](docs/tools.md#源码与许可证)。
+Freemium、jaywcjlove/tools 与固定 MIT 发布版的 XCPDF V7.3 采用 MIT 许可；其运行时依赖及附带资源遵循各自许可证，包括 Apache-2.0、BSD 与 MPL-2.0。许可证副本、依赖声明与 ExifReader 对应源码随 `public/licenses/` 发布，PDF.js 附带资源的许可随 `/tool-assets/pdfjs/` 发布；独立的 Office WASM 预览遵循 AGPL-3.0，源码与许可随 `/office-viewer/v0.2.0/source/index.html` 提供，主站只链接 Apache-2.0 SDK。完整来源说明见 [网页工具说明](docs/tools.md#源码与许可证)。
 
 ## 万象导航
 

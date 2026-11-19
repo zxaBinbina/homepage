@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- AGPL-3.0 section 13: set this to the URL where the source of the deployed viewer (with your changes) can be
+     downloaded. The viewer reports it to the embedding page in its "ready" event. -->
+    <meta name="office-wasm-viewer:source" content="source/index.html" />
+    <meta name="robots" content="noindex" />
+    <title>Office 文件预览 · ONLYOFFICE</title>
+    <script src="privacy.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #f5f6f8;
+        font:
+          14px/1.4 system-ui,
+          'Segoe UI',
+          sans-serif;
+        color: #1c2530;
+      }
+      #stage {
+        position: absolute;
+        inset: 0;
+      }
+      #picker {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        z-index: 1;
+      }
+      #picker[hidden] {
+        display: none;
+      }
+      #picker label {
+        border: 1px dashed #9aa5b1;
+        border-radius: 8px;
+        padding: 28px 36px;
+        background: #fff;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="picker" hidden>
+      <label
+        >选择或拖入 Word / Excel / PowerPoint 文件<br /><br /><input
+          type="file"
+          accept=".docx,.xlsx,.pptx,.doc,.xls,.ppt,.odt,.ods,.odp,.rtf"
+      /></label>
+    </div>
+    <div id="stage"><div id="placeholder"></div></div>
+    <script src="oo/web-apps/apps/api/documents/api.js"></script>
+    <script type="module" src="viewer.mjs"></script>
+  </body>
+</html>

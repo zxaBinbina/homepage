@@ -1,6 +1,7 @@
 import { analyzePages, numericCell, toMarkdown } from './analyze'
 import type { AnalyzedPage } from './analyze'
 import type { ConvertOptions, ConvertOutput, PdfPageData } from './types'
+import { presentationSize, slideFrame, slideText } from './presentation'
 
 const wordMime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 const excelMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -120,14 +121,23 @@ async function exportExcel(pages: AnalyzedPage[], options: ConvertOptions) {
     }))
     X.utils.book_append_sheet(workbook, sheet, name)
   }
-  return new Uint8Array(X.write(workbook, { type: 'array', bookType: 'xlsx' }))
+  // SheetJS emits Calibri as the default font. Name a CJK-capable font in the
+  // actual workbook so both native Office and the browser engine display Chinese.
+  const { unzipSync, zipSync, strFromU8, strToU8 } = await import('fflate')
+  const archive = unzipSync(new Uint8Array(X.write(workbook, { type: 'array', bookType: 'xlsx' })))
+  const styles = archive['xl/styles.xml']!
+  archive['xl/styles.xml'] = strToU8(
+    strFromU8(styles)
+      .replace('<name val="Calibri"/>', '<name val="Microsoft YaHei"/>')
+      .replace('<scheme val="minor"/>', ''),
+  )
+  return zipSync(archive)
 }
 
 async function exportPowerPoint(pages: PdfPageData[], options: ConvertOptions) {
   const { default: PptxGenJS } = await import('pptxgenjs')
   const deck = new PptxGenJS()
-  const width = Math.min(40, pages[0]!.width / 72),
-    height = Math.min(40, pages[0]!.height / 72)
+  const { width, height } = presentationSize(pages[0]!)
   deck.defineLayout({ name: 'PDF', width, height })
   deck.layout = 'PDF'
   deck.author = 'a彬彬a'
@@ -135,35 +145,22 @@ async function exportPowerPoint(pages: PdfPageData[], options: ConvertOptions) {
   for (const page of pages) {
     const slide = deck.addSlide()
     slide.background = { color: 'FFFFFF' }
-    const ratio = Math.min(width / page.width, height / page.height)
-    const x = (width - page.width * ratio) / 2,
-      y = (height - page.height * ratio) / 2
+    const { x, y, w, h } = slideFrame(page, { width, height })
     if (options.mode === 'image')
       slide.addImage({
         data: page.image!,
         x,
         y,
-        w: page.width * ratio,
-        h: page.height * ratio,
+        w,
+        h,
         altText: `PDF 第 ${page.index + 1} 页`,
       })
     else
       for (const item of page.items) {
         if (!item.text.trim()) continue
-        const font = page.fonts[item.font]?.name || ''
-        slide.addText(item.text, {
-          x: x + item.x * ratio,
-          y: y + item.y * ratio,
-          w: Math.max(item.width * ratio + 0.03, 0.08),
-          h: Math.max(item.height * ratio * 1.4, 0.08),
-          fontFace: /[\u3400-\u9fff]/.test(item.text)
-            ? 'Microsoft YaHei'
-            : /serif|times/i.test(font)
-              ? 'Times New Roman'
-              : 'Arial',
-          fontSize: Math.max(2, Math.min(400, item.height * ratio * 72)),
-          bold: /bold/i.test(font),
-          italic: /italic|oblique/i.test(font),
+        const { text, ...box } = slideText(item, page, { width, height })
+        slide.addText(text, {
+          ...box,
           margin: 0,
           breakLine: false,
           fit: 'shrink',

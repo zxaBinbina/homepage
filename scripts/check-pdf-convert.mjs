@@ -20,6 +20,17 @@ for (const item of manifest.files) {
 const notices = await readFile('public/licenses/pdf-convert.txt', 'utf8')
 assert.match(notices, /Copyright \(c\) 2020 Johannes Zillmann/)
 assert.match(notices, /Copyright \(c\) 2013 Julian Gruber/)
+const officeManifest = JSON.parse(await readFile('third_party/office-wasm/manifest.json', 'utf8'))
+for (const part of officeManifest.runtime)
+  assert.equal(hash(await readFile('third_party/office-wasm/' + part.file)), part.sha256)
+assert.equal(
+  hash(await readFile('third_party/office-wasm/viewer-source.tar.gz')),
+  officeManifest.viewer.sourceSha256,
+)
+assert.ok(officeManifest.assets.every((asset) => asset.bytes <= 25 * 1024 * 1024))
+assert.ok(officeManifest.assets.some((asset) => asset.file === 'wasm/prebuilt/x2t.wasm.br'))
+assert.ok(!officeManifest.assets.some((asset) => asset.file === 'wasm/prebuilt/x2t.wasm'))
+assert.ok(!officeManifest.assets.some((asset) => /\/(arial|calibri).*\.ttf$/i.test(asset.file)))
 await mkdir('artifacts/pdf-convert', { recursive: true })
 const engineFile = resolve('artifacts/pdf-convert/engine-check.mjs')
 await build({
@@ -94,10 +105,14 @@ assert.match(strFromU8(md.bytes), /\| 华东 \| 1,200 \|/)
 assert.match(strFromU8(md.bytes), /1\. 编号列表第一项/)
 assert.match(strFromU8(md.bytes), /Second Page Title/)
 assert.doesNotMatch(strFromU8(md.bytes), /[\u2e80-\u2fff]/)
-const word = unzipSync((await convertPages(pages, { ...opts, target: 'word' })).bytes)
+const wordResult = await convertPages(pages, { ...opts, target: 'word' })
+const word = unzipSync(wordResult.bytes)
 assert.match(strFromU8(word['word/document.xml']), /季度销售报告/)
 assert.equal((strFromU8(word['word/document.xml']).match(/<w:tbl>/g) || []).length, 2)
-const excel = X.read((await convertPages(pages, { ...opts, target: 'excel', numbers: true })).bytes)
+const excelResult = await convertPages(pages, { ...opts, target: 'excel', numbers: true })
+const excel = X.read(excelResult.bytes)
+assert.match(strFromU8(unzipSync(excelResult.bytes)['xl/styles.xml']), /Microsoft YaHei/)
+assert.doesNotMatch(strFromU8(unzipSync(excelResult.bytes)['xl/styles.xml']), /<scheme val="minor"/)
 assert.equal(excel.SheetNames.length, 2)
 assert.deepEqual(X.utils.sheet_to_json(excel.Sheets[excel.SheetNames[0]], { header: 1 })[1], [
   '华东',
@@ -135,6 +150,46 @@ assert.match(
   /中文段落/,
 )
 await assert.rejects(convertPages([{ ...synthetic, items: [] }], opts), /没有可提取的文字层/)
+
+const ppt = await convertPages(pages, { ...opts, target: 'powerpoint' })
+const pptXml = strFromU8(unzipSync(ppt.bytes)['ppt/slides/slide1.xml'])
+assert.match(pptXml, /季度销售报告/)
+assert.match(pptXml, /Microsoft YaHei/)
+
+const manyPages = Array.from({ length: 11 }, (_, index) => ({
+  ...synthetic,
+  index,
+  items: synthetic.items.map((item, i) =>
+    i ? item : { ...item, text: `Preview page ${index + 1}` },
+  ),
+}))
+const limitedWord = await convertPages(manyPages, { ...opts, target: 'word' })
+assert.match(
+  strFromU8(unzipSync(limitedWord.bytes)['word/document.xml']),
+  /Preview page 11/,
+  'Preview limits must not truncate the download',
+)
+
+const tableItems = []
+for (let row = 0; row < 111; row++)
+  for (let column = 0; column < 21; column++) {
+    tableItems.push({
+      x: 40 + column * 70,
+      y: 40 + row * 14,
+      width: 20,
+      height: 12,
+      font: 'normal',
+      text: row === 0 ? `C${column}` : String(row * 21 + column),
+    })
+  }
+const largeExcel = await convertPages(
+  [{ ...synthetic, width: 1600, height: 1800, items: tableItems }],
+  { ...opts, target: 'excel', numbers: true },
+)
+const fullBook = X.read(largeExcel.bytes)
+const fullRows = X.utils.sheet_to_json(fullBook.Sheets[fullBook.SheetNames[0]], { header: 1 })
+assert.equal(fullRows.length, 111)
+assert.equal(fullRows[110][20], 2330)
 console.log(
   'PDF conversion checks passed: pinned source, Chinese paragraphs, headings, lists, two tables, real DOCX/XLSX, numeric identifiers, repeated text and missing text layer.',
 )

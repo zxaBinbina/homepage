@@ -4501,6 +4501,196 @@ h1 > span {
 .pdfconv-result > p {
   overflow-wrap: anywhere;
 }
+.pdfconv-visual-preview {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+.pdfconv-preview-title {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--text);
+}
+.pdfconv-preview-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.pdfconv-preview-controls .jay-field {
+  min-width: min(100%, 160px);
+  max-width: 100%;
+}
+/* Office documents are drawn by the independently framed Office engine. */
+.office-preview {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.office-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.office-preview-toolbar > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.office-preview-stage {
+  position: relative;
+  min-width: 0;
+  height: clamp(420px, 75vh, 760px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+.office-preview-frame {
+  min-width: 640px;
+  width: 100%;
+  height: 100%;
+}
+.office-preview-frame.is-loading {
+  visibility: hidden;
+}
+.office-preview-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  text-align: center;
+}
+.office-preview-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: 0;
+}
+.office-preview-mobile-note {
+  display: none;
+  margin: 0;
+}
+.office-preview:fullscreen {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: var(--space-sm);
+  background: var(--bg);
+}
+.office-preview:fullscreen .office-preview-stage {
+  height: 100%;
+}
+@media (max-width: 760px) {
+  .office-preview-mobile-note {
+    display: block;
+  }
+}
+.pdfconv-reading {
+  min-width: 0;
+  max-width: 100%;
+  max-height: min(620px, 75vh);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+.pdfconv-reading {
+  max-height: min(620px, 75vh);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+.pdfconv-stage-scroll {
+  padding: var(--space-sm);
+  background: var(--bg);
+}
+.pdfconv-slide {
+  display: block;
+  max-width: 760px;
+  height: auto;
+  margin-inline: auto;
+  background: #fff;
+}
+.pdfconv-slide.is-zoomed {
+  max-width: none;
+}
+.pdfconv-reading {
+  min-height: 320px;
+  padding: var(--space-xl);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.pdfconv-reading :is(p, ul, ol, blockquote, pre, table, hr) {
+  margin-block: var(--space-sm);
+}
+.pdfconv-reading :is(h1, h2, h3, h4, h5, h6) {
+  margin: var(--space-lg) 0 var(--space-sm);
+  color: var(--text);
+  font-size: var(--text-lg);
+  font-weight: 650;
+  line-height: 1.5;
+}
+.pdfconv-reading h1 {
+  font-size: 24px;
+}
+.pdfconv-reading h2 {
+  font-size: 20px;
+}
+.pdfconv-reading > :first-child {
+  margin-top: 0;
+}
+.pdfconv-reading > :last-child {
+  margin-bottom: 0;
+}
+.pdfconv-reading :is(ul, ol) {
+  padding-left: var(--space-xl);
+}
+.pdfconv-reading blockquote {
+  border-left: 3px solid var(--blue);
+  padding-left: var(--space-md);
+  color: var(--muted);
+}
+.pdfconv-reading pre {
+  padding: var(--space-sm);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  white-space: pre-wrap;
+}
+.pdfconv-reading table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.pdfconv-reading :is(th, td) {
+  border: 1px solid var(--border);
+  padding: var(--space-xs) var(--space-sm);
+  text-align: left;
+  vertical-align: top;
+}
+.pdfconv-reading th {
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+}
+@media (max-width: 480px) {
+  .pdfconv-reading {
+    padding: var(--space-md);
+  }
+  .pdfconv-preview-controls .jay-field {
+    flex: 1;
+  }
+}
 .jay-panel-enter-active,
 .jay-panel-leave-active {
   transition:

@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import * as PDF from 'pdfjs-dist'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import ToolPage from '../freemium/components/ToolPage.vue'
+import PdfConvertPreview from './PdfConvertPreview.vue'
 import { saveBlob } from '../jaytools/files'
 import { normalizeText } from './analyze'
 import type { ConvertId, ConvertOptions, ConvertOutput, PdfPageData, Target } from './types'
@@ -409,15 +410,10 @@ async function copy() {
             {{ copied ? '已复制' : '复制 Markdown' }}
           </button>
         </div>
-        <label v-if="target === 'markdown'" class="jay-field"
-          >Markdown 预览（最多 5 万字符，下载与复制包含完整内容）
-          <textarea
-            class="field pdfconv-preview"
-            readonly
-            :value="result.preview"
-            spellcheck="false"
-          ></textarea>
-        </label>
+        <PdfConvertPreview
+          :result="result"
+          :name="`${file?.name.replace(/\.pdf$/i, '') || 'PDF'}.${result.extension}`"
+        />
       </div>
       <p class="jay-note">
         请核对转换后的内容与排版。<a href="/licenses/pdf-convert.txt" target="_blank" rel="noopener"
