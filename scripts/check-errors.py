@@ -191,12 +191,12 @@ with sync_playwright() as p:
         assert_error(code)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), code
 
-    page.get_by_role('button', name='选择配色方案').click()
+    page.get_by_role('button', name='主题设置').click()
     page.wait_for_function('document.querySelector(".palette-popover") && !document.querySelector(".palette-popover").classList.contains("palette-popover-enter-active")')
     palette_box = page.locator('.palette-popover').bounding_box()
     assert palette_box['x'] >= 0 and palette_box['x'] + palette_box['width'] <= 320, palette_box
     page.keyboard.press('Escape')
-    expect(page.get_by_role('button', name='选择配色方案')).to_be_focused()
+    expect(page.get_by_role('button', name='主题设置')).to_be_focused()
     page.get_by_role('button', name='打开菜单').click()
     page.get_by_role('navigation', name='移动导航').get_by_role('link', name='工具', exact=True).click()
     expect(page.locator('.tool-card').first).to_be_visible()

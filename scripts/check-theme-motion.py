@@ -47,6 +47,7 @@ with sync_playwright() as p:
     page = context.new_page()
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE, wait_until='networkidle')
+    trigger = page.get_by_role('button', name='主题设置', exact=True)
     assert page.locator('html').evaluate('el => !el.getAnimations().some(a => a.id === "theme-colors")')
     set_theme_mode(page, 'dark')
     selectors = {
@@ -54,10 +55,13 @@ with sync_playwright() as p:
         'text': ['body', 'color'], 'header': ['.app-header-transition', 'backgroundColor'],
         'border': ['.app-header-transition', 'borderBottomColor'], 'gradient': ['h1 span', 'backgroundImage'],
     }
-    samples['dark-light'] = sample(page, '.theme-toggle', selectors)
+    # A single button now opens the unified panel; picking a mode option triggers the color transition.
+    trigger.click()
+    expect(page.locator('.palette-popover')).to_be_visible()
+    samples['dark-light'] = sample(page, '#theme-mode-light', selectors)
     assert_progress(samples['dark-light'], ['canvas', 'background', 'text', 'header', 'border'])
     assert samples['dark-light']['frames'][-1]['background'] == 'rgb(244, 246, 250)'
-    page.get_by_role('button', name='选择配色方案', exact=True).click()
+    # The panel stays open; sample a palette change from the palette group's last option.
     samples['blue-red'] = sample(page, '.palette-option:last-of-type', selectors)
     assert_progress(samples['blue-red'], list(selectors))
     expect(page.locator('.palette-popover')).to_be_visible()
@@ -89,7 +93,9 @@ with sync_playwright() as p:
     set_theme_mode(page, 'dark')
     expect(page.locator('body')).to_have_css('background-color', 'rgb(58, 27, 25)')
     page.emulate_media(reduced_motion='no-preference')
-    page.locator('.theme-toggle').click()
+    # Trigger a dark->light transition from the panel, then interrupt it with a background tab.
+    trigger.click()
+    page.locator('#theme-mode-light').click()
     page.wait_for_timeout(200)
     page.evaluate('''() => {
         Object.defineProperty(document, 'hidden', {configurable: true, value: true});
@@ -98,6 +104,7 @@ with sync_playwright() as p:
     wait_theme_settled(page)
     expect(page.locator('body')).to_have_css('background-color', 'rgb(252, 240, 225)')
     page.evaluate('''() => { delete document.hidden; document.dispatchEvent(new Event('visibilitychange')); }''')
+    page.keyboard.press('Escape')
     print('Continuous reversal, same-option selection, automatic mode and motion/background cleanup passed', flush=True)
 
     page.goto(BASE + '/projects/rdp-access-auth', wait_until='networkidle')
@@ -107,7 +114,7 @@ with sync_playwright() as p:
     for mode in ['dark', 'light']:
         set_theme_mode(page, mode)
         for palette, name in [('fufu-blue', '芙芙蓝'), ('hutao-red', '胡桃红')]:
-            page.get_by_role('button', name='选择配色方案', exact=True).click()
+            page.get_by_role('button', name='主题设置', exact=True).click()
             page.get_by_role('button', name=name, exact=True).click()
             page.keyboard.press('Escape')
             rdp_colors[f'{palette}-{mode}'] = page.evaluate('''() => Object.fromEntries([
@@ -135,7 +142,7 @@ with sync_playwright() as p:
         for key in ['sky', 'taskbar', 'notice']:
             assert rdp_colors[f'{palette}-dark'][key] != rdp_colors[f'{palette}-light'][key], (palette, key)
     page.emulate_media(reduced_motion='no-preference')
-    page.get_by_role('button', name='选择配色方案', exact=True).click()
+    page.get_by_role('button', name='主题设置', exact=True).click()
     samples['rdp-red-blue'] = sample(page, '.palette-option:first-of-type', {
         'sky': ['.exposure-wallpaper', 'backgroundImage'],
         'mountains': ['.exposure-wallpaper', 'backgroundImage', '::before'],

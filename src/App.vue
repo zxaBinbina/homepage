@@ -76,7 +76,7 @@ function releasePageHeight() {
   >
     <Transition name="header-swap">
       <div v-if="!project && !gaze" class="header-layer" key="unified-header">
-        <SiteHeader :home="route.name === 'home'" :active="activeNav" :myriad="myriad" />
+        <SiteHeader :home="route.name === 'home'" :active="activeNav" />
       </div>
       <div v-else-if="gaze" class="header-layer" key="gaze-header">
         <GazeHeader :view="route.name === 'gaze' ? 'home' : 'guide'" />

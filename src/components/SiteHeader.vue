@@ -2,14 +2,12 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { Github, Menu, Rocket, X } from 'lucide-vue-next'
 import { profile } from '../content'
-import ColorPalettePicker from './ColorPalettePicker.vue'
-import ThemeToggle from './ThemeToggle.vue'
+import ThemePanel from './ThemePanel.vue'
 import MusicDialog from './MusicDialog.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
 const props = withDefaults(
   defineProps<{
     home?: boolean
-    myriad?: boolean
     active?: 'home' | 'projects' | 'tools' | 'games' | 'books' | 'myriad' | null
   }>(),
   {
@@ -116,10 +114,8 @@ onBeforeUnmount(() => {
         <span class="nav-travel-icon" aria-hidden="true"><Rocket :size="16" /></span>
         <span class="nav-travel-label">异次元之旅</span>
       </a>
-      <ColorPalettePicker />
-      <ThemeToggle />
+      <ThemePanel />
       <button
-        v-if="!myriad"
         ref="musicTrigger"
         class="icon-button music-toggle"
         :class="{ 'is-playing': musicPlaying }"
@@ -181,7 +177,7 @@ onBeforeUnmount(() => {
   </header>
   <MusicDialog
     :anchor="musicTrigger"
-    :suspended="myriad"
+    :suspended="false"
     @playing="musicPlaying = $event"
     @track="musicTrack = $event"
     @opened="musicOpen = $event"

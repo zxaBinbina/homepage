@@ -175,7 +175,10 @@ async def main():
         await hidden(page)
         await shown(page, 'navigation')
         assert await page.evaluate('window.originalHeader === document.querySelector(".header")')
+        # 统一主题面板：打开后在「明暗模式」组选浅色，再收起，验证加载态交互仍可用。
         await page.locator('.theme-toggle').click()
+        await page.locator('#theme-mode-light').click()
+        await page.keyboard.press('Escape')
         await expect(page.locator('html')).to_have_attribute('data-theme', 'light')
         for width in [320, 390, 768, 1024, 1440]:
             await page.set_viewport_size({'width': width, 'height': 844})

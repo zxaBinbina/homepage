@@ -12,6 +12,7 @@ from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from playwright.sync_api import sync_playwright, expect
+from browser_theme import set_theme_mode
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:4173').rstrip('/')
 out = Path('artifacts/pdf-convert'); out.mkdir(parents=True, exist_ok=True)
@@ -312,8 +313,7 @@ with sync_playwright() as p:
         expect(page.locator('.pdfconv-visual-preview')).to_be_visible(timeout=60000)
         if tool != 'markdown': office({'word':'documenteditor', 'excel':'spreadsheeteditor', 'powerpoint':'presentationeditor'}[tool])
         for theme in ['dark', 'light']:
-            while page.locator('.theme-toggle').get_attribute('data-mode') != theme:
-                page.locator('.theme-toggle').click()
+            set_theme_mode(page, theme)
             if tool != 'markdown':
                 native = next(f for f in page.frames if '/main/index.html' in f.url)
                 native.wait_for_function('(id) => window.uitheme.id === id', arg='theme-night' if theme == 'dark' else 'theme-white')

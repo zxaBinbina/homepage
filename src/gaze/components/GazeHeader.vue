@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Github } from 'lucide-vue-next'
-import ColorPalettePicker from '../../components/ColorPalettePicker.vue'
-import ThemeToggle from '../../components/ThemeToggle.vue'
+import ThemePanel from '../../components/ThemePanel.vue'
 defineProps<{ view: 'home' | 'guide' }>()
 </script>
 <template>
@@ -18,8 +17,7 @@ defineProps<{ view: 'home' | 'guide' }>()
         >使用指南</a
       >
       <div class="gaze-nav-tools">
-        <ColorPalettePicker />
-        <ThemeToggle class="gaze-theme" />
+        <ThemePanel class="gaze-theme" />
         <a
           class="icon-button"
           href="https://github.com/zxaBinbina/gaze-zh"

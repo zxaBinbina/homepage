@@ -1,4 +1,4 @@
-"""Check explicit/automatic themes and the persistent horizontal palette popup."""
+"""Check explicit/automatic themes and the unified theme panel's palette group."""
 import json
 import os
 from pathlib import Path
@@ -21,12 +21,11 @@ def assert_theme(page, mode, effective, palette='fufu-blue'):
     expect(page.locator('html')).to_have_attribute('data-theme-mode', mode)
     expect(page.locator('html')).to_have_attribute('data-theme', effective)
     expect(page.locator('html')).to_have_attribute('data-palette', palette)
+    # The single theme button keeps data-mode but now uses a fixed Palette icon.
     button = page.locator('.theme-toggle')
     expect(button).to_have_attribute('data-mode', mode)
-    icon = {'dark': 'moon', 'light': 'sun', 'auto': 'monitor'}[mode]
-    expect(button.locator(f'.lucide-{icon}-icon')).to_have_count(1)
-    label = {'dark': '深色模式', 'light': '浅色模式', 'auto': '自动模式（跟随系统）'}[mode]
-    assert button.get_attribute('aria-label').startswith('当前为' + label + '，')
+    expect(button).to_have_attribute('aria-label', '主题设置')
+    expect(button.locator('.lucide-palette-icon')).to_have_count(1)
     expect(page.locator('meta[name="theme-color"]')).to_have_attribute('content', COLORS[(palette, effective)])
 
 
@@ -34,10 +33,11 @@ def settled_popup(page):
     wait_theme_settled(page)
     expect(page.locator('.palette-popover')).to_be_visible()
     page.wait_for_function("!document.querySelector('.palette-popover').classList.contains('palette-popover-enter-active')")
+    # Scope to the palette group: the panel now also contains a mode group with its own thumb.
     page.wait_for_function('''() => {
-        const popup = document.querySelector('.palette-popover');
-        const a = popup.querySelector('[aria-pressed=true]').getBoundingClientRect();
-        const b = popup.querySelector('.seg__thumb').getBoundingClientRect();
+        const group = document.querySelector('.palette-popover [aria-label="配色方案"]');
+        const a = group.querySelector('[aria-pressed=true]').getBoundingClientRect();
+        const b = group.querySelector('.seg__thumb').getBoundingClientRect();
         return ['x','y','width','height'].every(k => Math.abs(a[k]-b[k]) < 1);
     }''')
 
@@ -65,27 +65,28 @@ with sync_playwright() as p:
     assert_theme(page, 'auto', 'dark')
     page.emulate_media(color_scheme='light')
     assert_theme(page, 'auto', 'light')
-    page.locator('.theme-toggle').click()
+    # Three modes are now chosen from the panel's mode group instead of a cycling button.
+    set_theme_mode(page, 'dark')
     assert_theme(page, 'dark', 'dark')
     page.emulate_media(color_scheme='dark')
     page.emulate_media(color_scheme='light')
     assert_theme(page, 'dark', 'dark')
-    page.locator('.theme-toggle').click()
+    set_theme_mode(page, 'light')
     assert_theme(page, 'light', 'light')
     page.emulate_media(color_scheme='dark')
     assert_theme(page, 'light', 'light')
-    page.locator('.theme-toggle').click()
+    set_theme_mode(page, 'auto')
     assert_theme(page, 'auto', 'dark')
     assert page.evaluate('localStorage.getItem("homepage-theme")') == 'auto'
     page.reload(wait_until='networkidle')
     assert_theme(page, 'auto', 'dark')
     page.emulate_media(color_scheme='light')
     assert_theme(page, 'auto', 'light')
-    results.append('Three-mode cycle, current-mode icons, live OS updates and auto persistence passed')
+    results.append('Three-mode selection via unified panel, live OS updates and auto persistence passed')
     print(results[-1], flush=True)
 
     # Keep the same popup and focus during repeated selections; measure the actual moving thumb.
-    trigger = page.get_by_role('button', name='选择配色方案', exact=True)
+    trigger = page.get_by_role('button', name='主题设置', exact=True)
     trigger.click()
     settled_popup(page)
     page.evaluate('window.palettePopup = document.querySelector(".palette-popover")')
@@ -96,10 +97,10 @@ with sync_playwright() as p:
     assert_theme(page, 'auto', 'light', 'hutao-red')
     settled_popup(page)
     samples = page.evaluate('''async () => {
-        const popup = document.querySelector('.palette-popover');
-        const thumb = popup.querySelector('.seg__thumb'), values = [];
+        const group = document.querySelector('.palette-popover [aria-label="配色方案"]');
+        const thumb = group.querySelector('.seg__thumb'), values = [];
         values.push(thumb.getBoundingClientRect().x);
-        popup.querySelector('button').click();
+        group.querySelector('button').click();
         const start = performance.now();
         while (performance.now() - start < 360) {
             await new Promise(requestAnimationFrame);
@@ -127,6 +128,7 @@ with sync_playwright() as p:
     expect(page.locator('.palette-popover')).to_have_count(0)
     trigger.click()
     settled_popup(page)
+    # The trigger is also the theme-toggle button; Enter toggles the open panel closed.
     page.locator('.theme-toggle').focus()
     page.keyboard.press('Enter')
     expect(page.locator('.palette-popover')).to_have_count(0)
@@ -149,7 +151,7 @@ with sync_playwright() as p:
     trigger.click()
     page.get_by_role('button', name='芙芙蓝', exact=True).click()
     settled_popup(page)
-    assert page.locator('.palette-popover .seg__thumb').evaluate(
+    assert page.locator('.palette-popover [aria-label="配色方案"] .seg__thumb').evaluate(
         'el => getComputedStyle(el).transitionDuration.split(",").every(duration => parseFloat(duration) <= 0.001)')
     page.keyboard.press('Escape')
     expect(page.locator('.palette-popover')).to_have_count(0)

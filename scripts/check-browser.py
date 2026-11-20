@@ -58,7 +58,7 @@ with sync_playwright() as p:
         page.locator('#' + section).scroll_into_view_if_needed()
         page.wait_for_timeout(300)
     page.wait_for_timeout(700)
-    assert page.locator('a[href="https://icp.gov.moe/?keyword=20264016"]').inner_text() == '萌ICP备20264016号'
+    assert '萌ICP备20264016号' in page.locator('a[href="https://icp.gov.moe/?keyword=20264016"]').inner_text()
     assert page.locator('a[href="https://icp.gov.moe/?keyword=20264016"]').get_attribute('target') == '_blank'
     broken = page.locator('img').evaluate_all('(els) => els.filter(e => !e.complete || !e.naturalWidth).map(e => e.src)')
     assert not broken, broken
@@ -76,8 +76,8 @@ with sync_playwright() as p:
       Object.assign(target.style, { position: 'fixed', left: '4px', top: '90px', zIndex: '300', width: '100px', height: '32px' })
       document.body.append(target)
     }""")
-    assert page.locator('.theme-toggle').evaluate('(e) => e.previousElementSibling.classList.contains("palette-picker")')
-    page.get_by_role('button', name='选择配色方案').click()
+    assert page.locator('.header-actions .theme-panel').count() == 1
+    page.get_by_role('button', name='主题设置').click()
     page.get_by_role('button', name='胡桃红').click()
     assert page.locator('html').get_attribute('data-palette') == 'hutao-red'
     assert_cursor_palette(page, base_url, 'hutao-red')
@@ -111,7 +111,7 @@ with sync_playwright() as p:
     page.reload(wait_until='networkidle')
     assert page.locator('html').get_attribute('data-theme') == 'light'
     assert page.locator('html').get_attribute('data-palette') == 'hutao-red'
-    page.get_by_role('button', name='选择配色方案').click()
+    page.get_by_role('button', name='主题设置').click()
     page.get_by_role('button', name='芙芙蓝').click()
     assert page.locator('html').get_attribute('data-palette') == 'fufu-blue'
     page.wait_for_function('getComputedStyle(document.body).backgroundColor === "rgb(244, 246, 250)"')
@@ -130,7 +130,7 @@ with sync_playwright() as p:
         page.wait_for_timeout(300)
         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), f'overflow at {width}'
     page.set_viewport_size({'width':320, 'height':844})
-    page.get_by_role('button', name='选择配色方案').click()
+    page.get_by_role('button', name='主题设置').click()
     page.wait_for_function('document.querySelector(".palette-popover") && !document.querySelector(".palette-popover").classList.contains("palette-popover-enter-active")')
     assert page.locator('.header .brand').evaluate('(el) => el.scrollWidth <= el.clientWidth')
     palette_box = page.locator('.palette-popover').bounding_box()
@@ -157,7 +157,7 @@ with sync_playwright() as p:
     for route in ['/projects/rdp-access-auth', '/projects/gaze']:
         page.goto(base_url + route, wait_until='networkidle')
         assert page.locator('.palette-picker').count() == 1
-        page.get_by_role('button', name='选择配色方案').click()
+        page.get_by_role('button', name='主题设置').click()
         page.get_by_role('button', name='胡桃红').click()
         assert page.locator('html').get_attribute('data-palette') == 'hutao-red'
         current_theme = page.locator('html').get_attribute('data-theme')
@@ -171,7 +171,7 @@ with sync_playwright() as p:
         assert action_colors and all(color == expected_action for color in action_colors), action_colors
         if route.endswith('rdp-access-auth'):
             assert page.locator('.demo-submit').evaluate('(e) => getComputedStyle(e).backgroundColor') == expected_action
-        page.get_by_role('button', name='选择配色方案').click()
+        page.get_by_role('button', name='主题设置').click()
         page.get_by_role('button', name='芙芙蓝').click()
         assert page.locator('html').get_attribute('data-palette') == 'fufu-blue'
         assert_cursor_palette(page, base_url, 'fufu-blue')

@@ -184,7 +184,7 @@ with sync_playwright() as p:
     print('Gaze tabs/linked panels and RDP methods/scenarios passed', flush=True)
 
     page.set_viewport_size({'width': 390, 'height': 844})
-    trigger = page.get_by_role('button', name='选择配色方案', exact=True)
+    trigger = page.get_by_role('button', name='主题设置', exact=True)
     trigger.click()
     settled(page)
     page.get_by_role('button', name='胡桃红', exact=True).click()

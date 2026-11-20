@@ -1019,6 +1019,20 @@ button:disabled {
   background: linear-gradient(135deg, #c94737 50%, #7b595e 50%);
 }
 
+/* 统一主题面板：配色组下方追加明暗模式组，两组共用 .seg 视觉并撑满面板宽度。 */
+.theme-panel-popover .seg {
+  width: 100%;
+}
+.theme-panel-title {
+  margin-top: var(--space-xs);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
+}
+.theme-mode-option {
+  gap: var(--space-2xs);
+  padding-inline: var(--space-2xs);
+}
+
 .palette-popover-enter-active,
 .palette-popover-leave-active {
   transition:
@@ -2403,6 +2417,26 @@ h1 > span {
     letter-spacing: -5px;
   }
 }
+/* 品牌在任何宽度都不被 flex 压缩：481px 等临界视口此前会挤出文字溢出，
+   因为 480px 断点尚未生效。合并主题按钮后由下方区间统一收起次要入口。 */
+.header .brand {
+  flex-shrink: 0;
+}
+/* 481–560px：桌面导航已隐藏，但 480px 的精简规则尚未生效。
+   延续同一精简集合（GitHub / 分隔线 / CTA），避免 header 内容顶穿右边界。 */
+@media (min-width: 481px) and (max-width: 560px) {
+  .header-actions > .icon-button:not(.theme-toggle):not(.music-toggle):not(.mobile-toggle),
+  .header-actions .nav-contact,
+  .nav-divider {
+    display: none;
+  }
+  .header {
+    gap: var(--space-xs);
+  }
+  .header .header-actions {
+    min-width: 0;
+  }
+}
 @media (max-width: 480px) {
   .header-actions > .icon-button:not(.theme-toggle):not(.music-toggle):not(.mobile-toggle),
   .nav-divider {
@@ -2410,9 +2444,6 @@ h1 > span {
   }
   .header {
     gap: var(--space-xs);
-  }
-  .header .brand {
-    flex-shrink: 0;
   }
   .header .header-actions {
     min-width: 0;
@@ -2610,6 +2641,9 @@ h1 > span {
   font-size: 12px;
 }
 .footer-info > a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
   border-left: 1px solid var(--border);
   padding-left: var(--space-lg);
   transition: color 0.2s;

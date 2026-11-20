@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from PIL import Image
 from playwright.sync_api import sync_playwright, expect
+from browser_theme import set_theme_mode
 
 base = os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:4173').rstrip('/')
 out = Path('artifacts/office-editor'); out.mkdir(parents=True, exist_ok=True)
@@ -176,8 +177,7 @@ with sync_playwright() as p:
     for kind, app in [('Word','documenteditor'), ('Excel','spreadsheeteditor'), ('PowerPoint','presentationeditor')]:
         frame = create(kind, app)
         for theme in ['dark', 'light']:
-            while page.locator('.theme-toggle').get_attribute('data-mode') != theme:
-                page.locator('.theme-toggle').click()
+            set_theme_mode(page, theme)
             frame.wait_for_function('(theme)=>window.uitheme.id===theme', arg='theme-night' if theme=='dark' else 'theme-white')
             for palette in ['fufu-blue','hutao-red']:
                 page.evaluate('(palette)=>document.documentElement.dataset.palette=palette', palette)

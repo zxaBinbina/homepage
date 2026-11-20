@@ -30,53 +30,54 @@
 
 ### 主要文件
 
-| 文件或目录                                                                     | 适合修改的内容                                     |
-| ------------------------------------------------------------------------------ | -------------------------------------------------- |
-| [src/style.css](src/style.css)                                                 | 全局主题变量、页面排版、通用组件、响应式和动效     |
-| [src/HomePage.vue](src/HomePage.vue)                                           | 个人主页结构、滚动显现、复制提示                   |
-| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)                 | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
-| [src/components/SiteFooter.vue](src/components/SiteFooter.vue)                 | 全站共用页脚：品牌、版权与备案                     |
-| [src/components/SegmentedControl.vue](src/components/SegmentedControl.vue)     | 全站分组选项、滑动选中块与键盘操作                 |
-| [src/components/CollapsePanel.vue](src/components/CollapsePanel.vue)           | 页内展开与收起、间距过渡及焦点处理                 |
-| [src/components/AnimatedDetails.vue](src/components/AnimatedDetails.vue)       | 保留原生语义的折叠说明                             |
-| [src/components/ThemeToggle.vue](src/components/ThemeToggle.vue)               | 深色 / 浅色 / 自动模式循环按钮                     |
-| [src/components/ColorPalettePicker.vue](src/components/ColorPalettePicker.vue) | 芙芙蓝 / 胡桃红配色选择弹窗                        |
-| [src/components/ProjectCard.vue](src/components/ProjectCard.vue)               | 项目目录卡片结构与视觉                             |
-| [src/components/MusicDialog.vue](src/components/MusicDialog.vue)               | 音乐浮层定位、展开宽度及外观                       |
-| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue)               | 播放器、歌词、歌单与局部样式                       |
-| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)               | 网易云 SVG 图标                                    |
-| [src/components/AnimatedCursor.vue](src/components/AnimatedCursor.vue)         | 加载区域的跟随鼠标指针动画                         |
-| [src/router.ts](src/router.ts)                                                 | 站内无刷新导航、历史滚动恢复、运行时元信息         |
-| [src/pages.ts](src/pages.ts)                                                   | 页面路径表，工具路径由工具目录自动派生             |
-| [src/content.ts](src/content.ts)                                               | 个人资料、项目文案和链接                           |
-| [src/composables/useTheme.ts](src/composables/useTheme.ts)                     | 主题与配色状态：三种模式、持久化与跟随系统         |
-| [src/utils/themeTransition.ts](src/utils/themeTransition.ts)                   | 全局颜色过渡、连续切换与减少动态效果清理           |
-| [src/loading/](src/loading/)                                                   | 内联首屏加载样式、等待与失败状态、路由加载事件     |
-| [src/composables/usePageLoading.ts](src/composables/usePageLoading.ts)         | 工具与游戏异步正文的等待、失败和卸载清理           |
-| [src/utils/lyrics.ts](src/utils/lyrics.ts)                                     | 歌词解析与翻译合并                                 |
-| [src/data/music.json](src/data/music.json)                                     | 歌单快照，只有歌单更新任务才改动                   |
-| [src/ProjectDirectory.vue](src/ProjectDirectory.vue)                           | 项目目录页：搜索、结果计数与空状态                 |
-| [src/games/](src/games/)                                                       | 游戏目录、游戏页面、规则逻辑与游戏文案             |
-| [src/books/](src/books/)                                                       | 小说书架、阅读器、书目、进度、书签与设置           |
-| [public/books/](public/books/)                                                 | 从 TXT 导入的章节目录与正文分块                    |
-| [src/tools/](src/tools/)                                                       | 工具目录、工作页、上游工具源码与中文文案           |
-| [src/rdp/](src/rdp/)                                                           | RDP 子站页面、样式与 Wiki 阅读布局                 |
-| [src/gaze/](src/gaze/)                                                         | Gaze 子站页面、指南内容与摘要                      |
-| [src/errors/](src/errors/)                                                     | 错误页组件与状态码文案                             |
-| [public/images/](public/images/)                                               | 头像、景观、项目和分享图片                         |
-| [public/projects/](public/projects/)                                           | Gaze 安装脚本等子站静态资源                        |
-| [public/cursors/](public/cursors/)                                             | 芙芙蓝与胡桃红两套鼠标指针资源                     |
-| [public/licenses/](public/licenses/)                                           | 第三方工具的许可证副本                             |
-| [index.html](index.html)                                                       | 首次绘制前的主题初始化与 HTML 模板                 |
-| [site.config.ts](site.config.ts)                                               | 站点标题、简介、域名及分享配置                     |
-| [build/](build/)                                                               | 构建期模板生成：页面 HTML、Wiki 内容、工具资源     |
-| [functions/api/](functions/api/)                                               | Cloudflare Pages 函数：歌词服务与棋类经验库        |
-| [docs/](docs/)                                                                 | 专题文档：音乐、分享、工具、RDP                    |
-| [third_party/](third_party/)                                                   | 上游工具清单、许可证与源码快照                     |
+| 文件或目录                                                                 | 适合修改的内容                                     |
+| -------------------------------------------------------------------------- | -------------------------------------------------- |
+| [src/style.css](src/style.css)                                             | 全局主题变量、页面排版、通用组件、响应式和动效     |
+| [src/HomePage.vue](src/HomePage.vue)                                       | 个人主页结构、滚动显现、复制提示                   |
+| [src/components/SiteHeader.vue](src/components/SiteHeader.vue)             | 主页、目录、工具与游戏共用导航、音乐入口、移动菜单 |
+| [src/components/SiteFooter.vue](src/components/SiteFooter.vue)             | 全站共用页脚：品牌、版权与备案                     |
+| [src/components/SegmentedControl.vue](src/components/SegmentedControl.vue) | 全站分组选项、滑动选中块与键盘操作                 |
+| [src/components/CollapsePanel.vue](src/components/CollapsePanel.vue)       | 页内展开与收起、间距过渡及焦点处理                 |
+| [src/components/AnimatedDetails.vue](src/components/AnimatedDetails.vue)   | 保留原生语义的折叠说明                             |
+| [src/components/ThemePanel.vue](src/components/ThemePanel.vue)             | 统一主题面板：单一入口、配色与明暗两组分段控件     |
+| [src/components/GovBadge.vue](src/components/GovBadge.vue)                 | 页脚萌ICP备案盾徽，内联 SVG 随四套主题染色         |
+| [src/components/ProjectCard.vue](src/components/ProjectCard.vue)           | 项目目录卡片结构与视觉                             |
+| [src/components/MusicDialog.vue](src/components/MusicDialog.vue)           | 音乐浮层定位、展开宽度及外观                       |
+| [src/components/MusicPlayer.vue](src/components/MusicPlayer.vue)           | 播放器、歌词、歌单与局部样式                       |
+| [src/components/NeteaseIcon.vue](src/components/NeteaseIcon.vue)           | 网易云 SVG 图标                                    |
+| [src/components/AnimatedCursor.vue](src/components/AnimatedCursor.vue)     | 加载区域的跟随鼠标指针动画                         |
+| [src/router.ts](src/router.ts)                                             | 站内无刷新导航、历史滚动恢复、运行时元信息         |
+| [src/pages.ts](src/pages.ts)                                               | 页面路径表，工具路径由工具目录自动派生             |
+| [src/content.ts](src/content.ts)                                           | 个人资料、项目文案和链接                           |
+| [src/composables/useTheme.ts](src/composables/useTheme.ts)                 | 主题与配色状态：三种模式、持久化与跟随系统         |
+| [src/utils/themeTransition.ts](src/utils/themeTransition.ts)               | 全局颜色过渡、连续切换与减少动态效果清理           |
+| [src/utils/motion.ts](src/utils/motion.ts)                                 | 统一 JS 动效曲线常量与运行时 token 读取            |
+| [src/loading/](src/loading/)                                               | 内联首屏加载样式、等待与失败状态、路由加载事件     |
+| [src/composables/usePageLoading.ts](src/composables/usePageLoading.ts)     | 工具与游戏异步正文的等待、失败和卸载清理           |
+| [src/utils/lyrics.ts](src/utils/lyrics.ts)                                 | 歌词解析与翻译合并                                 |
+| [src/data/music.json](src/data/music.json)                                 | 歌单快照，只有歌单更新任务才改动                   |
+| [src/ProjectDirectory.vue](src/ProjectDirectory.vue)                       | 项目目录页：搜索、结果计数与空状态                 |
+| [src/games/](src/games/)                                                   | 游戏目录、游戏页面、规则逻辑与游戏文案             |
+| [src/books/](src/books/)                                                   | 小说书架、阅读器、书目、进度、书签与设置           |
+| [public/books/](public/books/)                                             | 从 TXT 导入的章节目录与正文分块                    |
+| [src/tools/](src/tools/)                                                   | 工具目录、工作页、上游工具源码与中文文案           |
+| [src/rdp/](src/rdp/)                                                       | RDP 子站页面、样式与 Wiki 阅读布局                 |
+| [src/gaze/](src/gaze/)                                                     | Gaze 子站页面、指南内容与摘要                      |
+| [src/errors/](src/errors/)                                                 | 错误页组件与状态码文案                             |
+| [public/images/](public/images/)                                           | 头像、景观、项目和分享图片                         |
+| [public/projects/](public/projects/)                                       | Gaze 安装脚本等子站静态资源                        |
+| [public/cursors/](public/cursors/)                                         | 芙芙蓝与胡桃红两套鼠标指针资源                     |
+| [public/licenses/](public/licenses/)                                       | 第三方工具的许可证副本                             |
+| [index.html](index.html)                                                   | 首次绘制前的主题初始化与 HTML 模板                 |
+| [site.config.ts](site.config.ts)                                           | 站点标题、简介、域名及分享配置                     |
+| [build/](build/)                                                           | 构建期模板生成：页面 HTML、Wiki 内容、工具资源     |
+| [functions/api/](functions/api/)                                           | Cloudflare Pages 函数：歌词服务与棋类经验库        |
+| [docs/](docs/)                                                             | 专题文档：音乐、分享、工具、RDP                    |
+| [third_party/](third_party/)                                               | 上游工具清单、许可证与源码快照                     |
 
 ### 通用约定
 
-站内页面由 `src/main.ts`、`src/App.vue`、`src/router.ts` 与 `src/pages.ts` 使用 Vue Router 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成各地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页面切换时保留播放器实例；导航逻辑修改后运行 `python3 scripts/check-navigation.py`，建议连接构建预览服务器。主题按钮与状态分别维护在 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，全站共用。
+站内页面由 `src/main.ts`、`src/App.vue`、`src/router.ts` 与 `src/pages.ts` 使用 Vue Router 统一挂载和选择；页面内容只在 `.vue` 中维护。仅保留根目录 `index.html` 基础模板，`build/pageTemplates.ts` 自动生成各地址的 HTML 与分享标签，不要新增重复的页面 HTML 入口。共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页面切换时保留播放器实例；导航逻辑修改后运行 `python3 scripts/check-navigation.py`，建议连接构建预览服务器。主题入口统一为 `src/components/ThemePanel.vue` 的单一「主题设置」按钮与统一面板（配色 + 明暗两组分段控件），状态维护在 `src/composables/useTheme.ts`；主站、RDP 与 Gaze 头部共用。`src/components/ThemeToggle.vue` 与 `src/components/ColorPalettePicker.vue` 保留在仓库但已无任何引用，不作为入口使用。
 
 保持 Vue 3、TypeScript、原生 CSS 和现有图标体系。局部样式工作优先用已有工具完成；确有必要引入依赖时，说明用途并保持锁文件一致。
 
@@ -259,9 +260,9 @@ npx prettier --check README.md AGENTS.md DESIGN.md
 
 页面外壳为 `src/myriad/MyriadPage.vue`，桌面包与访客平台适配为 `src/myriad/MyriadDesktop.vue`，路由 / 元信息由 `pages.ts`、`router.ts` 与 `site.config.ts` 统一维护。共享包锁定公共 npm `@zxabinbina/myriad-core@0.1.0` / `@zxabinbina/myriad-ui@0.1.1`，无需相邻源码仓库。宿主显式导入 `@zxabinbina/myriad-ui/style.css`。网站隐藏登录已按用户要求取消。
 
-访客数据使用独立 `homepage.myriad.visitor.` 前缀，不接入个人同步或服务密钥；免费公开 Worker 地址可通过 `VITE_MYRIAD_PUBLIC_API` 修改。保留书架 / 阅读器既有路由、滚动恢复与导航隐藏逻辑；进入万象暂停音乐并保留播放器实例，离开不自动续播。
+访客数据使用独立 `homepage.myriad.visitor.` 前缀，不接入个人同步或服务密钥；免费公开 Worker 地址可通过 `VITE_MYRIAD_PUBLIC_API` 修改。保留书架 / 阅读器既有路由、滚动恢复与导航隐藏逻辑；万象页恢复网易云音乐入口，进入时不主动暂停，播放器实例、曲目、进度与播放状态在站内切换时持续保留，行为与其他页面一致。
 
-改动后运行构建与 `scripts/check-myriad.py`，验证访客存储 / 凭据隔离、公开请求、JSON 导入导出、音乐暂停、导航键盘显示、搜索历史与手机提示页；共享导航 / 主题 / 加载仍运行原有回归，分享与 SEO 检查需同时覆盖万象、书架和既有工具页面。
+改动后运行构建与 `scripts/check-myriad.py`，验证访客存储 / 凭据隔离、公开请求、JSON 导入导出、音乐入口与持续播放、导航键盘显示、搜索历史与手机提示页；共享导航 / 主题 / 加载仍运行原有回归，分享与 SEO 检查需同时覆盖万象、书架和既有工具页面。
 
 2026-11-15：万象接入从 `start_page/homepage` 旧快照逐处合并到本仓库，保留新版书架 / 阅读器、信创 PDF 工具箱与既有 CSS。正式 npm 依赖构建、34 项 M5 浏览器检查、导航 / 主题 / 动效 / 加载回归、分享与 SEO 检查均通过；全站 164 个规范页面和 10 个 noindex 错误页通过。用户级 `myriad-homepage-preview.service` 已切换到本仓库，地址仍是 `http://127.0.0.1:4173/myriad`。万象改动已提交到 master 并通过 Cloudflare Pages Git 集成上线。
 

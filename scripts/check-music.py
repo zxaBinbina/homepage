@@ -62,9 +62,9 @@ try:
         page.goto('https://homepage.test/',wait_until='networkidle')
         assert page.locator('.music-card').count()==0
         assert not any('/song/media/' in url or '/api/music/lyrics' in url for url in requests)
-        assert page.locator('.theme-toggle').evaluate('(e)=>e.nextElementSibling.classList.contains("music-toggle")')
+        assert page.locator('.theme-panel').evaluate('(e)=>e.nextElementSibling.classList.contains("music-toggle")')
         assert page.locator('.theme-toggle').get_attribute('data-mode')=='auto'
-        assert page.locator('.theme-toggle .lucide-monitor-icon').count()==1
+        assert page.locator('.theme-toggle').get_attribute('aria-label')=='主题设置'
         assert page.locator('.header-actions a.icon-button').get_attribute('title')=='GitHub'
         assert page.locator('.music-toggle').get_attribute('title')=='网易云音乐'
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
@@ -193,7 +193,7 @@ try:
         page.keyboard.press('Escape')
         dark_fill=page.locator('.music-toggle svg').evaluate('(e)=>getComputedStyle(e).fill')
         set_theme_mode(page, 'light')
-        assert page.locator('.theme-toggle .lucide-sun-icon').count()==1
+        assert page.locator('.theme-toggle').get_attribute('data-mode')=='light'
         page.wait_for_function('previous => getComputedStyle(document.querySelector(".music-toggle svg")).fill !== previous', arg=dark_fill, timeout=2000)
         page.get_by_role('button',name='打开网易云音乐播放器',exact=True).click()
         page.screenshot(path=str(OUT/'music-mobile-light.png'), animations='disabled')
