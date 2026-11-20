@@ -52,6 +52,17 @@ function enter(element: Element) {
   const el = element as HTMLElement
   for (const key of ['left', 'top', 'width', 'height']) el.style.removeProperty(key)
   el.inert = false
+  // Only cards in the first viewport join the stagger; a 100+ card list should
+  // not queue entrance animations that nobody can see.
+  if (el.getBoundingClientRect().top > window.innerHeight) {
+    el.style.setProperty('--tool-delay', '0ms')
+    el.classList.add('tool-list-instant')
+  }
+}
+function afterEnter(element: Element) {
+  const el = element as HTMLElement
+  el.classList.remove('tool-list-instant')
+  el.inert = false
 }
 </script>
 <template>
@@ -78,9 +89,12 @@ function enter(element: Element) {
             aria-label="搜索工具"
             placeholder="搜索工具，例如 JSON、二维码"
             @keydown.esc="query = ''"
-          /><button v-if="query" type="button" aria-label="清空搜索" @click="query = ''">
-            <X :size="16" aria-hidden="true" />
-          </button>
+          />
+          <Transition name="clear-pop">
+            <button v-if="query" type="button" aria-label="清空搜索" @click="query = ''">
+              <X :size="16" aria-hidden="true" />
+            </button>
+          </Transition>
         </div>
       </div>
       <!-- UI-FIX P2-8 · 常用工具快捷入口，不占用 .tool-card 计数。 -->
@@ -104,7 +118,8 @@ function enter(element: Element) {
         appear
         @before-leave="leave"
         @before-enter="enter"
-        @enter-cancelled="enter"
+        @after-enter="afterEnter"
+        @enter-cancelled="afterEnter"
       >
         <a
           v-for="(id, index) in matches"

@@ -128,7 +128,9 @@ onBeforeUnmount(() => {
             <div ref="fitFrame" class="game-play-content">
               <div ref="fitContent" class="game-fit-content">
                 <GameGuide :id="id" />
-                <p v-if="failed" role="alert">游戏暂时未能加载，请重新加载后再试。</p>
+                <p v-if="failed" class="game-load-feedback" role="alert">
+                  游戏暂时未能加载，请重新加载后再试。
+                </p>
                 <Suspense v-else @pending="pending" @resolve="resolved">
                   <component
                     :is="components[id]"

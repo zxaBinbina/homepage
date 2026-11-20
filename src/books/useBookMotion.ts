@@ -1,6 +1,7 @@
 import { onBeforeUnmount, onMounted, type Ref } from 'vue'
+import { motionEase } from '../utils/motion'
 
-const easing = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const easing = motionEase()
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** Native dialogs keep their focus trap until the closing animation finishes. */

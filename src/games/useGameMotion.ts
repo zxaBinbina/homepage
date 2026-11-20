@@ -1,9 +1,11 @@
 import { onBeforeUnmount, ref, watch, type Ref } from 'vue'
+import { motionEase } from '../utils/motion'
 
 /** Decorative motion always settles, including preference changes and interrupted navigation. */
 export function useGameMotion(disabled?: Ref<boolean>) {
   const preference = matchMedia('(prefers-reduced-motion: reduce)')
   const reduced = ref(preference.matches)
+  const easing = motionEase()
   const running = new Set<Animation>()
   function animate(
     element: Element | null | undefined,
@@ -13,7 +15,7 @@ export function useGameMotion(disabled?: Ref<boolean>) {
     if (!element || reduced.value || disabled?.value || document.hidden || !element.animate)
       return null
     const animation = element.animate(frames, {
-      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      easing,
       ...options,
     })
     running.add(animation)

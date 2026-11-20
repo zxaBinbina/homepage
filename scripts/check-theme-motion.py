@@ -32,7 +32,8 @@ def assert_progress(result, keys):
     # UI-FIX P1-4 / P2-6 · 过渡收敛到 400ms，避免循环切换时长时间闪烁。
     assert 300 <= result['duration'] <= 500, result['duration']
     frames = result['frames']
-    middle = min(frames, key=lambda frame: abs(frame['time'] - 500))
+    # The transition is 400ms; sample its midpoint, not the old 1s timing.
+    middle = min(frames, key=lambda frame: abs(frame['time'] - 160))
     for key in keys:
         assert frames[0][key] != frames[-1][key], (key, 'no change')
         assert middle[key] not in (frames[0][key], frames[-1][key]), (key, 'snapped', middle)
@@ -60,7 +61,7 @@ with sync_playwright() as p:
     samples['blue-red'] = sample(page, '.palette-option:last-of-type', selectors)
     assert_progress(samples['blue-red'], list(selectors))
     expect(page.locator('.palette-popover')).to_be_visible()
-    print('One-second background/text/border/gradient interpolation and persistent popup passed', flush=True)
+    print('400ms background/text/border/gradient interpolation and persistent popup passed', flush=True)
 
     # Reverse an unfinished transition in the same event turn: the visible color must not jump.
     page.get_by_role('button', name='芙芙蓝', exact=True).click()

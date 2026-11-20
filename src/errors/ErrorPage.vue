@@ -73,18 +73,32 @@ function goBack() {
           <p class="error-label">{{ details.code }} / {{ details.label }}</p>
           <h1 id="error-title">{{ details.title }}</h1>
           <p class="error-description">{{ details.description }}</p>
-          <div class="error-actions">
-            <a class="button primary" href="/"><Home :size="17" aria-hidden="true" />返回首页</a>
-            <button v-if="canGoBack" class="button secondary" type="button" @click="goBack">
+          <TransitionGroup tag="div" name="error-action" class="error-actions">
+            <a key="home" class="button primary" href="/"
+              ><Home :size="17" aria-hidden="true" />返回首页</a
+            >
+            <button
+              v-if="canGoBack"
+              key="back"
+              class="button secondary"
+              type="button"
+              @click="goBack"
+            >
               <ArrowLeft :size="17" aria-hidden="true" />返回上一页
             </button>
-            <button v-if="details.retry" class="button secondary" type="button" @click="retry">
+            <button
+              v-if="details.retry"
+              key="retry"
+              class="button secondary"
+              type="button"
+              @click="retry"
+            >
               <RefreshCw :size="17" aria-hidden="true" />重新加载
             </button>
-            <a v-else class="button secondary" href="/project">
+            <a v-else key="explore" class="button secondary" href="/project">
               看看作品<ArrowRight :size="17" aria-hidden="true" />
             </a>
-          </div>
+          </TransitionGroup>
           <a class="error-contact" href="/#contact"><Mail :size="15" aria-hidden="true" />联系我</a>
         </div>
       </section>

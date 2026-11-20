@@ -1,4 +1,6 @@
 /* UI-FIX P1-4 / P2-6 · 主题过渡由 1000ms 收敛到 400ms，消除循环切换时的长时间闪烁。 */
+import { motionEase } from './motion'
+
 const duration = 400
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 let colorProperties: string[] | undefined
@@ -73,7 +75,7 @@ export function transitionTheme(update: () => void) {
       Object.fromEntries(changed.map((name) => [name, before[name]])),
       Object.fromEntries(changed.map((name) => [name, after[name]])),
     ],
-    { duration, easing: 'ease-in-out' },
+    { duration, easing: motionEase(root) },
   )
   active.id = 'theme-colors'
   active.onfinish = finishThemeTransition

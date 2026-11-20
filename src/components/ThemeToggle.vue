@@ -15,8 +15,10 @@ const hint = computed(() => `当前为${labels[mode.value]}，点击切换${labe
     :aria-label="hint"
     :title="hint"
   >
-    <Monitor v-if="mode === 'auto'" :size="17" aria-hidden="true" />
-    <Moon v-else-if="mode === 'dark'" :size="17" aria-hidden="true" />
-    <Sun v-else :size="17" aria-hidden="true" />
+    <Transition name="theme-icon" mode="out-in">
+      <Monitor v-if="mode === 'auto'" key="auto" :size="17" aria-hidden="true" />
+      <Moon v-else-if="mode === 'dark'" key="dark" :size="17" aria-hidden="true" />
+      <Sun v-else key="light" :size="17" aria-hidden="true" />
+    </Transition>
   </button>
 </template>

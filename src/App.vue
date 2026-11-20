@@ -46,7 +46,20 @@ const activeNav = computed(() =>
               : null,
 )
 onMounted(() => document.addEventListener('click', navigateInternalLink))
-onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink))
+onBeforeUnmount(() => {
+  document.removeEventListener('click', navigateInternalLink)
+  releasePageHeight()
+})
+// The leaving page is absolutely positioned during the cross-fade. Hold the
+// app's height so a long-to-short navigation does not yank the footer up.
+function lockPageHeight(el: Element) {
+  el.setAttribute('inert', '')
+  const app = document.getElementById('app')
+  if (app) app.style.minHeight = `${app.offsetHeight}px`
+}
+function releasePageHeight() {
+  document.getElementById('app')?.style.removeProperty('min-height')
+}
 </script>
 <template>
   <AnimatedCursor />
@@ -78,8 +91,11 @@ onBeforeUnmount(() => document.removeEventListener('click', navigateInternalLink
   <RouterView v-slot="{ Component, route: pageRoute }">
     <Transition
       name="page-swap"
-      @before-leave="(el) => el.setAttribute('inert', '')"
+      @before-leave="lockPageHeight"
       @before-enter="(el) => el.removeAttribute('inert')"
+      @after-enter="releasePageHeight"
+      @enter-cancelled="releasePageHeight"
+      @leave-cancelled="releasePageHeight"
     >
       <component
         :is="Component"

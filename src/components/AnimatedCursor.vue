@@ -11,6 +11,7 @@ const cursorReady = ref(false)
 let media: MediaQueryList | undefined
 let observer: MutationObserver | undefined
 let pointerPosition = { x: 0, y: 0 }
+let frame = 0
 
 function syncBusyCursor(target: EventTarget | null) {
   const overBusyArea =
@@ -19,11 +20,17 @@ function syncBusyCursor(target: EventTarget | null) {
   document.body.classList.toggle('has-animated-busy-cursor', visible.value)
 }
 
+function flushPointer() {
+  frame = 0
+  position.value = pointerPosition
+  syncBusyCursor(document.elementFromPoint(pointerPosition.x, pointerPosition.y))
+}
+
 function onPointerMove(event: PointerEvent) {
   if (event.pointerType !== 'mouse') return
   pointerPosition = { x: event.clientX, y: event.clientY }
-  position.value = pointerPosition
-  syncBusyCursor(document.elementFromPoint(event.clientX, event.clientY))
+  // Batch the reactive update and the elementFromPoint read into one frame.
+  if (!frame) frame = requestAnimationFrame(flushPointer)
 }
 
 function onMotionChange(event: MediaQueryListEvent) {
@@ -79,6 +86,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (frame) cancelAnimationFrame(frame)
   observer?.disconnect()
   media?.removeEventListener('change', onMotionChange)
   document.removeEventListener('pointermove', onPointerMove)
@@ -93,13 +101,15 @@ onBeforeUnmount(() => {
     :src="`${cursorDirectory}/${animated ? 'busy.gif' : 'busy.png'}`"
     alt=""
     aria-hidden="true"
-    :style="{ left: `${position.x - 16}px`, top: `${position.y - 16}px` }"
+    :style="{ transform: `translate3d(${position.x - 16}px, ${position.y - 16}px, 0)` }"
   />
 </template>
 
 <style scoped>
 .animated-busy-cursor {
   position: fixed;
+  top: 0;
+  left: 0;
   z-index: 2147483647;
   width: 32px;
   height: 32px;

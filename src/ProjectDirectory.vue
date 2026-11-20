@@ -98,27 +98,31 @@ const matches = computed(() => {
           placeholder="搜索项目、账号或技术栈"
           @keydown.esc="query = ''"
         />
-        <button v-if="query" type="button" aria-label="清空搜索" @click="query = ''">
-          <X :size="16" />
-        </button>
+        <Transition name="clear-pop">
+          <button v-if="query" type="button" aria-label="清空搜索" @click="query = ''">
+            <X :size="16" />
+          </button>
+        </Transition>
       </div>
     </div>
-    <div v-if="matches.length" class="project-grid directory-project-grid">
-      <ProjectCard
-        v-for="(project, index) in matches"
-        :key="project.id"
-        v-reveal
-        :project="project"
-        heading="h2"
-        class="reveal"
-        :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
-      />
-    </div>
-    <div v-else v-reveal class="directory-empty">
-      <h2>暂时没有匹配的项目</h2>
-      <p>换个名称或技术关键词试试。</p>
-      <button type="button" @click="query = ''">查看全部项目</button>
-    </div>
+    <Transition name="directory-swap" mode="out-in">
+      <div v-if="matches.length" key="grid" class="project-grid directory-project-grid">
+        <ProjectCard
+          v-for="(project, index) in matches"
+          :key="project.id"
+          v-reveal
+          :project="project"
+          heading="h2"
+          class="reveal"
+          :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
+        />
+      </div>
+      <div v-else key="empty" v-reveal class="directory-empty">
+        <h2>暂时没有匹配的项目</h2>
+        <p>换个名称或技术关键词试试。</p>
+        <button type="button" @click="query = ''">查看全部项目</button>
+      </div>
+    </Transition>
     <p v-reveal class="directory-more">
       项目来自
       <a :href="`${profile.github}?tab=repositories`" target="_blank" rel="noopener noreferrer"

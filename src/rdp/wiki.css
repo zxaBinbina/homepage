@@ -89,29 +89,7 @@
   font-size: 12px;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-@supports selector(::-webkit-scrollbar) {
-  .rdp-toc {
-    scrollbar-width: auto;
-    scrollbar-color: auto;
-  }
-  .rdp-toc::-webkit-scrollbar {
-    width: 8px;
-  }
-  .rdp-toc::-webkit-scrollbar-track {
-    background: var(--scrollbar-track);
-    border-radius: var(--radius-xs);
-  }
-  .rdp-toc::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border: 2px solid var(--scrollbar-track);
-    border-radius: var(--radius-xs);
-  }
-  .rdp-toc::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
-  }
+  /* src/style.css owns scrollbar styling for both axes, including this rail. */
 }
 .wiki-mobile-toc {
   display: none;

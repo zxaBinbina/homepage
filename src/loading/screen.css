@@ -6,6 +6,9 @@
   --loading-muted: #979eaf;
   --loading-accent: #4ea4ef;
   --loading-border: rgba(218, 226, 237, 0.11);
+  --loading-scrollbar-thumb: #505d80;
+  --loading-scrollbar-thumb-hover: #7194c0;
+  --loading-scrollbar-track: #191b29;
 }
 :root[data-theme='light'] {
   --loading-bg: #f4f6fa;
@@ -14,6 +17,9 @@
   --loading-muted: #626b7c;
   --loading-accent: #2468b1;
   --loading-border: rgba(45, 60, 129, 0.15);
+  --loading-scrollbar-thumb: #a4b3ca;
+  --loading-scrollbar-thumb-hover: #6a89af;
+  --loading-scrollbar-track: #e9eef6;
 }
 :root[data-palette='hutao-red'] {
   --loading-bg: #3a1b19;
@@ -22,6 +28,9 @@
   --loading-muted: #c7a085;
   --loading-accent: #ed8871;
   --loading-border: rgba(252, 240, 225, 0.14);
+  --loading-scrollbar-thumb: #7b595e;
+  --loading-scrollbar-thumb-hover: #c7a085;
+  --loading-scrollbar-track: #2d1818;
 }
 :root[data-theme='light'][data-palette='hutao-red'] {
   --loading-bg: #fcf0e1;
@@ -30,6 +39,9 @@
   --loading-muted: #7b595e;
   --loading-accent: #a83d33;
   --loading-border: rgba(58, 27, 25, 0.16);
+  --loading-scrollbar-thumb: #b68e78;
+  --loading-scrollbar-thumb-hover: #7b595e;
+  --loading-scrollbar-track: #f2dfce;
 }
 body {
   margin: 0;
@@ -37,6 +49,37 @@ body {
   min-height: 100dvh;
   background: var(--bg, var(--loading-bg));
   color: var(--text, var(--loading-text));
+}
+/* Match the app's rounded, theme-aware scrollbars before the main stylesheet
+   arrives. width + height cover the vertical and horizontal axes; the fallback
+   keeps all four theme/palette combinations correct during first paint. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb, var(--loading-scrollbar-thumb))
+    var(--scrollbar-track, var(--loading-scrollbar-track));
+}
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track, var(--loading-scrollbar-track));
+  }
+  ::-webkit-scrollbar-thumb {
+    min-height: 32px;
+    border: 2px solid var(--scrollbar-track, var(--loading-scrollbar-track));
+    border-radius: 999px;
+    background: var(--scrollbar-thumb, var(--loading-scrollbar-thumb));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover, var(--loading-scrollbar-thumb-hover));
+  }
 }
 #site-loading {
   --loader-accent: var(--blue, var(--loading-accent));

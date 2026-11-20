@@ -145,7 +145,10 @@ onBeforeUnmount(() => {
             的热爱。你可以随意逛逛，看看代码，或者来悠哉世界一起创造。
           </p>
           <a class="text-link" :href="profile.github" target="_blank" rel="noopener noreferrer"
-            >在 GitHub 认识我 <ArrowUpRight :size="16" aria-hidden="true" /><span class="sr-only">（在新标签页打开）</span></a>
+            >在 GitHub 认识我 <ArrowUpRight :size="16" aria-hidden="true" /><span class="sr-only"
+              >（在新标签页打开）</span
+            ></a
+          >
         </div>
         <div class="about-aside">
           <span class="overline">WHAT I ENJOY</span>
@@ -230,10 +233,14 @@ onBeforeUnmount(() => {
               :href="profile.server"
               target="_blank"
               rel="noopener noreferrer"
-              >探索服务器官网 <ArrowUpRight :size="17" aria-hidden="true" /><span class="sr-only">（在新标签页打开）</span></a
+              >探索服务器官网 <ArrowUpRight :size="17" aria-hidden="true" /><span class="sr-only"
+                >（在新标签页打开）</span
+              ></a
             ><button class="address-button" @click="copyAddress">
               <span><small>服务器地址</small>{{ profile.address }}</span
-              ><Check v-if="copied" :size="18" /><Copy v-else :size="18" />
+              ><Transition name="icon-swap" mode="out-in"
+                ><Check v-if="copied" key="check" :size="18" /><Copy v-else key="copy" :size="18"
+              /></Transition>
             </button>
           </div>
         </div>
@@ -260,7 +267,11 @@ onBeforeUnmount(() => {
         :href="`${profile.server}/tutorials/quick_play_guide`"
         target="_blank"
         rel="noopener noreferrer"
-        >第一次来？看看快速游玩指南 <ArrowUpRight :size="16" aria-hidden="true" /><span class="sr-only">（在新标签页打开）</span></a>
+        >第一次来？看看快速游玩指南 <ArrowUpRight :size="16" aria-hidden="true" /><span
+          class="sr-only"
+          >（在新标签页打开）</span
+        ></a
+      >
     </section>
 
     <section id="contact" class="contact-section">
@@ -271,9 +282,16 @@ onBeforeUnmount(() => {
         <a class="email-link" :href="`mailto:${profile.email}`">{{ profile.email }}</a>
         <div class="contact-links">
           <a :href="profile.github" target="_blank" rel="noopener noreferrer"
-            ><Github :size="19" aria-hidden="true" /> GitHub <ArrowUpRight :size="14" aria-hidden="true" /><span class="sr-only">（在新标签页打开）</span></a
+            ><Github :size="19" aria-hidden="true" /> GitHub
+            <ArrowUpRight :size="14" aria-hidden="true" /><span class="sr-only"
+              >（在新标签页打开）</span
+            ></a
           ><a :href="profile.bilibili" target="_blank" rel="noopener noreferrer"
-            ><MonitorPlay :size="19" aria-hidden="true" /> Bilibili <ArrowUpRight :size="14" aria-hidden="true" /><span class="sr-only">（在新标签页打开）</span></a>
+            ><MonitorPlay :size="19" aria-hidden="true" /> Bilibili
+            <ArrowUpRight :size="14" aria-hidden="true" /><span class="sr-only"
+              >（在新标签页打开）</span
+            ></a
+          >
         </div>
       </div>
       <div class="contact-watermark" aria-hidden="true">keep creating.</div>

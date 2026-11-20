@@ -800,7 +800,7 @@ button:disabled {
 .header-swap-enter-active,
 .header-swap-leave-active {
   transition:
-    opacity 0.32s ease,
+    opacity 0.32s var(--motion-ease),
     translate 0.42s var(--motion-ease);
 }
 .header-swap-enter-active {
@@ -820,7 +820,7 @@ button:disabled {
 .page-swap-enter-active,
 .page-swap-leave-active {
   transition:
-    opacity 0.3s ease,
+    opacity 0.3s var(--motion-ease),
     translate 0.38s var(--motion-ease);
 }
 .page-swap-leave-active {
@@ -967,6 +967,9 @@ button:disabled {
   width: 34px;
   height: 36px;
   color: var(--muted);
+  transition:
+    background-color 220ms var(--motion-ease),
+    color 220ms var(--motion-ease);
 }
 .palette-picker {
   position: relative;
@@ -1453,13 +1456,13 @@ h1 > span {
   border-radius: var(--radius-lg);
   padding: var(--space-alt-28);
   transition:
-    border-color 0.3s,
-    transform 0.3s,
-    box-shadow 0.3s;
+    border-color 0.3s var(--motion-ease),
+    translate 0.3s var(--motion-ease),
+    box-shadow 0.3s var(--motion-ease);
 }
 .project-card:hover {
   border-color: var(--project-hover-border);
-  transform: translateY(-5px);
+  translate: 0 -5px;
   box-shadow: 0 15px 40px var(--shadow);
 }
 .project-top {
@@ -1783,6 +1786,14 @@ h1 > span {
   color: #141521;
   padding: var(--space-sm) var(--space-lg);
   font-size: 12px;
+  transition:
+    transform 0.25s var(--motion-ease),
+    background-color 0.25s var(--motion-ease),
+    box-shadow 0.25s var(--motion-ease);
+}
+.white-button:hover {
+  background: #f1f5fa;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
 }
 .address-button {
   display: flex;
@@ -1793,6 +1804,7 @@ h1 > span {
   color: #e7ecf3;
   font-size: 13px;
   padding: var(--space-2xs);
+  transition: color 220ms var(--motion-ease);
 }
 .address-button small {
   display: block;
@@ -2992,7 +3004,9 @@ h1 > span {
   }
 }
 
-/* Native scrolling with a theme-aware, rounded thumb. */
+/* Native scrolling with a theme-aware, rounded thumb, on both axes.
+   Per-container scrollbar-color declarations override the WebKit pseudo-elements
+   in Chromium 121+, so keep this block as the single source of scrollbar styling. */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -3559,6 +3573,15 @@ h1 > span {
   min-height: 44px;
   color: var(--muted);
   background: transparent;
+  transition:
+    color 200ms var(--motion-ease),
+    scale 200ms var(--motion-ease);
+}
+.directory-search button:hover {
+  color: var(--blue);
+}
+.directory-search button:active {
+  scale: 0.9;
 }
 .directory-more {
   margin-top: var(--space-2xl);
@@ -3626,11 +3649,11 @@ h1 > span {
     var(--panel);
   transition:
     translate 0.25s var(--motion-ease),
-    border-color 0.25s,
-    box-shadow 0.25s;
+    border-color 0.25s var(--motion-ease),
+    box-shadow 0.25s var(--motion-ease);
 }
 .tool-card:hover {
-  transform: translateY(-5px);
+  translate: 0 -5px;
   border-color: color-mix(in srgb, var(--blue) 50%, transparent);
   box-shadow: 0 12px 32px var(--shadow);
 }
@@ -4140,6 +4163,21 @@ h1 > span {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   color: var(--muted);
+  animation: state-fade-in 300ms var(--motion-ease) both;
+}
+/* Async page bodies, placeholders and error states ease in instead of snapping. */
+@keyframes state-fade-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.game-load-feedback {
+  animation: state-fade-in 300ms var(--motion-ease) both;
 }
 .tool-load-state .button {
   margin-top: var(--space-lg);
@@ -4147,23 +4185,20 @@ h1 > span {
 .tools-grid {
   position: relative;
 }
-.tool-card {
-  will-change: auto;
-}
-.tool-card:hover {
-  translate: 0 -5px;
-  transform: none;
-}
 .tool-list-enter-active {
   transition:
-    opacity 300ms ease var(--tool-delay),
+    opacity 300ms var(--motion-ease) var(--tool-delay),
     transform 360ms var(--motion-ease) var(--tool-delay);
 }
 .tool-list-leave-active {
   position: absolute;
   transition:
-    opacity 140ms ease,
+    opacity 140ms var(--motion-ease),
     transform 180ms var(--motion-ease);
+}
+/* Below-the-fold cards skip the stagger instead of queueing off-screen. */
+.tool-list-instant.tool-list-enter-active {
+  transition-duration: 0ms;
 }
 .tool-list-enter-from {
   opacity: 0;
@@ -4179,13 +4214,80 @@ h1 > span {
 .tool-empty-enter-active,
 .tool-empty-leave-active {
   transition:
-    opacity 160ms ease,
+    opacity 160ms var(--motion-ease),
     translate 200ms var(--motion-ease);
 }
 .tool-empty-enter-from,
 .tool-empty-leave-to {
   opacity: 0;
   translate: 0 8px;
+}
+
+/* State changes that used to snap: icon swaps, clear buttons, directory results
+   and error-page actions. All durations follow the DESIGN.md motion scale. */
+.icon-swap-enter-active,
+.icon-swap-leave-active,
+.theme-icon-enter-active,
+.theme-icon-leave-active {
+  transition:
+    opacity 140ms var(--motion-ease),
+    scale 200ms var(--motion-ease),
+    rotate 200ms var(--motion-ease);
+}
+.icon-swap-enter-from,
+.theme-icon-enter-from {
+  opacity: 0;
+  scale: 0.6;
+  rotate: -30deg;
+}
+.icon-swap-leave-to,
+.theme-icon-leave-to {
+  opacity: 0;
+  scale: 0.6;
+  rotate: 30deg;
+}
+.clear-pop-enter-active,
+.clear-pop-leave-active {
+  transition:
+    opacity 160ms var(--motion-ease),
+    scale 200ms var(--motion-ease);
+}
+.clear-pop-enter-from,
+.clear-pop-leave-to {
+  opacity: 0;
+  scale: 0.7;
+}
+.directory-swap-enter-active,
+.directory-swap-leave-active {
+  transition:
+    opacity 180ms var(--motion-ease),
+    translate 220ms var(--motion-ease);
+}
+.directory-swap-enter-from {
+  opacity: 0;
+  translate: 0 10px;
+}
+.directory-swap-leave-to {
+  opacity: 0;
+  translate: 0 -8px;
+}
+.error-actions {
+  position: relative;
+}
+.error-action-enter-active,
+.error-action-leave-active,
+.error-action-move {
+  transition:
+    opacity 200ms var(--motion-ease),
+    translate 220ms var(--motion-ease);
+}
+.error-action-enter-from,
+.error-action-leave-to {
+  opacity: 0;
+  translate: 0 8px;
+}
+.error-action-leave-active {
+  position: absolute;
 }
 @keyframes tool-workbench-in {
   from {
@@ -6830,8 +6932,6 @@ h1 > span {
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-inline: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) transparent;
   padding: var(--space-2xl) var(--space-sm) var(--space-md);
   min-height: 132px;
   height: 132px;
@@ -8232,7 +8332,6 @@ h1 > span {
 .mine-board-scroll {
   overflow-x: auto;
   padding: var(--space-2xs);
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   border-radius: var(--radius-xs);
 }
 .mine-board-scroll.is-large {
@@ -8305,7 +8404,6 @@ h1 > span {
   overflow-x: auto;
   padding: var(--space-xs);
   margin-inline: -6px;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 .solitaire-table {
   --card-step: 36px;

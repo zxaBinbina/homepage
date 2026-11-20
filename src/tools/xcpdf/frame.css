@@ -271,21 +271,28 @@ textarea::placeholder {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-corner {
-  background: var(--scrollbar-track);
-}
-::-webkit-scrollbar-thumb {
-  border: 2px solid var(--scrollbar-track);
-  border-radius: 999px;
-  background: var(--scrollbar-thumb);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    min-height: 32px;
+    border: 2px solid var(--scrollbar-track);
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
 }
 button,
 a,

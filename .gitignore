@@ -73,6 +73,7 @@ user-data-dir/
 .codex/
 .agents/
 .idea/
+.claude/
 .DS_Store
 Thumbs.db
 Desktop.ini
