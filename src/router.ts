@@ -46,6 +46,7 @@ const components = {
   wiki: () => import('./rdp/App.vue'),
   downloads: () => import('./rdp/App.vue'),
   gaze: () => import('./gaze/App.vue'),
+  sptl: () => import('./sptl/HomePage.vue'),
   ...Object.fromEntries(
     gazeGuides.map((guide) => [`gaze.${guide.id}`, () => import('./gaze/App.vue')]),
   ),
@@ -239,9 +240,15 @@ router.afterEach((to, _from, failure) => {
   const favicon = document.querySelector('link[rel="icon"]')
   favicon?.setAttribute(
     'href',
-    project ? '/images/rdp-access-auth.png' : gaze ? '/images/gaze.svg' : '/favicon.svg',
+    project
+      ? '/images/rdp-access-auth.png'
+      : gaze
+        ? '/images/gaze.svg'
+        : page === 'sptl'
+          ? '/images/sptl.png'
+          : '/favicon.svg',
   )
-  favicon?.setAttribute('type', project ? 'image/png' : 'image/svg+xml')
+  favicon?.setAttribute('type', project || page === 'sptl' ? 'image/png' : 'image/svg+xml')
 })
 
 /** Enhance regular links, including rendered Wiki content, without changing native link gestures. */

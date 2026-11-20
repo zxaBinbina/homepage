@@ -68,7 +68,7 @@ with sync_playwright() as p:
     page.evaluate('window.navigationProbe.audio = document.querySelector("audio")')
     page.get_by_role('button', name='关闭音乐播放器').click()
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(9)
+    expect(page.locator('.project-card')).to_have_count(10)
     expect(page).to_have_title('项目目录 · a彬彬a')
     metadata('/project')
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
@@ -102,7 +102,7 @@ with sync_playwright() as p:
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
     assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(9)
+    expect(page.locator('.project-card')).to_have_count(10)
 
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='游戏', exact=True).click()
     expect(page.locator('.game-card')).to_have_count(15)
@@ -118,7 +118,7 @@ with sync_playwright() as p:
         page.get_by_role('link', name='全部游戏', exact=True).click()
         expect(page.locator('.game-card')).to_have_count(15)
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(9)
+    expect(page.locator('.project-card')).to_have_count(10)
 
     card = page.locator('.project-rdp')
     card.scroll_into_view_if_needed()

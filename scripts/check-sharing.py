@@ -49,6 +49,7 @@ pages = {
     'RDP Access Auth · 远程桌面，先认证再连接': 'projects/rdp-access-auth',
     '部署与维护 Wiki · RDP Access Auth': 'projects/rdp-access-auth/wiki',
     '下载发行版 · RDP Access Auth': 'projects/rdp-access-auth/downloads',
+    'SPTL · SPlayer 任务栏歌词': 'projects/SPTL',
     '400 · 这个请求有点不对劲 · a彬彬a': '400',
     '401 · 先确认一下你的身份 · a彬彬a': '401',
     '403 · 这片区域暂未开放 · a彬彬a': '403',
@@ -88,13 +89,14 @@ for path in paths:
     image = meta('property', 'og:image')
     assert image == meta('itemprop', 'image') == meta('property', 'og:image:secure_url')
     project = pages[title].startswith('projects/rdp-access-auth')
-    image_path = 'images/rdp-access-auth.png' if project else 'images/share-avatar.jpg'
+    sptl = pages[title] == 'projects/SPTL'
+    image_path = 'images/rdp-access-auth.png' if project else 'images/sptl-share.png' if sptl else 'images/share-avatar.jpg'
     assert image == 'https://zxabinbina.cc.cd/' + image_path
     assert urlparse(image).scheme == 'https' and urlparse(image).netloc
-    assert meta('property', 'og:image:type') == ('image/png' if project else 'image/jpeg')
-    assert meta('property', 'og:image:width') == ('512' if project else '256')
-    assert meta('property', 'og:image:height') == ('394' if project else '256')
-    assert meta('property', 'og:image:alt') == ('RDP Access Auth 软件 Logo' if project else 'a彬彬a 的头像')
+    assert meta('property', 'og:image:type') == ('image/png' if project or sptl else 'image/jpeg')
+    assert meta('property', 'og:image:width') == ('512' if project else '1200' if sptl else '256')
+    assert meta('property', 'og:image:height') == ('394' if project else '630' if sptl else '256')
+    assert meta('property', 'og:image:alt') == ('RDP Access Auth 软件 Logo' if project else 'SPTL · 让歌词留在任务栏' if sptl else 'a彬彬a 的头像')
     canonical = 'https://zxabinbina.cc.cd/' + pages[title]
     assert meta('property', 'og:url') == canonical
     assert [link['href'] for link in head.links if link.get('rel') == 'canonical'] == [canonical]

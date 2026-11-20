@@ -4,6 +4,7 @@ import { RouterView, useRoute } from 'vue-router'
 import SiteHeader from './components/SiteHeader.vue'
 import ProjectHeader from './rdp/components/ProjectHeader.vue'
 import GazeHeader from './gaze/components/GazeHeader.vue'
+import SptlHeader from './sptl/SptlHeader.vue'
 import AnimatedCursor from './components/AnimatedCursor.vue'
 import './rdp/style.css'
 import { navigateInternalLink } from './router'
@@ -28,6 +29,7 @@ onMounted(() => document.addEventListener('pointermove', onPointer, { passive: t
 onBeforeUnmount(() => document.removeEventListener('pointermove', onPointer))
 const project = computed(() => isProjectPage(route.name))
 const gaze = computed(() => isGazePage(route.name))
+const sptl = computed(() => route.name === 'sptl')
 const reading = computed(() => isBookPage(route.name))
 // 主页、目录、工具、游戏与书架共用导航；Gaze 与 RDP 子站各用项目导航。
 const activeNav = computed(() =>
@@ -69,14 +71,18 @@ function releasePageHeight() {
     class="app-header-transition"
     :class="{
       'is-project': project || gaze,
+      'is-sptl': sptl,
       'is-reader': reading,
       'is-myriad': myriad,
       'is-revealed': revealed,
     }"
   >
     <Transition name="header-swap">
-      <div v-if="!project && !gaze" class="header-layer" key="unified-header">
+      <div v-if="!project && !gaze && !sptl" class="header-layer" key="unified-header">
         <SiteHeader :home="route.name === 'home'" :active="activeNav" />
+      </div>
+      <div v-else-if="sptl" class="header-layer" key="sptl-header">
+        <SptlHeader />
       </div>
       <div v-else-if="gaze" class="header-layer" key="gaze-header">
         <GazeHeader :view="route.name === 'gaze' ? 'home' : 'guide'" />

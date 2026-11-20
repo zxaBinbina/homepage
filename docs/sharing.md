@@ -19,6 +19,7 @@
 | ---------------------------------------- | ------------------------------------------------ | --------------- |
 | 个人主页、项目目录、工具、游戏与万象导航 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
 | RDP 官网、Wiki 与下载页                  | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
+| SPTL 官网                                | `public/images/sptl-share.png`（项目分享封面）   | PNG，1200 × 630 |
 
 头像原文件 `avatar.png` 实际为 JPEG；分享专用的 `share-avatar.jpg` 是它的原样副本，使用正确扩展名以匹配服务器响应格式。更新头像时同步更新该副本。OG 图片地址、格式、尺寸和替代文字统一由 `site.config.ts` 提供，QQ 图片与 JSON-LD 同步使用相同图片，站内切换时也同步更新。原 Minecraft `share-cover.jpg` 继续用于 README 展示。
 
@@ -51,6 +52,11 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 站内无刷新切换时，`src/router.ts` 复用 `createSiteMeta` 更新浏览器标题、description、canonical、Open Graph、QQ 标签及 favicon。`vite.config.ts` 将同一 `SITE_URL` 注入客户端，确保运行时与 EJS 构建结果一致。分享平台直接请求各页面时仍可从 HTML 源码获取完整标签。
 
 页面路径统一不带末尾斜线，canonical 与 `og:url` 直接复用 `src/pages.ts` 的路径。构建输出为根 `index.html`、`project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html`；Cloudflare Pages 以无 `.html` 的地址提供页面，自动生成的 `_redirects` 将旧的带斜线与 `/index.html` 地址转到规范地址。部署时保留该文件。
+
+SPTL 子页 `/projects/SPTL` 的标题、简介和分享封面由 `site.config.ts` 提供，浏览器图标为
+`public/images/sptl.png`，与官网导航、项目目录及小组件安装包使用同一张透明图标。
+规范地址、HTML 元信息、站内切换与站点地图沿用公共构建逻辑；
+页面及下载资源维护见 [SPTL 说明](SPTL.md)。Office 独立查看器资源不作为站内内容页面参与 SEO 检查。
 
 ## 网页工具
 

@@ -18,6 +18,11 @@ export const siteContent = {
 }
 
 const projectPages = {
+  sptl: {
+    title: 'SPTL · SPlayer 任务栏歌词',
+    description:
+      '为 SPlayer Next 打造的 KDE Plasma 任务栏歌词小组件：同步原文与翻译、逐字高亮、专辑封面和播放控制，提供源码下载与安装指南。',
+  },
   myriad: {
     title: '万象导航 · a彬彬a',
     description:
@@ -40,7 +45,7 @@ const projectPages = {
   directory: {
     title: '项目目录 · a彬彬a',
     description:
-      '浏览 a彬彬a 已公开的开发项目：YouzaiWorldCore、悠哉世界官网、Gaze 中文与登录修复和 RDP Access Auth，查看简介、技术栈与访问入口。',
+      '浏览 a彬彬a 的开发项目：YouzaiWorldCore、悠哉世界官网、Gaze 中文与登录修复、RDP Access Auth 和 SPTL 任务栏歌词，查看简介、技术栈与访问入口。',
   },
   rdp: {
     title: 'RDP Access Auth · 远程桌面，先认证再连接',
@@ -106,23 +111,32 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
               : isGazePage(page)
                 ? gazePageMeta(page)
                 : projectPages[page]
-  const image = isGazePage(page)
-    ? {
-        image: 'images/gaze-share.png',
-        imageAlt: 'Gaze 图标',
-        imageType: 'image/png',
-        imageWidth: 1200,
-        imageHeight: 630,
-      }
-    : isProjectPage(page)
+  const image =
+    page === 'sptl'
       ? {
-          image: 'images/rdp-access-auth.png',
-          imageAlt: 'RDP Access Auth 软件 Logo',
+          image: 'images/sptl-share.png',
+          imageAlt: 'SPTL · 让歌词留在任务栏',
           imageType: 'image/png',
-          imageWidth: 512,
-          imageHeight: 394,
+          imageWidth: 1200,
+          imageHeight: 630,
         }
-      : siteContent
+      : isGazePage(page)
+        ? {
+            image: 'images/gaze-share.png',
+            imageAlt: 'Gaze 图标',
+            imageType: 'image/png',
+            imageWidth: 1200,
+            imageHeight: 630,
+          }
+        : isProjectPage(page)
+          ? {
+              image: 'images/rdp-access-auth.png',
+              imageAlt: 'RDP Access Auth 软件 Logo',
+              imageType: 'image/png',
+              imageWidth: 512,
+              imageHeight: 394,
+            }
+          : siteContent
   return {
     ...siteContent,
     imageAlt: image.imageAlt,

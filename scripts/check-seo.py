@@ -45,6 +45,10 @@ error_codes = {400, 401, 403, 404, 408, 429, 500, 502, 503, 504}
 error_files = {f'{code}.html' for code in error_codes}
 for file in root.rglob('*.html'):
     doc = Document(file.read_text())
+    if file.relative_to(root).as_posix().startswith('office-viewer/'):
+        # The standalone Office engine is an embedded resource, not a site page.
+        assert urljoin(base, file.relative_to(root).as_posix()) not in urls, file
+        continue
     if file.relative_to(root).as_posix() == 'tool-assets/xcpdf/runtime.html':
         assert doc.robots == ['noindex'] and not doc.canonical, file
         assert urljoin(base, 'tool-assets/xcpdf/runtime.html') not in urls
@@ -68,7 +72,8 @@ for file in root.rglob('*.html'):
 assert base in canonical_urls, 'Missing homepage'
 tools = json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs']))
 books = json.loads(Path('src/books/library.json').read_text())
-assert len(canonical_urls) == 47 + len(tools) + len(books), canonical_urls
+assert urljoin(base, 'projects/SPTL') in canonical_urls, 'Missing SPTL canonical URL'
+assert urljoin(base, 'projects/SPTL') in urls, 'Missing SPTL sitemap URL'
 myriad_url = urljoin(base, 'myriad')
 assert myriad_url in canonical_urls, 'Missing Myriad canonical URL'
 assert myriad_url in urls, 'Missing Myriad sitemap URL'

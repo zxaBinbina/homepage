@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowUpRight, Globe2, ScanFace, ShieldCheck } from 'lucide-vue-next'
+import { ArrowUpRight, AudioLines, Globe2, ScanFace, ShieldCheck } from 'lucide-vue-next'
 import type { projects } from '../content'
 
 withDefaults(
@@ -10,7 +10,7 @@ withDefaults(
   { heading: 'h3' },
 )
 
-const icons = { globe: Globe2, scan: ScanFace, shield: ShieldCheck }
+const icons = { globe: Globe2, scan: ScanFace, shield: ShieldCheck, music: AudioLines }
 const asset = (name: string) => `/images/${name}`
 </script>
 
@@ -27,7 +27,7 @@ const asset = (name: string) => `/images/${name}`
     <div class="project-top">
       <div class="project-icon">
         <img
-          v-if="project.icon === 'youzai' || project.id === 'gaze'"
+          v-if="project.icon === 'youzai' || ['gaze', 'sptl'].includes(project.id)"
           :src="asset(project.icon === 'youzai' ? 'logocircle.webp' : project.image)"
           alt=""
           width="32"

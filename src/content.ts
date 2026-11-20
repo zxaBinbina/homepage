@@ -151,6 +151,22 @@ export const projects = [
     link: '探索仓库',
     icon: 'youzai',
   },
+  {
+    id: 'sptl',
+    repository: 'zxaBinbina/SplayerPlasmaTaskbarLyrics',
+    role: '个人项目',
+    featured: false,
+    image: 'sptl.png',
+    number: '10',
+    title: 'SPTL · SPlayer 任务栏歌词',
+    subtitle: '让歌词，留在任务栏。',
+    description:
+      '为 KDE Plasma 带来 SPlayer Next 同步歌词、专辑封面与播放控制，听歌时少切一次窗口。',
+    tags: ['QML', 'KDE Plasma', 'Python'],
+    url: '/projects/SPTL',
+    link: '官网与安装指南',
+    icon: 'music',
+  },
 ]
 
 export const featuredProjects = projects.filter((project) => project.featured)

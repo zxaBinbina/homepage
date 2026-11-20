@@ -15,7 +15,7 @@ with sync_playwright() as p:
   expect(nav.locator('[aria-current="page"]')).to_have_text('首页' if route=='/' else '项目')
   expect(nav.get_by_role('link',name='工具',exact=True)).to_have_attribute('href','/tool')
   expect(nav.get_by_role('link',name='游戏',exact=True)).to_have_attribute('href','/game')
-  assert nav.get_by_role('link').count()==5
+  assert nav.get_by_role('link').count()==7
   assert page.get_by_role('button',name='打开网易云音乐播放器').count()==1
   page.set_viewport_size(dict(width=390,height=844))
   page.get_by_role('button',name='打开菜单').click()
@@ -34,15 +34,15 @@ with sync_playwright() as p:
  for route in ['/project','/project/']:
   page.goto(base+route)
   expect(page).to_have_title('项目目录 · a彬彬a')
-  expect(page.locator('.project-card')).to_have_count(9)
- for term, count in [('zxaBinbina', 2), ('Youzai-World-Team', 7), ('YouzaiWorldWebNew', 1), ('YouzaiWorldDonaimEmailWorker', 1), ('.github', 0), ('自我介绍', 0), ('homepage', 0)]:
+  expect(page.locator('.project-card')).to_have_count(10)
+ for term, count in [('zxaBinbina', 3), ('Youzai-World-Team', 7), ('SPTL', 1), ('SplayerPlasmaTaskbarLyrics', 1), ('YouzaiWorldWebNew', 1), ('YouzaiWorldDonaimEmailWorker', 1), ('.github', 0), ('自我介绍', 0), ('homepage', 0)]:
   page.get_by_role('searchbox',name='搜索项目').fill(term)
   expect(page.locator('.project-card')).to_have_count(count)
  page.get_by_role('searchbox',name='搜索项目').fill('webAuthn')
  expect(page.locator('.project-card')).to_have_count(1)
  assert 'RDP Access Auth' in page.locator('.project-card').inner_text()
  page.get_by_role('searchbox').fill('not-a-project');expect(page.locator('.directory-empty')).to_be_visible()
- page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(9)
+ page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(10)
  for theme in ['dark','light']:
   page.evaluate('(v)=>localStorage.setItem("homepage-theme",v)',theme);page.reload()
   for w in [320,390,768,1024,1440]:
@@ -97,17 +97,17 @@ with sync_playwright() as p:
   for card in motion_page.locator('.project-card').all():
    card.scroll_into_view_if_needed()
    expect(card).to_have_css('opacity','1')
-  motion_page.wait_for_function('window.cardReveals.length === 9')
+  motion_page.wait_for_function('window.cardReveals.length === 10')
   records=motion_page.evaluate('window.cardReveals')
   assert all(r['options']['duration']==650 and r['frames'][0]['translate']=='0 20px' for r in records)
-  assert [r['options']['delay'] for r in records]==([0,90,0,90,0,90,0,90,0] if width==1440 else [0]*9)
+  assert [r['options']['delay'] for r in records]==([0,90]*5 if width==1440 else [0]*10)
   motion_page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
   motion_page.wait_for_timeout(800)
-  assert motion_page.evaluate('window.cardReveals.length')==9
+  assert motion_page.evaluate('window.cardReveals.length')==10
   motion_page.get_by_role('searchbox').fill('not-a-project')
   expect(motion_page.locator('.project-card')).to_have_count(0)
   motion_page.get_by_role('button',name='查看全部项目').click()
-  motion_page.wait_for_function('window.cardReveals.length > 9')
+  motion_page.wait_for_function('window.cardReveals.length > 10')
   motion_page.wait_for_timeout(1000)
   assert motion_page.evaluate('window.cardFlashes')==[], 'Cards flashed after scrolling or search'
   motion_page.emulate_media(reduced_motion='reduce')
@@ -120,4 +120,4 @@ with sync_playwright() as p:
   motion_page.emulate_media(reduced_motion='no-preference')
  assert not errors,errors
  b.close()
-print('Directory routes, title, 9 public projects and four featured projects, search/empty/reset, images, both themes, five widths, scroll/search reveals and reduced motion passed')
+print('Directory routes, title, 10 projects and four featured projects, search/empty/reset, images, both themes, five widths, scroll/search reveals and reduced motion passed')

@@ -78,8 +78,8 @@
     <link rel="canonical" href="<%= site.url %>" />
     <link
       rel="icon"
-      href="/<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'images/rdp-access-auth.png' : 'favicon.svg' %>"
-      type="<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'image/png' : 'image/svg+xml' %>"
+      href="/<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'images/rdp-access-auth.png' : page === 'sptl' ? 'images/sptl.png' : 'favicon.svg' %>"
+      type="<%= ['rdp', 'wiki', 'downloads'].includes(page) || page === 'sptl' ? 'image/png' : 'image/svg+xml' %>"
     />
     <title><%= site.title %></title>
   </head>

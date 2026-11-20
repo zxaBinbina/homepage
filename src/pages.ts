@@ -43,6 +43,7 @@ const staticPages = {
   wiki: '/projects/rdp-access-auth/wiki',
   downloads: '/projects/rdp-access-auth/downloads',
   gaze: '/projects/gaze',
+  sptl: '/projects/SPTL',
   ...errorPaths,
   ...gazeGuidePages,
 } as const

@@ -746,9 +746,13 @@ button:disabled {
   position: absolute;
   inset: 0;
 }
+.app-header-transition.is-sptl {
+  min-height: 64px;
+}
 .app-header-transition > .header-layer > .header,
 .app-header-transition > .header-layer > .rdp-header,
-.app-header-transition > .header-layer > .gaze-header {
+.app-header-transition > .header-layer > .gaze-header,
+.app-header-transition > .header-layer > .sptl-header {
   position: absolute;
   inset: 0;
   width: 100%;
