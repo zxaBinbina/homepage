@@ -10,6 +10,7 @@ const xcpdfComponents = Object.fromEntries(
 
 export const toolComponents = {
   ...xcpdfComponents,
+  'office-editor': defineAsyncComponent(() => import('./office/OfficeEditorTool.vue')),
   'pdf-to-word': pdfConvertComponent,
   'pdf-to-excel': pdfConvertComponent,
   'pdf-to-powerpoint': pdfConvertComponent,

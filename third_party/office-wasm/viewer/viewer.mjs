@@ -20,7 +20,7 @@ import { MathFonts } from './fonts/math-compat.mjs';
 import { preparePackage, fontNamesOf, scanDocument } from './x2t/prepare-package.mjs';
 import { prepareLocalFonts, installLocalFonts, LOCAL_PREFIX } from './fonts/local-fonts.mjs';
 
-const VERSION = '0.2.0-homepage.1';
+const VERSION = '0.2.0-homepage.2';
 const TAG = 'office-wasm-viewer';
 const ROOT = new URL('./', import.meta.url);
 const query = new URLSearchParams(location.search);
@@ -118,6 +118,7 @@ function disposeDoc() {
     editor = null;
   }
   if (doc) {
+    clearInterval(doc.dirtyTimer);
     URL.revokeObjectURL(doc.binUrl);
     for (const u of Object.values(doc.mediaUrls)) URL.revokeObjectURL(u);
     doc = null;
@@ -126,7 +127,7 @@ function disposeDoc() {
 }
 
 async function openDocument(name, bytes, mode = 'embedded', timeoutMs = 120000, localFonts = null) {
-  if (mode === 'edit') throw new Error('this deployment is read-only');
+  if (!['embedded', 'desktop', 'edit'].includes(mode)) throw new Error('unsupported mode');
   const docType = docTypeOf(name);
   if (!docType) throw new Error('unsupported file type: ' + name);
   // A site packed for some editors only (tools/pack.mjs --apps) lists them in x2t-info.json: say so at once instead of timing out.
@@ -184,7 +185,7 @@ async function openDocument(name, bytes, mode = 'embedded', timeoutMs = 120000, 
     if (restricted.length) log('local fonts shown but kept out of the PDF (licence flag "restricted"): ' + restricted.join(', '));
   }
   doc = {
-    name, ext, docType, bytes, tcvnFixed, local,
+    name, ext, docType, bytes, tcvnFixed, local, editable: mode === 'edit', imageCounter: 0,
     editorBin: r.output,
     media: r.media,
     mediaUrls,
@@ -257,12 +258,12 @@ function mountEditor(mode) {
       key: 'k' + Date.now(),
       title: doc.name,
       url: doc.binUrl, // the mock server answers "documentOpen" with this URL as Editor.bin
-      permissions: { edit: false, download: false, print: false, comment: false, review: false, copy: true, chat: false },
+      permissions: { edit, download: false, print: false, comment: false, review: false, copy: true, chat: false },
     },
     editorConfig: {
       mode: edit ? 'edit' : 'view',
       lang: 'zh',
-      user: { id: 'viewer', name: 'Viewer' },
+      user: { id: 'viewer', name: '访客' },
       customization: { compactHeader: true, uiTheme, features: { featuresTips: false }, comments: false, help: false, plugins: false, feedback: false, autosave: false },
       embedded: { toolbarDocked: 'top' },
     },
@@ -273,6 +274,7 @@ function mountEditor(mode) {
       },
       onDocumentReady: () => {
         state.timings.documentReadyMs = ms(tOpen);
+        if (edit) installEditingBridge();
         if (doc.docType === 'word') editorApi()?.api.zoomFitToWidth?.();
         setPhase('ready');
         log(`document shown: ${state.timings.documentReadyMs} ms`);
@@ -284,6 +286,9 @@ function mountEditor(mode) {
         emit('editorError', e && e.data);
       },
       onWarning: (e) => emit('editorWarning', e && e.data),
+      onDocumentStateChange: (e) => {
+        if (edit) { state.modified = !!e.data; emit('modified', { modified: state.modified }); }
+      },
     },
   };
   editor = new window.DocsAPI.DocEditor('placeholder', config);
@@ -295,6 +300,96 @@ function mountEditor(mode) {
     }),
     getImageURL: async (name) => doc?.mediaUrls[String(name).replace(/^.*[\\/]/, '')] || '',
     onMessage: edit ? editServer() : () => {},
+  });
+}
+
+// Native image insertion uses this CryptPad hook instead of an upload server.
+// Keep both the image bytes and the engine's URL mapping in this document's memory.
+async function addLocalImage(file) {
+  const active = doc;
+  if (!active?.editable) throw new Error('no editable document');
+  if (file.size > 10 * 1048576) throw new Error('image exceeds 10 MiB');
+  const bitmap = await createImageBitmap(file);
+  let blob = file;
+  try {
+    if (bitmap.width * bitmap.height > 16000000) throw new Error('image exceeds 16 megapixels');
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      canvas.getContext('2d').drawImage(bitmap, 0, 0);
+      blob = await canvas.convertToBlob({ type: 'image/png' });
+    }
+  } finally { bitmap.close(); }
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  if (active !== doc) throw new Error('superseded');
+  const size = Object.values(active.media).reduce((n, data) => n + data.length, 0);
+  if (size + bytes.length > 60 * 1048576) throw new Error('image total exceeds 60 MiB');
+  const name = 'inserted-' + Date.now() + '-' + (++active.imageCounter) + (blob.type === 'image/jpeg' ? '.jpg' : '.png');
+  const url = URL.createObjectURL(blob);
+  active.media[name] = bytes;
+  active.mediaUrls[name] = url;
+  editorApi().w.AscCommon.g_oDocumentUrls.addUrls({ ['media/' + name]: url });
+  // CryptPad's native insertion callback registers res.name as the package image
+  // ID. It displays res.url, and the binary writer resolves that URL back to name.
+  return { url, name, path: 'media/' + name };
+}
+window.APP.UploadImageFiles = (files, _id, _user, _jwt, callback) => {
+  Promise.all(Array.from(files).map(addLocalImage)).then(
+    (images) => callback(0, images.map((image) => image.url)),
+    () => callback(editorApi()?.w.Asc.c_oAscError.ID.UploadImageError || -1, []),
+  );
+};
+window.APP.AddImage = (callback) => {
+  const active = doc;
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*'; input.hidden = true;
+  document.body.append(input);
+  input.addEventListener('cancel', () => input.remove(), { once: true });
+  input.addEventListener('change', async () => {
+    try {
+      if (input.files[0]) {
+        const image = await addLocalImage(input.files[0]);
+        if (doc === active) callback(image);
+      }
+    } catch { emit('editorWarning', { message: '图片未能插入，请使用小于 10 MB 的有效图片。' }); }
+    finally { input.remove(); }
+  }, { once: true });
+  input.click();
+};
+function installEditingBridge() {
+  const { w, api } = editorApi();
+  const active = doc;
+  const markModified = () => {
+    if (doc !== active || state.phase !== 'ready') return;
+    if (!state.modified) { state.modified = true; emit('modified', { modified: true }); }
+  };
+  // Cell/text composition can be pending before the engine commits its history.
+  // Mark user input immediately, and cover ribbon/drawing operations via history.
+  w.addEventListener('input', markModified, true);
+  w.addEventListener('paste', markModified, true);
+  active.dirtyTimer = setInterval(() => {
+    if (api.isDocumentModified?.() || w.AscCommon.History.Have_Changes()) markModified();
+  }, 500);
+  // Pasted data/blob images use the same local path. Remote images cannot cause
+  // a document upload or an implicit external request.
+  w.AscCommon.sendImgUrls = (_api, images, callback) => {
+    Promise.all(images.map(async (url) => {
+      if (!String(url).startsWith('data:image/') && !String(url).startsWith('blob:')) throw new Error('remote image is unavailable');
+      return addLocalImage(await (await fetch(url)).blob());
+    })).then(callback, () => callback(images.map(() => ({ url: 'error', path: '' }))));
+  };
+  w.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+      event.preventDefault(); event.stopImmediatePropagation(); emit('saveRequested', {});
+    }
+  }, true);
+  w.addEventListener('click', (event) => {
+    if (event.target.closest?.('#id-toolbar-btn-save')) {
+      event.preventDefault(); event.stopImmediatePropagation(); emit('saveRequested', {});
+    }
+  }, true);
+  api.asc_registerCallback('asc_onDocumentModifiedChanged', () => {
+    state.modified = api.isDocumentModified?.() !== false;
+    emit('modified', { modified: state.modified });
   });
 }
 
@@ -425,11 +520,14 @@ async function exportPdf() {
   return pdf;
 }
 
-/** Edit mode: read the document back from the editor (internal "DOCY;v5;<size>;<base64>" text) and let x2t write
- *  the Office file. Pictures that were in the opened file are passed along; pictures inserted while editing are not. */
+/** Read the edited document and its original/inserted images back into an Office file. */
 async function saveDocument(to) {
   const e = editorApi();
   if (!doc || !e || !e.api || state.phase !== 'ready') throw new Error('no document is open');
+  if (!doc.editable) throw new Error('document is read-only');
+  // Commit a cell being edited (including its formula) before writing the workbook.
+  if (doc.docType === 'cell' && e.api.asc_closeCellEditor && !e.api.asc_closeCellEditor()) throw new Error('请先完成当前单元格的编辑。');
+  if (doc.docType === 'cell') e.api.wbModel?.dependencyFormulas?.calcTree();
   if (typeof e.api.asc_nativeGetFile !== 'function') throw new Error('this editor cannot return its document');
   const t0 = now();
   const text = e.api.asc_nativeGetFile();
@@ -443,10 +541,13 @@ async function saveDocument(to) {
   for (const [n, data] of Object.entries(doc.media)) files['media/' + n] = data;
   const r = await x2t.convert({ name: 'Editor.bin', data: bin, to: outName, formatTo: FORMAT[outExt], files });
   if (r.exitCode !== 0 || !r.output) throw new Error('x2t save exit=' + r.exitCode + ' ' + JSON.stringify(r.log));
+  if (r.output.length > 80 * 1048576) throw new Error('saved document exceeds 80 MiB');
   let bytes = r.output;
   if (doc.tcvnFixed && (outExt === 'docx' || outExt === 'pptx')) {
     bytes = (await preparePackage(bytes, { restore: true })).bytes; // U+F0AD back to U+00AD in the TCVN3 runs
   }
+  e.w.AscCommon.History.Reset_SavedIndex(true);
+  e.api.CheckChangedDocument();
   state.modified = false;
   emit('modified', { modified: false });
   state.timings.saveMs = ms(t0);
@@ -499,6 +600,11 @@ const methods = {
   async theme(p) {
     uiTheme = p.light ? 'theme-white' : 'theme-night';
     editorApi()?.w.Common?.UI?.Themes?.setTheme(uiTheme);
+    return [null];
+  },
+  async resize() {
+    const w = editorApi()?.w;
+    if (w) w.dispatchEvent(new w.Event('resize'));
     return [null];
   },
 };

@@ -893,7 +893,9 @@ button:disabled {
   margin-left: var(--space-sm);
 }
 .desktop-nav a {
-  padding: var(--space-sm) var(--space-md);
+  /* UI-FIX NAV-1 · 水平内边距由 16px 收到 12px：完整导航（7 项 + 异次元之旅 + CTA）
+     实测需 1046px，而 header 上限仅 1018px；收紧后省 56px，任何视口都不再顶穿右边界。 */
+  padding: var(--space-sm) var(--space-sm);
   white-space: nowrap;
   color: var(--muted);
   font-size: 13px;
@@ -2103,30 +2105,7 @@ h1 > span {
     width: 28px;
     height: 28px;
   }
-  .mobile-nav {
-    display: flex;
-    position: absolute;
-    top: 68px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    background: var(--bg);
-    padding: var(--space-sm);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 15px 40px var(--shadow);
-  }
-  .mobile-nav a {
-    padding: var(--space-md) var(--space-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    border-radius: var(--radius-sm);
-  }
-  .mobile-nav a:hover {
-    background: var(--panel);
-  }
+  /* UI-FIX NAV-3 · .mobile-nav 布局已上移到 ≤900px 断点，与汉堡按钮显示边界一致。 */
   .hero {
     padding-top: 128px;
   }
@@ -2745,15 +2724,11 @@ h1 > span {
   color: var(--blue);
 }
 
-/* UI-FIX P0-4 · 导航末尾的聚合入口弱化，避免与站内核心栏目等权。 */
+/* UI-FIX NAV-2 · 「万象导航」恢复统一导航色，只用分组间距表达层级。
+   原先的 opacity: 0.72 会让文字与玻璃背景混合，深色主题下等效亮度下降约 28%，
+   被读成「禁用 / 不可点」而不是「次要入口」，故移除透明度与缩小字号。 */
 .desktop-nav a:last-child {
-  color: var(--muted);
-  opacity: 0.72;
-  font-size: 12px;
-}
-.desktop-nav a:last-child:hover,
-.desktop-nav a:last-child.active {
-  opacity: 1;
+  margin-left: var(--space-2xs);
 }
 
 /* UI-FIX P3-4 · 首屏邮箱文字链，默认隐藏，仅在移动端常驻。 */
@@ -3487,12 +3462,39 @@ h1 > span {
 }
 
 /* The book link needs a little more room before the shared navigation collapses. */
+/* UI-FIX NAV-3 · 折叠边界统一为 900px：桌面导航隐藏、汉堡按钮出现的同时，
+   移动菜单布局也必须在此断点生效。此前 .mobile-nav 样式只写在 ≤760px，
+   导致 761–900px 汉堡可点、9 个链接也已渲染，却被基础 display:none 藏起来。 */
 @media (max-width: 900px) {
   .header .desktop-nav {
     display: none;
   }
   .header .mobile-toggle {
-    display: inline-flex;
+    display: grid;
+  }
+  .mobile-nav {
+    display: flex;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--bg);
+    padding: var(--space-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 15px 40px var(--shadow);
+  }
+  .mobile-nav a {
+    padding: var(--space-md) var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+  }
+  .mobile-nav a:hover {
+    background: var(--panel);
   }
 }
 
@@ -4578,6 +4580,73 @@ h1 > span {
 .office-preview-mobile-note {
   display: none;
   margin: 0;
+}
+.office-editor-panel {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+.office-editor-new .jay-file {
+  position: relative;
+  width: auto;
+}
+.office-editor-new .jay-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.office-editor-filebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-md);
+}
+.office-editor-filebar .jay-field {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.office-editor-workspace .office-preview-frame {
+  min-width: 960px;
+}
+.office-editor-workspace .office-preview-stage {
+  height: clamp(520px, 80vh, 860px);
+}
+.office-editor-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-md);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  text-align: center;
+}
+.office-editor-empty :is(h2, p) {
+  margin: 0;
+}
+.office-editor-empty h2 {
+  color: var(--text);
+  font-size: var(--text-lg);
+}
+.office-discard-dialog {
+  max-width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: var(--space-xl);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  color: var(--text);
+}
+.office-discard-dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+.office-discard-dialog h2 {
+  margin-top: 0;
+  font-size: var(--text-lg);
 }
 .office-preview:fullscreen {
   grid-template-rows: auto minmax(0, 1fr) auto;

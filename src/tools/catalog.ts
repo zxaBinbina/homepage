@@ -2,6 +2,7 @@
 import { jayToolCatalog } from './jaytools/catalog'
 import { pdfConvertCatalog } from './pdfconvert/catalog'
 import { xcpdfToolCatalog } from './xcpdf/catalog'
+import { officeToolCatalog } from './office/catalog'
 export const toolCatalog = {
   'web-browser': {
     name: '网页浏览器',
@@ -387,6 +388,7 @@ export const toolCatalog = {
   ...jayToolCatalog,
   ...xcpdfToolCatalog,
   ...pdfConvertCatalog,
+  ...officeToolCatalog,
   'codex-jsonl-cleaner': {
     name: 'Codex 对话加密字段清理',
     label: 'CODEX JSONL CLEANER',

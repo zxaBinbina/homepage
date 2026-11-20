@@ -378,12 +378,12 @@ async function copy() {
           ></label
         >
         <label class="jay-field"
-          >打开密码（仅加密文件需要）<input
+          >文件打开密码（仅加密文件需要）<input
             v-model="password"
             class="field"
             type="password"
             autocomplete="off"
-            placeholder="不会保存密码"
+            placeholder=""
         /></label>
       </div>
       <p class="jay-note">
@@ -416,9 +416,7 @@ async function copy() {
         />
       </div>
       <p class="jay-note">
-        请核对转换后的内容与排版。<a href="/licenses/pdf-convert.txt" target="_blank" rel="noopener"
-          >开源来源与许可</a
-        >
+        转换完成后会显示预览和下载。
       </p>
     </div>
   </ToolPage>

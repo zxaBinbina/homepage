@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0-homepage.1",
+  "version": "0.2.0-homepage.2",
   "path": "/office-viewer/v0.2.0/",
   "viewer": {
     "repo": "https://github.com/unestgroup/office-wasm-viewer",

@@ -117,3 +117,4 @@ await import('./check-codex-cleaner.mjs')
 
 await import('./check-xcpdf.mjs')
 await import('./check-pdf-convert.mjs')
+await import('./check-office-editor.mjs')

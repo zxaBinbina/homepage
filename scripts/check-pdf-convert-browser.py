@@ -221,14 +221,14 @@ with sync_playwright() as p:
 
     open_tool('markdown'); start(encrypted)
     expect(page.get_by_role('alert')).to_contain_text('打开密码', timeout=60000)
-    page.get_by_label('打开密码（仅加密文件需要）').fill('wrong')
+    page.get_by_label(re.compile(r'^(文件)?打开密码（仅加密文件需要）$')).fill('wrong')
     page.get_by_role('button', name='开始转换', exact=True).click()
     expect(page.get_by_role('alert')).to_contain_text('打开密码', timeout=60000)
-    page.get_by_label('打开密码（仅加密文件需要）').fill('secret')
+    page.get_by_label(re.compile(r'^(文件)?打开密码（仅加密文件需要）$')).fill('secret')
     page.get_by_role('button', name='开始转换', exact=True).click()
     assert '季度销售报告' in download('md', 'decrypted').read_text()
     page.get_by_role('button', name='取消并清空', exact=True).click()
-    expect(page.get_by_label('打开密码（仅加密文件需要）')).to_have_value('')
+    expect(page.get_by_label(re.compile(r'^(文件)?打开密码（仅加密文件需要）$'))).to_have_value('')
     expect(page.get_by_role('button', name='开始转换', exact=True)).to_be_disabled()
 
     page.get_by_label('选择 PDF', exact=True).set_input_files({'name': 'bad.pdf', 'mimeType': 'application/pdf', 'buffer': b'not a pdf'})

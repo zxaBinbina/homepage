@@ -41,7 +41,7 @@ assert.match(runtime, /connect-src 'none'/)
 assert.match(runtime, /form-action 'none'/)
 assert.match(runtime, /Copyright 2022 Mozilla Foundation/)
 assert.match(runtime, /xcpdf:init/)
-assert.equal(Object.keys(toolCatalog).length, 105)
+assert.equal(Object.keys(toolCatalog).length, 106)
 console.log(
   '43 XCPDF tools match the unchanged MIT archive; routes, source license and network-isolated runtime passed.',
 )

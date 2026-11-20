@@ -1,6 +1,6 @@
 # 网页工具
 
-本站收录 **105 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具、[XCPDF V7.3](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)（固定 MIT 发布版）的全部 43 项功能，另有 PDF 转办公格式与 Markdown 四个工具，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
+本站收录 **106 个工具**：[Freemium](https://github.com/incentius-foss/freemium)（MIT）的全部 41 个工具、[jaywcjlove/tools](https://github.com/jaywcjlove/tools)（MIT）的 15 个新增工具、[XCPDF V7.3](https://github.com/wallechfox/offline-pdf-tools/tree/98424086829730f3dd7313a8871bbbbb49e80cd8)（固定 MIT 发布版）的全部 43 项功能，另有 PDF 转办公格式与 Markdown 四个工具，另有在线 Office 编辑，以及本站自制的 Codex 对话加密字段清理与私人网页浏览器。Web Tools 固定版本共有 31 个实际工具页面，其余 16 个与本站重复，已逐项映射到已有功能。入口 `/tool`，工具均使用站内页面与延迟加载组件，本地工具源码随本站构建；私人网页浏览器使用独立中转与隔离浏览环境。
 
 ## 工具清单
 
@@ -154,6 +154,18 @@
 Office Viewer 与引擎遵循 AGPL-3.0，主站通过 Apache-2.0 的 office-wasm-sdk 消息桥访问独立程序。固定源码、运行包校验、字体许可与本地适配见 [来源说明](../third_party/office-wasm/README.md)；预览下方提供实际部署版本的源码与许可下载。保留上游品牌；使用 OFL 的中文与西文替代字体，专有 Office 字体的字距和分页仍可能不同。无需全站 COOP / COEP，所有静态文件低于 Cloudflare Pages 的 25 MiB 限制。
 
 Markdown 支持阅读预览和源码切换，最多预览 5 万字符；复制和下载包含全部结果。阅读预览净化 HTML，移除图片、脚本、嵌入页面、样式及链接操作，不加载外部资源；链接文字保留，源码与下载内容保持原样。下载后应核对内容及排版；数字签名、书签、批注、嵌入文件与原 PDF 的交互结构不迁移。
+
+## 在线 Office 编辑
+
+地址 `/tools/office-editor`，分类「文档编辑」。复用现有 [office-wasm-viewer](https://github.com/unestgroup/office-wasm-viewer) / ONLYOFFICE 引擎，提供完整的 Word、Excel、PowerPoint 编辑界面；支持打开 DOCX / XLSX / PPTX，以及新建空白 Word、工作表和带标题占位符的宽屏演示文稿。可编辑文字与格式、表格、公式、幻灯片和图片，使用原生撤销 / 重做与全屏。
+
+文件上限 30 MB，下载结果上限 80 MB；插入图片每张最多 10 MB、1600 万像素，图片总量最多 60 MB。新增图片在当前页面解码，非 PNG / JPEG 格式转换为 PNG，不请求图片上传服务器；链接图片不主动请求外部网站。打开已有文档的图片和新插入图片都随文件导出。下载前提交正在编辑的 Excel 单元格并重算公式。密码保护、宏、多人协作、云存储与历史恢复不在当前功能范围；开放替代字体可能造成字距或分页差异。
+
+可指定下载文件名，点击「下载编辑后的文件」、原生保存按钮或 Ctrl / ⌘ + S 生成当前修改后的文件。文档和编辑状态仅在当前页面与独立 iframe 的内存中保留，不上传或持久保存；静态引擎可使用 HTTP 缓存。关闭、替换文件、新建或站内跳转时，未下载修改会提示「下载并继续 / 放弃修改 / 返回编辑」，只要文档仍打开，刷新或关闭标签页都会触发浏览器原生的「是否要离开此网站」确认，不取决于是否修改或已生成下载；关闭文档后解除提示。浏览器最终允许用户确认离开。生成文件期间暂停编辑；下载失败保留当前文档以便重试。
+
+编辑工具位于 `src/tools/office/OfficeEditorTool.vue`，新建文件生成器为 `documents.ts`，登记在 `office/catalog.ts`；编辑与只读预览共用 `OfficeWorkspace.vue` 的生命周期、主题、布局和全屏，PDF 转换结果继续默认只读。独立引擎的本地图片、编辑状态和保存消息在 `third_party/office-wasm/viewer/viewer.mjs` 维护；不改动固定运行归档。版本、字体许可与源码提供方式见 [来源说明](../third_party/office-wasm/README.md)。
+
+修改后运行 `node scripts/check-tools.mjs` 与 `python3 scripts/check-office-editor-browser.py`，后者验证真实文字 / 公式 / 幻灯片修改、图片保存、文件重开、退出提示、取消、主题、窄屏、只读预览和本地处理；截图和下载位于 `artifacts/office-editor/`。
 
 ## 私人网页浏览器
 

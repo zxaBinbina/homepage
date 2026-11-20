@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Adapted for homepage: sandboxed read-only frame and complete startup cancellation.
+// Adapted for homepage: sandboxed frame, local editing and complete startup cancellation.
 // Host-side SDK for the office-wasm viewer.
 //
 // The viewer (x2t.wasm + sdkjs, AGPL-3.0) runs in an <iframe>, preferably on its own origin. This module only
@@ -47,7 +47,7 @@ export class OfficeViewer {
     this.iframe = document.createElement('iframe');
     this.iframe.title = title;
     this.iframe.sandbox = 'allow-scripts allow-same-origin';
-    this.iframe.allow = 'fullscreen';
+    this.iframe.allow = 'fullscreen; clipboard-read; clipboard-write';
     this.iframe.referrerPolicy = 'no-referrer';
     this.iframe.style.cssText = 'border:0;width:100%;height:100%;display:block';
     this.ready = new Promise((resolve, reject) => {
@@ -174,7 +174,7 @@ export class OfficeViewer {
 
   /**
    * Edit mode: the document as it is now, written as an Office file by x2t. Single user, no server: nothing is saved
-   * until this is called. Pictures inserted while editing are not included yet.
+   * until this is called. Original and locally inserted pictures are included by this deployment.
    * @param {{to?: string}} [opts] to: output file name or extension (docx, xlsx, pptx ...); default: the format opened
    * @returns {Promise<{data: Uint8Array, name: string, x2tMs: number, timings: object}>}
    */

@@ -70,6 +70,8 @@
 
 新增 **PDF 转 Word / Excel / PowerPoint / Markdown** 四个工具，均在浏览器内处理。Word 可导出可编辑的文字与表格，或以整页图片保留画面；Excel 提取对齐表格，也可导出全部文字；PowerPoint 选择整页图片或可编辑文字；Markdown 整理标题、列表与表格，并提供阅读 / 源码预览、复制和下载。Word / Excel / PowerPoint 预览使用浏览器内的 ONLYOFFICE 引擎直接打开生成文件，保留办公软件的分页、工作表、幻灯片缩略图与缩放界面，支持只读全屏查看。支持打开密码、指定页码和取消清空；文字模式不含 OCR，扫描件可使用 Word / PowerPoint 的图片模式。文字分析复用 MIT 许可的 pdf2md，完整来源与限制见 [工具说明](docs/tools.md#pdf-转办公格式与-markdown)。
 
+新增 **在线 Office 编辑**（`/tools/office-editor`）：在浏览器中打开或新建 Word、Excel、PowerPoint 文档，使用 ONLYOFFICE 的完整编辑界面修改文字、表格、公式、幻灯片和图片，然后下载 DOCX / XLSX / PPTX。支持全屏、下载文件名、Ctrl / ⌘ + S，以及未下载修改的退出提示；文档只在当前页面保留，不上传或自动保存到云端。来源与限制见 [工具说明](docs/tools.md#在线-office-编辑)。
+
 本站自制的 **Codex 对话加密字段清理**（`/tools/codex-jsonl-cleaner`）支持导入或粘贴 JSONL，以精确、宽泛或只删字段三种模式处理加密字段与推理内容；提供逐行校验、原始错误行号、前后行数统计、可选预览和 `.jsonl` 下载。「选择文件」旁的「导入教程」按钮可展开文件查找与导入步骤，按访问设备预选 Windows、macOS 或 Linux，无法判断时默认 Windows，也可手动切换。默认保留推理参数与用量元数据，非法行修正前不生成下载文件；规则与边界见 [工具说明](docs/tools.md#codex-对话加密字段清理)。
 
 本站自制的 **网页浏览器**（`/tools/web-browser`）提供密码保护的临时中转会话、网址导航、Bing / 云原神 / 抖音快捷入口及设备尺寸、横竖屏、缩放与 User-Agent 模拟。仅支持 Windows / Linux 上的 Chrome、Edge，移动设备显示说明页面。独立后端位于同级 `../bin-api/`，使用 Cloudflare Worker；接口与浏览内容分别使用 `api.zxabinbina.cc.cd` 和 `browse.zxabinbina.cc.cd`。网页请求和表单数据会经中转发送至目标网站，网站兼容性与云游戏实时链路需实际验证，详见 [工具说明](docs/tools.md#私人网页浏览器)。
