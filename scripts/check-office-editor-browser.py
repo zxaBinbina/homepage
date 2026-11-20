@@ -37,6 +37,8 @@ with sync_playwright() as p:
         frame = next(f for f in page.frames if f'/{app}/main/index.html' in f.url)
         assert 'mode=view' not in frame.url
         assert frame.evaluate('Asc.editor.isViewMode') is False
+        expect(frame.locator('[data-layout-name="toolbar-collaboration"]')).to_be_hidden()
+        assert frame.evaluate('(window.DE || window.SSE || window.PE).getController("Main").appOptions.canChangeCoAuthoring') is False
         assert frame.evaluate('localStorage.setItem.toString().includes("values.set")')
         assert frame.evaluate('navigator.serviceWorker.getRegistrations().then(r=>r.length)') == 0
         page.wait_for_timeout(150)

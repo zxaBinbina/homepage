@@ -31,6 +31,6 @@ npm run build
 
 正常构建不访问网络，`build/officeViewer.ts` 从分片校验并解包到 `.cache/office-wasm/`，原样复制到构建目录；不将 AGPL 引擎链接进主站 bundle。所有静态资源低于 Cloudflare Pages 的 25 MiB 单文件上限。38 MiB 的 x2t 模块以 6.5 MiB 的 `.wasm.br` 发布，局部 `_headers` 和本地中间件提供 `Content-Encoding: br` / `Content-Type: application/wasm`，浏览器解压后编译，无需全站 COOP / COEP。
 
-查看器以 `postMessage` 接收当前结果的副本，不上传文件，不保存输入。iframe 销毁后清除文档、Worker、内存偏好和 Blob URL；HTTP 缓存仅保存静态引擎。PDF 转换结果仍使用只读预览；独立编辑工具使用完整的单人编辑模式。编辑和图片操作在内存中处理，原生图片选择 / 粘贴映射到本地媒体字节，保存时带上原图片和新增图片，Excel 下载前提交单元格并重算公式。原生保存按钮 / Ctrl / ⌘ + S 通知主站生成下载，禁用插件、打印及服务器另存为。源码入口随预览展示，发布路径 `source/index.html` 提供本地修改源码、上游源码及固定引擎源码链接，满足网络使用的源码提供义务。
+查看器以 `postMessage` 接收当前结果的副本，不上传文件，不保存输入。iframe 销毁后清除文档、Worker、内存偏好和 Blob URL；HTTP 缓存仅保存静态引擎。PDF 转换结果仍使用只读预览；独立编辑工具使用单人编辑模式，禁用协作模式切换、批注、聊天与共享入口。社区构建不应用 `customization.layout`，适配器通过原生 Toolbar 的 `setVisible` 隐藏「协作」选项卡。编辑和图片操作在内存中处理，原生图片选择 / 粘贴映射到本地媒体字节，保存时带上原图片和新增图片，Excel 下载前提交单元格并重算公式。原生保存按钮 / Ctrl / ⌘ + S 通知主站生成下载，禁用插件、打印及服务器另存为。源码入口随预览展示，发布路径 `source/index.html` 提供本地修改源码、上游源码及固定引擎源码链接，满足网络使用的源码提供义务。
 
 字体使用开放替代字体，和 Microsoft Office 的专有字体可能有字距与分页差异；这是实际 Office 引擎的文件预览，不重新用 HTML 表格或 SVG 复写文档内容。

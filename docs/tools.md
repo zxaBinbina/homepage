@@ -157,7 +157,7 @@ Markdown 支持阅读预览和源码切换，最多预览 5 万字符；复制�
 
 ## 在线 Office 编辑
 
-地址 `/tools/office-editor`，分类「文档编辑」。复用现有 [office-wasm-viewer](https://github.com/unestgroup/office-wasm-viewer) / ONLYOFFICE 引擎，提供完整的 Word、Excel、PowerPoint 编辑界面；支持打开 DOCX / XLSX / PPTX，以及新建空白 Word、工作表和带标题占位符的宽屏演示文稿。可编辑文字与格式、表格、公式、幻灯片和图片，使用原生撤销 / 重做与全屏。
+地址 `/tools/office-editor`，分类「文档编辑」。复用现有 [office-wasm-viewer](https://github.com/unestgroup/office-wasm-viewer) / ONLYOFFICE 引擎，提供 Word、Excel、PowerPoint 的原生单人编辑界面，隐藏「协作」选项卡与协作模式切换，并禁用批注、聊天及共享入口；支持打开 DOCX / XLSX / PPTX，以及新建空白 Word、工作表和带标题占位符的宽屏演示文稿。可编辑文字与格式、表格、公式、幻灯片和图片，使用原生撤销 / 重做与全屏。
 
 文件上限 30 MB，下载结果上限 80 MB；插入图片每张最多 10 MB、1600 万像素，图片总量最多 60 MB。新增图片在当前页面解码，非 PNG / JPEG 格式转换为 PNG，不请求图片上传服务器；链接图片不主动请求外部网站。打开已有文档的图片和新插入图片都随文件导出。下载前提交正在编辑的 Excel 单元格并重算公式。密码保护、宏、多人协作、云存储与历史恢复不在当前功能范围；开放替代字体可能造成字距或分页差异。
 

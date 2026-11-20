@@ -20,7 +20,7 @@ import { MathFonts } from './fonts/math-compat.mjs';
 import { preparePackage, fontNamesOf, scanDocument } from './x2t/prepare-package.mjs';
 import { prepareLocalFonts, installLocalFonts, LOCAL_PREFIX } from './fonts/local-fonts.mjs';
 
-const VERSION = '0.2.0-homepage.2';
+const VERSION = '0.2.0-homepage.3';
 const TAG = 'office-wasm-viewer';
 const ROOT = new URL('./', import.meta.url);
 const query = new URLSearchParams(location.search);
@@ -264,6 +264,7 @@ function mountEditor(mode) {
       mode: edit ? 'edit' : 'view',
       lang: 'zh',
       user: { id: 'viewer', name: '访客' },
+      coEditing: { mode: 'fast', change: false },
       customization: { compactHeader: true, uiTheme, features: { featuresTips: false }, comments: false, help: false, plugins: false, feedback: false, autosave: false },
       embedded: { toolbarDocked: 'top' },
     },
@@ -358,6 +359,10 @@ window.APP.AddImage = (callback) => {
 function installEditingBridge() {
   const { w, api } = editorApi();
   const active = doc;
+  // This offline editor supports one user. Its community build does not apply
+  // customization.layout, so hide the collaboration tab through the native UI.
+  const application = w.DE || w.SSE || w.PE;
+  application.getController('Toolbar').getView('Toolbar').setVisible('review', false);
   const markModified = () => {
     if (doc !== active || state.phase !== 'ready') return;
     if (!state.modified) { state.modified = true; emit('modified', { modified: true }); }
