@@ -8,12 +8,22 @@ import {
   RotateCcw,
   Shield,
   Shuffle,
+  Tag,
   Undo2,
   UserRound,
   X,
 } from 'lucide-vue-next'
 import GameFullscreenButton from './GameFullscreenButton.vue'
 import GameResult from './GameResult.vue'
+import SegmentedControl from '../components/SegmentedControl.vue'
+import {
+  advanceJunqiKnowledge,
+  chooseJunqiChallenge,
+  createJunqiKnowledge,
+  guessJunqiPiece,
+  observeJunqi,
+  type JKnowledge,
+} from './junqiKnowledge'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
 import {
@@ -36,8 +46,27 @@ import {
 } from './junqi'
 
 type MoveRecord = { from: number; to: number; side: number; summary: string }
-type Snapshot = { state: JState; last: MoveRecord | null; records: MoveRecord[] }
+type Snapshot = {
+  state: JState
+  last: MoveRecord | null
+  records: MoveRecord[]
+  knowledge: JKnowledge
+  marks: Record<number, number>
+}
 const game = ref<JState>(newJunqi())
+const mode = ref<'practice' | 'challenge'>('practice')
+const challenge = computed(() => mode.value === 'challenge')
+const modeOptions = [
+  { value: 'practice' as const, label: '练习 · 明棋' },
+  { value: 'challenge' as const, label: '挑战 · 暗棋' },
+]
+const knowledge = ref(createJunqiKnowledge(game.value))
+const sharedMarks = ref<Record<number, number>>({})
+const intelMode = ref(false)
+const noteId = ref<number | null>(null)
+const noteDialog = ref<HTMLDialogElement>()
+let lastNoteId: number | null = null
+let leaving = false
 const history = ref<Snapshot[]>([])
 const arranging = ref(true)
 const thinking = ref(false)
@@ -47,11 +76,33 @@ const records = ref<MoveRecord[]>([])
 const notice = ref('交换两枚我方棋子，布置好后开始对局。')
 const boardElement = ref<HTMLElement>()
 const flightElement = ref<HTMLElement>()
-const flight = ref<{ piece: JPiece; to: number } | null>(null)
+const flight = ref<{
+  id: number
+  side: number
+  name: string
+  caption: string
+  hidden: boolean
+  to: number
+} | null>(null)
 const focusAt = ref(30)
 const horizontal = ref(false)
 const fullscreen = inject(gameFullscreenKey)!
 const motion = useGameMotion()
+const playerObservation = computed(() => observeJunqi(game.value, 1, knowledge.value))
+const computerObservation = computed(() => observeJunqi(game.value, -1, knowledge.value))
+const notePiece = computed(() =>
+  noteId.value === null
+    ? null
+    : (game.value.board.find((piece) => piece?.id === noteId.value) ?? null),
+)
+const computerGuess = computed(() =>
+  selectedPiece.value ? guessJunqiPiece(computerObservation.value, selectedPiece.value.id) : null,
+)
+const dialogGuess = computed(() =>
+  notePiece.value?.side === 1
+    ? guessJunqiPiece(computerObservation.value, notePiece.value.id)
+    : null,
+)
 let timer: ReturnType<typeof setTimeout> | undefined
 let revision = 0
 const selected = computed(() => game.value.selected)
@@ -105,8 +156,97 @@ const targets = computed(() => {
 function pieceName(piece: JPiece) {
   return rankNames[piece.rank] ?? '棋子'
 }
+function visibleRank(piece: JPiece) {
+  if (!challenge.value || piece.side === 1 || game.value.finished) return piece.rank
+  return playerObservation.value.board.find((visible) => visible?.id === piece.id)?.rank ?? null
+}
+function visibleName(piece: JPiece) {
+  const rank = visibleRank(piece)
+  return rank === null ? '未知棋子' : rankNames[rank]!
+}
+function cardName(piece: JPiece) {
+  const rank = visibleRank(piece)
+  return rank !== null
+    ? rankNames[rank]!
+    : sharedMarks.value[piece.id] !== undefined
+      ? rankNames[sharedMarks.value[piece.id]!]!
+      : '？'
+}
+function cardCaption(piece: JPiece) {
+  if (
+    challenge.value &&
+    knowledge.value.revealedSides.includes(piece.side) &&
+    visibleRank(piece) === 10
+  )
+    return '已亮旗'
+  if (piece.side === 1) return '我方'
+  if (visibleRank(piece) !== null) return challenge.value ? '已确认' : '电脑'
+  return sharedMarks.value[piece.id] !== undefined ? '标记' : '未知'
+}
+function guessText(guess: ReturnType<typeof guessJunqiPiece> | null) {
+  if (!guess) return '暂无判断'
+  return guess.rank === null
+    ? '尚未确定'
+    : `${guess.certain ? '已推断' : '偏向'}${rankNames[guess.rank]}`
+}
+async function openNote(id: number) {
+  if (
+    !challenge.value ||
+    game.value.finished ||
+    !game.value.board.some((piece) => piece?.id === id)
+  )
+    return
+  noteId.value = id
+  lastNoteId = id
+  await nextTick()
+  if (!notePiece.value || leaving) return
+  noteDialog.value?.showModal()
+  noteDialog.value?.querySelector<HTMLElement>('select, .junqi-note-close')?.focus()
+}
+function closeNote() {
+  noteDialog.value?.close()
+  noteId.value = null
+}
+function restoreNoteFocus() {
+  if (leaving) return
+  const button = boardElement.value
+    ?.querySelector<HTMLElement>(`[data-piece-id="${lastNoteId}"]`)
+    ?.closest<HTMLButtonElement>('button')
+  if (button && !button.disabled) button.focus({ preventScroll: true })
+}
+function setMark(value: string) {
+  const piece = notePiece.value
+  if (!piece || piece.side !== -1 || game.value.finished) return
+  const next = { ...sharedMarks.value }
+  if (value === '') delete next[piece.id]
+  else {
+    const rank = Number(value)
+    if (!Number.isInteger(rank) || rank < 0 || rank >= rankNames.length) return
+    next[piece.id] = rank
+  }
+  sharedMarks.value = next
+  notice.value =
+    value === ''
+      ? '标记已清除，并已同步给电脑。'
+      : `已同步给电脑：你将这枚棋子标记为${rankNames[Number(value)]}，这只是推测。`
+}
+function toggleIntel() {
+  intelMode.value = !intelMode.value
+  clearSelection()
+}
+function changeMode(value: 'practice' | 'challenge') {
+  if (value !== mode.value) {
+    mode.value = value
+    restart()
+  }
+}
+watch(notePiece, (piece) => {
+  if (!piece && noteDialog.value?.open) closeNote()
+})
 const pieceDetail = computed(() => {
   const piece = selectedPiece.value
+  if (!piece)
+    if (challenge.value && intelMode.value) return '点选棋子：查看电脑推测，或标记对方棋子。'
   if (!piece)
     return arranging.value
       ? '先选一枚我方棋子，再点另一枚交换位置。'
@@ -204,6 +344,10 @@ function resetMotion() {
 function restart() {
   resetMotion()
   game.value = newJunqi()
+  closeNote()
+  knowledge.value = createJunqiKnowledge(game.value)
+  sharedMarks.value = {}
+  intelMode.value = false
   history.value = []
   arranging.value = true
   lastMove.value = null
@@ -214,7 +358,9 @@ function restart() {
 function start() {
   if (!arranging.value) return
   arranging.value = false
+  intelMode.value = false
   game.value = { ...game.value, selected: null }
+  knowledge.value = createJunqiKnowledge(game.value)
   notice.value = '你先行棋，点击棋子查看可走的位置。'
 }
 function clearSelection() {
@@ -231,6 +377,8 @@ async function commitMove(from: number, to: number) {
       state: { ...before, selected: null },
       last: lastMove.value,
       records: [...records.value],
+      knowledge: knowledge.value,
+      marks: { ...sharedMarks.value },
     })
   const token = ++revision
   const source = boardElement.value
@@ -243,20 +391,36 @@ async function commitMove(from: number, to: number) {
   const effect = !defender
     ? '行棋'
     : result === 'win'
-      ? `吃掉${pieceName(defender)}`
+      ? `吃掉${visibleName(defender)}`
       : result === 'both'
         ? '双方同归于尽'
-        : `${pieceName(piece)}被吃掉`
+        : `${visibleName(piece)}被吃掉`
   lastMove.value = {
     from,
     to,
     side: piece.side,
-    summary: `${piece.side === 1 ? '你' : '电脑'} · ${pieceName(piece)} · ${effect}`,
+    summary: `${piece.side === 1 ? '你' : '电脑'} · ${visibleName(piece)} · ${effect}`,
   }
   records.value = [...records.value.slice(-2), lastMove.value]
+  const flying = {
+    id: piece.id,
+    side: piece.side,
+    name: cardName(piece),
+    caption: cardCaption(piece),
+    hidden: visibleRank(piece) === null,
+    to,
+  }
+  const previousReveals = knowledge.value.revealedSides
+  if (challenge.value)
+    knowledge.value = advanceJunqiKnowledge(knowledge.value, before, next, from, to)
+  sharedMarks.value = Object.fromEntries(
+    Object.entries(sharedMarks.value).filter(([id]) =>
+      next.board.some((alive) => alive?.side === -1 && alive.id === Number(id)),
+    ),
+  )
   game.value = next
   moving.value = true
-  flight.value = { piece, to }
+  flight.value = flying
   await nextTick()
   if (token !== revision) return
   const scale = fullscreen.scale.value || 1
@@ -275,7 +439,11 @@ async function commitMove(from: number, to: number) {
   if (token !== revision) return
   flight.value = null
   moving.value = false
-  notice.value = outcome.value || lastMove.value!.summary
+  const revealNotice = knowledge.value.revealedSides
+    .filter((side) => !previousReveals.includes(side))
+    .map((side) => `${side === 1 ? '你的' : '电脑的'}司令阵亡，军旗已亮出。`)
+    .join('')
+  notice.value = outcome.value || revealNotice || lastMove.value!.summary
   scheduleComputer()
 }
 function scheduleComputer() {
@@ -284,12 +452,24 @@ function scheduleComputer() {
   thinking.value = true
   timer = setTimeout(() => {
     timer = undefined
-    const move = chooseJunqi(game.value)
+    const move = challenge.value
+      ? chooseJunqiChallenge(computerObservation.value, { ...sharedMarks.value })
+      : chooseJunqi(game.value)
     thinking.value = false
     if (move) void commitMove(move[0], move[1])
   }, 500)
 }
 function act(at: number) {
+  const inspected = game.value.board[at]
+  if (
+    challenge.value &&
+    inspected &&
+    !game.value.finished &&
+    (intelMode.value || !canAct.value || (inspected.side === -1 && selected.value === null))
+  ) {
+    void openNote(inspected.id)
+    return
+  }
   if (!canAct.value) return
   if (selected.value === at) {
     clearSelection()
@@ -317,12 +497,15 @@ function undo() {
   game.value = previous.state
   lastMove.value = previous.last
   records.value = previous.records
+  knowledge.value = previous.knowledge
+  sharedMarks.value = previous.marks
+  closeNote()
   notice.value = '已撤回你与电脑的一轮行棋。'
 }
 function label(at: number) {
   const piece = game.value.board[at]
   const terrain = camps.has(at) ? '行营，安全区' : headquarters.has(at) ? '大本营' : '兵站'
-  return `${location(at)}，${piece ? `${piece.side === 1 ? '我方' : '电脑'}${pieceName(piece)}，` : ''}${terrain}${targets.value.has(at) ? (arranging.value ? '，可交换' : piece ? '，可攻击' : '，可移动') : ''}`
+  return `${location(at)}，${piece ? `${piece.side === 1 ? '我方' : '电脑'}${visibleName(piece)}${challenge.value && piece.side === -1 && sharedMarks.value[piece.id] !== undefined ? `，你标记为${rankNames[sharedMarks.value[piece.id]!]}` : ''}，` : ''}${terrain}${targets.value.has(at) ? (arranging.value ? '，可交换' : piece ? '，可攻击' : '，可移动') : ''}`
 }
 async function boardKey(event: KeyboardEvent) {
   const at = Number((event.target as HTMLElement).closest<HTMLElement>('[data-at]')?.dataset.at)
@@ -350,6 +533,8 @@ async function boardKey(event: KeyboardEvent) {
     ?.focus({ preventScroll: true })
 }
 onBeforeUnmount(() => {
+  leaving = true
+  closeNote()
   resetMotion()
   window.removeEventListener('resize', updateOrientation)
 })
@@ -362,15 +547,40 @@ onBeforeUnmount(() => {
       aria-label="军旗对局"
       :aria-busy="moving || thinking"
     >
+      <div class="junqi-mode-row">
+        <SegmentedControl
+          :model-value="mode"
+          :options="modeOptions"
+          label="军旗模式"
+          @update:model-value="changeMode"
+        />
+        <span class="junqi-mode-hint">切换模式会重新开局</span>
+      </div>
       <div class="game-toolbar junqi-toolbar">
         <div class="junqi-heading">
           <span class="junqi-game-mark"><Flag :size="22" aria-hidden="true" /></span>
           <div>
-            <span class="junqi-phase">{{ arranging ? '明棋布阵' : '双人明棋' }}</span
+            <span class="junqi-phase">{{
+              challenge
+                ? arranging
+                  ? '暗棋布阵'
+                  : '挑战 · 暗棋'
+                : arranging
+                  ? '明棋布阵'
+                  : '练习 · 明棋'
+            }}</span
             ><strong role="status">{{ status }}</strong>
           </div>
         </div>
         <div class="game-actions">
+          <button
+            v-if="challenge"
+            class="game-button junqi-intel-toggle"
+            :aria-pressed="intelMode"
+            @click="toggleIntel"
+          >
+            <Tag :size="16" aria-hidden="true" />标记与推测
+          </button>
           <button v-if="arranging" class="game-button junqi-primary" @click="start">
             <Play :size="16" aria-hidden="true" />开始对局</button
           ><button v-else class="game-button" :disabled="!history.length" @click="undo">
@@ -474,8 +684,13 @@ onBeforeUnmount(() => {
                 :aria-label="label(at - 1)"
                 :aria-pressed="selected === at - 1"
                 :tabindex="at - 1 === focusAt ? 0 : -1"
-                :disabled="!canAct"
+                :disabled="!!game.finished || (!canAct && !challenge)"
                 @click="act(at - 1)"
+                @contextmenu="
+                  challenge &&
+                  game.board[at - 1] &&
+                  ($event.preventDefault(), openNote(game.board[at - 1]!.id))
+                "
                 @focus="focusAt = at - 1"
               >
                 <span
@@ -483,11 +698,14 @@ onBeforeUnmount(() => {
                   class="junqi-piece"
                   :class="[
                     game.board[at - 1]!.side === 1 ? 'is-self' : 'is-enemy',
-                    { 'is-in-flight': flight?.piece.id === game.board[at - 1]!.id },
+                    {
+                      'is-in-flight': flight?.id === game.board[at - 1]!.id,
+                      'is-hidden': visibleRank(game.board[at - 1]!) === null,
+                    },
                   ]"
                   :data-piece-id="game.board[at - 1]!.id"
-                  ><b>{{ pieceName(game.board[at - 1]!) }}</b
-                  ><small>{{ game.board[at - 1]!.side === 1 ? '我方' : '电脑' }}</small></span
+                  ><b>{{ cardName(game.board[at - 1]!) }}</b
+                  ><small>{{ cardCaption(game.board[at - 1]!) }}</small></span
                 >
                 <span v-else-if="camps.has(at - 1)" class="junqi-terrain" aria-hidden="true"
                   >行营</span
@@ -508,11 +726,14 @@ onBeforeUnmount(() => {
                 v-if="flight"
                 ref="flightElement"
                 class="junqi-piece junqi-flight"
-                :class="flight.piece.side === 1 ? 'is-self' : 'is-enemy'"
+                :class="[
+                  flight.side === 1 ? 'is-self' : 'is-enemy',
+                  { 'is-hidden': flight.hidden },
+                ]"
                 :style="flightStyle"
                 aria-hidden="true"
-                ><b>{{ pieceName(flight.piece) }}</b
-                ><small>{{ flight.piece.side === 1 ? '我方' : '电脑' }}</small></span
+                ><b>{{ flight.name }}</b
+                ><small>{{ flight.caption }}</small></span
               >
               <GameResult
                 v-if="game.finished && !moving"
@@ -567,6 +788,14 @@ onBeforeUnmount(() => {
                   ? '选另一枚棋子调整位置'
                   : '这枚棋子当前无法移动'
             }}</span>
+            <div v-if="challenge && selectedPiece" class="junqi-computer-belief">
+              <strong>电脑对这枚棋子的推测</strong>
+              <p>
+                {{ guessText(computerGuess)
+                }}<span v-if="computerGuess && !computerGuess.certain"> · 可能有误</span>
+              </p>
+              <button class="game-button" @click="openNote(selectedPiece.id)">查看候选军衔</button>
+            </div>
             <div v-if="arranging" class="junqi-setup-actions">
               <button class="game-button" @click="restart">
                 <Shuffle :size="16" aria-hidden="true" />随机布阵
@@ -610,5 +839,82 @@ onBeforeUnmount(() => {
       </p>
       <p class="sr-only" role="status">{{ notice }}</p>
     </section>
+    <Teleport
+      :to="fullscreen.active.value && fullscreen.overlay.value ? fullscreen.overlay.value : 'body'"
+    >
+      <dialog
+        ref="noteDialog"
+        class="junqi-note-dialog"
+        aria-labelledby="junqi-note-title"
+        @cancel.prevent.stop="closeNote"
+        @close="restoreNoteFocus"
+      >
+        <template v-if="notePiece">
+          <header class="junqi-note-heading">
+            <div>
+              <p class="overline">{{ notePiece.side === 1 ? '电脑的判断' : '共享标记' }}</p>
+              <h2 id="junqi-note-title">
+                {{
+                  notePiece.side === 1
+                    ? `我方${pieceName(notePiece)}`
+                    : visibleRank(notePiece) === null
+                      ? '对方未知棋子'
+                      : `对方${visibleName(notePiece)}`
+                }}
+              </h2>
+            </div>
+            <button class="junqi-note-close" aria-label="关闭推测与标记" @click="closeNote">
+              <X :size="18" aria-hidden="true" />
+            </button>
+          </header>
+          <div v-if="notePiece.side === 1" class="junqi-guess-detail">
+            <p class="junqi-guess-result">{{ guessText(dialogGuess) }}</p>
+            <p>
+              {{
+                dialogGuess?.certain
+                  ? '电脑已从公开结果推断出这枚棋子的身份。'
+                  : '这是电脑根据公开信息作出的推测，可能有误。'
+              }}
+            </p>
+            <div class="junqi-candidate-list" aria-label="电脑考虑的候选军衔">
+              <span v-for="rank in dialogGuess?.candidates" :key="rank">{{ rankNames[rank] }}</span>
+            </div>
+          </div>
+          <div v-else class="junqi-mark-editor">
+            <p>标记只代表你的猜测，会同步给电脑；电脑会根据它调整行动。</p>
+            <label for="junqi-mark-rank">你认为这枚棋子是</label
+            ><select
+              id="junqi-mark-rank"
+              :value="sharedMarks[notePiece.id] ?? ''"
+              :disabled="!!game.finished"
+              @change="setMark(($event.target as HTMLSelectElement).value)"
+            >
+              <option value="">未标记</option>
+              <option v-for="(name, rank) in rankNames" :key="rank" :value="rank">
+                {{ name }}
+              </option>
+            </select>
+            <p
+              v-if="sharedMarks[notePiece.id] !== undefined"
+              class="junqi-mark-shared"
+              role="status"
+            >
+              已同步给电脑：{{ rankNames[sharedMarks[notePiece.id]!] }}
+            </p>
+            <p v-else class="junqi-mark-shared">当前没有标记</p>
+          </div>
+          <footer class="junqi-note-actions">
+            <button
+              v-if="notePiece.side === -1"
+              class="game-button"
+              :disabled="sharedMarks[notePiece.id] === undefined || !!game.finished"
+              @click="setMark('')"
+            >
+              清除标记</button
+            ><button class="game-button junqi-primary" @click="closeNote">完成</button>
+          </footer>
+        </template>
+      </dialog>
+    </Teleport>
   </div>
 </template>

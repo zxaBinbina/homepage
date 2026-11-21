@@ -176,3 +176,5 @@ assert.equal(j.moveJunqi(blocked, 30, 35), null, 'No moves after a result')
 console.log(
   'Junqi: 100 formations, swaps, railroads, camps/headquarters, captures and terminal states passed.',
 )
+
+await import('./check-games-junqi-challenge.mjs')
