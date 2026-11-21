@@ -83,9 +83,11 @@ with sync_playwright() as p:
                   return box.x===0 && box.y===0 && Math.abs(box.width-innerWidth)<1 && Math.abs(box.height-innerHeight)<1;
                 }''', timeout=4000)
                 fits_screen(page)
-                bounds = page.get_by_role('button', name='退出全屏', exact=True).bounding_box()
+                # ResizeObserver fitting may update the transform between separate reads.
+                bounds, restart = page.locator('.game-restart-actions').evaluate('''el =>
+                    [el.querySelector('.game-fullscreen-toggle'), el.querySelector('button')]
+                        .map(button => button.getBoundingClientRect().toJSON())''')
                 assert bounds['x'] >= 0 and bounds['y'] >= 0 and bounds['x']+bounds['width'] <= width
-                restart = page.get_by_role('button', name='重新开始', exact=True).bounding_box()
                 assert bounds['x'] > restart['x'] + restart['width'] and abs(bounds['y'] - restart['y']) < 1
                 assert page.get_by_role('button', name='退出全屏', exact=True).inner_text() == ''
                 if game == 'solitaire':

@@ -124,7 +124,7 @@ onBeforeUnmount(() => {
                   ? '560px'
                   : id === 'minesweeper'
                     ? '440px'
-                    : id === 'doudizhu'
+                    : id === 'doudizhu' || id === 'junqi'
                       ? '320px'
                       : '360px',
               '--game-fit-max': id === 'solitaire' || id === 'doudizhu' ? '1100px' : '760px',
