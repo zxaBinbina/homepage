@@ -120,8 +120,14 @@ onBeforeUnmount(() => {
             :class="{ 'is-fullscreen': fullscreen }"
             :style="{
               '--game-fit-min':
-                id === 'solitaire' ? '560px' : id === 'minesweeper' ? '440px' : '360px',
-              '--game-fit-max': id === 'solitaire' ? '1100px' : '760px',
+                id === 'solitaire'
+                  ? '560px'
+                  : id === 'minesweeper'
+                    ? '440px'
+                    : id === 'doudizhu'
+                      ? '320px'
+                      : '360px',
+              '--game-fit-max': id === 'solitaire' || id === 'doudizhu' ? '1100px' : '760px',
             }"
             :aria-label="game.name"
           >
