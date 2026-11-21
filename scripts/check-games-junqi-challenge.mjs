@@ -165,6 +165,15 @@ for (const piece of observed.board.filter((p) => p?.side === 1)) {
   assert(Math.abs(guess.distribution.reduce((sum, p) => sum + p.weight, 0) - 1) < 1e-9)
 }
 assert.equal(k.chooseJunqiChallenge({ ...observed, finished: true }), null)
+const publicEnding = k.observeJunqi(
+  { ...signals, finished: 1 },
+  -1,
+  k.createJunqiKnowledge(signals),
+)
+assert(
+  publicEnding.board.filter(Boolean).every((piece) => piece.rank !== null),
+  'Remaining ranks are public after the result',
+)
 console.log(
   'Junqi challenge: 100 masked observations, no hidden-rank reads, fair moves, battle/rail deductions, flag revelation, immutable undo and shared signals passed.',
 )

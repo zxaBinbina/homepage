@@ -148,7 +148,6 @@ with sync_playwright() as p:
  page.get_by_role('button',name='悔棋',exact=True).click()
  expect(page.locator('.junqi-flight')).to_have_count(0)
  expect(page.locator('.junqi-piece.is-hidden')).to_have_count(25)
- page.get_by_role('button',name='开始对局',exact=True).count()
  page.locator('[data-at="30"]').click();page.locator('[data-at="25"]').click()
  page.get_by_role('radio',name='练习 · 明棋',exact=True).click()
  page.wait_for_timeout(650)

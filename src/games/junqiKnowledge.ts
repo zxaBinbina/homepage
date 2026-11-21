@@ -156,7 +156,7 @@ export function observeJunqi(state: JState, observer: JSide, knowledge: JKnowled
     remainingRanks: remainingRanks(view),
     board: state.board.map((piece) => {
       if (!piece) return null
-      if (piece.side === observer)
+      if (piece.side === observer || state.finished)
         return { id: piece.id, side: piece.side, rank: piece.rank, candidates: [piece.rank] }
       const candidates = [...(view[piece.id]?.candidates ?? rankNames.map((_, rank) => rank))]
       return {
