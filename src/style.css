@@ -452,6 +452,22 @@
 * {
   box-sizing: border-box;
 }
+/* UI-FIX P1-5 · 主题切换窗口（data-theme-transitioning，由 src/utils/themeTransition.ts
+   在写入新主题前写入、过渡结束或取消后移除）：屏蔽元素自身的颜色类过渡，让所有颜色
+   统一跟随根节点的 WAAPI 变量插值，消除文字与背景错峰导致的颜色跳变。只保留非颜色的
+   位置、尺寸与透明度过渡，面板展开、页面切换与滚动显现等动效不受影响；被排除的颜色
+   属性在窗口内即时取值，其颜色本身仍随变量连续渐变。 */
+:root[data-theme-transitioning] *,
+:root[data-theme-transitioning] *::before,
+:root[data-theme-transitioning] *::after {
+  transition-property:
+    opacity, transform, translate, scale, rotate, visibility,
+    width, height, min-height, max-height, margin, padding,
+    inset, top, right, bottom, left,
+    grid-template-columns, grid-template-rows,
+    flex-basis, flex-grow, flex-shrink,
+    clip-path, object-position, letter-spacing, line-height !important;
+}
 .seg {
   position: relative;
   display: inline-flex;

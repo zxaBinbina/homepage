@@ -1,4 +1,8 @@
-/* UI-FIX P1-4 / P2-6 · 主题过渡由 1000ms 收敛到 400ms，消除循环切换时的长时间闪烁。 */
+/* UI-FIX P1-4 / P2-6 · 主题过渡由 1000ms 收敛到 400ms，消除循环切换时的长时间闪烁。
+   UI-FIX P1-5 · 过渡窗口内通过 data-theme-transitioning 屏蔽元素自身的颜色类过渡：
+   update() 写入新主题后会强制一次样式重算，此时代码插值动画尚未创建，浏览器会把
+   旧值→新静态值的突变交给元素的 transition: color/background/border-color 消化，
+   造成部分文字比整页晚约 170ms 才稳定（颜色错峰跳变）。 */
 import { motionEase } from './motion'
 
 const duration = 400
@@ -35,6 +39,7 @@ export function finishThemeTransition() {
     active.cancel()
     active = undefined
   }
+  document.documentElement.removeAttribute('data-theme-transitioning')
   reducedMotion.removeEventListener('change', onMotionChange)
   document.removeEventListener('visibilitychange', onVisibilityChange)
 }
@@ -65,10 +70,16 @@ export function transitionTheme(update: () => void) {
   // Capture the currently displayed colors before cancelling an unfinished transition.
   const before = colors(root, properties)
   finishThemeTransition()
+  // Suppress element-level color transitions before the update triggers a style
+  // recalc, so every color follows the single WAAPI variable interpolation.
+  root.setAttribute('data-theme-transitioning', '')
   update()
   const after = colors(root, properties)
   const changed = properties.filter((name) => before[name] !== after[name])
-  if (!changed.length) return
+  if (!changed.length) {
+    finishThemeTransition()
+    return
+  }
 
   active = root.animate(
     [
