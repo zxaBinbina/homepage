@@ -83,6 +83,30 @@ async function copyInstall() {
   }, 3500)
 }
 const page = ref<HTMLElement>()
+const featureGrid = ref<HTMLElement>()
+const packed = ref(false)
+let layoutObserver: ResizeObserver | undefined
+let layoutFrame = 0
+function packFeatures() {
+  const grid = featureGrid.value
+  if (!grid) return
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>('.sptl-feature'))
+  packed.value = matchMedia('(min-width: 761px)').matches
+  const gap = Number.parseFloat(getComputedStyle(grid).columnGap)
+  for (const card of cards) {
+    if (packed.value) {
+      const span = Math.ceil((card.getBoundingClientRect().height + gap) / 4)
+      card.style.gridRowEnd = `span ${span}`
+    } else card.style.removeProperty('grid-row-end')
+  }
+}
+function queueFeatureLayout() {
+  if (layoutFrame) return
+  layoutFrame = requestAnimationFrame(() => {
+    layoutFrame = 0
+    packFeatures()
+  })
+}
 const motion = matchMedia('(prefers-reduced-motion: reduce)')
 const animations = new Set<Animation>()
 let observer: IntersectionObserver | undefined
@@ -91,6 +115,14 @@ function cancelAnimations() {
   animations.clear()
 }
 onMounted(() => {
+  packFeatures()
+  if ('ResizeObserver' in window) {
+    layoutObserver = new ResizeObserver(queueFeatureLayout)
+    featureGrid.value
+      ?.querySelectorAll('.sptl-feature')
+      .forEach((card) => layoutObserver?.observe(card))
+  }
+  window.addEventListener('resize', queueFeatureLayout)
   if ('IntersectionObserver' in window && 'animate' in Element.prototype) {
     observer = new IntersectionObserver(
       (entries) => {
@@ -122,6 +154,9 @@ onBeforeUnmount(() => {
   clearTimeout(copyTimer)
   observer?.disconnect()
   cancelAnimations()
+  cancelAnimationFrame(layoutFrame)
+  layoutObserver?.disconnect()
+  window.removeEventListener('resize', queueFeatureLayout)
   motion.removeEventListener('change', cancelAnimations)
 })
 </script>
@@ -152,14 +187,14 @@ onBeforeUnmount(() => {
       </div>
       <DesktopRecording />
     </section>
-    <section class="sptl-section shell sptl-reveal" id="features">
+    <section class="sptl-section sptl-features shell sptl-reveal" id="features">
       <p class="sptl-eyebrow">01 / EVERYDAY LISTENING</p>
       <h2>小小一块，<span>刚好够用。</span></h2>
       <p class="sptl-section-lead">看歌词、换歌曲、找回当前播放进度，都留在熟悉的桌面里。</p>
       <p class="sptl-photo-intro">
-        下面都是本机小组件的实际画面。深浅两套实拍随页面明暗模式切换，任务栏图片可左右查看，点击可打开原图。
+        下面都是本机小组件的实际画面。深浅两套实拍随页面明暗模式切换，点击图片可查看完整原图。
       </p>
-      <div class="sptl-feature-grid">
+      <div ref="featureGrid" class="sptl-feature-grid" :class="{ 'is-packed': packed }">
         <article v-for="feature in features" :key="feature.label" class="sptl-feature sptl-reveal">
           <div class="sptl-feature-top">
             <component
@@ -171,12 +206,9 @@ onBeforeUnmount(() => {
           </div>
           <h3>{{ feature.title }}</h3>
           <p>{{ feature.description }}</p>
-          <div class="sptl-photo-stack" :class="{ 'is-comparison': feature.icon === 'settings' }">
+          <div class="sptl-photo-stack">
             <ShotImage v-for="shot in feature.shots" :key="shot.src" :shot="shot" />
           </div>
-          <a v-if="feature.icon === 'sync'" class="sptl-text-link" href="/projects/SPTL#recording"
-            >看首屏实拍视频 <ArrowUp :size="16" aria-hidden="true"
-          /></a>
         </article>
       </div>
     </section>

@@ -76,11 +76,12 @@ with sync_playwright() as playwright:
     assert taskbar_video.evaluate("video => video.paused")
 
     # Both palettes use the same matching recording and 11 real feature photos.
-    photo_names = ["double", "single", "karaoke-detail", "ordinary-controls", "fm-controls", "volume-osd", "right", "circle", "playlist-detail", "mode-detail", "theme-detail"]
+    photo_names = ["double-compact", "single-compact", "karaoke-detail", "ordinary-controls-compact", "fm-controls", "volume-osd", "right-compact", "circle-compact", "playlist-compact", "mode-compact", "theme-detail"]
     def assert_media_theme(theme):
         prefix = f"/images/sptl/{theme}/"
         expect(recording).to_have_attribute("src", prefix + "hero.mp4")
-        expect(taskbar_video).to_have_attribute("src", prefix + "taskbar.mp4")
+        expect(taskbar_video).to_have_attribute("src", prefix + "taskbar-compact.mp4")
+        expect(taskbar_video).to_have_attribute("poster", prefix + "taskbar-compact-poster.webp")
         expect(recording).to_have_attribute("poster", prefix + "hero-poster.webp")
         expect(page.get_by_role("link", name="查看原视频", exact=True)).to_have_attribute("href", prefix + "hero.mp4")
         page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
@@ -144,7 +145,7 @@ with sync_playwright() as playwright:
     expect(page.get_by_role("list", name="安装要求")).to_contain_text("SPlayer Next 插件 API 5+")
     assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
     for theme in ("dark", "light"):
-        for name in ("hero", "taskbar"):
+        for name in ("hero", "taskbar-compact"):
             probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(ROOT / f"public/images/sptl/{theme}/{name}.mp4")])
             data = json.loads(probe)
             assert len(data["streams"]) == 1 and data["streams"][0]["codec_type"] == "video"
@@ -216,6 +217,29 @@ with sync_playwright() as playwright:
             assert_media_theme(theme)
             for width in (320, 390, 768, 1024, 1440):
                 page.set_viewport_size({"width": width, "height": 1000})
+                # Captured content fits its frame; independent card heights leave no row gaps.
+                page.wait_for_function("""() => {
+                    const media = [...document.querySelectorAll('.sptl-photo-viewport, .sptl-recording-strip')]
+                    if (!media.every(frame => frame.scrollWidth <= frame.clientWidth + 1 && frame.firstElementChild.getBoundingClientRect().width <= frame.clientWidth + 1)) return false
+                    const columns = new Map()
+                    document.querySelectorAll('.sptl-feature').forEach(card => {
+                        const rect = card.getBoundingClientRect(), x = Math.round(rect.x)
+                        if (!columns.has(x)) columns.set(x, [])
+                        columns.get(x).push(rect)
+                    })
+                    const ends = []
+                    for (const column of columns.values()) {
+                        column.sort((a, b) => a.top - b.top)
+                        for (let i = 1; i < column.length; i++) {
+                            const gap = column[i].top - column[i - 1].bottom
+                            if (gap < 18 || gap > 26) return false
+                        }
+                        ends.push(column.at(-1).bottom)
+                    }
+                    return Math.max(...ends) - Math.min(...ends) < 240
+                }""")
+                hero_features_gap = page.locator("#features .sptl-eyebrow").evaluate("element => element.getBoundingClientRect().top - document.querySelector('#recording').getBoundingClientRect().bottom")
+                assert 0 <= hero_features_gap <= 70, (palette, theme, width, hero_features_gap)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), (palette, theme, width)
                 assert page.locator(".sptl-page img, .sptl-header img").evaluate_all("items => items.every(item => item.complete && item.naturalWidth > 0)")
                 bounds = page.locator(".sptl-header").bounding_box()

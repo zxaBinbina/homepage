@@ -103,17 +103,17 @@ onBeforeUnmount(() => {
       </button>
     </div>
     <div class="sptl-recording-taskbar">
-      <span>任务栏歌词 · 可左右查看</span>
+      <span>任务栏歌词</span>
       <div class="sptl-recording-strip">
         <video
           ref="taskbar"
-          :src="folder + 'taskbar.mp4'"
-          :poster="folder + 'taskbar-poster.webp'"
+          :src="folder + 'taskbar-compact.mp4'"
+          :poster="folder + 'taskbar-compact-poster.webp'"
           muted
           loop
           playsinline
           preload="metadata"
-          width="740"
+          width="460"
           height="74"
           aria-label="普通模式任务栏连续实录"
           @loadedmetadata="mediaLoaded"
@@ -138,8 +138,8 @@ onBeforeUnmount(() => {
       />
     </div>
     <figcaption>
-      <p>从《经过》的第一句歌词开始，连续呈现逐字高亮、圆形封面和普通播放控制。</p>
-      <span>屏幕连续录制 · 30 帧/秒 · 无音轨 · 可暂停细看</span>
+      <p>从《经过》的第一句开始，实拍逐字歌词、圆形封面与播放控制。</p>
+      <span>连续实录 · 30 帧/秒 · 无音轨 · 可暂停</span>
       <a
         class="sptl-text-link"
         :href="folder + 'hero.mp4'"

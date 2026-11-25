@@ -9,7 +9,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
   align-items: center;
   gap: var(--space-3xl);
-  padding-block: var(--space-2xl) 80px;
+  padding-block: var(--space-2xl);
 }
 .sptl-eyebrow {
   margin-bottom: var(--space-md);
@@ -106,6 +106,9 @@
   padding-block: 72px;
   border-top: 1px solid var(--border);
 }
+.sptl-features {
+  padding-block: var(--space-2xl);
+}
 .sptl-section-lead {
   margin-top: var(--space-md);
   color: var(--muted);
@@ -117,6 +120,11 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-lg);
   margin-top: var(--space-2xl);
+}
+.sptl-feature-grid.is-packed {
+  grid-auto-rows: 4px;
+  grid-auto-flow: row dense;
+  row-gap: 0;
 }
 .sptl-feature {
   min-width: 0;
@@ -423,10 +431,13 @@
     padding-top: 110px;
   }
   .sptl-hero {
-    padding-block: var(--space-md) 64px;
+    padding-block: var(--space-md) var(--space-2xl);
   }
   .sptl-section {
     padding-block: 60px;
+  }
+  .sptl-features {
+    padding-block: var(--space-2xl);
   }
   .sptl-settings-section,
   .sptl-release,
@@ -554,13 +565,15 @@
 }
 .sptl-recording-strip {
   display: block;
-  overflow-x: auto;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  overflow: hidden;
   border-radius: var(--radius-xs);
 }
 .sptl-recording-strip video {
   display: block;
   width: 100%;
-  min-width: 600px;
   height: auto;
 }
 .sptl-desktop-recording > figcaption span {
@@ -579,16 +592,15 @@
   gap: var(--space-lg);
   margin-top: var(--space-xl);
 }
-.sptl-photo-stack.is-comparison {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 .sptl-feature-photo {
   min-width: 0;
   margin: 0;
 }
 .sptl-photo-viewport {
   display: block;
-  overflow-x: auto;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
@@ -598,17 +610,9 @@
   width: 100%;
   height: auto;
 }
-.sptl-photo-viewport.is-panel img {
-  min-width: 600px;
-}
 .sptl-feature-photo figcaption {
   margin-top: var(--space-xs);
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.7;
-}
-@media (max-width: 480px) {
-  .sptl-photo-stack.is-comparison {
-    grid-template-columns: 1fr;
-  }
 }
