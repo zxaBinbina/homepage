@@ -1,3 +1,5 @@
+import { screenshots } from './screenshots'
+
 export const sptlProject = {
   version: '1.2.1',
   repository: 'https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics',
@@ -49,9 +51,10 @@ export const features = [
   {
     label: '03 / PLAYBACK',
     title: '播放控制，就在手边',
-    description: '悬停即可切歌、播放、暂停或收藏。滚轮调节音量，KDE 原生提示即时显示百分比。',
+    description:
+      '普通模式悬停可上一首、播放/暂停、下一首和收藏；私人 FM 将上一首替换为“不喜欢”。滚轮调节音量，KDE 原生提示显示百分比。',
     icon: 'playback',
-    shots: [screenshots.controls, screenshots.volume],
+    shots: [screenshots.ordinaryControls, screenshots.controls, screenshots.volume],
   },
   {
     label: '04 / YOUR PANEL',
@@ -67,7 +70,7 @@ export const features = [
     description:
       '完整歌词支持点击跳转，弹窗可切换播放模式、收藏与播放列表。列表支持翻页和点击播放。',
     icon: 'playlist',
-    shots: [screenshots.playlist],
+    shots: [screenshots.playlist, screenshots.ordinaryMode],
   },
   {
     label: '06 / SHARED SETTINGS',
@@ -75,7 +78,7 @@ export const features = [
     description:
       '主题可跟随 SPlayer、Plasma 或手动设置。应用后所有 SPTL 小组件同步，关闭播放器后仍然保留。',
     icon: 'settings',
-    shots: [screenshots.light, screenshots.dark],
+    shots: [screenshots.dark],
   },
 ] as const
 
@@ -91,4 +94,3 @@ export const settingGroups = [
     description: '即时操作反馈、悬停收藏、歌词跳转；空闲时可打开 SPlayer 或播放我喜欢的音乐。',
   },
 ]
-import { screenshots } from './screenshots'

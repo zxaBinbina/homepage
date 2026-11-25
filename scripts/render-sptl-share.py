@@ -15,7 +15,7 @@ with sync_playwright() as playwright:
     page.goto(base + "/projects/SPTL", wait_until="networkidle")
     page.evaluate("""() => {
       const panel = document.createElement('img');
-      panel.src = '/images/sptl/lyrics-double.webp';
+      panel.src = '/images/sptl/dark/double.webp';
       panel.alt = 'SPTL 本机任务栏实拍';
       const card = document.createElement('main');
       card.className = 'sptl-social-card';

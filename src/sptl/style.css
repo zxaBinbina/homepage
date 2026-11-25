@@ -529,7 +529,7 @@
   padding: var(--space-md);
   background: var(--bg);
 }
-.sptl-recording-stage img {
+.sptl-recording-stage video {
   display: block;
   width: 100%;
   height: auto;
@@ -557,7 +557,7 @@
   overflow-x: auto;
   border-radius: var(--radius-xs);
 }
-.sptl-recording-strip img {
+.sptl-recording-strip video {
   display: block;
   width: 100%;
   min-width: 600px;

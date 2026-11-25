@@ -53,42 +53,57 @@ with sync_playwright() as playwright:
     page.go_forward()
     expect(page).to_have_title("SPTL · SPlayer 任务栏歌词")
 
-    # The hero uses recorded desktop frames, with a still image for reduced motion.
-    recording = page.locator(".sptl-recording-stage img")
-    def recording_path(): return recording.evaluate("image => new URL(image.src).pathname")
-    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_visible()
-    assert recording_path() == "/images/sptl/hero-poster.webp"
+    # Native video keeps its current frame when paused; the paired taskbar also pauses.
+    recording = page.locator(".sptl-recording-stage video")
+    taskbar_video = page.locator(".sptl-recording-strip video")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    assert recording.evaluate("video => video.paused && video.muted")
     expect(page.locator(".sptl-demo")).to_have_count(0)
     expect(page.locator(".sptl-feature")).to_have_count(6)
-    expect(page.locator(".sptl-feature-photo")).to_have_count(10)
+    expect(page.locator(".sptl-feature-photo")).to_have_count(11)
     for feature in page.locator(".sptl-feature").all():
         assert feature.locator(".sptl-feature-photo").count() >= 1
-    page.get_by_role("button", name="播放实拍动图", exact=True).click()
-    expect(page.get_by_role("button", name="暂停实拍动图", exact=True)).to_be_visible()
-    assert recording_path() == "/images/sptl/hero-live.gif"
-    page.get_by_role("button", name="暂停实拍动图", exact=True).click()
-    assert recording_path() == "/images/sptl/hero-poster.webp"
+    expect(page.locator(".sptl-feature-photo figcaption")).to_contain_text(["双行", "单行", "当前高亮", "普通模式", "私人 FM", "KDE 原生音量", "圆角", "圆形", "播放列表", "普通模式", "KDE 深色"])
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
+    page.wait_for_timeout(400)
+    assert recording.evaluate("video => !video.paused && video.currentTime > 0")
+    page.get_by_role("button", name="暂停实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    frozen = recording.evaluate("video => video.currentTime")
+    page.wait_for_timeout(250)
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .05
+    assert taskbar_video.evaluate("video => video.paused")
     page.emulate_media(reduced_motion="no-preference")
-    page.get_by_role("button", name="播放实拍动图", exact=True).click()
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
     page.emulate_media(reduced_motion="reduce")
-    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_visible()
-    assert recording_path() == "/images/sptl/hero-poster.webp"
-    page.get_by_role("button", name="播放实拍动图", exact=True).click()
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.paused)")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    assert recording.evaluate("video => video.paused")
+    assert taskbar_video.evaluate("video => video.paused")
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
 
     page.get_by_role("navigation", name="SPTL 导航").get_by_role("link", name="安装指南").click()
     expect(page).to_have_url(base + route + "#install")
     expect(page.locator("#install h2")).to_be_in_viewport()
-    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_attached()
-    assert recording_path() == "/images/sptl/hero-poster.webp", "Offscreen recording must use a still frame"
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.paused)")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_attached()
+    assert recording.evaluate("video => video.paused"), "Offscreen video must pause"
     page.get_by_role("button", name="复制安装命令").click()
     expect(page.locator(".sptl-copy-status")).to_have_text("安装命令已复制")
     command = "curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh"
     assert page.evaluate("navigator.clipboard.readText()") == command
     expect(page.get_by_role("list", name="安装要求")).to_contain_text("SPlayer Next 插件 API 5+")
     assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
-    from PIL import Image
-    with Image.open(ROOT / "public/images/sptl/hero-live.gif") as gif:
-        assert gif.n_frames >= 20 and gif.info.get("loop") == 0
+    for name in ("hero", "taskbar"):
+        probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(ROOT / f"public/images/sptl/dark/{name}.mp4")])
+        data = json.loads(probe)
+        assert len(data["streams"]) == 1 and data["streams"][0]["codec_type"] == "video"
+        assert data["streams"][0]["r_frame_rate"] == "30/1"
+        assert int(data["streams"][0]["nb_frames"]) >= 300
+        assert float(data["format"]["duration"]) >= 10
     expect(page.locator(".sptl-release-status")).to_contain_text("已核对的 v1.2.1")
     with page.expect_download() as script_download:
         page.get_by_role("link", name="下载安装脚本", exact=True).click()
@@ -162,4 +177,4 @@ with sync_playwright() as playwright:
 
     assert not errors, errors
     browser.close()
-print("SPTL routing, metadata, real recording pause/reduced motion/offscreen state, 10 feature photos, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
+print("SPTL routing, metadata, continuous 30 fps video pause/reduced motion/offscreen state, 11 feature photos, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
