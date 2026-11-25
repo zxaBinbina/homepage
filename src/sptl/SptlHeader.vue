@@ -66,6 +66,23 @@ nav > a {
   display: inline-flex;
   align-items: center;
 }
+.sptl-install-link {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-xl);
+  color: var(--blue);
+  background: var(--panel-hover);
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sptl-install-link {
+    transition:
+      color 0.2s,
+      background 0.2s,
+      border-color 0.2s;
+  }
+}
 .sptl-nav-tools {
   gap: var(--space-xs);
 }
@@ -92,9 +109,6 @@ nav > a {
   }
   nav {
     gap: var(--space-xs);
-  }
-  .sptl-install-link {
-    font-size: var(--text-xs);
   }
 }
 </style>

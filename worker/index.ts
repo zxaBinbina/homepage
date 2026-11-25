@@ -1,6 +1,7 @@
 import type { Env } from './env'
 import { RoomDirectory, GameRoom, json } from './rooms'
 import { lyricsResponse } from '../server/lyrics'
+import { sptlReleaseResponse } from '../server/sptlRelease'
 import { onRequestGet, onRequestPost } from '../server/gameExperience'
 import { turnstileSiteKey, verifyTurnstile } from './turnstile'
 export { RoomDirectory, GameRoom }
@@ -38,6 +39,7 @@ export default {
       })
     }
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request)
+    if (url.pathname === '/api/projects/SPTL/release') return sptlReleaseResponse(request)
     if (url.pathname === '/api/music/lyrics')
       return request.method === 'GET'
         ? lyricsResponse(url)

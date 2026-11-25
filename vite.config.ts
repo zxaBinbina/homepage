@@ -11,6 +11,7 @@ import { xcpdfAssets } from './build/xcpdf'
 import { officeViewerAssets } from './build/officeViewer'
 import { siteContent } from './site.config'
 import { lyricsResponse } from './server/lyrics'
+import { sptlReleaseResponse } from './server/sptlRelease'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 async function lyricsMiddleware(request: IncomingMessage, response: ServerResponse) {
@@ -30,6 +31,16 @@ async function experienceMiddleware(request: IncomingMessage, response: ServerRe
     'Cache-Control': 'no-store',
   })
   response.end(JSON.stringify({ error: 'experience storage unavailable in local preview' }))
+}
+
+async function sptlReleaseMiddleware(request: IncomingMessage, response: ServerResponse) {
+  const result = await sptlReleaseResponse(
+    new Request('http://localhost/api/projects/SPTL/release', {
+      method: request.method,
+    }),
+  )
+  response.writeHead(result.status, Object.fromEntries(result.headers))
+  response.end(await result.text())
 }
 
 export default defineConfig(({ mode, command }) => {
@@ -75,10 +86,12 @@ export default defineConfig(({ mode, command }) => {
         configureServer(server) {
           server.middlewares.use('/api/music/lyrics', lyricsMiddleware)
           server.middlewares.use('/api/games/experience', experienceMiddleware)
+          server.middlewares.use('/api/projects/SPTL/release', sptlReleaseMiddleware)
         },
         configurePreviewServer(server) {
           server.middlewares.use('/api/music/lyrics', lyricsMiddleware)
           server.middlewares.use('/api/games/experience', experienceMiddleware)
+          server.middlewares.use('/api/projects/SPTL/release', sptlReleaseMiddleware)
         },
       },
       pageTemplates(env.SITE_URL, command === 'build'),

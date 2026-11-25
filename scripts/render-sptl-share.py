@@ -1,4 +1,4 @@
-"""Render SPTL's 1200 x 630 social card with the live site's CSS and demo."""
+"""Render SPTL's 1200 x 630 social card using an actual taskbar screenshot."""
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -14,7 +14,9 @@ with sync_playwright() as playwright:
     page.add_init_script("localStorage.setItem('homepage-theme', 'dark'); localStorage.setItem('homepage-palette', 'fufu-blue')")
     page.goto(base + "/projects/SPTL", wait_until="networkidle")
     page.evaluate("""() => {
-      const panel = document.querySelector('.sptl-demo-panel').cloneNode(true);
+      const panel = document.createElement('img');
+      panel.src = '/images/sptl/dark/double.webp';
+      panel.alt = 'SPTL 本机任务栏实拍';
       const card = document.createElement('main');
       card.className = 'sptl-social-card';
       card.innerHTML = `<div class="sptl-social-top"><img src="/images/sptl.png" width="56" height="56" alt=""><b>SPTL</b><span>SPLAYER TASKBAR LYRICS</span></div>
@@ -31,12 +33,12 @@ with sync_playwright() as playwright:
         .sptl-social-copy h1{margin:0;font-size:64px;line-height:1.3;letter-spacing:0;font-weight:700}
         .sptl-social-copy h1 span{color:var(--accent);background:none;-webkit-text-fill-color:var(--accent)}
         .sptl-social-copy p{font-size:20px;color:var(--muted);padding-bottom:12px}
-        .sptl-social-panel .sptl-demo-panel{padding:16px 24px;border-radius:20px;background:var(--panel)}
-        .sptl-social-panel .sptl-demo-lyrics{font-size:16px}
-        .sptl-social-panel .sptl-demo-primary{font-size:20px}
+        .sptl-social-panel{padding:16px;border:1px solid var(--border);border-radius:20px;background:var(--panel)}
+        .sptl-social-panel img{display:block;width:100%;height:auto;border-radius:12px}
         .sptl-social-footer{display:flex;justify-content:space-between;margin-top:28px;color:var(--muted);font-size:14px}`;
       document.head.append(style);
     }""")
+    page.wait_for_function("Array.from(document.images).every(image => image.complete && image.naturalWidth > 0)")
     page.screenshot(path=str(ROOT / "public/images/sptl-share.png"))
     browser.close()
 print("Rendered public/images/sptl-share.png (1200 x 630)")

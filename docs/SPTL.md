@@ -1,63 +1,162 @@
 # SPTL 项目子页
 
-入口为 `/projects/SPTL`，与 Gaze、RDP 子页共用 Vue 路由、站点主题和页脚样式。
-页面包含项目介绍、可交互的任务栏歌词演示、源码下载、四步安装、设置分组及常见问题。
-演示不播放音频，离开视口或切到后台时暂停推进；减少动态效果时默认暂停，仍可手动操作。
+入口为 `/projects/SPTL`，与 Gaze、RDP 子页共用 Vue 路由、站点主题和页脚。
+首屏使用本机小组件的连续录屏视频，六项功能卡片直接展示对应设置下的实际视频帧。
+视频不含音轨，使用原生视频播放器暂停并保留当前画面；离开视口或切到后台时暂停，减少动态效果时默认暂停。
+页面不单独展示作者邮箱、官网地址或许可证，头部没有返回个人主页或目录的入口。
+页脚完整复用主站 `SiteFooter`，提供品牌首页链接、版权及备案入口。
+这些资料由 SPTL 元数据提供给 KDE 小组件信息界面。目录保留 SPTL 卡片，首页仍为四个精选项目。
 
-页面不展示作者邮箱、官网地址或许可证说明，也没有返回项目目录、个人主页的入口。
-这些项目资料由 SPTL 仓库的 Plasma 5/6 元数据提供给 KDE 小组件信息界面。
-站内目录保留 SPTL 卡片供访客进入，首页仍为原来的四个精选项目。
+## 安装与更新
+
+三个部分分别安装：KDE 小组件、Python 辅助程序、SPlayer 插件。
+
+### 从 KDE 商店获取小组件
+
+右键面板（任务栏）→「添加或管理小部件」→「获取新小部件」→「下载新 Plasma 小部件」。
+在搜索框输入「SPTL」并搜索，打开「SPTL 1.2.1 — SPlayer Taskbar Lyrics」条目，点击「安装」。
+该入口适用于支持的 Plasma 版本；安装后将小组件添加到横向任务栏。
+
+### 安装或更新辅助程序
+
+在 KDE 桌面终端运行，无需 sudo：
+
+```sh
+curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh
+```
+
+每次读取 SPTL 仓库的最新公开正式 Release。API 不可用时跟随同一仓库的
+`releases/latest` 跳转，按正式版标签选择源码归档与对应 `SHA256SUMS-版本`。
+校验 SHA-256、在内存中核对版本元数据后，只解压并部署 `helper/`、`shared/` 与许可证，
+启用或重启 `sptl-bridge.service` 用户服务。不会执行发行包中的旧版全量安装器，
+因此现有 1.2.1 发行包也只会安装辅助程序。小组件及 SPlayer 插件文件不会释放到磁盘，
+安装成功或失败退出时都会清理下载归档与临时目录。
+
+需要 Python 3.10+、curl 和 systemd 用户会话。完整运行还需 SPlayer 插件 API 5+、
+Plasma 5.27 / Qt 5.15 或 Plasma 6 / Qt 6；收藏需要 gdbus 和 SPlayer Linux 托盘入口。
+更新保留共享设置、自定义 SPlayer 启动命令及配置路径，不安装或覆盖小组件、插件，不重载面板。
+第一次运行直接安装。检测到已有辅助程序后，再次执行同一命令会询问「升级 / 卸载 / 取消」。
+安装完成后输出“卸载请再次运行此脚本，并选择「卸载」”。卸载停止并禁用辅助服务，
+删除辅助程序与服务文件，保留小组件、SPlayer 插件及共享设置；卸载无需下载发行包。
+菜单从 `/dev/tty` 读取，支持官网的管道运行方式。没有交互终端时必须显式指定操作，避免自动选择。
+
+也可先下载官网脚本，再指定选项：
+
+```sh
+sh install.sh --dry-run
+sh install.sh --upgrade
+sh install.sh --uninstall
+sh install.sh --splayer-command '/path/to/SPlayer-Next.AppImage'
+sh install.sh --splayer-config '/path/to/settings.json'
+sh install.sh --help
+```
+
+`--upgrade` 跳过菜单直接安装或升级，`--uninstall` 可从已下载的脚本离线卸载，`--dry-run` 只读取版本与下载地址。
+旧 `--plasma`、`--reload-plasma` 和 `--no-reload-plasma`
+参数仅保留兼容，均不会安装小组件或重载面板。小组件请在 KDE 商店更新；若界面仍使用旧缓存，注销后重新登录。
+
+### 从 SPlayer 插件市场安装
+
+打开 SPlayer 的「全局设置」，点击「插件管理」，进入「插件市场」，
+找到「SPTL 任务栏歌词」，点击「安装」。SPlayer 插件通过官方插件管理更新。
+
+## 官网自动获取版本
+
+进入页面时请求 `/api/projects/SPTL/release`，同步版本、发布日期、发行说明与资产链接。
+接口优先读取 GitHub API，限流时读取最新发行页及资产列表，只接受 SPTL 仓库的正式版和下载地址。
+成功响应浏览器缓存 60 秒、CDN 缓存 300 秒；失败响应不缓存。页面可手动刷新，离开时取消请求。
+失败时保留已核对的 v1.2.1 或上次成功同步的版本，并明确说明尚未取得最新信息。
+页面仅保留 GitHub 与 KDE Store 等主要下载入口，不逐项列出发行文件或单独提供源码链接。
+
+Cloudflare Workers 与 Vite 开发 / 预览服务共用处理器。生产接口在 `worker/index.ts` 中分发，
+沿用 `wrangler.toml` 的 `/api/*` 规则；单独托管 `dist/` 时安装脚本可用，页面版本接口不可用。
+网站发布后，新 Release 无需修改网站代码即可更新版本与下载链接。
 
 ## 维护位置
 
-| 文件                           | 用途                                       |
-| ------------------------------ | ------------------------------------------ |
-| `src/sptl/HomePage.vue`        | 页面正文、命令复制、FAQ 与滚动显现         |
-| `src/sptl/TaskbarDemo.vue`     | 示例歌词、布局切换、播放暂停与换句         |
-| `src/sptl/SptlHeader.vue`      | 品牌、安装入口、共享主题面板及 GitHub 链接 |
-| `src/sptl/content.ts`          | 版本、下载位置及功能文案                   |
-| `src/sptl/style.css`           | 使用站点语义变量与 token 的局部样式        |
-| `public/images/sptl.png`       | 项目所有者提供的透明 PNG 图标              |
-| `public/images/sptl-share.png` | 1200 × 630 分享封面                        |
-| `public/projects/SPTL/`        | 包含完整项目源码的下载归档                 |
+| 文件                                        | 用途                                    |
+| ------------------------------------------- | --------------------------------------- |
+| `src/sptl/HomePage.vue`                     | 正文、复制、实拍、下载、FAQ 与滚动显现  |
+| `src/sptl/useSptlRelease.ts` / `release.ts` | 最新版本请求、取消与类型                |
+| `src/sptl/content.ts`                       | 已核对版本、功能文案与市场链接          |
+| `src/sptl/DesktopRecording.vue`             | 首屏连续视频、暂停、视口与动态效果偏好  |
+| `src/sptl/ShotImage.vue` / `screenshots.ts` | 实拍展示、深浅素材与特性对应关系        |
+| `src/sptl/SptlHeader.vue` / `style.css`     | 品牌、主题入口与局部样式                |
+| `server/sptlRelease.ts`                     | 最新 GitHub Release、限流回退与响应缓存 |
+| `worker/index.ts`                           | Cloudflare Workers 接口分发             |
+| `public/projects/SPTL/install.sh`           | 一键安装 / 更新脚本                     |
+| `public/images/sptl/`                       | 连续录屏、视频帧、任务栏与弹窗照片      |
+| `public/images/sptl.png` / `sptl-share.png` | 项目图标与 1200 × 630 分享封面          |
 
-路由、分享标签、favicon 与站点地图分别由 `src/pages.ts`、`src/router.ts`、
-`site.config.ts` 和公共构建模板维护，不添加独立 HTML 入口。
-SPTL 的共享页脚关闭品牌链接，其他页面保持原有行为。
+素材经项目所有者授权从本机录制。`public/images/sptl/dark/` 与 `public/images/sptl/light/`
+分别在 2026-11-25 的 KDE 深色、浅色主题下拍摄；系统明暗由项目所有者切换。
+普通模式歌曲《经过》，保留单曲循环，从第一句歌词（26.646 秒）开始连续录制。
+通过系统屏幕共享与 PipeWire/GStreamer 获取真实视频流，H.264、30 帧/秒、无音轨；
+录屏完成后裁剪任务栏与歌词弹窗，静态图从真实视频帧提取，不使用连拍图片拼接。
+每套首屏任务栏与弹窗视频来自同一次录制，支持暂停当前画面、循环与自动暂停。
+首屏视频、封面帧及 11 张特性图片跟随网站实际明暗模式，芙芙蓝和胡桃红使用相同的两套素材。
+自动模式随系统明暗切换；单独改配色不重载视频。切换素材保留播放进度及用户选择的播放 / 暂停状态。
 
-## 更新源码下载
+用于展示的 `*-compact.webp` 裁去任务栏空白或重复的弹窗标题，靠右封面和普通控制保留左右两块真实画面。
+`taskbar-compact.mp4` 同样移除中间空白，保留连续录制的时间轴与 30 帧/秒，不使用静态帧拼接动画。
+完整任务栏、弹窗和 `taskbar.mp4` 均保留。所有展示图在窄屏完整等比缩小，不需横滑；图片仅展示，不提供点击跳转。
+特性卡片按各自高度紧接排列，主题照片单独显示，首屏与特性区之间保留总计约 64px 的间距。
 
-源码包是本站的静态资源，部署与运行不需要相邻仓库或 GitHub API。
-更新下载内容时使用以下命令，参数指向 SPTL 源码仓库：
+「喜欢的样子，自己调」紧接「小小一块，刚好够用」的特性介绍，之后是发行信息和安装步骤。
+其四组说明各配一张原生配置界面图，文件为两套中的 `settings-lyrics.webp`、
+`settings-layout.webp`、`settings-theme.webp` 与 `settings-interaction.webp`，同样跟随页面深浅模式。
+图片加载本机已安装的 `ConfigGeneral.qml`，在 Qt 窗口中读取运行中辅助服务的真实配置；
+截图窗口使用 Breeze 深浅配色，包含原有控件、条件禁用状态和字号预览。拍摄后核对原配置与播放状态。
+完整窗口及采集记录保存在忽略的 `artifacts/sptl-settings/`。设置说明先于图片显示，桌面两列，1024px 及以下单列；图片完整等比显示。
 
-```sh
-python3 scripts/package-sptl.py ../SplayerPlasmaTaskbarLyrics
-```
+普通模式快捷操作与之前的私人 FM 实拍并列：普通模式显示上一首，私人 FM 显示不喜欢。
+两套素材包括双行 / 单行、封面左右位置、圆角 / 圆形、普通播放控制、播放列表及单曲循环菜单。
+浅色原生音量提示从浅色连续录屏提取；深色提示为当前 KDE 深色下重新拍摄的
+`volume-osd-live.webp`，显示 SPlayer 图标与 30% 音量。
+私人 FM 展示任务栏悬停后的“不喜欢、播放 / 暂停、下一首、收藏”，完整原图为两套的 `fm-taskbar.webp`，
+紧凑展示图为 `fm-taskbar-compact.webp`。深色图重新拍摄《Free Loop》，浅色图沿用已核对的《Light in Abyss》任务栏悬停实拍；
+图片展示任务栏悬停控制区。采集记录保存在忽略的 `artifacts/sptl-fm-fix/`。
+补拍结束后恢复当前普通歌曲《经过》、单曲循环、原设置与音量，并暂停播放。
 
-脚本只打包 Git 跟踪的项目源码、文档、测试和构建材料，排除本地配置、缓存及构建产物，
-保留完整 LICENSE。版本取自 Plasma 元数据；更新版本后同步 `src/sptl/content.ts`。
-归档内的顶层目录为 `SPTL-版本号`，安装命令与该目录一致。
+只公开裁剪后的组件视频和图片，完整录屏暂存在忽略的 `artifacts/sptl-dark/`、`artifacts/sptl-light/`，不公开。
+拍摄结束后恢复临时外观和音量，保留当前歌曲、普通模式及单曲循环，并按项目所有者要求暂停播放。
+后续拍摄也应先备份设置，并在退出时恢复。页面只使用静态素材文件，不调用本机播放器接口。
+路由、分享标签、favicon 与站点地图由公共配置和构建模板维护，不新增独立 HTML 入口。
+SPTL 页脚使用主站 `SiteFooter` 的默认配置，保留品牌首页链接、版权及备案入口。
 
-运行开发服务器后，可重新生成分享封面：
+## 源码与分享封面
+
+本站已移除旧版源码包，源码及发行文件通过 GitHub 获取。
+`src/sptl/content.ts` 的已核对版本仅用于接口失败时的显示，自动安装与版本接口始终读取 GitHub Release。
+分享封面复用网页主题与真实任务栏照片，
+可在开发服务器运行时生成：
 
 ```sh
 python3 scripts/render-sptl-share.py
 ```
 
-该脚本复用网页的主题色和歌词演示面板，不生成真实桌面截图。
-
 ## 验证
 
 ```sh
+sh -n public/projects/SPTL/install.sh
+python3 scripts/check-sptl-installer.py
+node scripts/check-sptl-release.mjs
 npm run build
-python3 scripts/check-sptl.py
-python3 scripts/check-project-directory.py
-python3 scripts/check-navigation.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-sptl.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-project-directory.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-navigation.py
 python3 scripts/check-sharing.py
 python3 scripts/check-seo.py
 ```
 
-浏览器检查的 `HOMEPAGE_TEST_URL` 默认是 `http://127.0.0.1:5173`，也可指向构建预览。
-SPTL 检查覆盖实际导航、元信息、演示暂停及布局切换、剪贴板、真实 ZIP 下载与独立构建、
-FAQ 键盘操作，以及四套主题在 320 / 390 / 768 / 1024 / 1440px 下的布局。
-截图保存在 `artifacts/sptl-*.png`，发布网站仍需部署完整 `dist/`。
+浏览器检查需要 Playwright 和 ffprobe，并运行预览服务器，例如 `npm run preview -- --port 4183`。
+安装测试从完整 Git 历史读取 v1.2.1 的真实测试源码，不将旧包重新发布到网站；
+浅克隆或历史不可用时可通过 `SPTL_TEST_SOURCE_ARCHIVE` 指定相同格式的测试 ZIP。
+测试使用临时 XDG 路径和模拟桌面服务，验证安装、更新、配置保留、管道执行、
+校验失败、不安全归档、版本不一致及安装失败，不改动本机 SPTL 安装。
+页面检查覆盖两套连续视频的播放 / 暂停与当前帧冻结、减少动态效果和离开视口、两套各 11 张特性图片、
+两种配色下的深浅切换、自动跟随系统、配色切换不重载视频、暂停 / 播放状态与进度保留、
+四组原生设置图片及其深浅切换、
+图片 / 任务栏视频无需横滑、卡片间距和首屏到特性区的留白、
+动态新版本、失败状态、复制、安装脚本下载、FAQ 键盘操作，
+以及四套主题在 320 / 390 / 768 / 1024 / 1440px 下的布局。截图输出到 `artifacts/`。

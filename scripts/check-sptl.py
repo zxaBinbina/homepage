@@ -1,9 +1,7 @@
-"""Check SPTL navigation, demo controls, copy, source download and layout."""
+"""Check SPTL navigation, real recording, feature photos, downloads and layout."""
 import json
 import os
 import subprocess
-import tempfile
-import zipfile
 from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
@@ -15,8 +13,13 @@ with sync_playwright() as playwright:
         executable_path=os.environ.get("HOMEPAGE_BROWSER", "/usr/bin/google-chrome"),
         args=["--no-sandbox"],
     )
-    context = browser.new_context(viewport={"width": 1440, "height": 1000}, reduced_motion="reduce")
+    context = browser.new_context(viewport={"width": 1440, "height": 1000}, reduced_motion="reduce", color_scheme="dark")
     context.grant_permissions(["clipboard-read", "clipboard-write"], origin=base)
+    api_payload = None
+    def release_fixture(request):
+        request.fulfill(status=200 if api_payload else 503,
+                        content_type="application/json", body=json.dumps(api_payload or {"error": "offline"}))
+    context.route("**/api/projects/SPTL/release", release_fixture)
     page = context.new_page()
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -31,58 +34,151 @@ with sync_playwright() as playwright:
     expect(page.locator('link[rel="canonical"]')).to_have_attribute("href", "https://zxabinbina.cc.cd/projects/SPTL")
     expect(page.locator('link[rel="icon"]')).to_have_attribute("href", "/images/sptl.png")
     expect(page.locator('meta[property="og:image"]')).to_have_attribute("content", "https://zxabinbina.cc.cd/images/sptl-share.png")
-    expect(page.locator('a[href^="mailto:"], a[href="/"], a[href="/project"]')).to_have_count(0)
+    expect(page.locator('a[href^="mailto:"], a[href="/project"], .sptl-header a[href="/"]')).to_have_count(0)
+    expect(page.locator('footer .brand')).to_have_attribute('href', '/')
     assert "zxabinbina@mcyzw.top" not in page.locator("body").inner_text()
     assert "AGPL" not in page.locator("body").inner_text()
-    assert "https://zxabinbina.cc.cd/projects/SPTL" not in page.locator("body").inner_text()
+    # The installation command contains the site URL; project contact details stay hidden.
+    text_without_commands = page.locator("body").evaluate("""element => {
+        const copy = element.cloneNode(true)
+        copy.querySelectorAll('pre').forEach(command => command.remove())
+        return copy.textContent
+    }""")
+    assert "https://zxabinbina.cc.cd/projects/SPTL" not in text_without_commands
     page.go_back()
     expect(page).to_have_title("项目目录 · a彬彬a")
     expect(page.locator('link[rel="icon"]')).to_have_attribute("href", "/favicon.svg")
     page.go_forward()
     expect(page).to_have_title("SPTL · SPlayer 任务栏歌词")
 
-    # Reduced motion starts paused. Advancing and changing layout remain usable.
-    expect(page.get_by_role("button", name="播放歌词演示", exact=True)).to_be_visible()
-    expect(page.locator(".sptl-demo-primary")).to_have_text("把今天唱给你听")
-    page.get_by_role("button", name="下一句演示歌词").click()
-    expect(page.locator(".sptl-demo-primary")).to_have_text("让旋律陪你走过每一步")
-    page.get_by_role("button", name="上一句演示歌词").click()
-    page.get_by_role("radio", name="歌词 + 信息", exact=True).click()
-    expect(page.locator(".sptl-demo-lyrics p").last).to_have_text("今天的旋律 · SPTL")
-    page.get_by_role("radio", name="双行歌词", exact=True).click()
-    expect(page.locator(".sptl-demo-lyrics p").last).to_have_text("Sing today for you")
-    page.get_by_role("button", name="播放歌词演示", exact=True).click()
-    expect(page.get_by_role("button", name="暂停歌词演示", exact=True)).to_be_visible()
-    page.wait_for_timeout(350)
-    page.get_by_role("button", name="暂停歌词演示", exact=True).click()
-    highlight = page.locator(".sptl-demo-primary").get_attribute("style")
+    # Native video keeps its current frame when paused; the paired taskbar also pauses.
+    recording = page.locator(".sptl-recording-stage video")
+    taskbar_video = page.locator(".sptl-recording-strip video")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    assert recording.evaluate("video => video.paused && video.muted")
+    expect(page.locator(".sptl-demo")).to_have_count(0)
+    expect(page.locator(".sptl-feature")).to_have_count(6)
+    expect(page.locator("#features .sptl-feature-photo")).to_have_count(11)
+    expect(page.locator("#settings .sptl-setting-photo")).to_have_count(4)
+    expect(page.locator("#features + #settings")).to_have_count(1)
+    expect(page.locator("#settings > .sptl-settings-heading .sptl-eyebrow")).to_have_text("02 / MAKE IT YOURS")
+    expect(page.locator("#install .sptl-eyebrow")).to_have_text("03 / GET STARTED")
+    expect(page.locator("#settings .sptl-setting-groups h3")).to_contain_text(["歌词显示", "尺寸与布局", "主题与动画", "交互与离线"])
+    for feature in page.locator(".sptl-feature").all():
+        assert feature.locator(".sptl-feature-photo").count() >= 1
+    expect(page.locator("#features .sptl-feature-photo figcaption")).to_contain_text(["双行", "单行", "当前高亮", "普通模式", "私人 FM", "KDE 原生音量", "圆角", "圆形", "播放列表", "普通模式", "KDE 深色"])
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
+    page.wait_for_timeout(400)
+    assert recording.evaluate("video => !video.paused && video.currentTime > 0")
+    page.get_by_role("button", name="暂停实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    frozen = recording.evaluate("video => video.currentTime")
     page.wait_for_timeout(250)
-    assert page.locator(".sptl-demo-primary").get_attribute("style") == highlight
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .05
+    assert taskbar_video.evaluate("video => video.paused")
+
+    # Both palettes use the same matching recording and 11 real feature photos.
+    photo_names = ["double-compact", "single-compact", "karaoke-detail", "ordinary-controls-compact", "fm-taskbar-compact", "volume-osd", "right-compact", "circle-compact", "playlist-compact", "mode-compact", "theme-detail"]
+    def assert_media_theme(theme):
+        prefix = f"/images/sptl/{theme}/"
+        expect(recording).to_have_attribute("src", prefix + "hero.mp4")
+        expect(taskbar_video).to_have_attribute("src", prefix + "taskbar-compact.mp4")
+        expect(taskbar_video).to_have_attribute("poster", prefix + "taskbar-compact-poster.webp")
+        expect(recording).to_have_attribute("poster", prefix + "hero-poster.webp")
+        page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
+        photos = page.locator("#features .sptl-feature-photo img")
+        for photo, name in zip(photos.all(), photo_names):
+            if name == "volume-osd" and theme == "dark": name = "volume-osd-live"
+            expect(photo).to_have_attribute("src", prefix + name + ".webp")
+        fm_photo = page.locator("#features .sptl-feature").nth(2).locator(".sptl-feature-photo").nth(1)
+        expect(fm_photo.locator("img")).to_have_js_property("naturalHeight", 74)
+        expect(page.locator(".sptl-feature-photo a")).to_have_count(0)
+        for photo, name in zip(page.locator("#settings .sptl-setting-photo img").all(), ("lyrics", "layout", "theme", "interaction")):
+            expect(photo).to_have_attribute("src", prefix + "settings-" + name + ".webp")
+        page.wait_for_function("Array.from(document.querySelectorAll('.sptl-feature-photo img')).every(image => image.complete && image.naturalWidth > 0)")
+
+    page.get_by_role("button", name="主题设置", exact=True).click()
+    theme_panel = page.get_by_role("dialog", name="主题设置")
+    theme_panel.get_by_role("button", name="浅色", exact=True).click()
+    assert_media_theme("light")
+    assert recording.evaluate("video => video.paused") and taskbar_video.evaluate("video => video.paused")
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .1
+    recording.evaluate("video => { video.dataset.reloads = '0'; video.addEventListener('loadstart', () => video.dataset.reloads = String(Number(video.dataset.reloads) + 1)) }")
+    theme_panel.get_by_role("button", name="胡桃红", exact=True).click()
+    assert_media_theme("light")
+    assert recording.get_attribute("data-reloads") == "0", "Palette change reloaded the video"
+    theme_panel.get_by_role("button", name="深色", exact=True).click()
+    assert_media_theme("dark")
+    assert recording.evaluate("video => video.paused")
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .1
+    theme_panel.get_by_role("button", name="芙芙蓝", exact=True).click()
+    assert_media_theme("dark")
+    page.emulate_media(color_scheme="light")
+    theme_panel.get_by_role("button", name="自动", exact=True).click()
+    assert_media_theme("light")
+    page.emulate_media(color_scheme="dark")
+    assert_media_theme("dark")
+    page.keyboard.press("Escape")
+
+    page.emulate_media(reduced_motion="no-preference")
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
+    page.emulate_media(color_scheme="light")
+    assert_media_theme("light")
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => !video.paused)")
+    page.emulate_media(color_scheme="dark")
+    assert_media_theme("dark")
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => !video.paused)")
+    page.emulate_media(reduced_motion="reduce")
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.paused)")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
+    assert recording.evaluate("video => video.paused")
+    assert taskbar_video.evaluate("video => video.paused")
+    page.get_by_role("button", name="播放实拍视频", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
 
     page.get_by_role("navigation", name="SPTL 导航").get_by_role("link", name="安装指南").click()
     expect(page).to_have_url(base + route + "#install")
     expect(page.locator("#install h2")).to_be_in_viewport()
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.paused)")
+    expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_attached()
+    assert recording.evaluate("video => video.paused"), "Offscreen video must pause"
     page.get_by_role("button", name="复制安装命令").click()
     expect(page.locator(".sptl-copy-status")).to_have_text("安装命令已复制")
-    assert page.evaluate("navigator.clipboard.readText()") == "cd SPTL-0.1.1\npython3 tools/install.py"
-    with page.expect_download() as download_info:
-        page.get_by_role("link", name="完整源码包 v0.1.1").click()
-    download = download_info.value
-    assert download.suggested_filename == "sptl-0.1.1-source.zip"
-    with zipfile.ZipFile(download.path()) as archive:
-        assert archive.testzip() is None
-        names = archive.namelist()
-        assert "SPTL-0.1.1/tools/install.py" in names
-        assert "SPTL-0.1.1/LICENSE" in names
-        assert not any(".git/" in name or ".env" in name for name in names)
-        metadata = json.loads(archive.read("SPTL-0.1.1/plasmoid/metadata.json"))
-        assert metadata["KPlugin"]["Website"] == "https://zxabinbina.cc.cd/projects/SPTL"
-        assert metadata["KPlugin"]["Authors"][0]["Email"] == "zxabinbina@mcyzw.top"
-        assert metadata["KPlugin"]["License"] == "AGPL-3.0-only"
-        with tempfile.TemporaryDirectory(prefix="sptl-website-source-") as directory:
-            archive.extractall(directory)
-            result = subprocess.run(["python3", "tools/build.py"], cwd=Path(directory) / "SPTL-0.1.1", capture_output=True, text=True)
-            assert result.returncode == 0, result.stdout + result.stderr
+    command = "curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh"
+    assert page.evaluate("navigator.clipboard.readText()") == command
+    assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
+    for theme in ("dark", "light"):
+        for name in ("hero", "taskbar-compact"):
+            probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(ROOT / f"public/images/sptl/{theme}/{name}.mp4")])
+            data = json.loads(probe)
+            assert len(data["streams"]) == 1 and data["streams"][0]["codec_type"] == "video"
+            assert data["streams"][0]["r_frame_rate"] == "30/1"
+            assert int(data["streams"][0]["nb_frames"]) >= 300
+            assert float(data["format"]["duration"]) >= 10
+    expect(page.locator(".sptl-release-status")).to_contain_text("已核对的 v1.2.1")
+
+    # A new release updates version, notes and download targets without changing website source.
+    future = "1.3.0"
+    release_url = f"https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics/releases/tag/v{future}"
+    source_url = f"https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics/releases/download/v{future}/sptl-source-{future}.tar.gz"
+    api_payload = {"version": future, "url": release_url, "publishedAt": "2026-12-01T00:00:00Z",
+                   "body": "新版发行说明 <script>window.sptlInjected = true</script>",
+                   "assets": [{"name": f"sptl-source-{future}.tar.gz", "url": source_url, "size": 100}]}
+    page.get_by_role("button", name="刷新最新版本").click()
+    expect(page.locator("#release .sptl-eyebrow")).to_contain_text(f"v{future}")
+    expect(page.get_by_role("link", name="查看正式版", exact=True)).to_have_attribute("href", release_url)
+    expect(page.locator(".sptl-release-assets")).to_have_count(0)
+    expect(page.get_by_role("link", name="完整发行说明")).to_have_attribute("href", release_url)
+    expect(page.locator(".sptl-release-notes")).to_contain_text("新版发行说明")
+    assert page.evaluate("window.sptlInjected === undefined")
+    api_payload["assets"] = []
+    page.get_by_role("button", name="刷新最新版本").click()
+    api_payload = None
+    page.get_by_role("button", name="刷新最新版本").click()
+    expect(page.locator(".sptl-release-status")).to_contain_text(f"上次同步的 v{future}")
+    assert page.evaluate("navigator.clipboard.readText()") == command
 
     # FAQ keeps native details semantics and works with the keyboard.
     question = page.locator(".sptl-faq summary").first
@@ -97,8 +193,32 @@ with sync_playwright() as playwright:
         for theme in ("dark", "light"):
             page.evaluate("([palette, theme]) => { localStorage.setItem('homepage-palette', palette); localStorage.setItem('homepage-theme', theme) }", [palette, theme])
             page.goto(base + route, wait_until="networkidle")
+            assert_media_theme(theme)
             for width in (320, 390, 768, 1024, 1440):
                 page.set_viewport_size({"width": width, "height": 1000})
+                # Captured content fits its frame; independent card heights leave no row gaps.
+                page.wait_for_function("""() => {
+                    const media = [...document.querySelectorAll('.sptl-photo-viewport, .sptl-recording-strip')]
+                    if (!media.every(frame => frame.scrollWidth <= frame.clientWidth + 1 && frame.firstElementChild.getBoundingClientRect().width <= frame.clientWidth + 1)) return false
+                    const columns = new Map()
+                    document.querySelectorAll('.sptl-feature').forEach(card => {
+                        const rect = card.getBoundingClientRect(), x = Math.round(rect.x)
+                        if (!columns.has(x)) columns.set(x, [])
+                        columns.get(x).push(rect)
+                    })
+                    const ends = []
+                    for (const column of columns.values()) {
+                        column.sort((a, b) => a.top - b.top)
+                        for (let i = 1; i < column.length; i++) {
+                            const gap = column[i].top - column[i - 1].bottom
+                            if (gap < 18 || gap > 26) return false
+                        }
+                        ends.push(column.at(-1).bottom)
+                    }
+                    return Math.max(...ends) - Math.min(...ends) < 240
+                }""")
+                hero_features_gap = page.locator("#features .sptl-eyebrow").evaluate("element => element.getBoundingClientRect().top - document.querySelector('#recording').getBoundingClientRect().bottom")
+                assert 0 <= hero_features_gap <= 70, (palette, theme, width, hero_features_gap)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), (palette, theme, width)
                 assert page.locator(".sptl-page img, .sptl-header img").evaluate_all("items => items.every(item => item.complete && item.naturalWidth > 0)")
                 bounds = page.locator(".sptl-header").bounding_box()
@@ -108,4 +228,4 @@ with sync_playwright() as playwright:
 
     assert not errors, errors
     browser.close()
-print("SPTL routing, metadata, demo pause/layout/skip, clipboard, source download/build, FAQ keyboard and 20 theme/width combinations passed")
+print("SPTL routing, metadata, paired dark/light 30 fps videos, 11 feature photos and four native settings photos, palette-independent theme switching, paused-frame retention, reduced motion/offscreen state, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
