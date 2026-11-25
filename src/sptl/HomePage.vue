@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   ArrowDown,
+  ArrowUp,
   ArrowDownToLine,
   AudioLines,
   Check,
@@ -17,7 +18,8 @@ import {
 } from 'lucide-vue-next'
 import AnimatedDetails from '../components/AnimatedDetails.vue'
 import SiteFooter from '../components/SiteFooter.vue'
-import TaskbarDemo from './TaskbarDemo.vue'
+import DesktopRecording from './DesktopRecording.vue'
+import ShotImage from './ShotImage.vue'
 import {
   distributionLinks,
   features,
@@ -148,12 +150,15 @@ onBeforeUnmount(() => {
           · 用户级安装
         </p>
       </div>
-      <TaskbarDemo />
+      <DesktopRecording />
     </section>
     <section class="sptl-section shell sptl-reveal" id="features">
       <p class="sptl-eyebrow">01 / EVERYDAY LISTENING</p>
       <h2>小小一块，<span>刚好够用。</span></h2>
       <p class="sptl-section-lead">看歌词、换歌曲、找回当前播放进度，都留在熟悉的桌面里。</p>
+      <p class="sptl-photo-intro">
+        下面都是本机小组件的实际画面。切换歌词、封面和主题设置后拍摄，任务栏图片可左右查看，点击可打开原图。
+      </p>
       <div class="sptl-feature-grid">
         <article v-for="feature in features" :key="feature.label" class="sptl-feature sptl-reveal">
           <div class="sptl-feature-top">
@@ -166,31 +171,14 @@ onBeforeUnmount(() => {
           </div>
           <h3>{{ feature.title }}</h3>
           <p>{{ feature.description }}</p>
+          <div class="sptl-photo-stack" :class="{ 'is-comparison': feature.icon === 'settings' }">
+            <ShotImage v-for="shot in feature.shots" :key="shot.src" :shot="shot" />
+          </div>
+          <a v-if="feature.icon === 'sync'" class="sptl-text-link" href="/projects/SPTL#recording"
+            >看首屏实拍动图 <ArrowUp :size="16" aria-hidden="true"
+          /></a>
         </article>
       </div>
-      <figure class="sptl-live-preview">
-        <a
-          href="/images/sptl-taskbar-live.webp"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="查看任务栏实拍原图（在新标签页打开）"
-          ><img
-            src="/images/sptl-taskbar-live.webp"
-            alt="SPTL 在本机任务栏实际显示专辑封面、英文原文与中文翻译歌词"
-            width="908"
-            height="74"
-            loading="lazy"
-        /></a>
-        <figcaption>
-          <span class="sptl-eyebrow">ON A REAL DESKTOP</span>
-          <h3>任务栏里的，真实一刻。</h3>
-          <p>
-            本机播放《Light in Abyss (Full
-            ver)》时的实际截图，展示双行原文与翻译。这里保留了桌面当时的配色。
-            <span class="sptl-live-hint">左右滑动查看完整画面，点击图片打开原图。</span>
-          </p>
-        </figcaption>
-      </figure>
     </section>
     <section
       class="sptl-section shell sptl-reveal sptl-release"

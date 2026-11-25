@@ -37,18 +37,21 @@ export const features = [
     title: '原文与翻译，一起看',
     description: '双行显示原文和翻译，也能切换音译或下一句。喜欢简洁？用单行歌词搭配歌曲信息。',
     icon: 'lyrics',
+    shots: [screenshots.double, screenshots.single],
   },
   {
     label: '02 / IN SYNC',
     title: '跟着每一句，慢慢唱',
     description: '支持逐字高亮和长歌词滚动。暂停时停在当前字，切歌时柔和过渡。',
     icon: 'sync',
+    shots: [screenshots.karaoke],
   },
   {
     label: '03 / PLAYBACK',
     title: '播放控制，就在手边',
     description: '悬停即可切歌、播放、暂停或收藏。滚轮调节音量，KDE 原生提示即时显示百分比。',
     icon: 'playback',
+    shots: [screenshots.controls, screenshots.volume],
   },
   {
     label: '04 / YOUR PANEL',
@@ -56,6 +59,7 @@ export const features = [
     description:
       '随面板高度缩放，宽度可自动或固定。封面可左右放置，支持方形、圆角与圆形；圆形可随播放旋转。',
     icon: 'panel',
+    shots: [screenshots.right, screenshots.circle],
   },
   {
     label: '05 / PLAYLIST',
@@ -63,6 +67,7 @@ export const features = [
     description:
       '完整歌词支持点击跳转，弹窗可切换播放模式、收藏与播放列表。列表支持翻页和点击播放。',
     icon: 'playlist',
+    shots: [screenshots.playlist],
   },
   {
     label: '06 / SHARED SETTINGS',
@@ -70,6 +75,7 @@ export const features = [
     description:
       '主题可跟随 SPlayer、Plasma 或手动设置。应用后所有 SPTL 小组件同步，关闭播放器后仍然保留。',
     icon: 'settings',
+    shots: [screenshots.light, screenshots.dark],
   },
 ] as const
 
@@ -85,3 +91,4 @@ export const settingGroups = [
     description: '即时操作反馈、悬停收藏、歌词跳转；空闲时可打开 SPlayer 或播放我喜欢的音乐。',
   },
 ]
+import { screenshots } from './screenshots'

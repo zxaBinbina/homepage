@@ -1,4 +1,4 @@
-"""Check SPTL navigation, demo controls, copy, source download and layout."""
+"""Check SPTL navigation, real recording, feature photos, downloads and layout."""
 import json
 import os
 import subprocess
@@ -53,33 +53,42 @@ with sync_playwright() as playwright:
     page.go_forward()
     expect(page).to_have_title("SPTL · SPlayer 任务栏歌词")
 
-    # Reduced motion starts paused. Advancing and changing layout remain usable.
-    expect(page.get_by_role("button", name="播放歌词演示", exact=True)).to_be_visible()
-    expect(page.locator(".sptl-demo-primary")).to_have_text("把今天唱给你听")
-    page.get_by_role("button", name="下一句演示歌词").click()
-    expect(page.locator(".sptl-demo-primary")).to_have_text("让旋律陪你走过每一步")
-    page.get_by_role("button", name="上一句演示歌词").click()
-    page.get_by_role("radio", name="歌词 + 信息", exact=True).click()
-    expect(page.locator(".sptl-demo-lyrics p").last).to_have_text("今天的旋律 · SPTL")
-    page.get_by_role("radio", name="双行歌词", exact=True).click()
-    expect(page.locator(".sptl-demo-lyrics p").last).to_have_text("Sing today for you")
-    page.get_by_role("button", name="播放歌词演示", exact=True).click()
-    expect(page.get_by_role("button", name="暂停歌词演示", exact=True)).to_be_visible()
-    page.wait_for_timeout(350)
-    page.get_by_role("button", name="暂停歌词演示", exact=True).click()
-    highlight = page.locator(".sptl-demo-primary").get_attribute("style")
-    page.wait_for_timeout(250)
-    assert page.locator(".sptl-demo-primary").get_attribute("style") == highlight
+    # The hero uses recorded desktop frames, with a still image for reduced motion.
+    recording = page.locator(".sptl-recording-stage img")
+    def recording_path(): return recording.evaluate("image => new URL(image.src).pathname")
+    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_visible()
+    assert recording_path() == "/images/sptl/hero-poster.webp"
+    expect(page.locator(".sptl-demo")).to_have_count(0)
+    expect(page.locator(".sptl-feature")).to_have_count(6)
+    expect(page.locator(".sptl-feature-photo")).to_have_count(10)
+    for feature in page.locator(".sptl-feature").all():
+        assert feature.locator(".sptl-feature-photo").count() >= 1
+    page.get_by_role("button", name="播放实拍动图", exact=True).click()
+    expect(page.get_by_role("button", name="暂停实拍动图", exact=True)).to_be_visible()
+    assert recording_path() == "/images/sptl/hero-live.gif"
+    page.get_by_role("button", name="暂停实拍动图", exact=True).click()
+    assert recording_path() == "/images/sptl/hero-poster.webp"
+    page.emulate_media(reduced_motion="no-preference")
+    page.get_by_role("button", name="播放实拍动图", exact=True).click()
+    page.emulate_media(reduced_motion="reduce")
+    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_visible()
+    assert recording_path() == "/images/sptl/hero-poster.webp"
+    page.get_by_role("button", name="播放实拍动图", exact=True).click()
 
     page.get_by_role("navigation", name="SPTL 导航").get_by_role("link", name="安装指南").click()
     expect(page).to_have_url(base + route + "#install")
     expect(page.locator("#install h2")).to_be_in_viewport()
+    expect(page.get_by_role("button", name="播放实拍动图", exact=True)).to_be_attached()
+    assert recording_path() == "/images/sptl/hero-poster.webp", "Offscreen recording must use a still frame"
     page.get_by_role("button", name="复制安装命令").click()
     expect(page.locator(".sptl-copy-status")).to_have_text("安装命令已复制")
     command = "curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh"
     assert page.evaluate("navigator.clipboard.readText()") == command
     expect(page.get_by_role("list", name="安装要求")).to_contain_text("SPlayer Next 插件 API 5+")
-    assert page.locator(".sptl-live-preview img").evaluate("image => new URL(image.src).pathname") == "/images/sptl-taskbar-live.webp"
+    assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
+    from PIL import Image
+    with Image.open(ROOT / "public/images/sptl/hero-live.gif") as gif:
+        assert gif.n_frames >= 20 and gif.info.get("loop") == 0
     expect(page.locator(".sptl-release-status")).to_contain_text("已核对的 v1.2.1")
     with page.expect_download() as script_download:
         page.get_by_role("link", name="下载安装脚本", exact=True).click()
@@ -153,4 +162,4 @@ with sync_playwright() as playwright:
 
     assert not errors, errors
     browser.close()
-print("SPTL routing, metadata, demo, one-command copy/script download, source build, dynamic release/failure state, real screenshot, FAQ keyboard and 20 theme/width combinations passed")
+print("SPTL routing, metadata, real recording pause/reduced motion/offscreen state, 10 feature photos, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
