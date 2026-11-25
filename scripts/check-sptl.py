@@ -81,7 +81,7 @@ with sync_playwright() as playwright:
     assert taskbar_video.evaluate("video => video.paused")
 
     # Both palettes use the same matching recording and 11 real feature photos.
-    photo_names = ["double-compact", "single-compact", "karaoke-detail", "ordinary-controls-compact", "fm-controls", "volume-osd", "right-compact", "circle-compact", "playlist-compact", "mode-compact", "theme-detail"]
+    photo_names = ["double-compact", "single-compact", "karaoke-detail", "ordinary-controls-compact", "fm-taskbar-compact", "volume-osd", "right-compact", "circle-compact", "playlist-compact", "mode-compact", "theme-detail"]
     def assert_media_theme(theme):
         prefix = f"/images/sptl/{theme}/"
         expect(recording).to_have_attribute("src", prefix + "hero.mp4")
@@ -92,7 +92,11 @@ with sync_playwright() as playwright:
         page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
         photos = page.locator("#features .sptl-feature-photo img")
         for photo, name in zip(photos.all(), photo_names):
+            if name == "volume-osd" and theme == "dark": name = "volume-osd-live"
             expect(photo).to_have_attribute("src", prefix + name + ".webp")
+        fm_photo = page.locator("#features .sptl-feature").nth(2).locator(".sptl-feature-photo").nth(1)
+        expect(fm_photo.locator("a")).to_have_attribute("href", prefix + "fm-taskbar.webp")
+        expect(fm_photo.locator("img")).to_have_js_property("naturalHeight", 74)
         expect(page.locator(".sptl-feature-photo a")).to_have_count(15)
         for photo, name in zip(page.locator("#settings .sptl-setting-photo img").all(), ("lyrics", "layout", "theme", "interaction")):
             expect(photo).to_have_attribute("src", prefix + "settings-" + name + ".webp")
