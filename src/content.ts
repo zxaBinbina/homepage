@@ -7,6 +7,49 @@ export const profile = {
   server: 'https://mcyzw.top',
   address: 'play.mcyzw.top',
 }
+
+export const partners = [
+  {
+    id: 'csituka',
+    name: 'Csituka_D',
+    image: 'company/csituka.webp',
+    url: 'https://csituka.top',
+    domain: 'csituka.top',
+    description: '去伙伴的个人空间坐坐，打个招呼。',
+  },
+]
+
+export const aiAssistants = [
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    image: 'company/chatgpt.svg',
+    url: 'https://chatgpt.com',
+    description: '聊想法，找灵感',
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    image: 'company/claude.svg',
+    url: 'https://claude.ai',
+    description: '推敲文字，梳理思路',
+  },
+  {
+    id: 'deepseek',
+    name: 'DeepSeek',
+    image: 'company/deepseek.svg',
+    url: 'https://chat.deepseek.com',
+    description: '拆解问题，探索解法',
+  },
+  {
+    id: 'glm',
+    name: 'GLM',
+    image: 'company/glm.svg',
+    url: 'https://chatglm.cn',
+    description: '中文交流，代码协作',
+  },
+]
+
 export const projectCatalog = {
   checkedAt: '2026-10-04',
   organization: 'https://github.com/Youzai-World-Team',

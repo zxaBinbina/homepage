@@ -12,8 +12,9 @@ import {
   Heart,
   Mountain,
   Sparkles,
+  Users,
 } from 'lucide-vue-next'
-import { profile, featuredProjects } from './content'
+import { profile, featuredProjects, partners, aiAssistants } from './content'
 import ProjectCard from './components/ProjectCard.vue'
 import SiteFooter from './components/SiteFooter.vue'
 
@@ -272,6 +273,93 @@ onBeforeUnmount(() => {
           >（在新标签页打开）</span
         ></a
       >
+    </section>
+
+    <section id="company" class="company-section" aria-labelledby="company-title">
+      <div class="shell">
+        <div class="section-label reveal">
+          <span>04 / GOOD COMPANY</span><span class="line"></span>
+        </div>
+        <div class="section-heading reveal">
+          <div>
+            <h2 id="company-title">伙伴与 AI 助手</h2>
+            <p>和伙伴交换灵感，也和 AI 一起琢磨，把想法慢慢做出来。</p>
+          </div>
+        </div>
+        <div class="company-grid">
+          <div class="company-group">
+            <h3 class="company-group-title reveal"><Users :size="18" aria-hidden="true" />伙伴</h3>
+            <ul class="company-list partner-list">
+              <li v-for="partner in partners" :key="partner.id" class="reveal">
+                <a
+                  class="companion-card partner-card"
+                  :href="partner.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :aria-label="`${partner.name} 的个人主页（在新标签页打开）`"
+                  :aria-describedby="`partner-${partner.id}-description`"
+                >
+                  <span class="company-kicker">一起创造的伙伴</span>
+                  <div class="partner-profile">
+                    <img
+                      :src="asset(partner.image)"
+                      :alt="`${partner.name} 的头像`"
+                      width="64"
+                      height="64"
+                      loading="lazy"
+                    />
+                    <div>
+                      <h4>{{ partner.name }}</h4>
+                      <span class="partner-domain">{{ partner.domain }}</span>
+                    </div>
+                  </div>
+                  <p :id="`partner-${partner.id}-description`">{{ partner.description }}</p>
+                  <span class="companion-link"
+                    >去主页坐坐<ArrowUpRight :size="18" aria-hidden="true"
+                  /></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="company-group">
+            <h3 class="company-group-title reveal">
+              <Sparkles :size="18" aria-hidden="true" />AI 助手
+            </h3>
+            <ul class="company-list assistant-list">
+              <li
+                v-for="(assistant, index) in aiAssistants"
+                :key="assistant.id"
+                class="reveal"
+                :style="{ '--reveal-delay': `${(index % 2) * 90}ms` }"
+              >
+                <a
+                  class="companion-card assistant-card"
+                  :href="assistant.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :aria-label="`${assistant.name} 官方入口（在新标签页打开）`"
+                  :aria-describedby="`assistant-${assistant.id}-description`"
+                >
+                  <span class="assistant-icon" aria-hidden="true">
+                    <img
+                      :src="asset(assistant.image)"
+                      alt=""
+                      width="32"
+                      height="32"
+                      loading="lazy"
+                    />
+                  </span>
+                  <div class="assistant-copy">
+                    <h4>{{ assistant.name }}</h4>
+                    <p :id="`assistant-${assistant.id}-description`">{{ assistant.description }}</p>
+                  </div>
+                  <ArrowUpRight class="companion-arrow" :size="18" aria-hidden="true" />
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="contact" class="contact-section">

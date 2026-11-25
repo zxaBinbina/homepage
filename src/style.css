@@ -1869,6 +1869,156 @@ h1 > span {
   margin-top: var(--space-2xs);
   font-size: 13px;
 }
+.company-section {
+  padding-block: 80px;
+  border-top: 1px solid var(--border);
+}
+.company-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-2xl);
+}
+.company-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.company-group-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.company-group-title svg {
+  color: var(--accent);
+}
+.company-list {
+  display: grid;
+  gap: var(--space-md);
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.assistant-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.companion-card {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  padding: var(--space-xl);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  transition:
+    transform 250ms var(--motion-ease),
+    border-color 250ms var(--motion-ease),
+    box-shadow 250ms var(--motion-ease);
+}
+.companion-card:hover,
+.companion-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 32px var(--shadow);
+}
+.companion-card h4 {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.companion-card p {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.8;
+}
+.partner-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--warm) 12%, var(--panel)),
+    var(--panel)
+  );
+}
+.company-kicker {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+}
+.partner-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+.partner-profile img {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+.partner-profile > div {
+  min-width: 0;
+}
+.partner-profile h4 {
+  font-size: 22px;
+}
+.partner-domain {
+  display: block;
+  margin-top: var(--space-2xs);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+.companion-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: auto;
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.assistant-card {
+  align-items: center;
+  gap: var(--space-md);
+}
+.assistant-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  /* 品牌图标保留原色，白色底板保证在四套主题中清晰。 */
+  background: #fff;
+}
+.assistant-icon img {
+  display: block;
+  object-fit: contain;
+}
+.assistant-copy {
+  min-width: 0;
+}
+.assistant-copy h4 {
+  margin-bottom: var(--space-2xs);
+  font-size: var(--text-lg);
+}
+.companion-arrow {
+  flex: none;
+  margin-left: auto;
+  color: var(--muted);
+}
+.companion-card:hover .companion-arrow,
+.companion-card:focus-visible .companion-arrow {
+  color: var(--accent);
+}
 .contact-section {
   text-align: center;
   position: relative;
@@ -2030,6 +2180,13 @@ h1 > span {
   }
 }
 @media (max-width: 1050px) {
+  .company-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: var(--space-xl);
+  }
+  .assistant-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .desktop-nav {
     margin-left: 0;
     gap: 0;
@@ -2085,6 +2242,25 @@ h1 > span {
   }
 }
 @media (max-width: 760px) {
+  .company-section {
+    padding-block: calc(var(--space-2xl) * 2);
+  }
+  .company-section .section-heading p {
+    max-width: 46ch;
+  }
+  .company-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+  .assistant-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .companion-card {
+    padding: var(--space-lg);
+  }
+  .companion-card p {
+    font-size: 15px;
+  }
   .shell {
     width: calc(100% - 36px);
   }
@@ -2442,6 +2618,9 @@ h1 > span {
   }
 }
 @media (max-width: 480px) {
+  .assistant-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .header-actions > .icon-button:not(.theme-toggle):not(.music-toggle):not(.mobile-toggle),
   .nav-divider {
     display: none;
