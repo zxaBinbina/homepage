@@ -1,63 +1,114 @@
 # SPTL 项目子页
 
-入口为 `/projects/SPTL`，与 Gaze、RDP 子页共用 Vue 路由、站点主题和页脚样式。
-页面包含项目介绍、可交互的任务栏歌词演示、源码下载、四步安装、设置分组及常见问题。
-演示不播放音频，离开视口或切到后台时暂停推进；减少动态效果时默认暂停，仍可手动操作。
+入口为 `/projects/SPTL`，与 Gaze、RDP 子页共用 Vue 路由、站点主题和页脚。
+页面包含歌词交互演示、本机实拍、最新 GitHub 正式版、一键安装 / 更新、设置和 FAQ。
+演示不播放音频；离开视口或切到后台时暂停推进，减少动态效果时默认暂停。
+页面不单独展示作者邮箱、官网地址或许可证，也没有返回个人主页或目录的入口。
+这些资料由 SPTL 元数据提供给 KDE 小组件信息界面。目录保留 SPTL 卡片，首页仍为四个精选项目。
 
-页面不展示作者邮箱、官网地址或许可证说明，也没有返回项目目录、个人主页的入口。
-这些项目资料由 SPTL 仓库的 Plasma 5/6 元数据提供给 KDE 小组件信息界面。
-站内目录保留 SPTL 卡片供访客进入，首页仍为原来的四个精选项目。
+## 一键安装与更新
+
+在 KDE 桌面终端运行，无需 sudo：
+
+```sh
+curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh
+```
+
+每次读取 SPTL 仓库的最新公开正式 Release。API 不可用时跟随同一仓库的
+`releases/latest` 跳转，按正式版标签选择源码归档与对应 `SHA256SUMS-版本`。
+校验 SHA-256、安全解压并核对源码版本后，执行该 Release 的 `tools/install.py`。
+退出时清理临时文件，不依赖相邻仓库，也不固定安装某个版本。
+
+需要 Python 3.10+、curl、SPlayer 插件 API 5+、Plasma 5.27 / Qt 5.15 或 Plasma 6 / Qt 6，
+以及 systemd 用户会话。收藏需要 gdbus 和 SPlayer Linux 托盘入口。
+脚本生成插件文件、安装对应小组件并启动辅助服务。用户随后在 SPlayer 插件管理中导入
+`~/.local/share/sptl/zxaBinbina.sptl.js`，允许 `network`、`control`、`api` 权限。
+更新后重新导入同 ID 插件；使用自定义 XDG 目录时，以脚本输出为准。
+
+再次执行同一命令即可更新。上游安装器保留共享设置；脚本读取已有用户服务，保留
+自定义 SPlayer 启动命令与配置路径。已有小组件且 Plasma 用户服务正在运行时自动重载
+面板以清除旧 QML 缓存，应用窗口保留；否则更新后注销再登录。
+
+也可先下载官网脚本，再指定选项：
+
+```sh
+sh install.sh --dry-run
+sh install.sh --plasma 6 --splayer-command '/path/to/SPlayer-Next.AppImage'
+sh install.sh --splayer-config '/path/to/settings.json'
+sh install.sh --no-reload-plasma
+sh install.sh --help
+```
+
+`--dry-run` 只读取版本与下载地址，不执行安装。`--reload-plasma` 显式要求重载；
+`--no-reload-plasma` 关闭更新时的自动重载。KDE Store 提供单独小组件，仍需辅助服务与插件。
+
+## 官网自动获取版本
+
+进入页面时请求 `/api/projects/SPTL/release`，同步版本、发布日期、发行说明与资产链接。
+接口优先读取 GitHub API，限流时读取最新发行页及资产列表，只接受 SPTL 仓库的正式版和下载地址。
+成功响应浏览器缓存 60 秒、CDN 缓存 300 秒；失败响应不缓存。页面可手动刷新，离开时取消请求。
+失败时保留已核对的 v1.2.1 或上次成功同步的版本，并明确说明尚未取得最新信息。
+若新版缺少源码资产，辅助下载入口指向发行页，不把旧源码标为最新版。
+
+Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保留 Pages 函数及
+`public/_routes.json` 的接口规则；单独托管 `dist/` 时安装脚本可用，页面版本接口不可用。
+网站发布后，新 Release 无需修改网站代码即可更新版本与下载链接。
 
 ## 维护位置
 
-| 文件                           | 用途                                       |
-| ------------------------------ | ------------------------------------------ |
-| `src/sptl/HomePage.vue`        | 页面正文、命令复制、FAQ 与滚动显现         |
-| `src/sptl/TaskbarDemo.vue`     | 示例歌词、布局切换、播放暂停与换句         |
-| `src/sptl/SptlHeader.vue`      | 品牌、安装入口、共享主题面板及 GitHub 链接 |
-| `src/sptl/content.ts`          | 版本、下载位置及功能文案                   |
-| `src/sptl/style.css`           | 使用站点语义变量与 token 的局部样式        |
-| `public/images/sptl.png`       | 项目所有者提供的透明 PNG 图标              |
-| `public/images/sptl-share.png` | 1200 × 630 分享封面                        |
-| `public/projects/SPTL/`        | 包含完整项目源码的下载归档                 |
+| 文件                                         | 用途                                       |
+| -------------------------------------------- | ------------------------------------------ |
+| `src/sptl/HomePage.vue`                      | 正文、复制、实拍、下载、FAQ 与滚动显现     |
+| `src/sptl/useSptlRelease.ts` / `release.ts`  | 最新版本请求、取消与类型                   |
+| `src/sptl/content.ts`                        | 已核对版本、备用源码、功能文案与市场链接   |
+| `src/sptl/TaskbarDemo.vue`                   | 示例歌词、布局切换、暂停与换句             |
+| `src/sptl/SptlHeader.vue` / `style.css`      | 品牌、主题入口与局部样式                   |
+| `server/sptlRelease.ts`                      | 最新 GitHub Release、限流回退与响应缓存    |
+| `functions/api/projects/SPTL/release.ts`     | Cloudflare Pages 接口                      |
+| `public/projects/SPTL/install.sh`            | 一键安装 / 更新脚本                        |
+| `public/projects/SPTL/sptl-1.2.1-source.zip` | 本站已核对的独立源码包                     |
+| `public/images/sptl-taskbar-live.webp`       | 2026-11-25 本机实际播放，908 × 74 静态裁剪 |
+| `public/images/sptl.png` / `sptl-share.png`  | 项目图标与 1200 × 630 分享封面             |
 
-路由、分享标签、favicon 与站点地图分别由 `src/pages.ts`、`src/router.ts`、
-`site.config.ts` 和公共构建模板维护，不添加独立 HTML 入口。
-SPTL 的共享页脚关闭品牌链接，其他页面保持原有行为。
+实拍经项目所有者授权，内容为播放《Light in Abyss (Full ver)》时的封面、原文和翻译。
+只裁剪任务栏小组件区域，保留原配色；完整桌面截图在被忽略的 `artifacts/` 中，不公开。
+页面的交互面板使用原创示例歌词，来源与实拍分开说明。
+路由、分享标签、favicon 与站点地图由公共配置和构建模板维护，不新增独立 HTML 入口。
+SPTL 共享页脚关闭品牌链接。
 
-## 更新源码下载
+## 备用源码与分享封面
 
-源码包是本站的静态资源，部署与运行不需要相邻仓库或 GitHub API。
-更新下载内容时使用以下命令，参数指向 SPTL 源码仓库：
+本站源码包保留完整 LICENSE、项目源码、文档、测试和构建材料，可独立构建。
+更新已核对快照时运行：
 
 ```sh
 python3 scripts/package-sptl.py ../SplayerPlasmaTaskbarLyrics
 ```
 
-脚本只打包 Git 跟踪的项目源码、文档、测试和构建材料，排除本地配置、缓存及构建产物，
-保留完整 LICENSE。版本取自 Plasma 元数据；更新版本后同步 `src/sptl/content.ts`。
-归档内的顶层目录为 `SPTL-版本号`，安装命令与该目录一致。
-
-运行开发服务器后，可重新生成分享封面：
+版本取自 Plasma 元数据，随后同步 `src/sptl/content.ts` 的快照版本与路径。
+自动安装与版本接口始终读取 GitHub Release，不依赖快照。分享封面复用网页主题与示例演示，
+可在开发服务器运行时生成：
 
 ```sh
 python3 scripts/render-sptl-share.py
 ```
 
-该脚本复用网页的主题色和歌词演示面板，不生成真实桌面截图。
-
 ## 验证
 
 ```sh
+sh -n public/projects/SPTL/install.sh
+python3 scripts/check-sptl-installer.py
+node scripts/check-sptl-release.mjs
 npm run build
-python3 scripts/check-sptl.py
-python3 scripts/check-project-directory.py
-python3 scripts/check-navigation.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-sptl.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-project-directory.py
+HOMEPAGE_TEST_URL=http://127.0.0.1:4183 python3 scripts/check-navigation.py
 python3 scripts/check-sharing.py
 python3 scripts/check-seo.py
 ```
 
-浏览器检查的 `HOMEPAGE_TEST_URL` 默认是 `http://127.0.0.1:5173`，也可指向构建预览。
-SPTL 检查覆盖实际导航、元信息、演示暂停及布局切换、剪贴板、真实 ZIP 下载与独立构建、
-FAQ 键盘操作，以及四套主题在 320 / 390 / 768 / 1024 / 1440px 下的布局。
-截图保存在 `artifacts/sptl-*.png`，发布网站仍需部署完整 `dist/`。
+浏览器检查需运行预览服务器，例如 `npm run preview -- --port 4183`。
+安装测试使用真实源码、临时 XDG 路径和模拟桌面服务，验证安装、更新、配置保留、管道执行、
+校验失败、不安全归档、版本不一致及安装失败，不改动本机 SPTL 安装。
+页面检查覆盖动态新版本、失败状态、复制、脚本 / ZIP 下载与独立构建、FAQ 键盘操作，
+以及四套主题在 320 / 390 / 768 / 1024 / 1440px 下的布局。截图输出到 `artifacts/`。

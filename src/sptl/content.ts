@@ -1,8 +1,35 @@
 export const sptlProject = {
-  version: '0.1.1',
+  version: '1.2.1',
   repository: 'https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics',
-  source: '/projects/SPTL/sptl-0.1.1-source.zip',
+  source: '/projects/SPTL/sptl-1.2.1-source.zip',
+  installer: '/projects/SPTL/install.sh',
+  latest: 'https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics/releases/latest',
+  pluginSubmission: 'https://github.com/SPlayer-Dev/plugins/pull/34',
 }
+
+export const releaseHighlights = [
+  '滚轮调节音量时，KDE 原生提示立即显示预计百分比，音量优先通过播放器原生接口同步。',
+  '播放、收藏和选曲提供即时反馈，独立操作并行处理，失败时恢复对应显示。',
+  '完整歌词与播放列表切换更平滑。即时反馈与界面动画都可以在设置中关闭。',
+] as const
+
+export const distributionLinks = [
+  {
+    title: 'GitHub 正式版',
+    description: '插件、Plasma 5 / 6 安装包、完整源码与 SHA-256 校验值。',
+    url: sptlProject.latest,
+  },
+  {
+    title: 'KDE Store · Plasma 6',
+    description: 'Plasma 6 小组件，还需安装辅助服务与 SPlayer 插件。',
+    url: 'https://store.kde.org/p/2382272/',
+  },
+  {
+    title: 'KDE Store · Plasma 5',
+    description: 'Plasma 5.27+ 小组件，还需安装辅助服务与 SPlayer 插件。',
+    url: 'https://store.kde.org/p/2382273/',
+  },
+] as const
 
 export const features = [
   {
@@ -20,32 +47,41 @@ export const features = [
   {
     label: '03 / PLAYBACK',
     title: '播放控制，就在手边',
-    description: '悬停即可切歌、播放或暂停，滚轮调节音量；打开完整歌词，还能点击歌词跳转。',
+    description: '悬停即可切歌、播放、暂停或收藏。滚轮调节音量，KDE 原生提示即时显示百分比。',
     icon: 'playback',
   },
   {
     label: '04 / YOUR PANEL',
     title: '跟着任务栏，自然适配',
-    description: '封面、两行文字与按钮随面板高度缩放。封面可放左侧或右侧，宽度可自动或固定。',
+    description:
+      '随面板高度缩放，宽度可自动或固定。封面可左右放置，支持方形、圆角与圆形；圆形可随播放旋转。',
     icon: 'panel',
   },
   {
-    label: '05 / APPEARANCE',
-    title: '让桌面，保持你的样子',
-    description: '跟随 SPlayer 或 Plasma 主题，也可手动选择明暗和主题色。界面动画可以单独关闭。',
-    icon: 'theme',
+    label: '05 / PLAYLIST',
+    title: '下一首，也在这里选',
+    description:
+      '完整歌词支持点击跳转，弹窗可切换播放模式、收藏与播放列表。列表支持翻页和点击播放。',
+    icon: 'playlist',
   },
   {
     label: '06 / SHARED SETTINGS',
     title: '设置一次，多处同步',
-    description: '在 KDE 小组件中修改并应用设置，其他 SPTL 小组件也会同步；关闭播放器后仍然保留。',
+    description:
+      '主题可跟随 SPlayer、Plasma 或手动设置。应用后所有 SPTL 小组件同步，关闭播放器后仍然保留。',
     icon: 'settings',
   },
 ] as const
 
 export const settingGroups = [
   { title: '歌词显示', description: '单行 / 双行、翻译 / 音译、基准字号与实时预览。' },
-  { title: '尺寸与布局', description: '封面位置、自动 / 固定宽度和最大显示宽度。' },
-  { title: '主题与动画', description: '主题来源、手动明暗、主题色与界面动画。' },
-  { title: '交互与离线', description: '主体点击、歌词跳转，以及播放器关闭时的显示与操作。' },
+  { title: '尺寸与布局', description: '封面位置与形状、圆角程度、圆形旋转，以及自动 / 固定宽度。' },
+  {
+    title: '主题与动画',
+    description: '主题来源、手动明暗、主题色与界面动画；无法读取 SP 配色时提示并回退 Plasma。',
+  },
+  {
+    title: '交互与离线',
+    description: '即时操作反馈、悬停收藏、歌词跳转；空闲时可打开 SPlayer 或播放我喜欢的音乐。',
+  },
 ]

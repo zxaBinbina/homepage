@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   ArrowDown,
   ArrowDownToLine,
@@ -7,8 +7,10 @@ import {
   Check,
   ChevronDown,
   Copy,
+  ExternalLink,
   LayoutPanelTop,
-  Palette,
+  ListMusic,
+  RefreshCw,
   Settings2,
   SlidersHorizontal,
   Type,
@@ -16,7 +18,14 @@ import {
 import AnimatedDetails from '../components/AnimatedDetails.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import TaskbarDemo from './TaskbarDemo.vue'
-import { features, settingGroups, sptlProject } from './content'
+import {
+  distributionLinks,
+  features,
+  releaseHighlights,
+  settingGroups,
+  sptlProject,
+} from './content'
+import { useSptlRelease } from './useSptlRelease'
 import './style.css'
 
 const icons = {
@@ -24,12 +33,38 @@ const icons = {
   sync: AudioLines,
   playback: SlidersHorizontal,
   panel: LayoutPanelTop,
-  theme: Palette,
+  playlist: ListMusic,
   settings: Settings2,
 }
 const copied = ref(false)
 const copyMessage = ref('')
-const installCommand = `cd SPTL-${sptlProject.version}\npython3 tools/install.py`
+const { release, loading, error, refresh } = useSptlRelease()
+const version = computed(() => release.value?.version || sptlProject.version)
+const releaseUrl = computed(() => release.value?.url || sptlProject.latest)
+const sourceAsset = computed(() =>
+  release.value?.assets.find((asset) => asset.name === `sptl-source-${version.value}.tar.gz`),
+)
+const sourceUrl = computed(() =>
+  release.value ? sourceAsset.value?.url || releaseUrl.value : sptlProject.source,
+)
+const sourceLabel = computed(() =>
+  release.value
+    ? sourceAsset.value
+      ? `完整源码 v${version.value}`
+      : '查看发行文件'
+    : `本站源码包 v${sptlProject.version}`,
+)
+const releaseDate = computed(() => {
+  const date = release.value?.publishedAt
+  return date && Number.isFinite(Date.parse(date))
+    ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).format(new Date(date))
+    : ''
+})
+const installerUrl = new URL(
+  sptlProject.installer,
+  import.meta.env.SITE_URL || 'https://zxabinbina.cc.cd/',
+).href
+const installCommand = `curl -fsSL '${installerUrl.replaceAll("'", "'\\''")}' | sh`
 let copyTimer: ReturnType<typeof setTimeout> | undefined
 async function copyInstall() {
   clearTimeout(copyTimer)
@@ -103,12 +138,15 @@ onBeforeUnmount(() => {
           <a class="sptl-button primary" href="/projects/SPTL#install"
             >开始安装 <ArrowDown :size="17" aria-hidden="true"
           /></a>
-          <a class="sptl-button" :href="sptlProject.source" download
-            >下载源码包 <ArrowDownToLine :size="17" aria-hidden="true"
+          <a class="sptl-button" :href="releaseUrl" target="_blank" rel="noopener noreferrer"
+            >查看正式版 <ExternalLink :size="17" aria-hidden="true"
           /></a>
         </div>
         <div class="sptl-tags"><span>KDE Plasma</span><span>SPlayer Next</span></div>
-        <p class="sptl-caption">v{{ sptlProject.version }} · Linux 桌面 · 用户级安装</p>
+        <p class="sptl-caption">
+          {{ release ? 'v' + version + ' 正式版' : '已核对 v' + sptlProject.version }} · Linux 桌面
+          · 用户级安装
+        </p>
       </div>
       <TaskbarDemo />
     </section>
@@ -130,6 +168,80 @@ onBeforeUnmount(() => {
           <p>{{ feature.description }}</p>
         </article>
       </div>
+      <figure class="sptl-live-preview">
+        <a
+          href="/images/sptl-taskbar-live.webp"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="查看任务栏实拍原图（在新标签页打开）"
+          ><img
+            src="/images/sptl-taskbar-live.webp"
+            alt="SPTL 在本机任务栏实际显示专辑封面、英文原文与中文翻译歌词"
+            width="908"
+            height="74"
+            loading="lazy"
+        /></a>
+        <figcaption>
+          <span class="sptl-eyebrow">ON A REAL DESKTOP</span>
+          <h3>任务栏里的，真实一刻。</h3>
+          <p>
+            本机播放《Light in Abyss (Full
+            ver)》时的实际截图，展示双行原文与翻译。这里保留了桌面当时的配色。
+            <span class="sptl-live-hint">左右滑动查看完整画面，点击图片打开原图。</span>
+          </p>
+        </figcaption>
+      </figure>
+    </section>
+    <section
+      class="sptl-section shell sptl-reveal sptl-release"
+      id="release"
+      aria-labelledby="sptl-release-title"
+    >
+      <div>
+        <p class="sptl-eyebrow">LATEST RELEASE / v{{ version }}</p>
+        <h2 id="sptl-release-title">这一版，<span>更顺手。</span></h2>
+        <p class="sptl-release-status" role="status" :aria-busy="loading">
+          <template v-if="loading">正在读取 GitHub 最新正式版…</template>
+          <template v-else-if="error"
+            >暂时无法读取最新版本，当前显示{{ release ? '上次同步的' : '已核对的' }} v{{
+              version
+            }}。安装脚本仍会读取 GitHub 最新版。</template
+          >
+          <template v-else
+            >已同步 GitHub 最新正式版<span v-if="releaseDate"> · {{ releaseDate }}</span></template
+          >
+        </p>
+        <button
+          class="sptl-text-link"
+          type="button"
+          :disabled="loading"
+          @click="refresh"
+          aria-label="刷新最新版本"
+        >
+          <RefreshCw :size="16" aria-hidden="true" />刷新版本
+        </button>
+      </div>
+      <div>
+        <ul v-if="version === sptlProject.version" class="sptl-release-highlights">
+          <li v-for="highlight in releaseHighlights" :key="highlight">{{ highlight }}</li>
+        </ul>
+        <p v-else-if="release?.body" class="sptl-release-notes">{{ release.body }}</p>
+        <p v-else class="sptl-release-notes">最新版本已发布，详细更新请查看 GitHub 发行说明。</p>
+        <a class="sptl-text-link" :href="releaseUrl" target="_blank" rel="noopener noreferrer"
+          >完整发行说明 <ExternalLink :size="16" aria-hidden="true"
+        /></a>
+        <div v-if="release?.assets.length" class="sptl-release-assets" aria-label="最新发行文件">
+          <a
+            v-for="asset in release.assets"
+            :key="asset.name"
+            class="sptl-text-link"
+            :href="asset.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><ArrowDownToLine :size="14" aria-hidden="true" />{{ asset.name }}</a
+          >
+        </div>
+      </div>
     </section>
     <section class="sptl-section shell sptl-reveal" id="install">
       <div class="sptl-section-heading">
@@ -137,32 +249,55 @@ onBeforeUnmount(() => {
           <p class="sptl-eyebrow">02 / GET STARTED</p>
           <h2>装好，<span>就开始听。</span></h2>
         </div>
-        <a class="sptl-text-link" :href="sptlProject.source" download
-          >完整源码包 v{{ sptlProject.version }} <ArrowDownToLine :size="16" aria-hidden="true"
+        <a class="sptl-text-link" :href="sourceUrl" :download="!release ? '' : undefined"
+          >{{ sourceLabel }} <ArrowDownToLine :size="16" aria-hidden="true"
         /></a>
       </div>
       <p class="sptl-section-lead">
-        当前提供源码安装。下载包包含 SPlayer 插件、小组件、辅助服务和安装脚本。
+        一条命令，自动下载 GitHub
+        最新正式版，校验后安装插件文件、小组件与辅助服务。已有安装会更新，并保留共享设置与自定义播放器路径。
       </p>
+      <div class="sptl-download-grid" aria-label="正式版下载入口">
+        <article
+          v-for="distribution in distributionLinks"
+          :key="distribution.title"
+          class="sptl-download"
+        >
+          <h3>
+            <a
+              class="sptl-text-link"
+              :href="distribution.url === sptlProject.latest ? releaseUrl : distribution.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ distribution.title }} <ExternalLink :size="16" aria-hidden="true"
+            /></a>
+          </h3>
+          <p>{{ distribution.description }}</p>
+        </article>
+      </div>
       <ul class="sptl-requirements" aria-label="安装要求">
-        <li>Python 3.10+</li>
+        <li>Python 3.10+ 与 curl</li>
         <li>Plasma 6 / Qt 6，或 Plasma 5.27 / Qt 5.15</li>
-        <li>SPlayer Next 插件 API 4+</li>
+        <li>SPlayer Next 插件 API 5+</li>
         <li>systemd 用户会话</li>
+        <li>收藏需要 gdbus 与 SPlayer 托盘入口</li>
       </ul>
       <ol class="sptl-install-steps">
         <li>
           <span class="sptl-step-number">01</span>
           <div>
-            <h3>下载并解压源码包</h3>
-            <p>把源码包解压到方便保存的位置，在解压目录的上一级打开终端。</p>
+            <h3>准备桌面环境</h3>
+            <p>安装 SPlayer Next，并在 KDE 桌面会话中打开终端。确认 Python 与 curl 已安装。</p>
           </div>
         </li>
         <li>
           <span class="sptl-step-number">02</span>
           <div>
-            <h3>运行用户级安装</h3>
-            <p>在 KDE 桌面会话里运行以下命令。安装脚本会构建插件与小组件，并启动歌词辅助服务。</p>
+            <h3>一键安装或更新</h3>
+            <p>
+              运行以下命令。脚本自动下载并校验最新源码，安装组件并启动辅助服务。更新已有组件时会短暂重载正在运行的
+              Plasma 面板，应用窗口保留。
+            </p>
             <div class="sptl-code">
               <div class="sptl-code-toolbar">
                 <span>TERMINAL · 无需 sudo</span
@@ -181,6 +316,9 @@ onBeforeUnmount(() => {
               <pre tabindex="0" aria-label="安装命令"><code>{{ installCommand }}</code></pre>
             </div>
             <p class="sptl-copy-status" role="status">{{ copyMessage }}</p>
+            <a class="sptl-text-link" :href="sptlProject.installer" download
+              >下载安装脚本 <ArrowDownToLine :size="16" aria-hidden="true"
+            /></a>
           </div>
         </li>
         <li>
@@ -189,8 +327,9 @@ onBeforeUnmount(() => {
             <h3>在 SPlayer Next 中导入插件</h3>
             <p>
               打开「设置 → 插件管理 → 本地导入」，选择
-              <code>~/.local/share/sptl/zxaBinbina.sptl.js</code
-              >，启用插件并允许网络与播放控制权限。使用自定义 XDG
+              <code>~/.local/share/sptl/zxaBinbina.sptl.js</code>，启用插件并允许
+              <code>network</code>、<code>control</code>、<code>api</code>
+              三项权限。更新后重新导入同 ID 插件。使用自定义 XDG
               数据目录时，以安装脚本输出的路径为准。
             </p>
           </div>
@@ -237,8 +376,8 @@ onBeforeUnmount(() => {
             >支持哪些桌面版本？<ChevronDown :size="18" aria-hidden="true"
           /></template>
           <p>
-            面向 KDE Plasma 5.27 / Qt 5.15 与 Plasma 6 / Qt 6 的横向任务栏。当前已在 Plasma 6
-            实机验证；Plasma 5 安装包已生成，仍需实机验收。
+            支持 KDE Plasma 5.27 / Qt 5.15 与 Plasma 6 / Qt 6 的顶部或底部横向任务栏。
+            正式版提供两种安装包，脚本自动检测当前桌面；切换 Plasma 主版本后重新运行安装命令。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -247,7 +386,8 @@ onBeforeUnmount(() => {
           /></template>
           <p>
             显示同步歌词需要 SPlayer Next 正在运行且 SPTL
-            插件已启用。播放器关闭后可收起为图标或隐藏；收起图标也可以设置为点击启动播放器。
+            插件已启用。播放器关闭后可收起为图标或隐藏；点击图标可打开播放器，也可设置为启动后播放「我喜欢的音乐」。自动播放需要在
+            SPlayer 中登录网易云音乐。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -255,10 +395,9 @@ onBeforeUnmount(() => {
             >更新后，小组件怎么还是原来的样子？<ChevronDown :size="18" aria-hidden="true"
           /></template>
           <p>
-            Plasma 可能缓存旧的小组件代码。在项目目录运行
-            <code>python3 tools/install.py --reload-plasma</code>
-            更新并重载桌面外壳，任务栏会短暂重载，应用窗口保留；也可以普通更新后注销再登录。更新插件后，在
-            SPlayer Next 中重新导入同 ID 插件。
+            再次运行一键安装命令即可更新。脚本在检测到已有组件且 Plasma
+            用户服务正在运行时自动重载面板，清除旧代码缓存；否则更新后注销再登录。更新后还需在
+            SPlayer 中重新导入同 ID 插件。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -266,12 +405,41 @@ onBeforeUnmount(() => {
             >AppImage 播放器无法从图标打开怎么办？<ChevronDown :size="18" aria-hidden="true"
           /></template>
           <p>
-            安装时使用
-            <code>--splayer-command '/path/to/SPlayer-Next.AppImage'</code>
-            指定启动入口。自定义播放器数据目录可以通过
-            <code>--splayer-config</code> 指定，详细用法见源码包中的 <code>docs/install.md</code>。
+            下载官网的安装脚本后运行
+            <code>sh install.sh --splayer-command '/path/to/SPlayer-Next.AppImage'</code>
+            指定启动入口。自定义播放器数据目录使用
+            <code>--splayer-config</code>；以后更新会保留这些参数。使用
+            <code>sh install.sh --help</code> 查看选项，<code>--dry-run</code> 只检查最新版本，<code
+              >--no-reload-plasma</code
+            >
+            可关闭自动面板重载。
           </p></AnimatedDetails
         >
+        <AnimatedDetails
+          ><template #summary
+            >从 KDE Store 安装后，还需要做什么？<ChevronDown :size="18" aria-hidden="true"
+          /></template>
+          <p>
+            KDE Store 只提供小组件，仍需运行一键安装脚本安装辅助服务与 SPlayer
+            插件文件，再在播放器中导入插件。SPlayer 插件市场投稿仍在等待维护者审核，可在
+            <a
+              class="sptl-text-link"
+              :href="sptlProject.pluginSubmission"
+              target="_blank"
+              rel="noopener noreferrer"
+              >投稿页面 <ExternalLink :size="14" aria-hidden="true" /></a
+            >查看进展。
+          </p>
+        </AnimatedDetails>
+        <AnimatedDetails
+          ><template #summary
+            >私人 FM 和收藏怎么用？<ChevronDown :size="18" aria-hidden="true"
+          /></template>
+          <p>
+            私人 FM 播放时，上一首替换为「不喜欢」，弹窗隐藏播放模式。收藏复用 SPlayer 的 Linux
+            托盘菜单，需要 gdbus 和可用的托盘入口；悬停收藏按钮可在「交互与离线」设置中关闭。
+          </p>
+        </AnimatedDetails>
         <AnimatedDetails
           ><template #summary
             >没有逐字歌词或翻译时会怎样？<ChevronDown :size="18" aria-hidden="true"
@@ -290,8 +458,8 @@ onBeforeUnmount(() => {
           <p>欢迎反馈使用体验，也欢迎一起完善。</p>
         </div>
         <div class="sptl-closing-links">
-          <a class="sptl-button primary" :href="sptlProject.source" download
-            >下载源码包 <ArrowDownToLine :size="17" aria-hidden="true"
+          <a class="sptl-button primary" href="/projects/SPTL#install"
+            >一键安装 <ArrowDown :size="17" aria-hidden="true"
           /></a>
         </div>
       </div>

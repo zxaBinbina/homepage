@@ -1,5 +1,5 @@
 {
   "version": 1,
-  "include": ["/api/music/lyrics", "/api/games/experience"],
+  "include": ["/api/music/lyrics", "/api/games/experience", "/api/projects/SPTL/release"],
   "exclude": []
 }

@@ -21,7 +21,7 @@ const projectPages = {
   sptl: {
     title: 'SPTL · SPlayer 任务栏歌词',
     description:
-      '为 SPlayer Next 打造的 KDE Plasma 任务栏歌词小组件：同步原文与翻译、逐字高亮、专辑封面和播放控制，提供源码下载与安装指南。',
+      '为 SPlayer Next 打造的 KDE Plasma 任务栏歌词小组件：同步歌词、逐字高亮、旋转封面、收藏与播放列表，自动获取最新正式版，支持一键安装和更新。',
   },
   myriad: {
     title: '万象导航 · a彬彬a',
