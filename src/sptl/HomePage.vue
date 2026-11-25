@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
       <h2>小小一块，<span>刚好够用。</span></h2>
       <p class="sptl-section-lead">看歌词、换歌曲、找回当前播放进度，都留在熟悉的桌面里。</p>
       <p class="sptl-photo-intro">
-        下面都是本机小组件的实际画面。切换歌词、封面和主题设置后拍摄，任务栏图片可左右查看，点击可打开原图。
+        下面都是本机小组件的实际画面。深浅两套实拍随页面明暗模式切换，任务栏图片可左右查看，点击可打开原图。
       </p>
       <div class="sptl-feature-grid">
         <article v-for="feature in features" :key="feature.label" class="sptl-feature sptl-reveal">
@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
             <ShotImage v-for="shot in feature.shots" :key="shot.src" :shot="shot" />
           </div>
           <a v-if="feature.icon === 'sync'" class="sptl-text-link" href="/projects/SPTL#recording"
-            >看首屏实拍动图 <ArrowUp :size="16" aria-hidden="true"
+            >看首屏实拍视频 <ArrowUp :size="16" aria-hidden="true"
           /></a>
         </article>
       </div>

@@ -78,7 +78,7 @@ export const features = [
     description:
       '主题可跟随 SPlayer、Plasma 或手动设置。应用后所有 SPTL 小组件同步，关闭播放器后仍然保留。',
     icon: 'settings',
-    shots: [screenshots.dark],
+    shots: [screenshots.theme],
   },
 ] as const
 

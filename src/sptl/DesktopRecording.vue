@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Camera, Pause, Play } from 'lucide-vue-next'
+import { useTheme } from '../composables/useTheme'
 
+const { light } = useTheme()
+const folder = computed(() => `/images/sptl/${light.value ? 'light' : 'dark'}/`)
 const recording = ref<HTMLElement>()
 const video = ref<HTMLVideoElement>()
 const taskbar = ref<HTMLVideoElement>()
@@ -12,14 +15,21 @@ const documentVisible = ref(!document.hidden)
 const playing = ref(false)
 const canPlay = computed(() => requested.value && inView.value && documentVisible.value)
 let observer: IntersectionObserver | undefined
+let savedTime = 0
+const loadedPlayers = new Set<HTMLVideoElement>()
 function playbackChanged() {
   playing.value = !!video.value && !video.value.paused
 }
 function syncPlayback() {
+  const ready =
+    !!video.value &&
+    !!taskbar.value &&
+    loadedPlayers.has(video.value) &&
+    loadedPlayers.has(taskbar.value)
   for (const player of [video.value, taskbar.value]) {
     if (!player) continue
     if (!canPlay.value) player.pause()
-    else {
+    else if (ready) {
       if (
         player === taskbar.value &&
         video.value &&
@@ -30,6 +40,13 @@ function syncPlayback() {
     }
   }
 }
+function mediaLoaded(event: Event) {
+  const player = event.target as HTMLVideoElement
+  if (!player.currentSrc.includes(folder.value)) return
+  player.currentTime = Math.min(savedTime, Math.max(0, player.duration - 0.05))
+  loadedPlayers.add(player)
+  syncPlayback()
+}
 function visibilityChanged() {
   documentVisible.value = !document.hidden
 }
@@ -37,6 +54,12 @@ function motionChanged() {
   if (motion.matches) requested.value = false
 }
 watch(canPlay, syncPlayback)
+watch(light, () => {
+  if (video.value && loadedPlayers.has(video.value)) savedTime = video.value.currentTime
+  loadedPlayers.clear()
+  video.value?.pause()
+  taskbar.value?.pause()
+})
 onMounted(() => {
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(
@@ -62,7 +85,9 @@ onBeforeUnmount(() => {
 <template>
   <figure ref="recording" class="sptl-desktop-recording" id="recording">
     <div class="sptl-recording-toolbar">
-      <span><Camera :size="17" aria-hidden="true" /> 普通模式 · KDE 深色</span>
+      <span
+        ><Camera :size="17" aria-hidden="true" /> 普通模式 · KDE {{ light ? '浅色' : '深色' }}</span
+      >
       <button
         type="button"
         @click="requested = !playing"
@@ -82,8 +107,8 @@ onBeforeUnmount(() => {
       <div class="sptl-recording-strip">
         <video
           ref="taskbar"
-          src="/images/sptl/dark/taskbar.mp4"
-          poster="/images/sptl/dark/taskbar-poster.webp"
+          :src="folder + 'taskbar.mp4'"
+          :poster="folder + 'taskbar-poster.webp'"
           muted
           loop
           playsinline
@@ -91,15 +116,15 @@ onBeforeUnmount(() => {
           width="740"
           height="74"
           aria-label="普通模式任务栏连续实录"
-          @loadedmetadata="syncPlayback"
+          @loadedmetadata="mediaLoaded"
         />
       </div>
     </div>
     <div class="sptl-recording-stage">
       <video
         ref="video"
-        src="/images/sptl/dark/hero.mp4"
-        poster="/images/sptl/dark/hero-poster.webp"
+        :src="folder + 'hero.mp4'"
+        :poster="folder + 'hero-poster.webp'"
         muted
         loop
         playsinline
@@ -107,7 +132,7 @@ onBeforeUnmount(() => {
         width="600"
         height="694"
         aria-label="普通模式歌词弹窗连续实录"
-        @loadedmetadata="syncPlayback"
+        @loadedmetadata="mediaLoaded"
         @play="playbackChanged"
         @pause="playbackChanged"
       />
@@ -117,7 +142,7 @@ onBeforeUnmount(() => {
       <span>屏幕连续录制 · 30 帧/秒 · 无音轨 · 可暂停细看</span>
       <a
         class="sptl-text-link"
-        href="/images/sptl/dark/hero.mp4"
+        :href="folder + 'hero.mp4'"
         target="_blank"
         rel="noopener noreferrer"
         >查看原视频</a

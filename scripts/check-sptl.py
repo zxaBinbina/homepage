@@ -16,7 +16,7 @@ with sync_playwright() as playwright:
         executable_path=os.environ.get("HOMEPAGE_BROWSER", "/usr/bin/google-chrome"),
         args=["--no-sandbox"],
     )
-    context = browser.new_context(viewport={"width": 1440, "height": 1000}, reduced_motion="reduce")
+    context = browser.new_context(viewport={"width": 1440, "height": 1000}, reduced_motion="reduce", color_scheme="dark")
     context.grant_permissions(["clipboard-read", "clipboard-write"], origin=base)
     api_payload = None
     def release_fixture(request):
@@ -74,9 +74,55 @@ with sync_playwright() as playwright:
     page.wait_for_timeout(250)
     assert abs(recording.evaluate("video => video.currentTime") - frozen) < .05
     assert taskbar_video.evaluate("video => video.paused")
+
+    # Both palettes use the same matching recording and 11 real feature photos.
+    photo_names = ["double", "single", "karaoke-detail", "ordinary-controls", "fm-controls", "volume-osd", "right", "circle", "playlist-detail", "mode-detail", "theme-detail"]
+    def assert_media_theme(theme):
+        prefix = f"/images/sptl/{theme}/"
+        expect(recording).to_have_attribute("src", prefix + "hero.mp4")
+        expect(taskbar_video).to_have_attribute("src", prefix + "taskbar.mp4")
+        expect(recording).to_have_attribute("poster", prefix + "hero-poster.webp")
+        expect(page.get_by_role("link", name="查看原视频", exact=True)).to_have_attribute("href", prefix + "hero.mp4")
+        page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
+        photos = page.locator(".sptl-feature-photo img")
+        for photo, name in zip(photos.all(), photo_names):
+            expect(photo).to_have_attribute("src", prefix + name + ".webp")
+        expect(page.locator(".sptl-feature-photo a")).to_have_count(11)
+        assert page.locator(".sptl-feature-photo a").evaluate_all("(links, prefix) => links.every(link => new URL(link.href).pathname.startsWith(prefix))", prefix)
+        page.wait_for_function("Array.from(document.querySelectorAll('.sptl-feature-photo img')).every(image => image.complete && image.naturalWidth > 0)")
+
+    page.get_by_role("button", name="主题设置", exact=True).click()
+    theme_panel = page.get_by_role("dialog", name="主题设置")
+    theme_panel.get_by_role("button", name="浅色", exact=True).click()
+    assert_media_theme("light")
+    assert recording.evaluate("video => video.paused") and taskbar_video.evaluate("video => video.paused")
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .1
+    recording.evaluate("video => { video.dataset.reloads = '0'; video.addEventListener('loadstart', () => video.dataset.reloads = String(Number(video.dataset.reloads) + 1)) }")
+    theme_panel.get_by_role("button", name="胡桃红", exact=True).click()
+    assert_media_theme("light")
+    assert recording.get_attribute("data-reloads") == "0", "Palette change reloaded the video"
+    theme_panel.get_by_role("button", name="深色", exact=True).click()
+    assert_media_theme("dark")
+    assert recording.evaluate("video => video.paused")
+    assert abs(recording.evaluate("video => video.currentTime") - frozen) < .1
+    theme_panel.get_by_role("button", name="芙芙蓝", exact=True).click()
+    assert_media_theme("dark")
+    page.emulate_media(color_scheme="light")
+    theme_panel.get_by_role("button", name="自动", exact=True).click()
+    assert_media_theme("light")
+    page.emulate_media(color_scheme="dark")
+    assert_media_theme("dark")
+    page.keyboard.press("Escape")
+
     page.emulate_media(reduced_motion="no-preference")
     page.get_by_role("button", name="播放实拍视频", exact=True).click()
     expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
+    page.emulate_media(color_scheme="light")
+    assert_media_theme("light")
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => !video.paused)")
+    page.emulate_media(color_scheme="dark")
+    assert_media_theme("dark")
+    page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => !video.paused)")
     page.emulate_media(reduced_motion="reduce")
     page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.paused)")
     expect(page.get_by_role("button", name="播放实拍视频", exact=True)).to_be_visible()
@@ -97,13 +143,14 @@ with sync_playwright() as playwright:
     assert page.evaluate("navigator.clipboard.readText()") == command
     expect(page.get_by_role("list", name="安装要求")).to_contain_text("SPlayer Next 插件 API 5+")
     assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
-    for name in ("hero", "taskbar"):
-        probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(ROOT / f"public/images/sptl/dark/{name}.mp4")])
-        data = json.loads(probe)
-        assert len(data["streams"]) == 1 and data["streams"][0]["codec_type"] == "video"
-        assert data["streams"][0]["r_frame_rate"] == "30/1"
-        assert int(data["streams"][0]["nb_frames"]) >= 300
-        assert float(data["format"]["duration"]) >= 10
+    for theme in ("dark", "light"):
+        for name in ("hero", "taskbar"):
+            probe = subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(ROOT / f"public/images/sptl/{theme}/{name}.mp4")])
+            data = json.loads(probe)
+            assert len(data["streams"]) == 1 and data["streams"][0]["codec_type"] == "video"
+            assert data["streams"][0]["r_frame_rate"] == "30/1"
+            assert int(data["streams"][0]["nb_frames"]) >= 300
+            assert float(data["format"]["duration"]) >= 10
     expect(page.locator(".sptl-release-status")).to_contain_text("已核对的 v1.2.1")
     with page.expect_download() as script_download:
         page.get_by_role("link", name="下载安装脚本", exact=True).click()
@@ -166,6 +213,7 @@ with sync_playwright() as playwright:
         for theme in ("dark", "light"):
             page.evaluate("([palette, theme]) => { localStorage.setItem('homepage-palette', palette); localStorage.setItem('homepage-theme', theme) }", [palette, theme])
             page.goto(base + route, wait_until="networkidle")
+            assert_media_theme(theme)
             for width in (320, 390, 768, 1024, 1440):
                 page.set_viewport_size({"width": width, "height": 1000})
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), (palette, theme, width)
@@ -177,4 +225,4 @@ with sync_playwright() as playwright:
 
     assert not errors, errors
     browser.close()
-print("SPTL routing, metadata, continuous 30 fps video pause/reduced motion/offscreen state, 11 feature photos, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
+print("SPTL routing, metadata, paired dark/light 30 fps videos and 11 matching photos, palette-independent theme switching, paused-frame retention, reduced motion/offscreen state, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
