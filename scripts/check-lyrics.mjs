@@ -29,7 +29,8 @@ assert.deepEqual(mergeLyrics('[00:01.0]Test line', '[00:01.00]测试行'), [
   { time: 1, text: 'Test line', translation: '测试行' },
 ])
 
-const { onRequestGet } = await load('functions/api/music/lyrics.ts')
+const { lyricsResponse } = await load('server/lyrics.ts')
+const onRequestGet = (context) => lyricsResponse(new URL(context.request.url))
 const request = (id) => ({ request: new Request(`https://example.test/api/music/lyrics?id=${id}`) })
 const originalFetch = globalThis.fetch
 let calls = 0
@@ -56,7 +57,7 @@ try {
   assert.equal(failed.status, 503)
   assert.equal(failed.headers.get('cache-control'), 'no-store')
   console.log(
-    'LRC timestamps, repeated lines, offset, translation, Pages worker bundle, allowlist and upstream failure: passed.',
+    'LRC timestamps, repeated lines, offset, translation, Workers lyrics handler, allowlist and upstream failure: passed.',
   )
 } finally {
   globalThis.fetch = originalFetch

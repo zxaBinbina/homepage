@@ -1,0 +1,4 @@
+# Cloudflare official test credentials, for local development only.
+# Production uses wrangler.toml's Site Key and Cloudflare Worker Secrets.
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA

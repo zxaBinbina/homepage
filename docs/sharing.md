@@ -33,7 +33,7 @@
 
 构建时 `build/pageTemplates.ts` 从 `src/pages.ts` 自动生成 `sitemap.xml`，只包含内容页面的规范地址，不包含查询参数、锚点、旧地址或错误页。地址与 canonical 一样使用 `SITE_URL`；没有可靠的内容修改时间时不生成 `lastmod`，避免每次构建都错误地标记更新。`robots.txt` 允许抓取并声明站点地图地址。部署完整 `dist/` 后，可在 Google Search Console、Bing Webmaster Tools 等站长平台验证域名并提交 `https://zxabinbina.cc.cd/sitemap.xml`。
 
-构建同时生成 `400.html`、`401.html`、`403.html`、`404.html`、`408.html`、`429.html`、`500.html`、`502.html`、`503.html` 与 `504.html`，使用统一 Vue 错误页、对应状态的标题和描述，均带 `noindex` 且不进入站点地图。Cloudflare Pages 自动使用 `404.html` 对未知路径返回真实 404；错误文档的脚本与样式使用根路径，避免嵌套网址无法加载。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。其余状态页需由服务器或代理配置使用，静态 HTML 本身不会设置 HTTP 状态。此状态码行为由部署平台提供，Vite 预览服务不模拟 Cloudflare 的 404 策略。
+构建同时生成 `400.html`、`401.html`、`403.html`、`404.html`、`408.html`、`429.html`、`500.html`、`502.html`、`503.html` 与 `504.html`，使用统一 Vue 错误页、对应状态的标题和描述，均带 `noindex` 且不进入站点地图。Cloudflare Workers 配置 `not_found_handling = "404-page"` 使用 `404.html` 对未知路径返回真实 404；错误文档的脚本与样式使用根路径，避免嵌套网址无法加载。已注册页面与历史地址仍由现有 HTML 产物和 301 规则承接。其余状态页需由服务器或代理配置使用，静态 HTML 本身不会设置 HTTP 状态。此状态码行为由部署平台提供，Vite 预览服务不模拟 Workers 的 404 策略。
 
 未知 Vue 路由也显示 404，并保留访问地址；站内进入或离开错误页时同步更新 `robots`、标题、canonical 与分享标签，返回正常页面后恢复 `index, follow, max-image-preview:large`。文案和路径定义见 `src/errors/catalog.ts`，浏览器检查见 `scripts/check-errors.py`。
 
@@ -51,7 +51,7 @@ RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `proje
 
 站内无刷新切换时，`src/router.ts` 复用 `createSiteMeta` 更新浏览器标题、description、canonical、Open Graph、QQ 标签及 favicon。`vite.config.ts` 将同一 `SITE_URL` 注入客户端，确保运行时与 EJS 构建结果一致。分享平台直接请求各页面时仍可从 HTML 源码获取完整标签。
 
-页面路径统一不带末尾斜线，canonical 与 `og:url` 直接复用 `src/pages.ts` 的路径。构建输出为根 `index.html`、`project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html`；Cloudflare Pages 以无 `.html` 的地址提供页面，自动生成的 `_redirects` 将旧的带斜线与 `/index.html` 地址转到规范地址。部署时保留该文件。
+页面路径统一不带末尾斜线，canonical 与 `og:url` 直接复用 `src/pages.ts` 的路径。构建输出为根 `index.html`、`project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html`；Workers 静态资源以无 `.html` 的地址提供页面，自动生成的 `_redirects` 将旧的带斜线与 `/index.html` 地址转到规范地址。部署时保留该文件。
 
 SPTL 子页 `/projects/SPTL` 的标题、简介和分享封面由 `site.config.ts` 提供，浏览器图标为
 `public/images/sptl.png`，与官网导航、项目目录及小组件安装包使用同一张透明图标。
@@ -64,7 +64,7 @@ SPTL 子页 `/projects/SPTL` 的标题、简介和分享封面由 `site.config.t
 
 ## 小游戏
 
-游戏目录 `/game` 的元信息由 `site.config.ts` 提供；十三个 `/games/*` 页面（2048、扫雷、纸牌接龙、俄罗斯方块、数独、中国象棋、五子棋、贪吃蛇、消灭星星、华容道、跳一跳、国际象棋单机版、围棋）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。
+游戏目录 `/game` 的元信息由 `site.config.ts` 提供；十五个 `/games/*` 页面（2048、扫雷、纸牌接龙、俄罗斯方块、数独、中国象棋、五子棋、贪吃蛇、消灭星星、华容道、跳一跳、国际象棋、围棋、欢乐斗地主、军旗）的标题和简介来自 `src/games/catalog.ts`。这些页面沿用主页 favicon 与头像分享图片，构建生成 `game.html` 和 `games/*.html`。规范地址、原始 HTML 分享标签、JSON-LD、站点地图和旧地址重定向均沿用公共构建逻辑，`scripts/check-sharing.py` 与 `scripts/check-seo.py` 覆盖这些新页面。
 
 ## 小说书架
 

@@ -138,16 +138,31 @@ with sync_playwright() as p:
     expect(page.locator('.mine-cell').last).to_have_attribute('aria-label', '第 128 行第 128 列：已插旗')
     assert page.locator('.mine-board-scroll').evaluate('el => el.scrollLeft > 0 && el.scrollTop > 0')
     custom_toggle.click()
+    # Chromium retains large style allocations when repeatedly resizing 16,384 cells.
+    # Isolate each layout sample so the full matrix can run on ordinary-memory hosts.
     for theme in ['dark', 'light']:
-        page.evaluate('theme => document.documentElement.dataset.theme = theme', theme)
         for width in [320, 390, 480, 481, 768, 1024, 1440]:
-            page.set_viewport_size({'width': width, 'height': 1000})
-            page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
-            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), ('custom board', theme, width)
-            assert page.locator('.mine-board-scroll').evaluate('el => el.clientHeight <= innerHeight * .7 + 1')
-            if width in [320, 390, 1440]:
-                page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
-                page.screenshot(path=str(out / f'game-minesweeper-custom-{theme}-{width}.png'), full_page=True, timeout=30000)
+            layout_browser = p.chromium.launch(executable_path=os.environ.get('HOMEPAGE_BROWSER', '/usr/bin/google-chrome'), args=['--no-sandbox'])
+            try:
+                layout_context = layout_browser.new_context(viewport={'width': width, 'height': 1000}, reduced_motion='reduce')
+                layout_context.add_init_script("Math.random = () => 0; localStorage.setItem('homepage-theme', '" + theme + "')")
+                layout_page = layout_context.new_page()
+                layout_page.on('pageerror', lambda error: errors.append(str(error)))
+                layout_page.goto(base + '/games/minesweeper', wait_until='networkidle')
+                layout_page.get_by_label('难度', exact=True).select_option('custom')
+                layout_page.get_by_label('棋盘边长', exact=True).fill('128')
+                layout_page.get_by_label('地雷数量', exact=True).fill('1')
+                layout_page.get_by_role('button', name='应用并开局', exact=True).click()
+                expect(layout_page.locator('.mine-cell')).to_have_count(16384)
+                layout_page.locator('.mine-cell').last.click(button='right')
+                layout_page.get_by_role('button', name='自定义设置', exact=True).click()
+                assert layout_page.evaluate('document.documentElement.scrollWidth <= innerWidth'), ('custom board', theme, width)
+                assert layout_page.locator('.mine-board-scroll').evaluate('el => el.clientHeight <= innerHeight * .7 + 1')
+                if width in [320, 390, 1440]:
+                    layout_page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
+                    layout_page.screenshot(path=str(out / f'game-minesweeper-custom-{theme}-{width}.png'), full_page=True, timeout=30000)
+            finally:
+                layout_browser.close()
     page.get_by_role('button', name='重新开始', exact=True).click()
     assert page.locator('.mine-board-scroll').evaluate('el => el.scrollLeft === 0 && el.scrollTop === 0')
     # Large blank floods remain immediate even with motion enabled.
@@ -265,7 +280,7 @@ with sync_playwright() as p:
                         const cards = Array.from(stack.querySelectorAll('.tableau-card'));
                         return cards.every(card => card.getBoundingClientRect().bottom <= stack.getBoundingClientRect().bottom + 1);
                     })'''), (theme, width, 'Tableau stack must contain its last card')
-                if width > 760:
+                if width > 900:
                     # No wrapping or overlap between brand, navigation, and actions.
                     assert page.evaluate('''() => {
                         const brand = document.querySelector('.brand').getBoundingClientRect();
@@ -274,6 +289,9 @@ with sync_playwright() as p:
                         const header = document.querySelector('.header').getBoundingClientRect();
                         return brand.right <= nav.left && nav.right <= actions.left && actions.right <= header.right;
                     }'''), ('header overlap', width)
+                else:
+                    expect(page.locator('.desktop-nav')).not_to_be_visible()
+                    expect(page.get_by_role('button', name='打开菜单', exact=True)).to_be_visible()
                 if width in [320, 390, 768, 1024, 1440]:
                     page.screenshot(path=str(out / f'game-{path.split("/")[-1]}-{theme}-{width}.png'), full_page=True)
         page.set_viewport_size({'width': 390, 'height': 844})

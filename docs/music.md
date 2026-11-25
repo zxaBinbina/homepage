@@ -16,7 +16,7 @@
 
 `.github/workflows/sync-music.yml` 配置 GitHub Actions 在北京时间每月 **1 日、16 日 10:30** 自动同步（UTC cron：`30 2 1,16 * *`）。这是按每月两次计算的“半个月”，并非严格间隔 360 小时；GitHub 的定时任务可能排队延迟。
 
-将工作流和播放器相关文件一并推送到 GitHub 默认分支后生效。同步完成后会安装依赖、构建网站并检查歌词函数，全部通过才将 `src/data/music.json` 提交回默认分支。Cloudflare Pages 需启用此仓库默认分支的 Git 自动部署，收到新提交后发布最新歌单及歌词允许列表；无需配置额外 Token 或部署 Hook。
+将工作流和播放器相关文件一并推送到 GitHub 默认分支后生效。同步完成后会安装依赖、构建网站并检查歌词函数，全部通过才将 `src/data/music.json` 提交回默认分支。Cloudflare Workers Builds 需启用此仓库默认分支的 Git 自动部署，收到新提交后发布最新歌单及歌词允许列表；无需配置额外 Token 或部署 Hook。
 
 可在 GitHub 仓库 **Actions → Sync NetEase playlist → Run workflow** 立即同步。工作流使用仓库自带的 `GITHUB_TOKEN`，申请 `contents: write` 权限；仓库策略须允许 Actions 写入默认分支。如果分支保护要求所有修改必须经 PR，此直接提交工作流会失败，需按仓库策略调整。定时工作流在公开仓库连续 60 天无活动时可能被 GitHub 停用，可在 Actions 中重新启用。
 
@@ -41,19 +41,19 @@ HTML 中的 `upgrade-insecure-requests` 策略将网易云外链的 HTTP CDN 重
 
 脚本会临时启动本地歌词服务，首先验证网易云真实音频和纯音乐状态，然后用短音频和原创测试歌词验证切歌、续播、歌词同步、歌词定位、VIP、搜索、音量、弹窗关闭后的播放与手机布局。截图写入 `artifacts/`。
 
-`node scripts/check-lyrics.mjs` 检查 LRC 时间戳、重复时间、偏移、翻译合并及 Pages Function 的打包和失败处理。
+`node scripts/check-lyrics.mjs` 检查 LRC 时间戳、重复时间、偏移、翻译合并及 Workers 歌词处理模块的打包和失败处理。
 
 `node scripts/check-music-sync.mjs` 使用隔离的临时目录和模拟接口，检查同步顺序、VIP 标记，以及接口失败、缺曲和不完整歌单时旧快照不会被覆盖。
 
-## 歌词与 Cloudflare Pages
+## 歌词与 Cloudflare Workers
 
-播放器打开时请求同源 `/api/music/lyrics?id=歌曲ID`，由 `functions/api/music/lyrics.ts` 调用网易云公开歌词接口。只允许读取当前歌单中的歌曲，提供超时、失败重试和缓存；歌词不写入静态文件。开发和预览服务器通过 Vite 中间件使用相同处理逻辑。
+播放器打开时请求同源 `/api/music/lyrics?id=歌曲ID`，由 `worker/index.ts` 分发到 `server/lyrics.ts` 调用网易云公开歌词接口。只允许读取当前歌单中的歌曲，提供超时、失败重试和缓存；歌词不写入静态文件。开发和预览服务器通过 Vite 中间件使用相同处理逻辑。
 
 支持滚动歌词、播放高亮、点击歌词跳转和已有翻译。纯音乐显示“纯音乐，请欣赏”，没有歌词或请求失败时分别显示空状态或重试入口。各歌词状态保持相同高度，避免切换时窗口跳动。切歌会取消旧请求，避免错配；关闭弹窗不再请求歌词。
 
-Cloudflare Pages 的项目根目录保持仓库根目录，构建命令 `npm run build`，输出目录 `dist`。Git 集成部署会同时编译根目录 `functions/`。`public/_routes.json` 将函数执行限制在歌词与棋类经验接口；棋类接口还需在 Pages 项目配置 `GAME_EXPERIENCE` KV binding，配置 ID 见仓库 `wrangler.toml`。
+Cloudflare Workers 的项目根目录保持仓库根目录，构建命令 `npm run build`。`wrangler.toml` 将 `dist` 作为静态资源，`/api/*` 执行 `worker/index.ts`；Office 预压缩 WASM 另由 Worker 保留原始编码，其他资源直接交给 Assets。棋类经验的 `GAME_EXPERIENCE` KV binding 保留在该配置中。
 
-如使用命令行直接上传，应从仓库根目录执行 `npx wrangler pages deploy dist --project-name 你的项目名`，让 Wrangler 同时发现 `functions/`。仅在控制台拖拽上传 `dist` 不会部署歌词函数。无需网易云账号、Token 或额外密钥。
+如使用命令行部署，从仓库根目录执行 `npm run deploy`；静态资源和 Worker 一并发布。歌词仍无需网易云账号、Token 或额外密钥。首次迁移与联机所需 Turnstile 配置见 [联机房间说明](game-rooms.md)。
 
 主页与项目目录页的音乐入口由 `src/components/SiteHeader.vue` 共用，导航在 `src/App.vue` 中持久挂载，浮层仍由 `MusicDialog.vue` 管理。页面内收起浮层不会卸载播放器；主页与目录之间无刷新切换时保留歌曲、进度和播放状态。进入使用独立导航的 RDP 子站或离开本站时，个人主页播放器会卸载。
 

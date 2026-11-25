@@ -3,6 +3,9 @@ import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, provide, ref
 import { ArrowLeft } from 'lucide-vue-next'
 import SiteFooter from '../components/SiteFooter.vue'
 import GameGuide from './GameGuide.vue'
+import SegmentedControl from '../components/SegmentedControl.vue'
+import { isOnlineKind } from './multiplayer/types'
+import { savedRoom } from './multiplayer/useGameRoom'
 import { gameCatalog, type GameId } from './catalog'
 import { gameFullscreenKey } from './fullscreen'
 import { useGameMotion } from './useGameMotion'
@@ -11,6 +14,14 @@ import { usePageLoading } from '../composables/usePageLoading'
 
 const props = defineProps<{ id: GameId }>()
 const game = computed(() => gameCatalog[props.id])
+const mode = ref<'single' | 'online'>(savedRoom()?.kind === props.id ? 'online' : 'single')
+const onlineComponent = defineAsyncComponent(() => import('./multiplayer/MultiplayerGame.vue'))
+const roomComponent = ref<{ requestLeave: () => void }>()
+function changeMode(value: 'single' | 'online') {
+  if (value === mode.value) return
+  if (mode.value === 'online' && roomComponent.value) roomComponent.value.requestLeave()
+  else mode.value = value
+}
 const { pending, resolved, failed } = usePageLoading()
 const components = {
   twenty48: defineAsyncComponent(() => import('./NumberGame.vue')),
@@ -133,12 +144,32 @@ onBeforeUnmount(() => {
           >
             <div ref="fitFrame" class="game-play-content">
               <div ref="fitContent" class="game-fit-content">
-                <GameGuide :id="id" />
+                <SegmentedControl
+                  v-if="isOnlineKind(id)"
+                  class="game-mode-control"
+                  :model-value="mode"
+                  :options="[
+                    { value: 'single', label: '单机对战' },
+                    { value: 'online', label: '朋友联机' },
+                  ]"
+                  label="游戏模式"
+                  @update:model-value="changeMode"
+                />
+                <GameGuide :id="id" :online="mode === 'online'" />
                 <p v-if="failed" class="game-load-feedback" role="alert">
                   游戏暂时未能加载，请重新加载后再试。
                 </p>
                 <Suspense v-else @pending="pending" @resolve="resolved">
                   <component
+                    v-if="mode === 'online' && isOnlineKind(id)"
+                    :is="onlineComponent"
+                    ref="roomComponent"
+                    :key="id + '-online'"
+                    :kind="id"
+                    @left="mode = 'single'"
+                  />
+                  <component
+                    v-else
                     :is="components[id]"
                     :key="id"
                     v-bind="id === 'xiangqi' || id === 'gomoku' ? { kind: id } : {}"

@@ -44,6 +44,11 @@ def settled_popup(page):
 
 def popup_bounds(page, width):
     settled_popup(page)
+    # Browser resize events and Vue's position update finish after set_viewport_size.
+    page.wait_for_function('''width => {
+        const box = document.querySelector('.palette-popover').getBoundingClientRect();
+        return innerWidth === width && box.x >= 15 && box.right <= width - 15;
+    }''', arg=width)
     box = page.locator('.palette-popover').bounding_box()
     assert box['x'] >= 15 and box['x'] + box['width'] <= width - 15, (width, box)
     blue = page.get_by_role('button', name='芙芙蓝', exact=True).bounding_box()

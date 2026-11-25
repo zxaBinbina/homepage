@@ -93,7 +93,7 @@ export function officeViewerAssets(siteUrl: string): Plugin {
   )
     writeFileSync(sourceIndex, sourceHtml)
 
-  const ancestors = `'self' ${new URL(siteUrl).origin} http://127.0.0.1:* http://localhost:*`
+  const ancestors = `'self' ${new URL(siteUrl).origin} https://homepage.zxabinbina.workers.dev http://127.0.0.1:* http://localhost:*`
   const csp = `default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' blob:; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self' blob:; frame-ancestors ${ancestors}; object-src 'none'; base-uri 'none'; form-action 'none'`
   const headers = `${prefix}*\n  Content-Security-Policy: ${csp}\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n${prefix}wasm/prebuilt/x2t.wasm.br\n  Content-Type: application/wasm\n  Content-Encoding: br\n`
   function middleware(
@@ -175,7 +175,7 @@ export function officeViewerAssets(siteUrl: string): Plugin {
           const file = join(dir, entry.name)
           if (entry.isDirectory()) verify(file)
           else if (statSync(file).size > 25 * 1024 * 1024)
-            throw new Error(`Asset exceeds Cloudflare Pages limit: ${file}`)
+            throw new Error(`Asset exceeds Cloudflare Workers static asset limit: ${file}`)
         }
       }
       verify(output)

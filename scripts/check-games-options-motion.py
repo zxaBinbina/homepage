@@ -116,6 +116,7 @@ with sync_playwright() as p:
         button = page.get_by_role('button', name='机器先手', exact=True)
         button.click()
         expect(page.locator('.strategy-surface')).to_have_attribute('aria-busy', 'true')
+        page.wait_for_function('requests.length > 0')
         assert page.evaluate('requests[0].data.side') == 1
         cell = page.locator('.board-cell').nth(0)
         cell.scroll_into_view_if_needed()

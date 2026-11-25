@@ -31,7 +31,7 @@ const resizeObserver = new ResizeObserver(() => {
 
 function viewerUrl() {
   const configured = import.meta.env.VITE_OFFICE_VIEWER_ORIGIN as string | undefined
-  const origin = new URL(configured || 'https://homepage-r2n.pages.dev')
+  const origin = new URL(configured || 'https://homepage.zxabinbina.workers.dev')
   if (!configured && ['127.0.0.1', 'localhost'].includes(location.hostname)) {
     origin.protocol = location.protocol
     origin.hostname = location.hostname === 'localhost' ? '127.0.0.1' : 'localhost'
@@ -41,7 +41,7 @@ function viewerUrl() {
   if (origin.origin === location.origin) throw new Error('预览来源需要与主页使用不同地址。')
   if (origin.protocol !== 'https:' && !['127.0.0.1', 'localhost'].includes(origin.hostname))
     throw new Error('预览来源需要使用 HTTPS。')
-  return new URL('/office-viewer/v0.2.0/index.html', origin).href
+  return new URL('/office-viewer/v0.2.0/', origin).href
 }
 function dispose() {
   ++generation

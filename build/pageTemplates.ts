@@ -100,7 +100,7 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
           fileName: 'robots.txt',
           source: `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', createSiteMeta(baseUrl).url).href}\n`,
         })
-        // The registered /404 emits 404.html, disabling Cloudflare Pages' implicit SPA fallback.
+        // Workers serves 404.html with assets.not_found_handling = '404-page'.
       },
     },
   }

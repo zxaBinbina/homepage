@@ -106,7 +106,7 @@ with sync_playwright() as p:
     def office(app):
         page.locator('.office-preview-stage').scroll_into_view_if_needed()
         expect(page.locator('.office-preview[data-ready="true"]')).to_be_visible(timeout=90000)
-        native = next(frame for frame in page.frames if f'/apps/{app}/main/index.html' in frame.url)
+        native = next(frame for frame in page.frames if urlparse(frame.url).path.removesuffix('index.html').endswith(f'/apps/{app}/main/'))
         assert 'mode=view' in native.url and 'lang=zh' in native.url
         assert native.evaluate('!!window.Asc.editor')
         assert native.locator('canvas').count() > 0
@@ -315,7 +315,7 @@ with sync_playwright() as p:
         for theme in ['dark', 'light']:
             set_theme_mode(page, theme)
             if tool != 'markdown':
-                native = next(f for f in page.frames if '/main/index.html' in f.url)
+                native = next(f for f in page.frames if urlparse(f.url).path.removesuffix('index.html').endswith('/main/'))
                 native.wait_for_function('(id) => window.uitheme.id === id', arg='theme-night' if theme == 'dark' else 'theme-white')
                 assert not native.evaluate('window.uitheme.iscontentdark')
             for palette in ['fufu-blue', 'hutao-red']:

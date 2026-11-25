@@ -29,4 +29,13 @@
     const storage = memoryStorage()
     Object.defineProperty(window, name, { get: () => storage })
   }
+  // Native font paths contain duplicate slashes. Use the canonical asset URL so
+  // Workers does not redirect them (which also breaks local HTTP previews).
+  const open = XMLHttpRequest.prototype.open
+  XMLHttpRequest.prototype.open = function (method, resource, ...options) {
+    const url = new URL(resource, location.href)
+    if (url.origin === location.origin && ['http:', 'https:'].includes(url.protocol))
+      url.pathname = url.pathname.replace(/\/{2,}/g, '/')
+    return open.call(this, method, url.href, ...options)
+  }
 })()

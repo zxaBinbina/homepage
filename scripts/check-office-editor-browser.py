@@ -35,7 +35,7 @@ with sync_playwright() as p:
         expect(page.locator('.office-preview-stage')).to_be_visible(timeout=30000)
         page.locator('.office-preview-stage').scroll_into_view_if_needed()
         expect(page.locator('.office-preview[data-ready="true"]')).to_be_visible(timeout=90000)
-        frame = next(f for f in page.frames if f'/{app}/main/index.html' in f.url)
+        frame = next(f for f in page.frames if urlparse(f.url).path.removesuffix('index.html').endswith(f'/{app}/main/'))
         assert 'mode=view' not in frame.url
         assert frame.evaluate('Asc.editor.isViewMode') is False
         expect(frame.locator('[data-layout-name="toolbar-collaboration"]')).to_be_hidden()

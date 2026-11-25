@@ -37,6 +37,12 @@ export default defineConfig(({ mode, command }) => {
   return {
     define: { 'import.meta.env.SITE_URL': JSON.stringify(env.SITE_URL || siteContent.url) },
     worker: { format: 'es' },
+    server: {
+      proxy: { '/api/games/rooms': { target: 'http://127.0.0.1:8788', ws: true } },
+    },
+    preview: {
+      proxy: { '/api/games/rooms': { target: 'http://127.0.0.1:8788', ws: true } },
+    },
     plugins: [
       {
         name: 'rdp-wiki-content',

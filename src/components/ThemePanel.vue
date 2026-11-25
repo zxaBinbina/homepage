@@ -12,6 +12,8 @@ const root = ref<HTMLElement>()
 const trigger = ref<HTMLButtonElement>()
 const popover = ref<HTMLElement>()
 const popoverRight = ref<string>()
+let alignmentFrame = 0
+let alignmentObserver: ResizeObserver | undefined
 const panelId = useId()
 
 const modes = [
@@ -49,19 +51,38 @@ function alignPopover() {
   const left = Math.max(16, Math.min(anchor.right + 4 - width, innerWidth - width - 16))
   popoverRight.value = `${anchor.right - left - width}px`
 }
+function scheduleAlignment() {
+  if (!open.value) return
+  cancelAnimationFrame(alignmentFrame)
+  alignmentFrame = requestAnimationFrame(alignPopover)
+}
 
-watch(open, alignPopover, { flush: 'post' })
+watch(
+  open,
+  () => {
+    alignPopover()
+    scheduleAlignment()
+  },
+  { flush: 'post' },
+)
 onMounted(() => {
+  // Header width may settle after resize when the document scrollbar changes.
+  alignmentObserver = new ResizeObserver(scheduleAlignment)
+  alignmentObserver.observe(document.documentElement)
+  const header = root.value?.closest('header')
+  if (header) alignmentObserver.observe(header)
   document.addEventListener('pointerdown', onOutsideInteraction)
   document.addEventListener('click', onOutsideInteraction)
   document.addEventListener('keydown', onKeydown)
-  window.addEventListener('resize', alignPopover)
+  window.addEventListener('resize', scheduleAlignment)
 })
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onOutsideInteraction)
   document.removeEventListener('click', onOutsideInteraction)
   document.removeEventListener('keydown', onKeydown)
-  window.removeEventListener('resize', alignPopover)
+  window.removeEventListener('resize', scheduleAlignment)
+  alignmentObserver?.disconnect()
+  cancelAnimationFrame(alignmentFrame)
 })
 </script>
 

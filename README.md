@@ -85,7 +85,7 @@
 
 本站自制的 **网页浏览器**（`/tools/web-browser`）提供密码保护的临时中转会话、网址导航、Bing / 云原神 / 抖音快捷入口及设备尺寸、横竖屏、缩放与 User-Agent 模拟。仅支持 Windows / Linux 上的 Chrome、Edge，移动设备显示说明页面。独立后端位于同级 `../bin-api/`，使用 Cloudflare Worker；接口与浏览内容分别使用 `api.zxabinbina.cc.cd` 和 `browse.zxabinbina.cc.cd`。网页请求和表单数据会经中转发送至目标网站，网站兼容性与云游戏实时链路需实际验证，详见 [工具说明](docs/tools.md#私人网页浏览器)。
 
-其余工具的输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布。个人主页继续使用 Cloudflare Pages，网页浏览器的 Worker 单独部署。
+其余工具的输入在浏览器内处理，不持久保存；徽章引用本地生成，主动打开远程徽章链接时会向对应服务发送项目名或徽章文字。需要的库随工具按需加载，PDF 字体、CMap 与 WASM 资源随站点发布。个人主页使用 Cloudflare Workers 静态资源与 API，网页浏览器的 Worker 继续独立部署。
 
 目录、中文操作界面、Lucide 图标、深浅主题与芙芙蓝 / 胡桃红配色保持一致；保留共享播放器与页脚，加入卡片错峰进入、筛选退出 / 重排和页面切换动画。完整地址、使用限制与维护说明见 [网页工具说明](docs/tools.md)。
 
@@ -93,31 +93,31 @@
 
 访问 `https://zxabinbina.cc.cd/game`，或点击桌面 / 移动导航中的「游戏」，进入小游戏目录。游戏沿用本站深浅主题与共用导航、页脚，无需登录或安装。
 
-| 游戏             | 地址                 | 玩法与操作                                                                                                |
-| ---------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
-| 2048             | `/games/2048`        | 方向键 / WASD、棋盘滑动与方向按钮；合并计分、达到 2048 后继续挑战、最多撤销 100 步                        |
-| 扫雷             | `/games/minesweeper` | 五档难度，自定义 5–128 格边长与地雷数量；首步及周围安全、空白展开、插旗、数字周围快速翻开、计时与胜负提示 |
-| 纸牌接龙         | `/games/solitaire`   | 经典 Klondike，翻一张 / 翻三张、无限循环；红黑交替、整段移动、同花色 A → K 收牌与撤销                     |
-| 欢乐斗地主单机版 | `/games/doudizhu`    | 三人叫分、常见牌型比较、炸弹与王炸，并与两位本地电脑轮流出牌                                              |
-| 军旗单机版       | `/games/junqi`       | 标准 25 子配置，明棋练习 / 暗棋挑战；布阵、铁路、行营、共享标记与电脑推测                                 |
-| 俄罗斯方块       | `/games/tetris`      | 七种方块、落点预览、下一块；三档起始速度，每 5 行加速，30 行过关；键盘与手机按钮、暂停                    |
-| 数独经典版       | `/games/sudoku`      | 入门 / 标准 / 进阶唯一解题库，数字填写、候选笔记、提示一格与撤销                                          |
-| 中国象棋单机版   | `/games/xiangqi`     | 红方先行，与本地电脑对弈；合法落点、将军 / 将死 / 困毙、两档电脑与整轮悔棋                                |
-| 五子棋单机版     | `/games/gomoku`      | 15 × 15 自由规则，黑方先行、无禁手、长连获胜；预览后确认落子、两档电脑与整轮悔棋                          |
-| 贪吃蛇           | `/games/snake`       | 18 × 18 棋盘，吃果子成长；三档起始速度、键盘 / 滑动 / 方向按钮、暂停                                      |
-| 消灭星星经典版   | `/games/popstar`     | 同色连块消除、下落与空列左移；累计目标分闯关、剩余奖励、点选预览后确认                                    |
-| 华容道           | `/games/huarongdao`  | 点击相邻数字滑块，按顺序归位；三种棋盘、可解开局与撤销                                                    |
-| 跳一跳           | `/games/jump`        | 按住蓄力、松开跳跃；跨过空隙得分、变化的平台与落点判定                                                    |
-| 国际象棋单机版   | `/games/chess`       | 白方先行，合法落点、将军 / 将死、逼和；王车易位、吃过路兵与四种升变选择                                   |
-| 围棋             | `/games/go`          | 9 × 9 棋盘，黑方先行；气与提子、自杀禁着、全局同形禁着、停一手与死子核对后数子                            |
+| 游戏           | 地址                 | 玩法与操作                                                                                                |
+| -------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
+| 2048           | `/games/2048`        | 方向键 / WASD、棋盘滑动与方向按钮；合并计分、达到 2048 后继续挑战、最多撤销 100 步                        |
+| 扫雷           | `/games/minesweeper` | 五档难度，自定义 5–128 格边长与地雷数量；首步及周围安全、空白展开、插旗、数字周围快速翻开、计时与胜负提示 |
+| 纸牌接龙       | `/games/solitaire`   | 经典 Klondike，翻一张 / 翻三张、无限循环；红黑交替、整段移动、同花色 A → K 收牌与撤销                     |
+| 欢乐斗地主     | `/games/doudizhu`    | 三人叫分、常见牌型比较、炸弹与王炸，并与两位本地电脑轮流出牌                                              |
+| 军旗           | `/games/junqi`       | 标准 25 子配置，明棋练习 / 暗棋挑战；布阵、铁路、行营、共享标记与电脑推测                                 |
+| 俄罗斯方块     | `/games/tetris`      | 七种方块、落点预览、下一块；三档起始速度，每 5 行加速，30 行过关；键盘与手机按钮、暂停                    |
+| 数独经典版     | `/games/sudoku`      | 入门 / 标准 / 进阶唯一解题库，数字填写、候选笔记、提示一格与撤销                                          |
+| 中国象棋       | `/games/xiangqi`     | 红方先行，与本地电脑对弈；合法落点、将军 / 将死 / 困毙、两档电脑与整轮悔棋                                |
+| 五子棋         | `/games/gomoku`      | 15 × 15 自由规则，黑方先行、无禁手、长连获胜；预览后确认落子、两档电脑与整轮悔棋                          |
+| 贪吃蛇         | `/games/snake`       | 18 × 18 棋盘，吃果子成长；三档起始速度、键盘 / 滑动 / 方向按钮、暂停                                      |
+| 消灭星星经典版 | `/games/popstar`     | 同色连块消除、下落与空列左移；累计目标分闯关、剩余奖励、点选预览后确认                                    |
+| 华容道         | `/games/huarongdao`  | 点击相邻数字滑块，按顺序归位；三种棋盘、可解开局与撤销                                                    |
+| 跳一跳         | `/games/jump`        | 按住蓄力、松开跳跃；跨过空隙得分、变化的平台与落点判定                                                    |
+| 国际象棋       | `/games/chess`       | 白方先行，合法落点、将军 / 将死、逼和；王车易位、吃过路兵与四种升变选择                                   |
+| 围棋           | `/games/go`          | 9 × 9 棋盘，黑方先行；气与提子、自杀禁着、全局同形禁着、停一手与死子核对后数子                            |
 
-所有游戏页先展示完整玩法教程，再显示游戏界面；教程末尾提醒离开或刷新会重新开局。游戏内保留胜负结果、必要操作与手机横屏提示，不再显示重复的操作摘要或每步文字反馈。游戏状态只保留在当前页面。
+所有游戏页先展示完整玩法教程，再显示游戏界面。单机状态保留在当前页面，离开或刷新会重新开局。六款对战游戏另提供朋友联机：免登录、昵称与 6 位房间号入房、准备后由房主开局，支持聊天、房主设置、超时代操作和 3 分钟重连。创建与加入必须完成 Turnstile 验证。详细规则、免费额度与迁移步骤见 [联机房间说明](docs/game-rooms.md)。
 
 ### 电脑对手与棋力说明
 
-国际象棋、围棋、五子棋和中国象棋会在对局结束后，将每步走法按最终胜、和、负汇总到跨访客经验库；不收集 IP、账号或设备标识，也不保存逐局记录。只有单个局面 / 行棋方 / 走法达到 20 个样本，且 95% Wilson 胜率下界高于 50% 时，电脑才会采用该经验，否则使用原有搜索。该统计门槛降低了弱样本误导电脑的机会，但不能数学上保证棋力提升；仍需通过持续对局和基准赛验证。
+国际象棋、围棋、五子棋和中国象棋的单机对局会在结束后，将每步走法按最终胜、和、负汇总到跨访客经验库；不收集 IP、账号或设备标识，也不保存逐局记录。只有单个局面 / 行棋方 / 走法达到 20 个样本，且 95% Wilson 胜率下界高于 50% 时，电脑才会采用该经验，否则使用原有搜索。该统计门槛降低了弱样本误导电脑的机会，但不能数学上保证棋力提升；仍需通过持续对局和基准赛验证。
 
-国际象棋单机版使用 `chess.js` 校验规则，电脑以有时间预算的本地搜索选择合法走法；兵升变时选择后、车、象或马。休闲对局对三次重复局面及连续 50 回合未动兵、未吃子自动判和，子力不足与逼和也会结束。围棋采用 9 路入门对弈，白贴 6.5 目。落子先预览再确认；禁止自杀和重复任何历史棋盘局面，停一手不受同形限制。双方连续停一手后进入数子，玩家点选整块死子并核对地盘，再确认结算；死活未定可继续对局。按活子与单方围住的空点计算面积，共同接触的空区不计分，提子数不重复加分。电脑考虑提子、救子、气与对手应手，用于休闲练习，不作专业死活裁判；对玩家的停一手，若仍有直接提子或救子机会可能继续下。
+国际象棋使用 `chess.js` 校验规则，电脑以有时间预算的本地搜索选择合法走法；兵升变时选择后、车、象或马。休闲对局对三次重复局面及连续 50 回合未动兵、未吃子自动判和，子力不足与逼和也会结束。围棋采用 9 路入门对弈，白贴 6.5 目。落子先预览再确认；禁止自杀和重复任何历史棋盘局面，停一手不受同形限制。双方连续停一手后进入数子，玩家点选整块死子并核对地盘，再确认结算；死活未定可继续对局。按活子与单方围住的空点计算面积，共同接触的空区不计分，提子数不重复加分。电脑考虑提子、救子、气与对手应手，用于休闲练习，不作专业死活裁判；对玩家的停一手，若仍有直接提子或救子机会可能继续下。
 
 象棋与五子棋默认由你先手，可通过操作栏的「机器先手」按钮切换，开启后电脑执象棋红方 / 五子棋黑方，你执后手方。切换先手会重新开局，再次点击恢复自己先手；重开和切换电脑难度保留先手选择。悔棋撤回你的一步及电脑的应手，保留电脑的开局第一步。棋类电脑通过 Web Worker 中的规则搜索实现，不需要训练或下载模型；正式构建将 Worker 内联进按需加载的游戏代码，打开游戏页面后即可断网对弈，包括重开与悔棋；首次打开、刷新或进入尚未加载的页面仍需要网络，本站没有添加离线站点缓存。两档电脑适合休闲练习，不代表专业棋力。计算有时间预算，悔棋、重开或离开页面会终止过期任务；失败时可重试。
 
@@ -161,7 +161,7 @@
 
 主页、项目目录、网页工具、小游戏与 RDP 子站之间的普通链接使用 Vue Router 无刷新切换，保留浏览器前进 / 后退、历史滚动位置和跨页锚点。只接管当前同源且已注册的页面；外站、下载、接口、未知路径和新标签页操作仍按浏览器原有方式处理。地址栏直接访问或刷新仍由构建生成的 HTML 入口承接。站内页面路径统一不带末尾斜线，例如 `/project`、`/tool`、`/tools/json` 和 `/projects/rdp-access-auth/wiki`；旧的带斜线、`.html` 和 `/index.html` 地址会转到规范地址，并保留查询参数和锚点。
 
-共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Cloudflare Pages 的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。
+共享导航由 `src/App.vue` 挂载，主页、项目目录、工具与游戏页切换时保留音乐播放器实例。进入 RDP 子站时固定导航容器保持可见，仅平滑交叉变换导航内容，个人主页播放器随之卸载。RDP 概览与 Wiki 之间切换时保留项目导航和页脚，仅更新正文，避免导航重复入场闪烁。切换同步更新标题、canonical、Open Graph、QQ 标签和 favicon；分享抓取仍使用 EJS 在构建时注入的原始 HTML。新增页面需登记 `src/pages.ts`、`src/router.ts` 的懒加载组件与 `site.config.ts` 元信息。构建会生成 `project.html`、`projects/rdp-access-auth.html`、`projects/rdp-access-auth/wiki.html` 与 Workers 静态资源的 `_redirects`，发布时一并上传；源码仍只有一个 HTML 基础模板。
 
 ## 错误页面
 
@@ -169,7 +169,7 @@
 
 加载时显示方块等待动画；进入后卡片、状态码与文案依次出现，方块尝试跨过缺口、碰壁晃动后回落。离开或点击「重新加载」时，方块散开收小，正文淡出；站内切换与目标页面交叉过渡。碰壁反馈只播放一次，所有动效尊重系统的减少动态效果设置。
 
-未知路由保留原地址并显示 404。构建会生成相应的 `400.html` 等文件，其中 `404.html` 由 Cloudflare Pages 自动用于不存在的地址；其资源使用根路径，多级错误地址也能加载样式。其余状态页可直接访问，若要用于真实的 HTTP 错误，需要由服务器或代理配置相应错误响应；静态页面本身不会改变 HTTP 状态码，也不会替换 Cloudflare 在站点应用之外产生的拦截或故障页面。所有错误页使用 `noindex`，不进入站点地图。
+未知路由保留原地址并显示 404。构建会生成相应的 `400.html` 等文件，其中 `404.html` 由 Workers 的 `404-page` 配置用于不存在的地址；其资源使用根路径，多级错误地址也能加载样式。其余状态页可直接访问，若要用于真实的 HTTP 错误，需要由服务器或代理配置相应错误响应；静态页面本身不会改变 HTTP 状态码，也不会替换 Cloudflare 在站点应用之外产生的拦截或故障页面。所有错误页使用 `noindex`，不进入站点地图。
 
 ## RDP Access Auth 官网与 Wiki
 
@@ -179,7 +179,7 @@
 
 主页的 RDP 项目卡片进入官网。项目导航提供自动读取 GitHub Releases 的下载页；Wiki 提供 RPM / DEB 安装、浏览器或终端部署向导、Turnstile 配置、维护与排错；源码入口保留给开发和构建发行版的维护者。
 
-页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，通过 `src/router.ts` 和 Vue Router 根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合正文和页脚；项目导航由根 `src/App.vue` 持久挂载。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站通用样式位于 `src/rdp/style.css`，Wiki 阅读布局位于 `src/rdp/wiki.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为章节、内容块和搜索数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成各页面地址的 HTML，可直接访问、刷新并抓取分享元信息。与主页一起发布完整 `dist/` 到现有 Cloudflare Pages 即可，无需新建站点或 DNS 记录。
+页面与主页统一使用 Vue 3、TypeScript、Vite、原生 CSS 和 Lucide Vue 组件。`src/main.ts` 统一挂载 `src/App.vue`，通过 `src/router.ts` 和 Vue Router 根据 `src/pages.ts` 的路径表按需加载页面。个人主页模板为 `src/HomePage.vue`，官网和 Wiki 模板分别为 `src/rdp/components/OverviewPage.vue` 与 `src/rdp/components/WikiPage.vue`，由 `src/rdp/App.vue` 组合正文和页脚；项目导航由根 `src/App.vue` 持久挂载。仓库仅保留一份 `index.html` 基础挂载与元信息模板，不在 HTML 中编写页面内容。主页与子站共用 `src/components/ThemeToggle.vue` 和 `src/composables/useTheme.ts`，子站通用样式位于 `src/rdp/style.css`，Wiki 阅读布局位于 `src/rdp/wiki.css`。Wiki 正文维护在 [docs/rdp-access-auth.md](docs/rdp-access-auth.md)，基于 [上游 README](https://github.com/zxaBinbina/rdp-access-auth/blob/main/readme.md) 整理，应随上游部署方式更新。`build/rdpWiki.ts` 使用 `marked` 在构建时将受信任的本地 Markdown 转为章节、内容块和搜索数据，由 Wiki Vue 组件展示，访问页面无需下载解析器。`build/pageTemplates.ts` 在构建时从公共模板自动生成各页面地址的 HTML，可直接访问、刷新并抓取分享元信息。完整 `dist/` 与 `worker/index.ts` 通过 Wrangler 发布到 Workers；官网和 Wiki 继续沿用本站域名。
 
 Wiki 按「开始部署、使用与维护、了解项目」组织内容，提供全文范围的章节搜索、可收起的移动目录、六步安装包部署编号和命令复制。页面中的「交给 Agent 部署」提供可一键复制的 [部署提示词](docs/rdp-agent-deploy.md)，填写主机、认证域名、RDP 地址与隧道 ID 后即可交给具备终端能力的 Agent 使用。提示词要求凭据在服务器终端安全输入，并区分实际验收与待人工验证。
 
@@ -217,7 +217,7 @@ npm run preview
 
 本地环境文件 `.env`、`.env.*`、`.dev.vars*` 和 `.secrets/` 不提交，只有不含凭据的 `.example` 示例保留。与 `../bin-api` 联调时，可把 [.env.example](.env.example) 复制为 `.env.local`；使用线上中转时无需创建此文件。`VITE_*` 会进入浏览器代码，不能放密码、签名密钥或 Cloudflare API Token。中转密码及 Worker 密钥由 `bin-api` 管理，不复制到本仓库。
 
-`wrangler.toml` 中的 KV namespace ID 与站点域名属于部署标识，不是访问凭据，保留它们以维持现有 Pages 绑定。使用自己的 Cloudflare 项目时替换为自己的 namespace ID。Cloudflare 登录凭据使用 Wrangler 登录或部署环境的 Secret 配置。
+`wrangler.toml` 中的 KV namespace ID 与站点域名属于部署标识，不是访问凭据，保留它们以维持现有棋类经验绑定。使用自己的 Cloudflare 项目时替换为自己的 namespace ID。Cloudflare 登录凭据使用 Wrangler 登录或部署环境的 Secret 配置。
 
 上传前可检查待提交文件与排除效果：
 
@@ -246,7 +246,7 @@ npx prettier --check README.md AGENTS.md DESIGN.md
 
 歌单使用本地快照；需要更新时运行 `npm run sync:music`。播放与歌词依赖网易云服务，无法播放的歌曲会显示提示及官方入口。详细行为、同步工作流和验证说明见 [docs/music.md](docs/music.md)。
 
-Cloudflare Pages 使用仓库根目录、构建命令 `npm run build`、输出目录 `dist`。API 函数需部署根目录的 `functions/`；Git 集成可以同时部署静态站点与函数。仅上传静态产物不会包含函数。棋类经验接口还需创建 KV namespace，并在 Pages 项目的 Settings → Functions → KV namespace bindings 添加变量名 `GAME_EXPERIENCE`，绑定刚创建的 namespace，然后重新部署。可用 `npx --yes wrangler kv namespace create GAME_EXPERIENCE` 创建 namespace；账号登录后命令会返回 namespace ID。歌词部署步骤见音乐文档。
+Cloudflare Workers 使用根目录 `wrangler.toml`：`dist` 为静态资源，`worker/index.ts` 提供 API 和联机房间，原 `GAME_EXPERIENCE` KV 保留。运行 `npm run deploy` 构建并发布；也可通过 Workers Builds 连接默认分支自动发布。SQLite Durable Objects 支持免费套餐，不需要 R2、银行卡或付费服务。首次从 Pages 切换域名及 Turnstile 配置见 [联机与部署说明](docs/game-rooms.md#正式配置与迁移)，歌词行为见音乐文档。
 
 站点分享配置和 `SITE_URL` 用法见 [docs/sharing.md](docs/sharing.md)。构建自动生成搜索引擎使用的 `sitemap.xml`、`robots.txt`、页面 JSON-LD 结构化数据及 `noindex` 错误页；保持原有 Vue 正文加载与动画。部署后可向搜索引擎站长平台提交 `/sitemap.xml`。
 

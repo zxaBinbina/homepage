@@ -30,16 +30,16 @@ export const gameCatalog = {
     description: '从一格空白开始，让每个数字各归其位。三档难度，留给自己一点安静思考的时间。',
   },
   xiangqi: {
-    name: '中国象棋单机版',
+    name: '中国象棋',
     label: 'ACROSS THE RIVER',
     category: '棋艺策略',
-    description: '楚河汉界，一步一思量。与电脑对弈，在车马炮之间练习谋划与取舍。',
+    description: '楚河汉界，一步一思量。与朋友或电脑对弈，在车马炮之间练习谋划与取舍。',
   },
   gomoku: {
-    name: '五子棋单机版',
+    name: '五子棋',
     label: 'FIVE IN A ROW',
     category: '休闲对弈',
-    description: '黑白交错，把五颗棋子连成一线。随时与电脑开一局，简单的规则也有巧妙的变化。',
+    description: '黑白交错，把五颗棋子连成一线。和朋友或电脑开一局，简单的规则也有巧妙的变化。',
   },
   snake: {
     name: '贪吃蛇',
@@ -66,28 +66,28 @@ export const gameCatalog = {
     description: '按住积攒一点力量，松开跨过方块间的空隙。找准距离，让每一跳稳稳落下。',
   },
   chess: {
-    name: '国际象棋单机版',
+    name: '国际象棋',
     label: 'THINK ONE MOVE AHEAD',
     category: '棋艺策略',
-    description: '在黑白方格之间，调动每一枚棋子。与电脑开一局，从第一步布局到最后的将军。',
+    description: '在黑白方格之间，调动每一枚棋子。与朋友或电脑开一局，从第一步布局到最后的将军。',
   },
   go: {
     name: '围棋',
     label: 'A LITTLE SPACE TO GROW',
     category: '棋艺策略',
-    description: '一子落下，围出一片天地。在九路棋盘上与电脑对弈，慢慢体会连接、取舍与留白。',
+    description: '一子落下，围出一片天地。在九路棋盘上与朋友或电脑对弈，慢慢体会连接、取舍与留白。',
   },
   doudizhu: {
-    name: '欢乐斗地主单机版',
+    name: '欢乐斗地主',
     label: 'A FRIENDLY ROUND',
     category: '经典纸牌',
-    description: '和两位本地电脑来一局斗地主。叫地主、理好手牌，在出牌与不出之间找准节奏。',
+    description: '叫上朋友，或和电脑来一局斗地主。叫地主、理好手牌，在出牌与不出之间找准节奏。',
   },
   junqi: {
-    name: '军旗单机版',
+    name: '军旗',
     label: 'PLAN YOUR CAMPAIGN',
     category: '棋艺策略',
-    description: '排兵布阵，在棋盘上寻找突破口。与电脑对弈，保护军旗并一步步赢下战局。',
+    description: '排兵布阵，在棋盘上寻找突破口。与朋友或电脑对弈，保护军旗并一步步赢下战局。',
   },
 } as const
 

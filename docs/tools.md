@@ -149,9 +149,9 @@
 
 转换成功后，Word / Excel / PowerPoint 使用 [office-wasm-viewer 0.2.0](https://github.com/unestgroup/office-wasm-viewer) 的实际 ONLYOFFICE 引擎直接打开生成文件。Word 按文件实际分页，Excel 保留工作表切换、行列与单元格，PowerPoint 保留幻灯片缩略图与缩放；三种格式均为只读预览，支持全屏。预览接收下载字节的副本，查看及切换主题不改变输出，不再用 HTML 表格或 SVG 模拟 Office 内容，也不限制为前 10 页。
 
-引擎在独立来源 `homepage-r2n.pages.dev` 的 iframe 中本地运行，与主站 `zxabinbina.cc.cd` 共用同一 Pages 构建，无文档服务器。开发及构建预览自动在 `localhost` 与 `127.0.0.1` 之间切换来源；可通过 `VITE_OFFICE_VIEWER_ORIGIN` 指定托管本构建的独立来源。首次打开按需加载 WASM、相应编辑器及字体，后续可复用静态资源缓存；输入文件不上传、不持久保存。加载失败或三分钟超时时可重试，原下载不受影响。改动输入、选项、取消或离开页面销毁 iframe 和运行线程，清除当前文档与临时偏好。窄屏在预览区域内横向滚动，可全屏查看。
+引擎在独立来源 `homepage.zxabinbina.workers.dev` 的 iframe 中本地运行，与主站 `zxabinbina.cc.cd` 共用同一 Workers 静态资源构建，无文档服务器。开发及构建预览自动在 `localhost` 与 `127.0.0.1` 之间切换来源；可通过 `VITE_OFFICE_VIEWER_ORIGIN` 指定托管本构建的独立来源。首次打开按需加载 WASM、相应编辑器及字体，后续可复用静态资源缓存；输入文件不上传、不持久保存。加载失败或三分钟超时时可重试，原下载不受影响。改动输入、选项、取消或离开页面销毁 iframe 和运行线程，清除当前文档与临时偏好。窄屏在预览区域内横向滚动，可全屏查看。
 
-Office Viewer 与引擎遵循 AGPL-3.0，主站通过 Apache-2.0 的 office-wasm-sdk 消息桥访问独立程序。固定源码、运行包校验、字体许可与本地适配见 [来源说明](../third_party/office-wasm/README.md)；预览下方提供实际部署版本的源码与许可下载。保留上游品牌；使用 OFL 的中文与西文替代字体，专有 Office 字体的字距和分页仍可能不同。无需全站 COOP / COEP，所有静态文件低于 Cloudflare Pages 的 25 MiB 限制。
+Office Viewer 与引擎遵循 AGPL-3.0，主站通过 Apache-2.0 的 office-wasm-sdk 消息桥访问独立程序。固定源码、运行包校验、字体许可与本地适配见 [来源说明](../third_party/office-wasm/README.md)；预览下方提供实际部署版本的源码与许可下载。保留上游品牌；使用 OFL 的中文与西文替代字体，专有 Office 字体的字距和分页仍可能不同。无需全站 COOP / COEP，所有静态文件低于 Cloudflare Workers 静态资源的 25 MiB 限制。预压缩 `x2t.wasm.br` 由 Worker 以原始 Brotli 编码流式传回，避免自动压缩改变 WASM 字节；其余资源直接使用 Assets。
 
 Markdown 支持阅读预览和源码切换，最多预览 5 万字符；复制和下载包含全部结果。阅读预览净化 HTML，移除图片、脚本、嵌入页面、样式及链接操作，不加载外部资源；链接文字保留，源码与下载内容保持原样。下载后应核对内容及排版；数字签名、书签、批注、嵌入文件与原 PDF 的交互结构不迁移。
 

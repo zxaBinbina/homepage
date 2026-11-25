@@ -461,12 +461,9 @@
 :root[data-theme-transitioning] *::before,
 :root[data-theme-transitioning] *::after {
   transition-property:
-    opacity, transform, translate, scale, rotate, visibility,
-    width, height, min-height, max-height, margin, padding,
-    inset, top, right, bottom, left,
-    grid-template-columns, grid-template-rows,
-    flex-basis, flex-grow, flex-shrink,
-    clip-path, object-position, letter-spacing, line-height !important;
+    opacity, transform, translate, scale, rotate, visibility, width, height, min-height, max-height,
+    margin, padding, inset, top, right, bottom, left, grid-template-columns, grid-template-rows,
+    flex-basis, flex-grow, flex-shrink, clip-path, object-position, letter-spacing, line-height !important;
 }
 .seg {
   position: relative;
@@ -6442,6 +6439,440 @@ h1 > span {
 }
 .game-button:disabled {
   opacity: 0.45;
+}
+.game-mode-control {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto var(--space-xl);
+}
+.is-fullscreen .game-mode-control {
+  display: none;
+}
+.room-entry-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+.room-entry-heading h2 {
+  margin: var(--space-xs) 0;
+  font-size: clamp(20px, 3vw, 28px);
+  letter-spacing: 0;
+}
+.room-entry-heading h2 span {
+  display: inline-block;
+}
+.room-entry-heading p:last-child,
+.room-help {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.room-entry-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--blue);
+}
+.room-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-xl);
+}
+.room-entry-form {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  min-width: 0;
+}
+.room-field {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.room-field input,
+.room-field select,
+.room-chat-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  box-sizing: border-box;
+}
+.room-field input:focus-visible,
+.room-field select:focus-visible,
+.room-chat-form input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.room-entry-notes {
+  min-width: 0;
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+}
+.room-entry-notes h3 {
+  margin: var(--space-sm) 0 var(--space-lg);
+  font-size: 20px;
+}
+.room-entry-notes ol {
+  margin: 0;
+  padding-left: var(--space-lg);
+  font-size: 13px;
+  line-height: 2.2;
+}
+.room-entry-notes > p:last-child {
+  margin-top: var(--space-lg);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+.game-button.room-primary {
+  background: var(--primary-action);
+  color: var(--primary-action-text);
+  border-color: var(--blue);
+}
+.game-button.room-primary:not(:disabled):hover {
+  background: var(--primary-action);
+  color: var(--primary-action-text);
+  filter: brightness(1.08);
+}
+.room-turnstile,
+.room-turnstile > div {
+  width: 100%;
+  min-width: 0;
+}
+.room-feedback {
+  margin: var(--space-md) 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.room-feedback .game-button {
+  margin-left: var(--space-xs);
+}
+.room-number {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  font: inherit;
+  font-size: 30px;
+  font-weight: 650;
+  letter-spacing: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.room-number svg {
+  flex-shrink: 0;
+}
+.room-toolbar .strategy-turn {
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 260px;
+  overflow-wrap: anywhere;
+}
+.room-seats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+.room-seat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.room-seat > div {
+  display: grid;
+  gap: var(--space-2xs);
+  min-width: 0;
+  flex: 1;
+}
+.room-seat strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.room-seat strong small {
+  margin-left: var(--space-xs);
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 400;
+}
+.room-seat span:last-child {
+  font-size: 12px;
+  color: var(--muted);
+}
+.room-seat.is-ready,
+.room-seat.is-current {
+  border-color: var(--blue);
+}
+.room-seat > svg {
+  color: var(--status-success);
+  flex-shrink: 0;
+}
+.room-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--blue);
+  font-size: 13px;
+}
+.room-settings {
+  min-width: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.room-settings legend {
+  padding-inline: var(--space-xs);
+  font-size: 12px;
+  color: var(--muted);
+}
+.room-settings > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-md);
+}
+.room-settings select:disabled {
+  opacity: 0.75;
+}
+.room-ready-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0;
+}
+.room-proposal {
+  margin-block: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.room-proposal p {
+  margin: 0 0 var(--space-sm);
+}
+.room-leave-control {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.room-leave-popover {
+  --room-leave-width: 300px;
+  --room-leave-offset: calc(-1 * var(--space-2xs));
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: var(--room-leave-width);
+  max-width: calc(100vw - 2 * var(--space-sm));
+  overflow: visible;
+  background: transparent;
+  color: var(--text);
+  filter: drop-shadow(0 var(--space-sm) var(--space-xl) var(--shadow));
+  transform-origin: var(--room-leave-arrow-left, 50%) top;
+  opacity: 0;
+  transform: translateY(var(--room-leave-offset)) scale(0.97);
+  transition:
+    opacity 180ms var(--motion-ease),
+    transform 200ms var(--motion-ease),
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+.room-leave-popover:popover-open {
+  opacity: 1;
+  transform: none;
+}
+.room-leave-popover:not(:popover-open) {
+  pointer-events: none;
+}
+.room-leave-popover::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-sm) / -2);
+  left: calc(var(--room-leave-arrow-left, 50%) - var(--space-sm) / 2);
+  width: var(--space-sm);
+  height: var(--space-sm);
+  transform: rotate(45deg);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  background: var(--panel);
+  z-index: 1;
+}
+.room-leave-popover[data-side='above'] {
+  --room-leave-offset: var(--space-2xs);
+  transform-origin: var(--room-leave-arrow-left, 50%) bottom;
+}
+.room-leave-popover[data-side='above']::before {
+  top: auto;
+  bottom: calc(var(--space-sm) / -2);
+  border-top: 0;
+  border-left: 0;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.room-leave-popover-surface {
+  max-height: var(--room-leave-max-height, calc(100dvh - 2 * var(--space-sm)));
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.room-leave-popover h3 {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.room-leave-popover p {
+  margin: var(--space-xs) 0 var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  line-height: 1.7;
+}
+.room-leave-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-xs);
+}
+.game-button.room-leave-confirm {
+  color: var(--status-danger);
+}
+@starting-style {
+  .room-leave-popover:popover-open {
+    opacity: 0;
+    transform: translateY(var(--room-leave-offset)) scale(0.97);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .room-leave-popover {
+    transition: none;
+  }
+}
+.room-chat {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+.room-chat-content {
+  padding-top: var(--space-md);
+}
+.room-chat-log {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.room-chat-log p {
+  display: grid;
+  grid-template-columns: minmax(50px, 90px) minmax(0, 1fr);
+  gap: var(--space-sm);
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.room-chat-log p.room-help {
+  display: block;
+}
+.room-chat-log strong {
+  color: var(--muted);
+  font-weight: 500;
+}
+.room-chat-form {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+.room-chat-form input {
+  flex: 1;
+  font-size: 12px;
+}
+.room-hand {
+  padding-top: var(--space-lg);
+}
+.room-dd-board .dd-seat h2 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.room-board .strategy-piece {
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .room-entry-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .room-entry-notes {
+    padding: var(--space-md);
+  }
+  .room-toolbar .game-stats {
+    gap: var(--space-md);
+  }
+}
+@media (max-width: 480px) {
+  .room-entry-heading {
+    align-items: flex-start;
+  }
+  .room-entry-heading h2 {
+    font-size: 20px;
+  }
+  .room-entry-icon {
+    width: 44px;
+    height: 44px;
+  }
+  .room-seats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .room-seats .room-seat {
+    padding: var(--space-xs) var(--space-sm);
+  }
+  .room-settings > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .room-toolbar {
+    gap: var(--space-md);
+  }
+  .room-number {
+    font-size: 26px;
+  }
+  .room-toolbar .game-actions {
+    width: 100%;
+  }
 }
 /* Three seats, one shared table. Colors follow the site's palette and theme tokens. */
 .game-layout.dd-layout {

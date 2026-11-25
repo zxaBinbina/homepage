@@ -2,7 +2,7 @@
 import { Info } from 'lucide-vue-next'
 import type { GameId } from './catalog'
 
-defineProps<{ id: GameId }>()
+defineProps<{ id: GameId; online?: boolean }>()
 const titles = {
   twenty48: '让相同的数字相遇。',
   minesweeper: '每个数字，都是线索。',
@@ -28,7 +28,57 @@ const titles = {
       <p class="overline">HOW TO PLAY</p>
       <h2 id="game-guide-title">{{ titles[id] }}</h2>
     </div>
-    <template v-if="id === 'twenty48'">
+    <template v-if="online">
+      <ol v-if="id === 'xiangqi'">
+        <li>红方先行，点击己方棋子，再点合法落点。将死或困毙对方获胜，被将军时必须应将。</li>
+        <li>象不过河，士与将帅不出九宫；马有蹩腿、象有塞眼，炮吃子需隔一枚棋子。</li>
+        <li>采用原有休闲和棋规则：同一局面第三次出现，或连续 120 步未吃子，判和。</li>
+      </ol>
+      <ol v-else-if="id === 'gomoku'">
+        <li>15 × 15 棋盘，黑方先行，双方轮流落子。</li>
+        <li>横、竖或斜向至少五子连线获胜。采用自由规则，无禁手，长连也获胜。</li>
+        <li>先点交点预览，再点同处或点击「确认落子」。棋盘已满且无人获胜时判和。</li>
+      </ol>
+      <ol v-else-if="id === 'chess'">
+        <li>白方先行。点击己方棋子后选择合法落点；将死获胜，逼和、子力不足等情况判和。</li>
+        <li>支持王车易位、吃过路兵；兵到达底线后选择后、车、象或马升变。</li>
+        <li>同一局面三次重复，或连续 50 回合未动兵、未吃子，按休闲规则自动判和。</li>
+      </ol>
+      <ol v-else-if="id === 'go'">
+        <li>
+          九路棋盘，黑方先行，白贴 6.5 目。相连同色棋子没有气时被提走，禁止自杀和重复历史棋盘。
+        </li>
+        <li>先预览再确认落子。双方连续停一手后，共同标记死子；更改标记会清除双方之前的确认。</li>
+        <li>双方确认数子后结算，活子与单方围住的空点计分；有争议可以继续对局。</li>
+      </ol>
+      <ol v-else-if="id === 'doudizhu'">
+        <li>1～3 位真人，空位由电脑补足。三人轮流叫分，最高分者成为地主，另两位农民合作。</li>
+        <li>同牌型且点数更大才能压过上家，炸弹可压普通牌型，王炸最大。先出完牌的一方获胜。</li>
+        <li>只显示自己的手牌和对方剩余张数，底牌在叫出地主后揭晓。斗地主不支持悔棋。</li>
+      </ol>
+      <ol v-else-if="id === 'junqi'">
+        <li>
+          双人军旗，每方 25
+          子。双方可先交换己方棋子布阵，确认后开始；军旗、地雷、炸弹须放在合法位置。
+        </li>
+        <li>公路一步、铁路可长走，工兵可转弯；行营内不能被攻击，军旗被夺或无合法走法时判负。</li>
+        <li>房主可选择明棋或暗棋。暗棋隐藏对方身份，由系统判断碰子结果，且禁用悔棋。</li>
+      </ol>
+      <div class="game-guide-tips">
+        <p>创建者分享 6 位房间号，朋友填写昵称和号码加入。所有真人准备后由房主开局。</p>
+        <p>
+          {{
+            id === 'doudizhu'
+              ? '点选多张手牌后出牌；提示会选中建议牌型，仍需你确认。'
+              : '棋盘用方向键移动焦点，回车或空格操作；Esc 取消选择。手机直接点选。'
+          }}
+        </p>
+        <p>
+          每步限时和悔棋规则由房主设置。超时由电脑代操作一步，再交还真人；中途重开需要其他真人全部同意。
+        </p>
+      </div>
+    </template>
+    <template v-else-if="id === 'twenty48'">
       <ol>
         <li>向一个方向移动，所有方块都会滑到那一侧。</li>
         <li>相同数字碰在一起就会合并，每步每块只合并一次。</li>
@@ -303,7 +353,11 @@ const titles = {
       </div>
     </template>
     <p class="game-session-note" role="note">
-      <Info :size="16" aria-hidden="true" /><span>离开或刷新页面会重新开局。</span>
+      <Info :size="16" aria-hidden="true" /><span>{{
+        online
+          ? '掉线或刷新后保留席位 3 分钟，回来继续。对局中不接纳新玩家，结束后再加入。所有真人退出后房间与聊天会清空。'
+          : '离开或刷新页面会重新开局。'
+      }}</span>
     </p>
   </aside>
 </template>

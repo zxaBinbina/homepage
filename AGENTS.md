@@ -71,7 +71,7 @@
 | [index.html](index.html)                                                   | 首次绘制前的主题初始化与 HTML 模板                 |
 | [site.config.ts](site.config.ts)                                           | 站点标题、简介、域名及分享配置                     |
 | [build/](build/)                                                           | 构建期模板生成：页面 HTML、Wiki 内容、工具资源     |
-| [functions/api/](functions/api/)                                           | Cloudflare Pages 函数：歌词服务与棋类经验库        |
+| [worker/](worker/)                                                         | Cloudflare Workers：API 分发、联机房间与实时同步   |
 | [docs/](docs/)                                                             | 专题文档：音乐、分享、工具、RDP                    |
 | [third_party/](third_party/)                                               | 上游工具清单、许可证与源码快照                     |
 
@@ -99,7 +99,7 @@
 
 共享样式在 `src/style.css`（`.freemium-workbench` 与 `.jay-*` 范围），Freemium 组件的专用样式随组件保留。来源、版本、许可证与使用限制见 [docs/tools.md](docs/tools.md)、[Freemium 来源说明](third_party/freemium/README.md) 与 [Web Tools 来源说明](third_party/jaywcjlove-tools/README.md)。升级时核对完整上游清单，更新固定版本、源码归档、校验值与逐项去重映射，保留原始许可证。更新 jaytools 依赖后运行 `node scripts/update-jaytools-notices.mjs`，并核对依赖声明、补充许可证与 ExifReader 对应源码。
 
-工具计算仅在浏览器内处理输入，不上传、不持久保存；项目徽章的引用代码在本地生成，只有主动打开远程徽章链接时才向对应服务发送项目名或徽章文字。保留计算任务的取消、过期结果隔离与卸载清理。PDF.js 的字体、CMap、WASM 与附带许可证由 `build/toolAssets.ts` 在开发和构建时提供本地资源；新增工具无需应用后端，浏览器 Web Worker 不改变 Cloudflare Pages 部署方式。
+工具计算仅在浏览器内处理输入，不上传、不持久保存；项目徽章的引用代码在本地生成，只有主动打开远程徽章链接时才向对应服务发送项目名或徽章文字。保留计算任务的取消、过期结果隔离与卸载清理。PDF.js 的字体、CMap、WASM 与附带许可证由 `build/toolAssets.ts` 在开发和构建时提供本地资源；新增工具无需应用后端，浏览器 Web Worker 不改变主站 Workers 部署方式。
 
 变更清单或转换规则运行 `node scripts/check-tools.mjs`，该入口已包含 `check-jaytools.mjs`，无需重复执行；归档校验需要系统提供 `tar`。交互或布局变更运行 `python3 scripts/check-tools-browser.py`，涉及 jaytools 时再运行 `python3 scripts/check-jaytools-browser.py`，检查真实文件、图片与 ZIP 导出、取消、主题、响应式和动效。后者还需要 Python Pillow（`PIL`），截图与下载结果位于 `artifacts/jaytools/`。
 
@@ -123,7 +123,7 @@ PDF 转 Word、Excel、PowerPoint 与 Markdown 位于 `src/tools/pdfconvert/`，
 
 游戏目录为 `/game`，游戏地址为 `/games/*`。名称与说明维护在 `src/games/catalog.ts`，游戏组件及纯规则逻辑位于 `src/games/`，样式在 `src/style.css`。
 
-游戏状态仅在页面内保留。通用外壳由 `src/games/GamePage.vue` 提供教程、结算与网页全屏；`GameGuide.vue`、`GameFullscreenButton.vue`、`GameResult.vue` 供各游戏复用；`useGameMotion.ts` 统一处理动画完成、取消及减少动态效果，`useSolitaireDrag.ts` 管理指针手势，`useGameFit.ts` 计算全屏缩放，`SolitaireCelebration.vue` 管理庆祝绘制与清理。
+单机游戏状态仅在页面内保留。六款联机游戏在 `src/games/multiplayer/` 维护适配和界面，房间服务位于 `worker/`，规则与部署见 [docs/game-rooms.md](docs/game-rooms.md)。联机变更运行 `npm run check:rooms` 和 `python3 scripts/check-game-rooms-browser.py`，保留服务端合法性与轮次校验、私有信息隔离、Turnstile、重连、同意流程和房间清理。通用外壳由 `src/games/GamePage.vue` 提供教程、结算与网页全屏；`GameGuide.vue`、`GameFullscreenButton.vue`、`GameResult.vue` 供各游戏复用；`useGameMotion.ts` 统一处理动画完成、取消及减少动态效果，`useSolitaireDrag.ts` 管理指针手势，`useGameFit.ts` 计算全屏缩放，`SolitaireCelebration.vue` 管理庆祝绘制与清理。
 
 各游戏的组件与纯规则逻辑成对维护，新增游戏时沿用同样的拆分：
 
