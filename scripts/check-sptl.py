@@ -60,10 +60,15 @@ with sync_playwright() as playwright:
     assert recording.evaluate("video => video.paused && video.muted")
     expect(page.locator(".sptl-demo")).to_have_count(0)
     expect(page.locator(".sptl-feature")).to_have_count(6)
-    expect(page.locator(".sptl-feature-photo")).to_have_count(11)
+    expect(page.locator("#features .sptl-feature-photo")).to_have_count(11)
+    expect(page.locator("#settings .sptl-setting-photo")).to_have_count(4)
+    expect(page.locator("#features + #settings")).to_have_count(1)
+    expect(page.locator("#settings > .sptl-settings-heading .sptl-eyebrow")).to_have_text("02 / MAKE IT YOURS")
+    expect(page.locator("#install .sptl-eyebrow")).to_have_text("03 / GET STARTED")
+    expect(page.locator("#settings .sptl-setting-groups h3")).to_contain_text(["歌词显示", "尺寸与布局", "主题与动画", "交互与离线"])
     for feature in page.locator(".sptl-feature").all():
         assert feature.locator(".sptl-feature-photo").count() >= 1
-    expect(page.locator(".sptl-feature-photo figcaption")).to_contain_text(["双行", "单行", "当前高亮", "普通模式", "私人 FM", "KDE 原生音量", "圆角", "圆形", "播放列表", "普通模式", "KDE 深色"])
+    expect(page.locator("#features .sptl-feature-photo figcaption")).to_contain_text(["双行", "单行", "当前高亮", "普通模式", "私人 FM", "KDE 原生音量", "圆角", "圆形", "播放列表", "普通模式", "KDE 深色"])
     page.get_by_role("button", name="播放实拍视频", exact=True).click()
     expect(page.get_by_role("button", name="暂停实拍视频", exact=True)).to_be_visible()
     page.wait_for_timeout(400)
@@ -85,10 +90,12 @@ with sync_playwright() as playwright:
         expect(recording).to_have_attribute("poster", prefix + "hero-poster.webp")
         expect(page.get_by_role("link", name="查看原视频", exact=True)).to_have_attribute("href", prefix + "hero.mp4")
         page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
-        photos = page.locator(".sptl-feature-photo img")
+        photos = page.locator("#features .sptl-feature-photo img")
         for photo, name in zip(photos.all(), photo_names):
             expect(photo).to_have_attribute("src", prefix + name + ".webp")
-        expect(page.locator(".sptl-feature-photo a")).to_have_count(11)
+        expect(page.locator(".sptl-feature-photo a")).to_have_count(15)
+        for photo, name in zip(page.locator("#settings .sptl-setting-photo img").all(), ("lyrics", "layout", "theme", "interaction")):
+            expect(photo).to_have_attribute("src", prefix + "settings-" + name + ".webp")
         assert page.locator(".sptl-feature-photo a").evaluate_all("(links, prefix) => links.every(link => new URL(link.href).pathname.startsWith(prefix))", prefix)
         page.wait_for_function("Array.from(document.querySelectorAll('.sptl-feature-photo img')).every(image => image.complete && image.naturalWidth > 0)")
 
@@ -249,4 +256,4 @@ with sync_playwright() as playwright:
 
     assert not errors, errors
     browser.close()
-print("SPTL routing, metadata, paired dark/light 30 fps videos and 11 matching photos, palette-independent theme switching, paused-frame retention, reduced motion/offscreen state, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")
+print("SPTL routing, metadata, paired dark/light 30 fps videos, 11 feature photos and four native settings photos, palette-independent theme switching, paused-frame retention, reduced motion/offscreen state, installation/downloads, dynamic versions, FAQ keyboard and 20 theme/width combinations passed")

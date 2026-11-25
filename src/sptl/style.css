@@ -327,34 +327,43 @@
   font-size: var(--text-xs);
 }
 .sptl-settings-section {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 90px;
-  align-items: center;
+  display: block;
+}
+.sptl-settings-heading {
+  max-width: 760px;
+  margin-bottom: var(--space-2xl);
 }
 .sptl-setting-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-lg);
+}
+.sptl-setting-groups article {
+  min-width: 0;
+  padding: var(--space-xl);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--panel);
-  padding: var(--space-xs) var(--space-xl);
 }
-.sptl-setting-groups article {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: var(--space-md);
-  padding-block: var(--space-lg);
+.sptl-setting-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
-.sptl-setting-groups article + article {
-  border-top: 1px solid var(--border);
-}
-.sptl-setting-groups article > span {
+.sptl-setting-title > span {
   color: var(--accent);
   font: var(--text-xs)/1.8 monospace;
 }
 .sptl-setting-groups h3 {
   font-size: var(--text-lg);
   font-weight: 600;
-  margin-bottom: var(--space-2xs);
+}
+.sptl-setting-groups article > p {
+  margin-top: var(--space-xs);
+}
+.sptl-setting-groups .sptl-setting-photo {
+  margin-top: var(--space-md);
 }
 .sptl-faq {
   margin-top: var(--space-2xl);
@@ -419,8 +428,8 @@
   .sptl-feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .sptl-settings-section {
-    gap: var(--space-3xl);
+  .sptl-setting-groups {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 760px) {

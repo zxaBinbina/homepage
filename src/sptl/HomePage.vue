@@ -212,6 +212,29 @@ onBeforeUnmount(() => {
         </article>
       </div>
     </section>
+    <section class="sptl-section shell sptl-settings-section sptl-reveal" id="settings">
+      <div class="sptl-settings-heading">
+        <p class="sptl-eyebrow">02 / MAKE IT YOURS</p>
+        <h2>喜欢的样子，<span>自己调。</span></h2>
+        <p class="sptl-lead">
+          右键 SPTL → 配置。修改后点击「应用」或「确定」，所有 SPTL 小组件共用这套设置。
+        </p>
+        <p class="sptl-caption">
+          基准字号以 42 像素组件高度为参照；任务栏高度变化时，文字和封面自动适配。
+        </p>
+        <p class="sptl-photo-intro">每组说明配有小组件原生设置界面，点击图片可查看清晰原图。</p>
+      </div>
+      <div class="sptl-setting-groups">
+        <article v-for="(group, index) in settingGroups" :key="group.title">
+          <div class="sptl-setting-title">
+            <span>{{ String(index + 1).padStart(2, '0') }}</span>
+            <h3>{{ group.title }}</h3>
+          </div>
+          <p>{{ group.description }}</p>
+          <ShotImage class="sptl-setting-photo" :shot="group.shot" />
+        </article>
+      </div>
+    </section>
     <section
       class="sptl-section shell sptl-reveal sptl-release"
       id="release"
@@ -266,7 +289,7 @@ onBeforeUnmount(() => {
     <section class="sptl-section shell sptl-reveal" id="install">
       <div class="sptl-section-heading">
         <div>
-          <p class="sptl-eyebrow">02 / GET STARTED</p>
+          <p class="sptl-eyebrow">03 / GET STARTED</p>
           <h2>装好，<span>就开始听。</span></h2>
         </div>
         <a class="sptl-text-link" :href="sourceUrl" :download="!release ? '' : undefined"
@@ -365,27 +388,6 @@ onBeforeUnmount(() => {
           </div>
         </li>
       </ol>
-    </section>
-    <section class="sptl-section shell sptl-settings-section sptl-reveal" id="settings">
-      <div>
-        <p class="sptl-eyebrow">03 / MAKE IT YOURS</p>
-        <h2>喜欢的样子，<br /><span>自己调。</span></h2>
-        <p class="sptl-lead">
-          右键 SPTL → 配置。修改后点击「应用」或「确定」，所有 SPTL 小组件共用这套设置。
-        </p>
-        <p class="sptl-caption">
-          基准字号以 42 像素组件高度为参照；任务栏高度变化时，文字和封面自动适配。
-        </p>
-      </div>
-      <div class="sptl-setting-groups">
-        <article v-for="(group, index) in settingGroups" :key="group.title">
-          <span>{{ String(index + 1).padStart(2, '0') }}</span>
-          <div>
-            <h3>{{ group.title }}</h3>
-            <p>{{ group.description }}</p>
-          </div>
-        </article>
-      </div>
     </section>
     <section class="sptl-section shell sptl-reveal" id="faq">
       <p class="sptl-eyebrow">04 / GOOD TO KNOW</p>

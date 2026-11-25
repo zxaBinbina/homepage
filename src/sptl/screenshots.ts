@@ -117,3 +117,34 @@ export const screenshots = {
     },
   },
 } satisfies Record<string, Screenshot>
+
+export const settingsScreenshots = {
+  lyrics: {
+    src: folder + 'dark/settings-lyrics.webp',
+    light: { src: folder + 'light/settings-lyrics.webp' },
+    width: 877,
+    height: 412,
+    caption: '歌词设置 · 模式、辅助歌词与字号预览',
+  },
+  layout: {
+    src: folder + 'dark/settings-layout.webp',
+    light: { src: folder + 'light/settings-layout.webp' },
+    width: 877,
+    height: 387,
+    caption: '布局设置 · 封面位置、形状与宽度选项',
+  },
+  theme: {
+    src: folder + 'dark/settings-theme.webp',
+    light: { src: folder + 'light/settings-theme.webp' },
+    width: 877,
+    height: 259,
+    caption: '主题设置 · 配色来源、手动明暗与界面动画',
+  },
+  interaction: {
+    src: folder + 'dark/settings-interaction.webp',
+    light: { src: folder + 'light/settings-interaction.webp' },
+    width: 877,
+    height: 422,
+    caption: '交互设置 · 即时反馈、歌词跳转与离线操作',
+  },
+} satisfies Record<string, Screenshot>

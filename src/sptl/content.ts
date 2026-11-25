@@ -1,4 +1,4 @@
-import { screenshots } from './screenshots'
+import { screenshots, settingsScreenshots } from './screenshots'
 
 export const sptlProject = {
   version: '1.2.1',
@@ -83,14 +83,24 @@ export const features = [
 ] as const
 
 export const settingGroups = [
-  { title: '歌词显示', description: '单行 / 双行、翻译 / 音译、基准字号与实时预览。' },
-  { title: '尺寸与布局', description: '封面位置与形状、圆角程度、圆形旋转，以及自动 / 固定宽度。' },
+  {
+    title: '歌词显示',
+    description: '单行 / 双行、翻译 / 音译、基准字号与实时预览。',
+    shot: settingsScreenshots.lyrics,
+  },
+  {
+    title: '尺寸与布局',
+    description: '封面位置与形状、圆角程度、圆形旋转，以及自动 / 固定宽度。',
+    shot: settingsScreenshots.layout,
+  },
   {
     title: '主题与动画',
     description: '主题来源、手动明暗、主题色与界面动画；无法读取 SP 配色时提示并回退 Plasma。',
+    shot: settingsScreenshots.theme,
   },
   {
     title: '交互与离线',
     description: '即时操作反馈、悬停收藏、歌词跳转；空闲时可打开 SPlayer 或播放我喜欢的音乐。',
+    shot: settingsScreenshots.interaction,
   },
 ]
