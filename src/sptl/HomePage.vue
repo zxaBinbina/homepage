@@ -3,7 +3,6 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   ArrowDown,
   ArrowUp,
-  ArrowDownToLine,
   AudioLines,
   Check,
   ChevronDown,
@@ -20,13 +19,7 @@ import AnimatedDetails from '../components/AnimatedDetails.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import DesktopRecording from './DesktopRecording.vue'
 import ShotImage from './ShotImage.vue'
-import {
-  distributionLinks,
-  features,
-  releaseHighlights,
-  settingGroups,
-  sptlProject,
-} from './content'
+import { features, releaseHighlights, settingGroups, sptlProject } from './content'
 import { useSptlRelease } from './useSptlRelease'
 import './style.css'
 
@@ -43,19 +36,6 @@ const copyMessage = ref('')
 const { release, loading, error, refresh } = useSptlRelease()
 const version = computed(() => release.value?.version || sptlProject.version)
 const releaseUrl = computed(() => release.value?.url || sptlProject.latest)
-const sourceAsset = computed(() =>
-  release.value?.assets.find((asset) => asset.name === `sptl-source-${version.value}.tar.gz`),
-)
-const sourceUrl = computed(() =>
-  release.value ? sourceAsset.value?.url || releaseUrl.value : sptlProject.source,
-)
-const sourceLabel = computed(() =>
-  release.value
-    ? sourceAsset.value
-      ? `完整源码 v${version.value}`
-      : '查看发行文件'
-    : `本站源码包 v${sptlProject.version}`,
-)
 const releaseDate = computed(() => {
   const date = release.value?.publishedAt
   return date && Number.isFinite(Date.parse(date))
@@ -179,11 +159,6 @@ onBeforeUnmount(() => {
             >查看正式版 <ExternalLink :size="17" aria-hidden="true"
           /></a>
         </div>
-        <div class="sptl-tags"><span>KDE Plasma</span><span>SPlayer Next</span></div>
-        <p class="sptl-caption">
-          {{ release ? 'v' + version + ' 正式版' : '已核对 v' + sptlProject.version }} · Linux 桌面
-          · 用户级安装
-        </p>
       </div>
       <DesktopRecording />
     </section>
@@ -191,9 +166,7 @@ onBeforeUnmount(() => {
       <p class="sptl-eyebrow">01 / EVERYDAY LISTENING</p>
       <h2>小小一块，<span>刚好够用。</span></h2>
       <p class="sptl-section-lead">看歌词、换歌曲、找回当前播放进度，都留在熟悉的桌面里。</p>
-      <p class="sptl-photo-intro">
-        下面都是本机小组件的实际画面。深浅两套实拍随页面明暗模式切换，点击图片可查看完整原图。
-      </p>
+      <p class="sptl-photo-intro">下面都是小组件的实际画面。深浅两套实拍随页面明暗模式切换。</p>
       <div ref="featureGrid" class="sptl-feature-grid" :class="{ 'is-packed': packed }">
         <article v-for="feature in features" :key="feature.label" class="sptl-feature sptl-reveal">
           <div class="sptl-feature-top">
@@ -222,7 +195,6 @@ onBeforeUnmount(() => {
         <p class="sptl-caption">
           基准字号以 42 像素组件高度为参照；任务栏高度变化时，文字和封面自动适配。
         </p>
-        <p class="sptl-photo-intro">每组说明配有小组件原生设置界面，点击图片可查看清晰原图。</p>
       </div>
       <div class="sptl-setting-groups">
         <article v-for="(group, index) in settingGroups" :key="group.title">
@@ -273,17 +245,6 @@ onBeforeUnmount(() => {
         <a class="sptl-text-link" :href="releaseUrl" target="_blank" rel="noopener noreferrer"
           >完整发行说明 <ExternalLink :size="16" aria-hidden="true"
         /></a>
-        <div v-if="release?.assets.length" class="sptl-release-assets" aria-label="最新发行文件">
-          <a
-            v-for="asset in release.assets"
-            :key="asset.name"
-            class="sptl-text-link"
-            :href="asset.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><ArrowDownToLine :size="14" aria-hidden="true" />{{ asset.name }}</a
-          >
-        </div>
       </div>
     </section>
     <section class="sptl-section shell sptl-reveal" id="install">
@@ -292,54 +253,31 @@ onBeforeUnmount(() => {
           <p class="sptl-eyebrow">03 / GET STARTED</p>
           <h2>装好，<span>就开始听。</span></h2>
         </div>
-        <a class="sptl-text-link" :href="sourceUrl" :download="!release ? '' : undefined"
-          >{{ sourceLabel }} <ArrowDownToLine :size="16" aria-hidden="true"
-        /></a>
       </div>
       <p class="sptl-section-lead">
-        一条命令，自动下载 GitHub
-        最新正式版，校验后安装插件文件、小组件与辅助服务。已有安装会更新，并保留共享设置与自定义播放器路径。
+        小组件从 KDE 商店获取，SPlayer 插件从插件市场安装。下面的命令只安装或更新辅助程序，
+        并保留共享设置与自定义播放器路径。
       </p>
-      <div class="sptl-download-grid" aria-label="正式版下载入口">
-        <article
-          v-for="distribution in distributionLinks"
-          :key="distribution.title"
-          class="sptl-download"
-        >
-          <h3>
-            <a
-              class="sptl-text-link"
-              :href="distribution.url === sptlProject.latest ? releaseUrl : distribution.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ distribution.title }} <ExternalLink :size="16" aria-hidden="true"
-            /></a>
-          </h3>
-          <p>{{ distribution.description }}</p>
-        </article>
-      </div>
-      <ul class="sptl-requirements" aria-label="安装要求">
-        <li>Python 3.10+ 与 curl</li>
-        <li>Plasma 6 / Qt 6，或 Plasma 5.27 / Qt 5.15</li>
-        <li>SPlayer Next 插件 API 5+</li>
-        <li>systemd 用户会话</li>
-        <li>收藏需要 gdbus 与 SPlayer 托盘入口</li>
-      </ul>
       <ol class="sptl-install-steps">
         <li>
           <span class="sptl-step-number">01</span>
           <div>
-            <h3>准备桌面环境</h3>
-            <p>安装 SPlayer Next，并在 KDE 桌面会话中打开终端。确认 Python 与 curl 已安装。</p>
+            <h3>从 KDE 商店获取小组件</h3>
+            <p>
+              右键面板（任务栏），点击「添加或管理小部件」，点击「获取新小部件」，选择「下载新
+              Plasma 小部件」。在搜索框输入「SPTL」并搜索，找到「SPTL 1.2.1 — SPlayer Taskbar
+              Lyrics」，点击进入，再点击「安装」。
+            </p>
           </div>
         </li>
         <li>
           <span class="sptl-step-number">02</span>
           <div>
-            <h3>一键安装或更新</h3>
+            <h3>安装或更新辅助程序</h3>
             <p>
-              运行以下命令。脚本自动下载并校验最新源码，安装组件并启动辅助服务。更新已有组件时会短暂重载正在运行的
-              Plasma 面板，应用窗口保留。
+              确认 Python 与 curl 已安装，在 KDE 桌面终端运行以下命令。首次运行直接安装辅助程序，
+              之后再次运行可选择升级或卸载。脚本不释放小组件和插件文件，结束后清理下载的临时文件；
+              升级或卸载均保留共享设置，不重载面板。
             </p>
             <div class="sptl-code">
               <div class="sptl-code-toolbar">
@@ -359,21 +297,15 @@ onBeforeUnmount(() => {
               <pre tabindex="0" aria-label="安装命令"><code>{{ installCommand }}</code></pre>
             </div>
             <p class="sptl-copy-status" role="status">{{ copyMessage }}</p>
-            <a class="sptl-text-link" :href="sptlProject.installer" download
-              >下载安装脚本 <ArrowDownToLine :size="16" aria-hidden="true"
-            /></a>
           </div>
         </li>
         <li>
           <span class="sptl-step-number">03</span>
           <div>
-            <h3>在 SPlayer Next 中导入插件</h3>
+            <h3>在 SPlayer 插件市场安装</h3>
             <p>
-              打开「设置 → 插件管理 → 本地导入」，选择
-              <code>~/.local/share/sptl/zxaBinbina.sptl.js</code>，启用插件并允许
-              <code>network</code>、<code>control</code>、<code>api</code>
-              三项权限。更新后重新导入同 ID 插件。使用自定义 XDG
-              数据目录时，以安装脚本输出的路径为准。
+              打开 SPlayer 的「全局设置」，点击「插件管理」，进入「插件市场」，找到「SPTL
+              任务栏歌词」，点击「安装」。
             </p>
           </div>
         </li>
@@ -399,7 +331,7 @@ onBeforeUnmount(() => {
           /></template>
           <p>
             支持 KDE Plasma 5.27 / Qt 5.15 与 Plasma 6 / Qt 6 的顶部或底部横向任务栏。
-            正式版提供两种安装包，脚本自动检测当前桌面；切换 Plasma 主版本后重新运行安装命令。
+            从面板的「获取新小部件」入口安装时，商店会提供对应桌面版本的小组件。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -417,9 +349,8 @@ onBeforeUnmount(() => {
             >更新后，小组件怎么还是原来的样子？<ChevronDown :size="18" aria-hidden="true"
           /></template>
           <p>
-            再次运行一键安装命令即可更新。脚本在检测到已有组件且 Plasma
-            用户服务正在运行时自动重载面板，清除旧代码缓存；否则更新后注销再登录。更新后还需在
-            SPlayer 中重新导入同 ID 插件。
+            小组件请通过 KDE 商店更新。如果更新后仍显示旧界面，注销后重新登录以清除 Plasma
+            的组件缓存。辅助程序再次运行上面的命令并选择「升级」；SPlayer 插件通过官方插件管理更新。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -431,10 +362,7 @@ onBeforeUnmount(() => {
             <code>sh install.sh --splayer-command '/path/to/SPlayer-Next.AppImage'</code>
             指定启动入口。自定义播放器数据目录使用
             <code>--splayer-config</code>；以后更新会保留这些参数。使用
-            <code>sh install.sh --help</code> 查看选项，<code>--dry-run</code> 只检查最新版本，<code
-              >--no-reload-plasma</code
-            >
-            可关闭自动面板重载。
+            <code>sh install.sh --help</code> 查看选项，<code>--dry-run</code> 只检查最新版本。
           </p></AnimatedDetails
         >
         <AnimatedDetails
@@ -442,15 +370,8 @@ onBeforeUnmount(() => {
             >从 KDE Store 安装后，还需要做什么？<ChevronDown :size="18" aria-hidden="true"
           /></template>
           <p>
-            KDE Store 只提供小组件，仍需运行一键安装脚本安装辅助服务与 SPlayer
-            插件文件，再在播放器中导入插件。SPlayer 插件市场投稿仍在等待维护者审核，可在
-            <a
-              class="sptl-text-link"
-              :href="sptlProject.pluginSubmission"
-              target="_blank"
-              rel="noopener noreferrer"
-              >投稿页面 <ExternalLink :size="14" aria-hidden="true" /></a
-            >查看进展。
+            KDE Store 提供小组件，还需运行上面的命令安装辅助程序。SPlayer 插件已收录到插件市场：
+            打开「全局设置 → 插件管理 → 插件市场」，找到「SPTL 任务栏歌词」，点击「安装」。
           </p>
         </AnimatedDetails>
         <AnimatedDetails
@@ -475,17 +396,17 @@ onBeforeUnmount(() => {
     <section class="sptl-section shell sptl-reveal">
       <div class="sptl-closing">
         <div>
-          <p class="sptl-eyebrow">OPEN SOURCE / MADE BY a彬彬a</p>
+          <p class="sptl-eyebrow">OPEN SOURCE / MADE BY ZXABINBINA</p>
           <h2>给日常听歌，<br /><span>留一个小角落。</span></h2>
           <p>欢迎反馈使用体验，也欢迎一起完善。</p>
         </div>
         <div class="sptl-closing-links">
           <a class="sptl-button primary" href="/projects/SPTL#install"
-            >一键安装 <ArrowDown :size="17" aria-hidden="true"
+            >开始安装 <ArrowUp :size="17" aria-hidden="true"
           /></a>
         </div>
       </div>
     </section>
   </main>
-  <SiteFooter :brand-link="false" />
+  <SiteFooter />
 </template>

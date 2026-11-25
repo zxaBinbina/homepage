@@ -6,31 +6,12 @@ export const sptlProject = {
   source: '/projects/SPTL/sptl-1.2.1-source.zip',
   installer: '/projects/SPTL/install.sh',
   latest: 'https://github.com/zxaBinbina/SplayerPlasmaTaskbarLyrics/releases/latest',
-  pluginSubmission: 'https://github.com/SPlayer-Dev/plugins/pull/34',
 }
 
 export const releaseHighlights = [
   '滚轮调节音量时，KDE 原生提示立即显示预计百分比，音量优先通过播放器原生接口同步。',
   '播放、收藏和选曲提供即时反馈，独立操作并行处理，失败时恢复对应显示。',
   '完整歌词与播放列表切换更平滑。即时反馈与界面动画都可以在设置中关闭。',
-] as const
-
-export const distributionLinks = [
-  {
-    title: 'GitHub 正式版',
-    description: '插件、Plasma 5 / 6 安装包、完整源码与 SHA-256 校验值。',
-    url: sptlProject.latest,
-  },
-  {
-    title: 'KDE Store · Plasma 6',
-    description: 'Plasma 6 小组件，还需安装辅助服务与 SPlayer 插件。',
-    url: 'https://store.kde.org/p/2382272/',
-  },
-  {
-    title: 'KDE Store · Plasma 5',
-    description: 'Plasma 5.27+ 小组件，还需安装辅助服务与 SPlayer 插件。',
-    url: 'https://store.kde.org/p/2382273/',
-  },
 ] as const
 
 export const features = [
@@ -43,7 +24,7 @@ export const features = [
   },
   {
     label: '02 / IN SYNC',
-    title: '跟着每一句，慢慢唱',
+    title: '每一句，自动滚动',
     description: '支持逐字高亮和长歌词滚动。暂停时停在当前字，切歌时柔和过渡。',
     icon: 'sync',
     shots: [screenshots.karaoke],

@@ -1,4 +1,5 @@
 """Check SPTL navigation, real recording, feature photos, downloads and layout."""
+import io
 import json
 import os
 import subprocess
@@ -37,7 +38,8 @@ with sync_playwright() as playwright:
     expect(page.locator('link[rel="canonical"]')).to_have_attribute("href", "https://zxabinbina.cc.cd/projects/SPTL")
     expect(page.locator('link[rel="icon"]')).to_have_attribute("href", "/images/sptl.png")
     expect(page.locator('meta[property="og:image"]')).to_have_attribute("content", "https://zxabinbina.cc.cd/images/sptl-share.png")
-    expect(page.locator('a[href^="mailto:"], a[href="/"], a[href="/project"]')).to_have_count(0)
+    expect(page.locator('a[href^="mailto:"], a[href="/project"], .sptl-header a[href="/"]')).to_have_count(0)
+    expect(page.locator('footer .brand')).to_have_attribute('href', '/')
     assert "zxabinbina@mcyzw.top" not in page.locator("body").inner_text()
     assert "AGPL" not in page.locator("body").inner_text()
     # The installation command contains the site URL; project contact details stay hidden.
@@ -88,19 +90,16 @@ with sync_playwright() as playwright:
         expect(taskbar_video).to_have_attribute("src", prefix + "taskbar-compact.mp4")
         expect(taskbar_video).to_have_attribute("poster", prefix + "taskbar-compact-poster.webp")
         expect(recording).to_have_attribute("poster", prefix + "hero-poster.webp")
-        expect(page.get_by_role("link", name="查看原视频", exact=True)).to_have_attribute("href", prefix + "hero.mp4")
         page.wait_for_function("Array.from(document.querySelectorAll('#recording video')).every(video => video.readyState >= 2 && video.currentSrc === video.src)")
         photos = page.locator("#features .sptl-feature-photo img")
         for photo, name in zip(photos.all(), photo_names):
             if name == "volume-osd" and theme == "dark": name = "volume-osd-live"
             expect(photo).to_have_attribute("src", prefix + name + ".webp")
         fm_photo = page.locator("#features .sptl-feature").nth(2).locator(".sptl-feature-photo").nth(1)
-        expect(fm_photo.locator("a")).to_have_attribute("href", prefix + "fm-taskbar.webp")
         expect(fm_photo.locator("img")).to_have_js_property("naturalHeight", 74)
-        expect(page.locator(".sptl-feature-photo a")).to_have_count(15)
+        expect(page.locator(".sptl-feature-photo a")).to_have_count(0)
         for photo, name in zip(page.locator("#settings .sptl-setting-photo img").all(), ("lyrics", "layout", "theme", "interaction")):
             expect(photo).to_have_attribute("src", prefix + "settings-" + name + ".webp")
-        assert page.locator(".sptl-feature-photo a").evaluate_all("(links, prefix) => links.every(link => new URL(link.href).pathname.startsWith(prefix))", prefix)
         page.wait_for_function("Array.from(document.querySelectorAll('.sptl-feature-photo img')).every(image => image.complete && image.naturalWidth > 0)")
 
     page.get_by_role("button", name="主题设置", exact=True).click()
@@ -153,7 +152,6 @@ with sync_playwright() as playwright:
     expect(page.locator(".sptl-copy-status")).to_have_text("安装命令已复制")
     command = "curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh"
     assert page.evaluate("navigator.clipboard.readText()") == command
-    expect(page.get_by_role("list", name="安装要求")).to_contain_text("SPlayer Next 插件 API 5+")
     assert page.locator(".sptl-feature-photo img").evaluate_all("images => images.every(image => new URL(image.src).pathname.startsWith('/images/sptl/'))")
     for theme in ("dark", "light"):
         for name in ("hero", "taskbar-compact"):
@@ -164,14 +162,9 @@ with sync_playwright() as playwright:
             assert int(data["streams"][0]["nb_frames"]) >= 300
             assert float(data["format"]["duration"]) >= 10
     expect(page.locator(".sptl-release-status")).to_contain_text("已核对的 v1.2.1")
-    with page.expect_download() as script_download:
-        page.get_by_role("link", name="下载安装脚本", exact=True).click()
-    assert Path(script_download.value.path()).read_bytes() == (ROOT / "public/projects/SPTL/install.sh").read_bytes()
-    with page.expect_download() as download_info:
-        page.get_by_role("link", name=f"本站源码包 v{version}").click()
-    download = download_info.value
-    assert download.suggested_filename == f"sptl-{version}-source.zip"
-    with zipfile.ZipFile(download.path()) as archive:
+    archive_response = context.request.get(base + f"/projects/SPTL/sptl-{version}-source.zip")
+    assert archive_response.ok
+    with zipfile.ZipFile(io.BytesIO(archive_response.body())) as archive:
         assert archive.testzip() is None
         names = archive.namelist()
         assert f"SPTL-{version}/tools/install.py" in names
@@ -198,15 +191,14 @@ with sync_playwright() as playwright:
                    "body": "新版发行说明 <script>window.sptlInjected = true</script>",
                    "assets": [{"name": f"sptl-source-{future}.tar.gz", "url": source_url, "size": 100}]}
     page.get_by_role("button", name="刷新最新版本").click()
-    expect(page.locator(".sptl-hero-copy .sptl-caption")).to_contain_text(f"v{future} 正式版")
-    expect(page.get_by_role("link", name=f"完整源码 v{future}")).to_have_attribute("href", source_url)
+    expect(page.locator("#release .sptl-eyebrow")).to_contain_text(f"v{future}")
+    expect(page.get_by_role("link", name="查看正式版", exact=True)).to_have_attribute("href", release_url)
+    expect(page.locator(".sptl-release-assets")).to_have_count(0)
     expect(page.get_by_role("link", name="完整发行说明")).to_have_attribute("href", release_url)
     expect(page.locator(".sptl-release-notes")).to_contain_text("新版发行说明")
     assert page.evaluate("window.sptlInjected === undefined")
     api_payload["assets"] = []
     page.get_by_role("button", name="刷新最新版本").click()
-    expect(page.get_by_role("link", name="查看发行文件", exact=True)).to_have_attribute("href", release_url)
-    expect(page.get_by_role("link", name=f"本站源码包 v{version}")).to_have_count(0)
     api_payload = None
     page.get_by_role("button", name="刷新最新版本").click()
     expect(page.locator(".sptl-release-status")).to_contain_text(f"上次同步的 v{future}")

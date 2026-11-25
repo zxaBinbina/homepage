@@ -164,7 +164,7 @@ Gaze 页面位于 `src/gaze/`，指南正文位于 `src/gaze/content/guide/`，�
 ### SPTL 子页
 
 页面、版本状态与样式位于 `src/sptl/`，一键安装脚本为 `public/projects/SPTL/install.sh`。
-最新正式版接口共用 `server/sptlRelease.ts`，由 Pages 函数与 Vite 开发 / 预览服务提供；新增接口保持 `public/_routes.json` 一致。版本与下载链接读取 GitHub 最新 Release，API 限流时只回退同一仓库的最新发行页；读取失败时明确显示快照版本。安装前校验同一 Release 的 SHA-256，升级保留共享设置与自定义播放器路径。脚本不能代替 SPlayer 官方插件导入步骤。
+最新正式版接口共用 `server/sptlRelease.ts`，由 Pages 函数与 Vite 开发 / 预览服务提供；新增接口保持 `public/_routes.json` 一致。版本与下载链接读取 GitHub 最新 Release，API 限流时只回退同一仓库的最新发行页；读取失败时明确显示快照版本。安装前校验同一 Release 的 SHA-256，只部署辅助程序与共享设置定义，升级保留共享设置及自定义播放器路径。脚本不得安装或覆盖 KDE 小组件、SPlayer 插件，不重载 Plasma；两者通过各自商店安装。
 
 修改后运行 `python3 scripts/check-sptl-installer.py`、`node scripts/check-sptl-release.mjs`，构建后运行 `python3 scripts/check-sptl.py` 及目录、导航、分享、SEO 检查。安装测试使用临时 XDG 目录和模拟桌面服务；实拍素材来源与维护方式见 [docs/SPTL.md](docs/SPTL.md)。
 

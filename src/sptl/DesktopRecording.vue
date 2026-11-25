@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
   <figure ref="recording" class="sptl-desktop-recording" id="recording">
     <div class="sptl-recording-toolbar">
       <span
-        ><Camera :size="17" aria-hidden="true" /> 普通模式 · KDE {{ light ? '浅色' : '深色' }}</span
+        ><Camera :size="17" aria-hidden="true" /> 实拍 · {{ light ? '浅色' : '深色' }}</span
       >
       <button
         type="button"
@@ -103,7 +103,6 @@ onBeforeUnmount(() => {
       </button>
     </div>
     <div class="sptl-recording-taskbar">
-      <span>任务栏歌词</span>
       <div class="sptl-recording-strip">
         <video
           ref="taskbar"
@@ -137,16 +136,5 @@ onBeforeUnmount(() => {
         @pause="playbackChanged"
       />
     </div>
-    <figcaption>
-      <p>从《经过》的第一句开始，实拍逐字歌词、圆形封面与播放控制。</p>
-      <span>连续实录 · 30 帧/秒 · 无音轨 · 可暂停</span>
-      <a
-        class="sptl-text-link"
-        :href="folder + 'hero.mp4'"
-        target="_blank"
-        rel="noopener noreferrer"
-        >查看原视频</a
-      >
-    </figcaption>
   </figure>
 </template>

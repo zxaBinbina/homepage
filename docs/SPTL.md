@@ -3,10 +3,21 @@
 入口为 `/projects/SPTL`，与 Gaze、RDP 子页共用 Vue 路由、站点主题和页脚。
 首屏使用本机小组件的连续录屏视频，六项功能卡片直接展示对应设置下的实际视频帧。
 视频不含音轨，使用原生视频播放器暂停并保留当前画面；离开视口或切到后台时暂停，减少动态效果时默认暂停。
-页面不单独展示作者邮箱、官网地址或许可证，也没有返回个人主页或目录的入口。
+页面不单独展示作者邮箱、官网地址或许可证，头部没有返回个人主页或目录的入口。
+页脚完整复用主站 `SiteFooter`，提供品牌首页链接、版权及备案入口。
 这些资料由 SPTL 元数据提供给 KDE 小组件信息界面。目录保留 SPTL 卡片，首页仍为四个精选项目。
 
-## 一键安装与更新
+## 安装与更新
+
+三个部分分别安装：KDE 小组件、Python 辅助程序、SPlayer 插件。
+
+### 从 KDE 商店获取小组件
+
+右键面板（任务栏）→「添加或管理小部件」→「获取新小部件」→「下载新 Plasma 小部件」。
+在搜索框输入「SPTL」并搜索，打开「SPTL 1.2.1 — SPlayer Taskbar Lyrics」条目，点击「安装」。
+该入口适用于支持的 Plasma 版本；安装后将小组件添加到横向任务栏。
+
+### 安装或更新辅助程序
 
 在 KDE 桌面终端运行，无需 sudo：
 
@@ -16,31 +27,38 @@ curl -fsSL 'https://zxabinbina.cc.cd/projects/SPTL/install.sh' | sh
 
 每次读取 SPTL 仓库的最新公开正式 Release。API 不可用时跟随同一仓库的
 `releases/latest` 跳转，按正式版标签选择源码归档与对应 `SHA256SUMS-版本`。
-校验 SHA-256、安全解压并核对源码版本后，执行该 Release 的 `tools/install.py`。
-退出时清理临时文件，不依赖相邻仓库，也不固定安装某个版本。
+校验 SHA-256、在内存中核对版本元数据后，只解压并部署 `helper/`、`shared/` 与许可证，
+启用或重启 `sptl-bridge.service` 用户服务。不会执行发行包中的旧版全量安装器，
+因此现有 1.2.1 发行包也只会安装辅助程序。小组件及 SPlayer 插件文件不会释放到磁盘，
+安装成功或失败退出时都会清理下载归档与临时目录。
 
-需要 Python 3.10+、curl、SPlayer 插件 API 5+、Plasma 5.27 / Qt 5.15 或 Plasma 6 / Qt 6，
-以及 systemd 用户会话。收藏需要 gdbus 和 SPlayer Linux 托盘入口。
-脚本生成插件文件、安装对应小组件并启动辅助服务。用户随后在 SPlayer 插件管理中导入
-`~/.local/share/sptl/zxaBinbina.sptl.js`，允许 `network`、`control`、`api` 权限。
-更新后重新导入同 ID 插件；使用自定义 XDG 目录时，以脚本输出为准。
-
-再次执行同一命令即可更新。上游安装器保留共享设置；脚本读取已有用户服务，保留
-自定义 SPlayer 启动命令与配置路径。已有小组件且 Plasma 用户服务正在运行时自动重载
-面板以清除旧 QML 缓存，应用窗口保留；否则更新后注销再登录。
+需要 Python 3.10+、curl 和 systemd 用户会话。完整运行还需 SPlayer 插件 API 5+、
+Plasma 5.27 / Qt 5.15 或 Plasma 6 / Qt 6；收藏需要 gdbus 和 SPlayer Linux 托盘入口。
+更新保留共享设置、自定义 SPlayer 启动命令及配置路径，不安装或覆盖小组件、插件，不重载面板。
+第一次运行直接安装。检测到已有辅助程序后，再次执行同一命令会询问「升级 / 卸载 / 取消」。
+安装完成后输出“卸载请再次运行此脚本，并选择「卸载」”。卸载停止并禁用辅助服务，
+删除辅助程序与服务文件，保留小组件、SPlayer 插件及共享设置；卸载无需下载发行包。
+菜单从 `/dev/tty` 读取，支持官网的管道运行方式。没有交互终端时必须显式指定操作，避免自动选择。
 
 也可先下载官网脚本，再指定选项：
 
 ```sh
 sh install.sh --dry-run
-sh install.sh --plasma 6 --splayer-command '/path/to/SPlayer-Next.AppImage'
+sh install.sh --upgrade
+sh install.sh --uninstall
+sh install.sh --splayer-command '/path/to/SPlayer-Next.AppImage'
 sh install.sh --splayer-config '/path/to/settings.json'
-sh install.sh --no-reload-plasma
 sh install.sh --help
 ```
 
-`--dry-run` 只读取版本与下载地址，不执行安装。`--reload-plasma` 显式要求重载；
-`--no-reload-plasma` 关闭更新时的自动重载。KDE Store 提供单独小组件，仍需辅助服务与插件。
+`--upgrade` 跳过菜单直接安装或升级，`--uninstall` 可从已下载的脚本离线卸载，`--dry-run` 只读取版本与下载地址。
+旧 `--plasma`、`--reload-plasma` 和 `--no-reload-plasma`
+参数仅保留兼容，均不会安装小组件或重载面板。小组件请在 KDE 商店更新；若界面仍使用旧缓存，注销后重新登录。
+
+### 从 SPlayer 插件市场安装
+
+打开 SPlayer 的「全局设置」，点击「插件管理」，进入「插件市场」，
+找到「SPTL 任务栏歌词」，点击「安装」。SPlayer 插件通过官方插件管理更新。
 
 ## 官网自动获取版本
 
@@ -48,7 +66,7 @@ sh install.sh --help
 接口优先读取 GitHub API，限流时读取最新发行页及资产列表，只接受 SPTL 仓库的正式版和下载地址。
 成功响应浏览器缓存 60 秒、CDN 缓存 300 秒；失败响应不缓存。页面可手动刷新，离开时取消请求。
 失败时保留已核对的 v1.2.1 或上次成功同步的版本，并明确说明尚未取得最新信息。
-若新版缺少源码资产，辅助下载入口指向发行页，不把旧源码标为最新版。
+页面仅保留 GitHub 与 KDE Store 等主要下载入口，不逐项列出发行文件或单独提供源码链接。
 
 Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保留 Pages 函数及
 `public/_routes.json` 的接口规则；单独托管 `dist/` 时安装脚本可用，页面版本接口不可用。
@@ -62,7 +80,7 @@ Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保
 | `src/sptl/useSptlRelease.ts` / `release.ts`  | 最新版本请求、取消与类型                 |
 | `src/sptl/content.ts`                        | 已核对版本、备用源码、功能文案与市场链接 |
 | `src/sptl/DesktopRecording.vue`              | 首屏连续视频、暂停、视口与动态效果偏好   |
-| `src/sptl/ShotImage.vue` / `screenshots.ts`  | 实拍展示、原图链接与特性对应关系         |
+| `src/sptl/ShotImage.vue` / `screenshots.ts`  | 实拍展示、深浅素材与特性对应关系         |
 | `src/sptl/SptlHeader.vue` / `style.css`      | 品牌、主题入口与局部样式                 |
 | `server/sptlRelease.ts`                      | 最新 GitHub Release、限流回退与响应缓存  |
 | `functions/api/projects/SPTL/release.ts`     | Cloudflare Pages 接口                    |
@@ -77,12 +95,12 @@ Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保
 通过系统屏幕共享与 PipeWire/GStreamer 获取真实视频流，H.264、30 帧/秒、无音轨；
 录屏完成后裁剪任务栏与歌词弹窗，静态图从真实视频帧提取，不使用连拍图片拼接。
 每套首屏任务栏与弹窗视频来自同一次录制，支持暂停当前画面、循环与自动暂停。
-首屏视频、封面帧、11 张特性图片及原图链接跟随网站实际明暗模式，芙芙蓝和胡桃红使用相同的两套素材。
+首屏视频、封面帧及 11 张特性图片跟随网站实际明暗模式，芙芙蓝和胡桃红使用相同的两套素材。
 自动模式随系统明暗切换；单独改配色不重载视频。切换素材保留播放进度及用户选择的播放 / 暂停状态。
 
 用于展示的 `*-compact.webp` 裁去任务栏空白或重复的弹窗标题，靠右封面和普通控制保留左右两块真实画面。
 `taskbar-compact.mp4` 同样移除中间空白，保留连续录制的时间轴与 30 帧/秒，不使用静态帧拼接动画。
-完整任务栏、弹窗和 `taskbar.mp4` 均保留；图片链接打开对应的完整原图。所有展示图在窄屏完整等比缩小，不需横滑。
+完整任务栏、弹窗和 `taskbar.mp4` 均保留。所有展示图在窄屏完整等比缩小，不需横滑；图片仅展示，不提供点击跳转。
 特性卡片按各自高度紧接排列，主题照片单独显示，首屏与特性区之间保留总计约 64px 的间距。
 
 「喜欢的样子，自己调」紧接「小小一块，刚好够用」的特性介绍，之后是发行信息和安装步骤。
@@ -90,7 +108,7 @@ Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保
 `settings-layout.webp`、`settings-theme.webp` 与 `settings-interaction.webp`，同样跟随页面深浅模式。
 图片加载本机已安装的 `ConfigGeneral.qml`，在 Qt 窗口中读取运行中辅助服务的真实配置；
 截图窗口使用 Breeze 深浅配色，包含原有控件、条件禁用状态和字号预览。拍摄后核对原配置与播放状态。
-完整窗口及采集记录保存在忽略的 `artifacts/sptl-settings/`。设置说明先于图片显示，桌面两列，1024px 及以下单列；点击图片可打开清晰原图。
+完整窗口及采集记录保存在忽略的 `artifacts/sptl-settings/`。设置说明先于图片显示，桌面两列，1024px 及以下单列；图片完整等比显示。
 
 普通模式快捷操作与之前的私人 FM 实拍并列：普通模式显示上一首，私人 FM 显示不喜欢。
 两套素材包括双行 / 单行、封面左右位置、圆角 / 圆形、普通播放控制、播放列表及单曲循环菜单。
@@ -98,14 +116,14 @@ Cloudflare Pages 函数与 Vite 开发 / 预览服务共用处理器。部署保
 `volume-osd-live.webp`，显示 SPlayer 图标与 30% 音量。
 私人 FM 展示任务栏悬停后的“不喜欢、播放 / 暂停、下一首、收藏”，完整原图为两套的 `fm-taskbar.webp`，
 紧凑展示图为 `fm-taskbar-compact.webp`。深色图重新拍摄《Free Loop》，浅色图沿用已核对的《Light in Abyss》任务栏悬停实拍；
-原图链接同样打开任务栏，避免以歌词弹窗的控制区代替。采集记录保存在忽略的 `artifacts/sptl-fm-fix/`。
+图片展示任务栏悬停控制区。采集记录保存在忽略的 `artifacts/sptl-fm-fix/`。
 补拍结束后恢复当前普通歌曲《经过》、单曲循环、原设置与音量，并暂停播放。
 
 只公开裁剪后的组件视频和图片，完整录屏暂存在忽略的 `artifacts/sptl-dark/`、`artifacts/sptl-light/`，不公开。
 拍摄结束后恢复临时外观和音量，保留当前歌曲、普通模式及单曲循环，并按项目所有者要求暂停播放。
 后续拍摄也应先备份设置，并在退出时恢复。页面只使用静态素材文件，不调用本机播放器接口。
 路由、分享标签、favicon 与站点地图由公共配置和构建模板维护，不新增独立 HTML 入口。
-SPTL 共享页脚关闭品牌链接。
+SPTL 页脚使用主站 `SiteFooter` 的默认配置，保留品牌首页链接、版权及备案入口。
 
 ## 备用源码与分享封面
 

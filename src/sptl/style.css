@@ -48,7 +48,6 @@
   line-height: 1.85;
 }
 .sptl-actions,
-.sptl-tags,
 .sptl-requirements {
   display: flex;
   flex-wrap: wrap;
@@ -84,11 +83,6 @@
 .sptl-button.primary:hover {
   background: var(--primary-action-hover);
 }
-.sptl-tags {
-  margin-top: var(--space-2xl);
-  gap: var(--space-xs);
-}
-.sptl-tags span,
 .sptl-requirements li {
   padding: var(--space-2xs) var(--space-sm);
   border: 1px solid var(--border);
@@ -221,12 +215,6 @@
   white-space: pre-line;
   overflow-wrap: anywhere;
   color: var(--muted);
-}
-.sptl-release-assets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-lg);
-  margin-top: var(--space-md);
 }
 .sptl-download-grid {
   display: grid;

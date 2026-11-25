@@ -9,14 +9,7 @@ const current = computed(() => (light.value ? { ...props.shot, ...props.shot.lig
 
 <template>
   <figure class="sptl-feature-photo">
-    <a
-      class="sptl-photo-viewport"
-      :class="{ 'is-panel': current.panel }"
-      :href="current.original || current.src"
-      target="_blank"
-      rel="noopener noreferrer"
-      :aria-label="`${current.caption}，查看本机实拍原图（在新标签页打开）`"
-    >
+    <div class="sptl-photo-viewport" :class="{ 'is-panel': current.panel }">
       <img
         :src="current.src"
         :alt="`SPTL 本机实拍：${current.caption}`"
@@ -24,7 +17,7 @@ const current = computed(() => (light.value ? { ...props.shot, ...props.shot.lig
         :height="current.height"
         decoding="async"
       />
-    </a>
+    </div>
     <figcaption>{{ current.caption }}</figcaption>
   </figure>
 </template>
