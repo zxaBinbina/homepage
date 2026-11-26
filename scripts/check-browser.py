@@ -53,7 +53,7 @@ with sync_playwright() as p:
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(os.environ.get('HOMEPAGE_TEST_URL', 'http://127.0.0.1:5173'), wait_until='networkidle')
     assert page.title() == 'a彬彬a · 在代码与方块之间'
-    assert page.locator('.project-card').count() == 4
+    assert page.locator('#projects .project-card').count() == 6
     for section in ['about', 'projects', 'world', 'contact']:
         page.locator('#' + section).scroll_into_view_if_needed()
         page.wait_for_timeout(300)
@@ -119,7 +119,12 @@ with sync_playwright() as p:
     page.screenshot(path=str(OUT / 'desktop-light.png'))
     set_theme_mode(page, 'dark')
     for section in ['home','about','projects','world','contact']:
-        page.locator('#'+section).scroll_into_view_if_needed()
+        if section == 'projects':
+            for card in page.locator('#projects .project-card').all():
+                card.scroll_into_view_if_needed()
+                page.wait_for_timeout(150)
+        else:
+            page.locator('#'+section).scroll_into_view_if_needed()
         page.wait_for_timeout(250)
     page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
     page.wait_for_timeout(700)

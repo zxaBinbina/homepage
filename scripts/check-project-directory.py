@@ -1,6 +1,13 @@
 import os
 base = os.environ.get("HOMEPAGE_TEST_URL", "http://127.0.0.1:5173").rstrip("/")
 from playwright.sync_api import sync_playwright,expect
+
+project_count = 13
+github_projects = {
+ 'myriad': 'myriad',
+ 'myriad-api': 'myriad_api',
+ 'browser-api': 'homepage-browser-api',
+}
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
  page=b.new_page(reduced_motion='reduce'); errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
@@ -34,26 +41,60 @@ with sync_playwright() as p:
  for route in ['/project','/project/']:
   page.goto(base+route)
   expect(page).to_have_title('项目目录 · a彬彬a')
-  expect(page.locator('.project-card')).to_have_count(10)
- for term, count in [('zxaBinbina', 3), ('Youzai-World-Team', 7), ('SPTL', 1), ('SplayerPlasmaTaskbarLyrics', 1), ('YouzaiWorldWebNew', 1), ('YouzaiWorldDonaimEmailWorker', 1), ('.github', 0), ('自我介绍', 0), ('homepage', 0)]:
+  expect(page.locator('.project-card')).to_have_count(project_count)
+ expect(page.get_by_role('status')).to_have_text(f'全部 {project_count} 个项目')
+ for card_id, repo in github_projects.items():
+  card = page.locator(f'.project-{card_id}')
+  expect(card).to_have_attribute('href', f'https://github.com/zxaBinbina/{repo}')
+  expect(card).to_have_attribute('target', '_blank')
+  expect(card.locator('.project-logo-art')).to_be_visible()
+ sptl = page.locator('.project-sptl')
+ expect(sptl).to_have_attribute('href', '/projects/SPTL')
+ expect(sptl.locator('.project-logo-art img')).to_have_attribute('src', '/images/sptl.png')
+ for term, count in [
+  ('zxaBinbina', 6), ('Youzai-World-Team', 7), ('SPTL', 1),
+  ('SplayerPlasmaTaskbarLyrics', 1), ('YouzaiWorldWebNew', 1),
+  ('YouzaiWorldDonaimEmailWorker', 1), ('myriad', 2), ('myriad_api', 1),
+  ('homepage-browser-api', 1), ('homepage', 1), ('.github', 0), ('自我介绍', 0),
+ ]:
   page.get_by_role('searchbox',name='搜索项目').fill(term)
   expect(page.locator('.project-card')).to_have_count(count)
  page.get_by_role('searchbox',name='搜索项目').fill('webAuthn')
  expect(page.locator('.project-card')).to_have_count(1)
  assert 'RDP Access Auth' in page.locator('.project-card').inner_text()
  page.get_by_role('searchbox').fill('not-a-project');expect(page.locator('.directory-empty')).to_be_visible()
- page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(10)
- for theme in ['dark','light']:
-  page.evaluate('(v)=>localStorage.setItem("homepage-theme",v)',theme);page.reload()
-  for w in [320,390,768,1024,1440]:
-   page.set_viewport_size(dict(width=w,height=1000))
-   page.locator('.project-card').last.scroll_into_view_if_needed()
-   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(theme,w)
-   assert page.locator('.project-card img').evaluate_all('(els)=>els.every(e=>e.complete && e.naturalWidth>0)')
-   if w in [390,1440]:
-    page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
-    page.screenshot(path=f'artifacts/project-directory-{theme}-{w}.png',full_page=True)
- page.goto(base+'/');expect(page.locator('.project-card')).to_have_count(4);page.get_by_role('link',name='查看全部项目').click();expect(page).to_have_title('项目目录 · a彬彬a')
+ page.get_by_role('button',name='查看全部项目').click();expect(page.locator('.project-card')).to_have_count(project_count)
+ for palette in ['fufu-blue','hutao-red']:
+  for theme in ['dark','light']:
+   page.evaluate('([palette, theme]) => { localStorage.setItem("homepage-palette", palette); localStorage.setItem("homepage-theme", theme); }', [palette, theme])
+   page.reload()
+   expect(page.locator('html')).to_have_attribute('data-theme', theme)
+   expect(page.locator('html')).to_have_attribute('data-palette', palette)
+   expect(page.locator('.project-card')).to_have_count(project_count)
+   page.locator('.project-card img').evaluate_all('images => images.forEach(image => { image.loading = "eager" })')
+   page.wait_for_function('[...document.querySelectorAll(".project-card img")].every(image => image.complete && image.naturalWidth > 0)')
+   for w in [320,390,481,760,1024,1440]:
+    page.set_viewport_size(dict(width=w,height=1000))
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(palette,theme,w)
+    columns = page.locator('.directory-project-grid').evaluate('grid => getComputedStyle(grid).gridTemplateColumns.split(" ").length')
+    assert columns == (1 if w <= 480 else 2), (palette,theme,w,columns)
+    for card_id in ['sptl', *github_projects]:
+     card = page.locator(f'.project-{card_id}')
+     art = card.locator('.project-logo-art').bounding_box()
+     title = card.locator('h2').bounding_box()
+     assert art['y'] + art['height'] < title['y'], (palette,theme,w,card_id)
+    if palette == 'fufu-blue' and w in [390,1440]:
+     page.screenshot(path=f'artifacts/project-directory-{theme}-{w}.png',full_page=True)
+ page.goto(base+'/')
+ featured = page.locator('#projects .project-card')
+ expect(featured).to_have_count(6)
+ expect(featured.nth(4)).to_have_attribute('href', 'https://github.com/zxaBinbina/myriad')
+ expect(featured.nth(5)).to_have_attribute('href', '/projects/SPTL')
+ featured.nth(5).click()
+ expect(page).to_have_url(f'{base}/projects/SPTL')
+ page.go_back()
+ page.get_by_role('link',name='查看全部项目').click()
+ expect(page).to_have_title('项目目录 · a彬彬a')
  assert not errors,errors
  # Capture actual card animations, including cards mounted again after searching.
  motion_page=b.new_page(viewport=dict(width=1440,height=1000))
@@ -97,17 +138,17 @@ with sync_playwright() as p:
   for card in motion_page.locator('.project-card').all():
    card.scroll_into_view_if_needed()
    expect(card).to_have_css('opacity','1')
-  motion_page.wait_for_function('window.cardReveals.length === 10')
+  motion_page.wait_for_function(f'window.cardReveals.length === {project_count}')
   records=motion_page.evaluate('window.cardReveals')
   assert all(r['options']['duration']==650 and r['frames'][0]['translate']=='0 20px' for r in records)
-  assert [r['options']['delay'] for r in records]==([0,90]*5 if width==1440 else [0]*10)
+  assert [r['options']['delay'] for r in records]==[i % 2 * 90 if width==1440 else 0 for i in range(project_count)]
   motion_page.evaluate('window.scrollTo({top:0,behavior:"instant"})')
   motion_page.wait_for_timeout(800)
-  assert motion_page.evaluate('window.cardReveals.length')==10
+  assert motion_page.evaluate('window.cardReveals.length')==project_count
   motion_page.get_by_role('searchbox').fill('not-a-project')
   expect(motion_page.locator('.project-card')).to_have_count(0)
   motion_page.get_by_role('button',name='查看全部项目').click()
-  motion_page.wait_for_function('window.cardReveals.length > 10')
+  motion_page.wait_for_function(f'window.cardReveals.length > {project_count}')
   motion_page.wait_for_timeout(1000)
   assert motion_page.evaluate('window.cardFlashes')==[], 'Cards flashed after scrolling or search'
   motion_page.emulate_media(reduced_motion='reduce')
@@ -120,4 +161,4 @@ with sync_playwright() as p:
   motion_page.emulate_media(reduced_motion='no-preference')
  assert not errors,errors
  b.close()
-print('Directory routes, title, 10 projects and four featured projects, search/empty/reset, images, both themes, five widths, scroll/search reveals and reduced motion passed')
+print(f'Directory routes, title, {project_count} projects and six featured projects, search/empty/reset, card links and images, four themes, six widths, scroll/search reveals and reduced motion passed')

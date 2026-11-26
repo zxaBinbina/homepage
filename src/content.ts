@@ -51,17 +51,35 @@ export const aiAssistants = [
 ]
 
 export const projectCatalog = {
-  checkedAt: '2026-10-04',
+  checkedAt: '2026-11-26',
   organization: 'https://github.com/Youzai-World-Team',
 }
 
-export const projects = [
+export type Project = {
+  id: string
+  repository: string
+  role: string
+  featured: boolean
+  image?: { file: string; width: number; height: number }
+  number: string
+  title: string
+  subtitle: string
+  description: string
+  tags: string[]
+  url: string
+  link: string
+  icon?: 'youzai' | 'shield' | 'database' | 'server'
+}
+
+const myriadLogo = { file: 'myriad.svg', width: 180, height: 180 }
+
+export const projects: Project[] = [
   {
     id: 'core',
     repository: 'Youzai-World-Team/YouzaiWorldCore',
     role: '团队项目',
     featured: true,
-    image: 'youzaiworld-core.png',
+    image: { file: 'youzaiworld-core.png', width: 64, height: 64 },
     number: '01',
     title: 'YouzaiWorldCore',
     subtitle: '让方块世界，多一点可能。',
@@ -77,7 +95,7 @@ export const projects = [
     repository: 'Youzai-World-Team/YouzaiWorldWebNew',
     role: '团队项目',
     featured: true,
-    image: 'youzaiworld-web.webp',
+    image: { file: 'youzaiworld-web.webp', width: 1200, height: 612 },
     number: '02',
     title: 'Youzai World Web',
     subtitle: '一个世界，从这里开始。',
@@ -92,7 +110,7 @@ export const projects = [
     repository: 'zxaBinbina/gaze-zh',
     role: '分支维护',
     featured: true,
-    image: 'gaze.svg',
+    image: { file: 'gaze.svg', width: 128, height: 128 },
     number: '03',
     title: 'Gaze · 中文与登录修复',
     subtitle: '让日常使用，顺手一点。',
@@ -101,14 +119,13 @@ export const projects = [
     tags: ['Rust', 'Linux', 'PAM'],
     url: '/projects/gaze',
     link: '访问官网',
-    icon: 'scan',
   },
   {
     id: 'rdp',
     repository: 'zxaBinbina/rdp-access-auth',
     role: '个人项目',
     featured: true,
-    image: 'rdp-access-auth.png',
+    image: { file: 'rdp-access-auth.png', width: 512, height: 394 },
     number: '04',
     title: 'RDP Access Auth',
     subtitle: '为远程连接，多守一道门。',
@@ -120,12 +137,41 @@ export const projects = [
     icon: 'shield',
   },
   {
+    id: 'myriad',
+    repository: 'zxaBinbina/myriad',
+    role: '个人项目',
+    featured: true,
+    image: myriadLogo,
+    number: '05',
+    title: '万象 · Myriad',
+    subtitle: '把常用入口，收进一页。',
+    description:
+      '替换浏览器新标签页的扩展，把快捷方式、小组件和多引擎搜索放在一起，还能订阅热榜与 RSS。',
+    tags: ['Vue', 'TypeScript', 'WXT'],
+    url: 'https://github.com/zxaBinbina/myriad',
+    link: '源码与安装说明',
+  },
+  {
+    id: 'sptl',
+    repository: 'zxaBinbina/SplayerPlasmaTaskbarLyrics',
+    role: '个人项目',
+    featured: true,
+    image: { file: 'sptl.png', width: 833, height: 833 },
+    number: '06',
+    title: 'SPTL · SPlayer 任务栏歌词',
+    subtitle: '让歌词，留在任务栏。',
+    description:
+      '为 KDE Plasma 带来 SPlayer Next 同步歌词、专辑封面与播放控制，听歌时少切一次窗口。',
+    tags: ['QML', 'KDE Plasma', 'Python'],
+    url: '/projects/SPTL',
+    link: '官网与安装指南',
+  },
+  {
     id: 'api',
     repository: 'Youzai-World-Team/YouzaiWorldApi',
     role: '团队项目',
     featured: false,
-    image: '',
-    number: '05',
+    number: '07',
     title: 'YouzaiWorldApi',
     subtitle: '连接世界背后的服务。',
     description: '悠哉世界服务器使用的 API 项目，为服务器相关功能提供接口支持。',
@@ -139,8 +185,7 @@ export const projects = [
     repository: 'Youzai-World-Team/YouzaiWorldWebAssets',
     role: '团队项目',
     featured: false,
-    image: '',
-    number: '06',
+    number: '08',
     title: 'YouzaiWorldWebAssets',
     subtitle: '让网站素材各就各位。',
     description: '集中存放悠哉世界主站资源文件，用于同步到 Cloudflare。',
@@ -154,8 +199,7 @@ export const projects = [
     repository: 'Youzai-World-Team/YouzaiWorldServiceStatus',
     role: '团队项目',
     featured: false,
-    image: '',
-    number: '07',
+    number: '09',
     title: 'YouzaiWorldServiceStatus',
     subtitle: '关心每一次连接。',
     description: '检查悠哉世界相关服务的可用性，帮助了解服务是否正常运行。',
@@ -169,8 +213,7 @@ export const projects = [
     repository: 'Youzai-World-Team/YouzaiWorldDonaimEmailWorker',
     role: '团队项目',
     featured: false,
-    image: '',
-    number: '08',
+    number: '10',
     title: 'YouzaiWorldDonaimEmailWorker',
     subtitle: '打理域名下的往来。',
     description: '悠哉世界的域名邮件管理器，用于管理域名邮件。',
@@ -184,8 +227,7 @@ export const projects = [
     repository: 'Youzai-World-Team/YouzaiWorldModpack',
     role: '团队项目',
     featured: false,
-    image: '',
-    number: '09',
+    number: '11',
     title: 'YouzaiWorldModpack',
     subtitle: '准备好，来世界里坐坐。',
     description: '存放悠哉世界服务器整合包的下载资源，方便玩家获取游玩所需的整合包。',
@@ -195,20 +237,33 @@ export const projects = [
     icon: 'youzai',
   },
   {
-    id: 'sptl',
-    repository: 'zxaBinbina/SplayerPlasmaTaskbarLyrics',
+    id: 'myriad-api',
+    repository: 'zxaBinbina/myriad_api',
     role: '个人项目',
     featured: false,
-    image: 'sptl.png',
-    number: '10',
-    title: 'SPTL · SPlayer 任务栏歌词',
-    subtitle: '让歌词，留在任务栏。',
-    description:
-      '为 KDE Plasma 带来 SPlayer Next 同步歌词、专辑封面与播放控制，听歌时少切一次窗口。',
-    tags: ['QML', 'KDE Plasma', 'Python'],
-    url: '/projects/SPTL',
-    link: '官网与安装指南',
-    icon: 'music',
+    image: myriadLogo,
+    number: '12',
+    title: '万象同步服务',
+    subtitle: '换台设备，也能接着用。',
+    description: '可自建的万象后端，用于跨设备同步和云端备份，并提供天气、热榜和 RSS 等数据接口。',
+    tags: ['TypeScript', 'Cloudflare Workers', 'Yjs'],
+    url: 'https://github.com/zxaBinbina/myriad_api',
+    link: '源码与部署说明',
+    icon: 'database',
+  },
+  {
+    id: 'browser-api',
+    repository: 'zxaBinbina/homepage-browser-api',
+    role: '个人项目',
+    featured: false,
+    number: '13',
+    title: '私人网页浏览器后端',
+    subtitle: '为临时浏览会话提供服务。',
+    description: '为本站的私人网页浏览器提供密码认证和网页中转，让访客在临时会话中打开网页。',
+    tags: ['TypeScript', 'Cloudflare Workers', 'Scramjet'],
+    url: 'https://github.com/zxaBinbina/homepage-browser-api',
+    link: '源码与部署说明',
+    icon: 'server',
   },
 ]
 

@@ -13,6 +13,7 @@ collections = json.loads(Path('src/books/collections.json').read_text())
 grouped_ids = {id for collection in collections for id in collection['volumes']}
 shelf_count = sum(b['id'] not in grouped_ids for b in books) + len(collections)
 tool_count = len(json.loads(subprocess.check_output(['node', 'scripts/list-tools.mjs'])))
+project_count = 13
 audio = io.BytesIO()
 with wave.open(audio, 'wb') as wav:
     wav.setnchannels(1)
@@ -68,7 +69,7 @@ with sync_playwright() as p:
     page.evaluate('window.navigationProbe.audio = document.querySelector("audio")')
     page.get_by_role('button', name='关闭音乐播放器').click()
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(10)
+    expect(page.locator('.project-card')).to_have_count(project_count)
     expect(page).to_have_title('项目目录 · a彬彬a')
     metadata('/project')
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
@@ -102,7 +103,7 @@ with sync_playwright() as p:
     assert page.evaluate('window.navigationProbe.header === document.querySelector(".header")')
     assert page.evaluate('window.navigationProbe.audio === document.querySelector("audio") && !document.querySelector("audio").paused')
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(10)
+    expect(page.locator('.project-card')).to_have_count(project_count)
 
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='游戏', exact=True).click()
     expect(page.locator('.game-card')).to_have_count(15)
@@ -118,7 +119,7 @@ with sync_playwright() as p:
         page.get_by_role('link', name='全部游戏', exact=True).click()
         expect(page.locator('.game-card')).to_have_count(15)
     page.get_by_role('navigation', name='主导航', exact=True).get_by_role('link', name='项目', exact=True).click()
-    expect(page.locator('.project-card')).to_have_count(10)
+    expect(page.locator('.project-card')).to_have_count(project_count)
 
     card = page.locator('.project-rdp')
     card.scroll_into_view_if_needed()

@@ -24,15 +24,15 @@
 
 ## 页面内容
 
-| 区域           | 内容                                                                    |
-| -------------- | ----------------------------------------------------------------------- |
-| 首屏           | 个人主张、自我介绍、作品与服务器入口、Minecraft 横幅                    |
-| 关于           | 个人资料、开发与创造兴趣                                                |
-| 精选项目       | YouzaiWorldCore、Youzai World Web、Gaze 中文与登录修复、RDP Access Auth |
-| 悠哉世界       | 服务器实景、特色、官网、地址复制与游玩指南                              |
-| 伙伴与 AI 助手 | 伙伴 Csituka_D 的个人主页，以及 ChatGPT、Claude、DeepSeek、GLM 官方入口 |
-| 联系           | 邮箱、GitHub、Bilibili                                                  |
-| 音乐浮层       | 网易云播放控制、歌词、歌单搜索，桌面侧栏与窄屏覆盖式歌单                |
+| 区域           | 内容                                                                                |
+| -------------- | ----------------------------------------------------------------------------------- |
+| 首屏           | 个人主张、自我介绍、作品与服务器入口、Minecraft 横幅                                |
+| 关于           | 个人资料、开发与创造兴趣                                                            |
+| 精选项目       | YouzaiWorldCore、Youzai World Web、Gaze 中文与登录修复、RDP Access Auth、万象、SPTL |
+| 悠哉世界       | 服务器实景、特色、官网、地址复制与游玩指南                                          |
+| 伙伴与 AI 助手 | 伙伴 Csituka_D 的个人主页，以及 ChatGPT、Claude、DeepSeek、GLM 官方入口             |
+| 联系           | 邮箱、GitHub、Bilibili                                                              |
+| 音乐浮层       | 网易云播放控制、歌词、歌单搜索，桌面侧栏与窄屏覆盖式歌单                            |
 
 音乐在访客首次点击入口后尝试播放，关闭浮层后继续播放。页面还包含主题切换、键盘焦点、移动菜单、复制反馈和分享卡片元信息。
 
@@ -42,7 +42,7 @@
 
 主页、项目目录与 RDP 子站共用完全一致的 `src/components/SiteFooter.vue` 页脚。
 
-访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记保留四个精选项目。列表最初于 2026-10-04 从 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories) 核对，核对了 12 个公开仓库，当时收录其中 9 个项目（个人 2 个、组织 7 个）；2026-11-20 新增 SPTL 任务栏歌词，现共 10 个项目（个人 3 个、组织 7 个）。保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）、「工具」（`/tool`）、「游戏」（`/game`）、「书架」（`/book`）、「悠哉世界」（`https://mcyzw.top`）和联系入口（保留主页锚点）。发布完整构建产物即可上线。
+访问 `https://zxabinbina.cc.cd/project`（规范地址 `/project`）可查看全部已公开项目，支持按名称、简介、仓库原名、所属账号或技术栈搜索。列表与个人主页复用 `src/content.ts` 的项目数据和 `src/components/ProjectCard.vue` 卡片组件，统一图标、透视图片、文字标签与悬停效果；目录展示完整列表，首页通过 `featured` 标记展示六个精选项目。2026-11-26 核对了 [个人仓库](https://github.com/zxaBinbina?tab=repositories) 和 [组织仓库](https://github.com/orgs/Youzai-World-Team/repositories)，补入万象浏览器扩展、万象同步服务和私人网页浏览器后端，共收录 13 个项目（个人 6 个、组织 7 个）。万象卡片使用 [项目官方图标](https://github.com/zxaBinbina/myriad/blob/main/docs/logo.svg)。保留开发分支，排除本站 `homepage` 项目、个人自我介绍与组织 `.github` 等资料仓库。列表为本地维护快照，不在访客打开页面时请求 GitHub；更新时同时维护 `repository`、用途说明和 `projectCatalog.checkedAt`。页面模板位于 `src/ProjectDirectory.vue`，沿用个人主页主题、图标和萌备页脚；从主页导航「项目」或项目区「查看全部项目」进入。主页与目录页共用 `src/components/SiteHeader.vue` 完整导航，包含主题、音乐、GitHub、联系与移动菜单；桌面与移动导航均提供「首页」（`/`）、「项目」（`/project`）、「工具」（`/tool`）、「游戏」（`/game`）、「书架」（`/book`）、「悠哉世界」（`https://mcyzw.top`）和联系入口（保留主页锚点）。发布完整构建产物即可上线。
 
 ## SPTL 任务栏歌词
 

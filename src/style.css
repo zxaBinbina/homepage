@@ -1481,9 +1481,11 @@ h1 > span {
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 414px;
   overflow: hidden;
   border: 1px solid var(--border);
-  background: var(--panel);
+  background:
+    radial-gradient(ellipse at 70% 15%, var(--project-image-glow), transparent 70%), var(--panel);
   border-radius: var(--radius-lg);
   padding: var(--space-alt-28);
   transition:
@@ -1529,7 +1531,8 @@ h1 > span {
 }
 .project-content {
   position: relative;
-  margin-top: var(--space-alt-28);
+  margin-top: auto;
+  padding-top: 115px;
   z-index: 2;
 }
 .project-role {
@@ -1589,26 +1592,9 @@ h1 > span {
 .project-card:hover .project-link {
   color: var(--blue);
 }
-.project-youzai,
-.project-rdp,
-.project-gaze {
-  min-height: 414px;
-}
-.project-youzai,
-.project-rdp,
-.project-gaze {
-  background:
-    radial-gradient(ellipse at 70% 15%, var(--project-image-glow), transparent 70%), var(--panel);
-}
 .project-web {
   background:
     radial-gradient(ellipse at 60% 5%, var(--project-web-glow), transparent 70%), var(--panel);
-}
-.project-youzai .project-content,
-.project-rdp .project-content,
-.project-gaze .project-content {
-  margin-top: auto;
-  padding-top: 115px;
 }
 
 .voxel-art {
@@ -1686,25 +1672,28 @@ h1 > span {
   position: absolute;
   top: 48px;
   right: 95px;
-  width: 160px;
+  width: 128px;
   transform: perspective(600px) rotateY(-12deg) rotateZ(5deg);
   transition: transform 0.5s var(--motion-ease);
 }
-.project-logo-art img {
+.project-logo-art--large {
+  width: 160px;
+}
+.project-logo-art > :is(img, svg) {
   display: block;
   width: 100%;
   height: auto;
   object-fit: contain;
   filter: drop-shadow(8px 16px 14px var(--shadow));
 }
+.project-logo-art > svg {
+  color: var(--blue);
+}
 .project-card:hover .project-logo-art,
 .project-card:focus-visible .project-logo-art {
   transform: perspective(600px) translateY(-6px) rotateY(-3deg) rotateZ(1deg);
 }
 
-.gaze-logo-art {
-  width: 128px;
-}
 .project-icon img {
   object-fit: contain;
 }
@@ -2228,6 +2217,7 @@ h1 > span {
   }
   .project-card {
     padding: var(--space-xl);
+    min-height: 435px;
   }
   .project-content :is(h2, h3) {
     font-size: 22px;
@@ -2236,11 +2226,6 @@ h1 > span {
     align-items: start;
     flex-direction: column;
     gap: var(--space-md);
-  }
-  .project-youzai,
-  .project-rdp,
-  .project-gaze {
-    min-height: 435px;
   }
   .browser-art {
     right: 27px;
@@ -2451,14 +2436,10 @@ h1 > span {
   }
   .project-card {
     padding: var(--space-lg);
+    min-height: 440px;
   }
   .project-top > span {
     gap: var(--space-xs);
-  }
-  .project-youzai,
-  .project-rdp,
-  .project-gaze {
-    min-height: 440px;
   }
   .project-content :is(h2, h3) {
     font-size: 20px;
@@ -2482,10 +2463,10 @@ h1 > span {
   .project-logo-art {
     top: 52px;
     right: 18px;
-    width: 120px;
-  }
-  .gaze-logo-art {
     width: 94px;
+  }
+  .project-logo-art--large {
+    width: 120px;
   }
 
   .voxel-art {
@@ -2506,9 +2487,7 @@ h1 > span {
   .project-bottom {
     margin-top: var(--space-lg);
   }
-  .project-youzai .project-content,
-  .project-rdp .project-content,
-  .project-gaze .project-content {
+  .project-content {
     padding-top: 110px;
   }
   .world-section {
@@ -2695,15 +2674,9 @@ h1 > span {
   }
   .project-card {
     padding: var(--space-xl);
-  }
-  .project-youzai,
-  .project-rdp,
-  .project-gaze {
     min-height: 365px;
   }
-  .project-youzai .project-content,
-  .project-rdp .project-content,
-  .project-gaze .project-content {
+  .project-content {
     padding-top: 93px;
   }
   .project-content :is(h2, h3) {

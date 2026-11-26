@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="32 28 140 140" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">万象</title>
+  <desc id="desc">深蓝圆角方形窗口中，青蓝至紫色的环绕轨迹汇聚在中央星点。</desc>
+  <defs>
+    <linearGradient id="tile" x1="31" y1="28" x2="171" y2="177" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#182B4B"/>
+      <stop offset="1" stop-color="#0B1429"/>
+    </linearGradient>
+    <linearGradient id="orbit" x1="53" y1="58" x2="151" y2="146" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#55E6E1"/>
+      <stop offset="0.48" stop-color="#4E9DFF"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="82" y1="77" x2="124" y2="122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FFFF"/>
+      <stop offset="0.42" stop-color="#7DE8F2"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 57 -57 0 103 103)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3D9CFF" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#3D9CFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="17" y="17" width="170" height="174" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <!-- App mark -->
+  <rect x="32" y="28" width="140" height="140" rx="38" fill="#2467C7" opacity=".22" filter="url(#softShadow)"/>
+  <rect x="32" y="28" width="140" height="140" rx="38" fill="url(#tile)"/>
+  <rect x="32.75" y="28.75" width="138.5" height="138.5" rx="37.25" stroke="#FFFFFF" stroke-opacity=".10" stroke-width="1.5"/>
+  <circle cx="102" cy="98" r="57" fill="url(#glow)"/>
+
+  <!-- Open frame: an entry point to a universe of content -->
+  <path d="M73 58H92M112 58H124C134.493 58 143 66.5066 143 77V88" stroke="url(#orbit)" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M143 109V119C143 129.493 134.493 138 124 138H111M91 138H80C69.5066 138 61 129.493 61 119V108" stroke="url(#orbit)" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M61 88V77C61 66.5066 69.5066 58 80 58" stroke="url(#orbit)" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- Connected orbit -->
+  <path d="M72 111C76.5 91.7 91.7 75.5 110.2 72.3C127.5 69.3 139.9 79.2 140.7 93.2C141.7 111.2 123.7 129.7 104.3 132.5C88.7 134.7 76.8 127.3 74.8 115.4" stroke="url(#orbit)" stroke-width="2.5" stroke-linecap="round" opacity=".95"/>
+  <path d="M68.5 83.5C76.6 73.8 88.6 68 101.9 68" stroke="#75E8E4" stroke-opacity=".55" stroke-width="1.7" stroke-linecap="round"/>
+  <circle cx="73" cy="111" r="4.2" fill="#61E5DE"/>
+  <circle cx="140.5" cy="93" r="4.2" fill="#A78BFA"/>
+  <circle cx="101.9" cy="68" r="3.2" fill="#77DCEB"/>
+
+  <!-- Central four-point spark -->
+  <path d="M102 78L108.8 94.2L125 101L108.8 107.8L102 124L95.2 107.8L79 101L95.2 94.2L102 78Z" fill="url(#spark)"/>
+  <circle cx="102" cy="101" r="4.1" fill="#FFFFFF"/>
+</svg>
