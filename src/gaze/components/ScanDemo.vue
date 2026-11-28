@@ -34,7 +34,7 @@ onBeforeUnmount(() => clearInterval(timer))
   >
     <div class="gaze-scan-stage">
       <div class="gaze-scan-face">
-        <img src="/images/gaze.svg" alt="Gaze 图标" width="84" height="84" />
+        <img src="/images/gaze.svg" alt="Gaze 图标" width="84" height="84" decoding="async" />
       </div>
       <div class="gaze-scan-beam" aria-hidden="true"></div>
     </div>

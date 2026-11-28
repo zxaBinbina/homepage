@@ -44,16 +44,31 @@ const asset = (name: string) => `/images/${name}`
           width="32"
           height="32"
           loading="lazy"
+          decoding="async"
         />
       </div>
       <span>{{ project.number }} <ArrowUpRight :size="20" /></span>
     </div>
     <div v-if="project.id === 'core' && art" class="voxel-art" aria-hidden="true">
-      <img :src="asset(art.file)" alt="" :width="art.width" :height="art.height" loading="lazy" />
+      <img
+        :src="asset(art.file)"
+        alt=""
+        :width="art.width"
+        :height="art.height"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
     <div v-else-if="project.id === 'web' && art" class="browser-art" aria-hidden="true">
       <div><i></i><i></i><i></i><span>mcyzw.top</span></div>
-      <img :src="asset(art.file)" alt="" :width="art.width" :height="art.height" loading="lazy" />
+      <img
+        :src="asset(art.file)"
+        alt=""
+        :width="art.width"
+        :height="art.height"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
     <div
       v-else
@@ -68,6 +83,7 @@ const asset = (name: string) => `/images/${name}`
         :width="art.width"
         :height="art.height"
         loading="lazy"
+        decoding="async"
       />
       <component v-else-if="badgeIcon" :is="badgeIcon" :size="128" :stroke-width="1.25" />
     </div>

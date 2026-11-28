@@ -251,6 +251,8 @@ onBeforeUnmount(() => {
             alt=""
             width="30"
             height="30"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <div class="exposure-taskbar-status">

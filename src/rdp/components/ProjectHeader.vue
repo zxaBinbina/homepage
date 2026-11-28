@@ -6,7 +6,7 @@ defineProps<{ view: 'rdp' | 'wiki' | 'downloads' }>()
 <template>
   <header class="rdp-header shell">
     <a class="rdp-brand" href="/projects/rdp-access-auth"
-      ><img class="rdp-mark" src="/images/rdp-access-auth.png" alt="" width="38" height="38" />
+      ><img class="rdp-mark" src="/images/rdp-access-auth.png" alt="" width="38" height="38" decoding="async" />
       <span>RDP <b>Access Auth</b></span></a
     >
     <nav aria-label="项目导航">

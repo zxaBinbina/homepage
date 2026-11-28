@@ -101,6 +101,7 @@ onBeforeUnmount(() => {
     :src="`${cursorDirectory}/${animated ? 'busy.gif' : 'busy.png'}`"
     alt=""
     aria-hidden="true"
+    decoding="async"
     :style="{ transform: `translate3d(${position.x - 16}px, ${position.y - 16}px, 0)` }"
   />
 </template>

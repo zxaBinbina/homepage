@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { X } from 'lucide-vue-next'
-import MusicPlayer from './MusicPlayer.vue'
 import NeteaseIcon from './NeteaseIcon.vue'
+
+// The player (and its 81KB playlist snapshot) loads on the first popover open
+// instead of travelling inside the entry bundle for every visitor.
+const MusicPlayer = defineAsyncComponent(() => import('./MusicPlayer.vue'))
 
 const props = defineProps<{ anchor?: HTMLElement; suspended?: boolean }>()
 const emit = defineEmits<{

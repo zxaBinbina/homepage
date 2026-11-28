@@ -150,7 +150,15 @@ onBeforeUnmount(() => {
     </div>
     <div class="demo-scene">
       <div class="demo-heading">
-        <img class="demo-shield" src="/images/rdp-access-auth.png" alt="" width="43" height="43" />
+        <img
+          class="demo-shield"
+          src="/images/rdp-access-auth.png"
+          alt=""
+          width="43"
+          height="43"
+          loading="lazy"
+          decoding="async"
+        />
         <div>
           <h2>验证访问身份</h2>
           <p>RDP Access Auth · 选择你习惯的认证方式</p>

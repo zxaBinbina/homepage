@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
 <template>
   <header class="header">
     <a href="/" class="brand" :aria-label="`${profile.name}的首页`" @click="menuOpen = false"
-      ><img :src="asset('avatar.png')" alt="" width="30" height="30" /><span
+      ><img :src="asset('avatar.png')" alt="" width="30" height="30" decoding="async" /><span
         >{{ profile.name }}<span class="brand-dot">.</span></span
       ></a
     >

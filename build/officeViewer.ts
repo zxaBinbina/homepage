@@ -95,7 +95,7 @@ export function officeViewerAssets(siteUrl: string): Plugin {
 
   const ancestors = `'self' ${new URL(siteUrl).origin} https://homepage.zxabinbina.workers.dev http://127.0.0.1:* http://localhost:*`
   const csp = `default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' blob:; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self' blob:; frame-ancestors ${ancestors}; object-src 'none'; base-uri 'none'; form-action 'none'`
-  const headers = `${prefix}*\n  Content-Security-Policy: ${csp}\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n${prefix}wasm/prebuilt/x2t.wasm.br\n  Content-Type: application/wasm\n  Content-Encoding: br\n`
+  const headers = `${prefix}*\n  Content-Security-Policy: ${csp}\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n  Cache-Control: public, max-age=31536000, immutable\n${prefix}wasm/prebuilt/x2t.wasm.br\n  Content-Type: application/wasm\n  Content-Encoding: br\n/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n`
   function middleware(
     request: import('node:http').IncomingMessage,
     response: import('node:http').ServerResponse,
