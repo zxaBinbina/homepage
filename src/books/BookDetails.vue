@@ -108,7 +108,7 @@ defineExpose({ open })
           target="_blank"
           rel="noopener noreferrer"
           class="book-details-source"
-          >番茄作品页 ↗</a
+          >查看作品页 ↗</a
         >
       </div>
       <footer>

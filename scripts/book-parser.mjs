@@ -81,7 +81,7 @@ export function parseBook(bytes) {
 }
 
 const extraHeading =
-  /^(?:番外(?:之|结局|[\d一二三四五六七八九十（(：:]|$)|小剧场(?:$|[—－：:])|小脑洞$)/u
+  /^(?:番外(?:之|结局|篇(?=[：:])|[\d一二三四五六七八九十（(：:]|$)|小剧场(?:$|[—－：:])|小脑洞$)/u
 const noteHeading = /^(?:完本感言|完结感言|作者的话|后记|附记)[！!：:。]?$/u
 const groupForTitle = (title) =>
   noteHeading.test(title) ? 'notes' : extraHeading.test(title) ? 'extra' : 'main'

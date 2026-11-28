@@ -180,5 +180,46 @@
       "终结篇。还有四天满十七岁的哈利，必须提前永远离开住了十六年的女贞路 4 号；凤凰社的转移计划仍遭食死徒伏击。伏地魔已占领魔法部、染指霍格沃茨，控制了半个魔法界。",
       "哈利、罗恩、赫敏从此流亡在外，隐形遁迹，只为完成邓布利多的遗命：找出并销毁剩余魂器。途中他们得知传说中的三件死亡圣器，而伏地魔也在追索老魔杖；邓布利多的过往、斯内普的真相与「爱的古老魔法」被逐一揭开。禁林里，哈利主动倒在伏地魔手中；最终在霍格沃茨大战的决斗中，老魔杖不肯杀死它的主人，伏地魔自食其果。正如梗概所言：「死亡圣器不可能战胜纯正的灵魂。」"
     ]
+  },
+  {
+    "match": "三尸语",
+    "id": "three-corpse-whispers",
+    "category": "悬疑探险",
+    "description": "爷爷去世后，返乡奔丧的洛小阳发现尸体嘴巴怎么也合不上。接连发生的怪事，让他一步步走进这场丧事背后的谜局。",
+    "cover": "/images/books/three-corpse-whispers.webp",
+    "coverSource": "https://book.qq.com/book-detail/59047408"
+  },
+  {
+    "match": "从霍格沃茨开始的艾尔登之王",
+    "id": "elden-lord-at-hogwarts",
+    "category": "魔法世界",
+    "description": "莱特·桑克斯觉醒了艾尔登法环的系统，智力高达 99 点，其余属性却只有 10 点。正担心怎么在交界地生存，一封来自霍格沃茨的信给了他另一条路。",
+    "cover": "/images/books/elden-lord-at-hogwarts.webp",
+    "coverSource": "https://fanqienovel.com/page/7540988126534061081"
+  },
+  {
+    "match": "原神：人体九大系统，无限可能",
+    "id": "genshin-nine-systems",
+    "category": "原神同人",
+    "description": "穿越到提瓦特后，姜逸发现自己的九大身体系统会随着营养和能量不断进化。他一边在陌生大陆求生，一边探索这份力量能走多远。",
+    "cover": "/images/books/genshin-nine-systems.webp",
+    "coverSource": "https://fanqienovel.com/page/7140155041532349481",
+    "extraFromChapter": 1567
+  },
+  {
+    "match": "原神：穿成月灵后，成为少女眷属",
+    "id": "genshin-moon-spirit",
+    "category": "原神同人",
+    "description": "穿成月灵的戈文遇见愚人众执行官「少女」哥伦比娅，成为她的眷属。他们从一起偷吃贡品开始，在至冬闹出一连串趣事。",
+    "cover": "/images/books/genshin-moon-spirit.webp",
+    "coverSource": "https://fanqienovel.com/page/7569163593816493080"
+  },
+  {
+    "match": "原神：至冬执行官的我被迫营业",
+    "id": "genshin-snezhnaya-harbinger",
+    "category": "原神同人",
+    "description": "原本负责内政的至冬执行官秦夜被派往璃月，任务是取得岩神的神之心。为了完成差事，他不得不以使节身份在诸国之间周旋。",
+    "cover": "/images/books/genshin-snezhnaya-harbinger.webp",
+    "coverSource": "https://fanqienovel.com/page/7120070191253294084"
   }
 ]

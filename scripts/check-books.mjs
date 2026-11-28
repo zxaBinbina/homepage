@@ -37,6 +37,16 @@ assert.deepEqual(
     ['extra', null, null, true, '番外 · 续篇'],
   ],
 )
+const bonusChapter = organizeChapters(
+  parseBook(new TextEncoder().encode('第1章 结局\n正文\n第2章 番外篇：归离\n后续故事')),
+)
+assert.deepEqual(
+  bonusChapter.map(({ number, appendix, name }) => [number, appendix, name]),
+  [
+    [1, false, '结局'],
+    [null, true, '番外篇：归离'],
+  ],
+)
 const skits = organizeChapters(
   parseBook(
     new TextEncoder().encode(

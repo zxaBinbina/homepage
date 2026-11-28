@@ -1316,7 +1316,7 @@ onBeforeUnmount(() => {
             target="_blank"
             rel="noopener noreferrer"
             class="reader-source-link"
-            >在番茄查看这本书 ↗</a
+            >查看作品页 ↗</a
           >
           <p class="reader-info-note">
             章节以本地收录文本为准。进度、书签和设置保存在当前浏览器，清除浏览器数据后会消失。

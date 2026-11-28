@@ -387,5 +387,118 @@
     "repeated": [],
     "lastNumber": 36,
     "outOfOrder": false
+  },
+  {
+    "id": "three-corpse-whispers",
+    "filename": "三尸语 洛小阳 1-419章.txt",
+    "sha256": "832d03d5dc2877f4be63f59c07b8a2048e147b2e5663a31c4fccc0c0f5f8eea2",
+    "filenameEnd": 419,
+    "sourceChapterCount": 419,
+    "chapterCount": 419,
+    "numberedChapterCount": 419,
+    "appendixCount": 0,
+    "groups": {
+      "main": 419,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 419,
+    "outOfOrder": false
+  },
+  {
+    "id": "elden-lord-at-hogwarts",
+    "filename": "从霍格沃茨开始的艾尔登之王 晨曦沐橙 1-206章.txt",
+    "sha256": "61a81be59b6f9179904c13406e842252674dd0e1ee6687fc7b8e789a00be641e",
+    "filenameEnd": 206,
+    "sourceChapterCount": 206,
+    "chapterCount": 206,
+    "numberedChapterCount": 206,
+    "appendixCount": 0,
+    "groups": {
+      "main": 206,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 206,
+    "outOfOrder": false
+  },
+  {
+    "id": "genshin-nine-systems",
+    "filename": "原神：人体九大系统，无限可能 天有流火 1-1567章.txt",
+    "sha256": "d694ff5dd7ff7437b0c2a11404bd9ab43d2ecd9c71e9399b9e08d5a6246e1420",
+    "filenameEnd": 1567,
+    "sourceChapterCount": 1567,
+    "chapterCount": 1567,
+    "numberedChapterCount": 1566,
+    "appendixCount": 1,
+    "groups": {
+      "main": 1566,
+      "extra": 1,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 1567,
+    "outOfOrder": false
+  },
+  {
+    "id": "genshin-moon-spirit",
+    "filename": "原神：穿成月灵后，成为少女眷属 风林夜月 1-272章.txt",
+    "sha256": "cd96bfa86a2a6d069bd4aeefb9c162c59e305234391e78012fd449ecf81dac1a",
+    "filenameEnd": 272,
+    "sourceChapterCount": 272,
+    "chapterCount": 272,
+    "numberedChapterCount": 272,
+    "appendixCount": 0,
+    "groups": {
+      "main": 272,
+      "extra": 0,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [],
+    "lastNumber": 272,
+    "outOfOrder": false
+  },
+  {
+    "id": "genshin-snezhnaya-harbinger",
+    "filename": "原神：至冬执行官的我被迫营业 月影红莲 1-319章.txt",
+    "sha256": "7e1c67759be5d69d0ec6b64babc3a022aabdbc9e4a0898965d03e1e575a22337",
+    "filenameEnd": 319,
+    "sourceChapterCount": 319,
+    "chapterCount": 319,
+    "numberedChapterCount": 306,
+    "appendixCount": 13,
+    "groups": {
+      "main": 304,
+      "extra": 15,
+      "notes": 0
+    },
+    "replacements": 0,
+    "controls": 0,
+    "collapsedHeadings": 0,
+    "missing": [],
+    "repeated": [
+      67,
+      113
+    ],
+    "lastNumber": 317,
+    "outOfOrder": false
   }
 ]
