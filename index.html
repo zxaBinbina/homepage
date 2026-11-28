@@ -81,6 +81,8 @@
       href="/<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'images/rdp-access-auth.png' : page === 'sptl' ? 'images/sptl.png' : 'favicon.svg' %>"
       type="<%= ['rdp', 'wiki', 'downloads'].includes(page) || page === 'sptl' ? 'image/png' : 'image/svg+xml' %>"
     />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <title><%= site.title %></title>
   </head>
   <body id="top" class="<%= ['rdp', 'wiki', 'downloads'].includes(page) ? 'rdp-site' : '' %>">
@@ -90,15 +92,15 @@
           <div class="site-loading-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           <div class="site-loading-copy" aria-live="polite" aria-atomic="true">
             <p class="site-loading-label">a彬彬a · 在代码与方块之间</p>
-            <p class="site-loading-title">正在搭建这一页</p>
-            <p class="site-loading-description">一点点准备，马上见面。</p>
+            <p class="site-loading-title">正在搭建这一�?</p>
+            <p class="site-loading-description">一点点准备，马上见靀�?</p>
           </div>
           <div class="site-loading-track" aria-hidden="true"><span></span></div>
         </div>
         <a class="site-loading-retry" href="" inert aria-hidden="true">重新加载</a>
       </div>
     </div>
-    <noscript><p class="site-loading-noscript">请启用 JavaScript 后重新加载页面。</p></noscript>
+    <noscript><p class="site-loading-noscript">请启�? JavaScript 后重新加载页靀�?</p></noscript>
     <script>
       <%- loadingScript %>
     </script>

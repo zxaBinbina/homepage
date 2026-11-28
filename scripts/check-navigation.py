@@ -48,12 +48,12 @@ with sync_playwright() as p:
         structured = page.locator('#site-structured-data').evaluate('(el) => JSON.parse(el.textContent)')
         assert structured['@graph'][1]['url'] == 'https://zxabinbina.cc.cd' + path
         assert structured['@graph'][1]['name'] == title
-        image = 'https://zxabinbina.cc.cd/images/' + ('rdp-access-auth.png' if project else 'share-avatar.jpg')
+        image = 'https://zxabinbina.cc.cd/images/' + ('rdp-access-auth.png' if project else 'share-cover.png')
         for selector in ['meta[property="og:image"]', 'meta[property="og:image:secure_url"]', 'meta[itemprop="image"]']:
             expect(page.locator(selector)).to_have_attribute('content', image)
-        expect(page.locator('meta[property="og:image:type"]')).to_have_attribute('content', 'image/png' if project else 'image/jpeg')
-        expect(page.locator('meta[property="og:image:width"]')).to_have_attribute('content', '512' if project else '256')
-        expect(page.locator('meta[property="og:image:height"]')).to_have_attribute('content', '394' if project else '256')
+        expect(page.locator('meta[property="og:image:type"]')).to_have_attribute('content', 'image/png')
+        expect(page.locator('meta[property="og:image:width"]')).to_have_attribute('content', '512' if project else '1200')
+        expect(page.locator('meta[property="og:image:height"]')).to_have_attribute('content', '394' if project else '630')
         assert structured['@graph'][1]['primaryImageOfPage']['url'] == image
         expect(page.locator('link[rel="icon"]')).to_have_attribute('href', '/images/rdp-access-auth.png' if project else '/favicon.svg')
         assert page.locator('body').evaluate('(el) => el.classList.contains("rdp-site")') == project
@@ -170,7 +170,7 @@ with sync_playwright() as p:
     # solely in this test so external sites/downloads/new tabs do not have to be opened.
     for attrs in [
         {'href': 'https://mcyzw.top/'},
-        {'href': '/images/share-cover.jpg'},
+        {'href': '/images/share-cover.png'},
         {'href': '/api/music/lyrics?id=1'},
         {'href': '/', 'target': '_blank'},
         {'href': '/', 'download': ''},

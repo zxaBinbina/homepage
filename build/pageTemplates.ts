@@ -1,10 +1,21 @@
 import type { Plugin } from 'vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { execSync } from 'node:child_process'
 import ejs from 'ejs'
 import { readFileSync } from 'node:fs'
 import { createSiteMeta, createStructuredData, serializeStructuredData } from '../site.config'
-import { pages, pageForPath, knownPageForPath, pageFile, type PageName } from '../src/pages'
+import {
+  isGazePage,
+  pageForPath,
+  knownPageForPath,
+  pageFile,
+  pages,
+  type PageName,
+} from '../src/pages'
 import { isErrorPage } from '../src/errors/catalog'
+import { isToolId } from '../src/tools/catalog'
+import { isGameId } from '../src/games/catalog'
+import { isBookPage } from '../src/books/catalog'
 
 /** All URLs share index.html; page content lives in Vue single-file components. */
 export function pageTemplates(baseUrl: string | undefined, build: boolean): Plugin {
@@ -87,9 +98,40 @@ export function pageTemplates(baseUrl: string | undefined, build: boolean): Plug
         })
         const escapeXml = (value: string) =>
           value.replace(/[<>&"']/g, (character) => `&#${character.charCodeAt(0)};`)
+        // Anchor sitemap freshness to the last commit so repeated builds stay stable
+        // until the content actually changes.
+        const lastmod = (() => {
+          try {
+            return execSync('git log -1 --format=%cI').toString().trim()
+          } catch {
+            return new Date().toISOString()
+          }
+        })()
+        const pagePriority = (page: PageName) =>
+          page === 'home'
+            ? '1.0'
+            : [
+                  'directory',
+                  'tools',
+                  'games',
+                  'bookshelf',
+                  'myriad',
+                  'rdp',
+                  'wiki',
+                  'downloads',
+                  'gaze',
+                  'sptl',
+                ].includes(page)
+              ? '0.8'
+              : isToolId(page) || isGameId(page) || isBookPage(page)
+                ? '0.6'
+                : '0.5'
         const urls = (Object.keys(pages) as PageName[])
           .filter((page) => !isErrorPage(page))
-          .map((page) => `  <url><loc>${escapeXml(createSiteMeta(baseUrl, page).url)}</loc></url>`)
+          .map(
+            (page) =>
+              `  <url><loc>${escapeXml(createSiteMeta(baseUrl, page).url)}</loc><lastmod>${lastmod}</lastmod><priority>${pagePriority(page)}</priority></url>`,
+          )
         this.emitFile({
           type: 'asset',
           fileName: 'sitemap.xml',

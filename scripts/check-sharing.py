@@ -90,13 +90,13 @@ for path in paths:
     assert image == meta('itemprop', 'image') == meta('property', 'og:image:secure_url')
     project = pages[title].startswith('projects/rdp-access-auth')
     sptl = pages[title] == 'projects/SPTL'
-    image_path = 'images/rdp-access-auth.png' if project else 'images/sptl-share.png' if sptl else 'images/share-avatar.jpg'
+    image_path = 'images/rdp-access-auth.png' if project else 'images/sptl-share.png' if sptl else 'images/share-cover.png'
     assert image == 'https://zxabinbina.cc.cd/' + image_path
     assert urlparse(image).scheme == 'https' and urlparse(image).netloc
-    assert meta('property', 'og:image:type') == ('image/png' if project or sptl else 'image/jpeg')
-    assert meta('property', 'og:image:width') == ('512' if project else '1200' if sptl else '256')
-    assert meta('property', 'og:image:height') == ('394' if project else '630' if sptl else '256')
-    assert meta('property', 'og:image:alt') == ('RDP Access Auth 软件 Logo' if project else 'SPTL · 让歌词留在任务栏' if sptl else 'a彬彬a 的头像')
+    assert meta('property', 'og:image:type') == 'image/png'
+    assert meta('property', 'og:image:width') == ('512' if project else '1200')
+    assert meta('property', 'og:image:height') == ('394' if project else '630')
+    assert meta('property', 'og:image:alt') == ('RDP Access Auth 软件 Logo' if project else 'SPTL · 让歌词留在任务栏' if sptl else 'a彬彬a · 在代码与方块之间，创造一点不一样')
     canonical = 'https://zxabinbina.cc.cd/' + pages[title]
     assert meta('property', 'og:url') == canonical
     assert [link['href'] for link in head.links if link.get('rel') == 'canonical'] == [canonical]

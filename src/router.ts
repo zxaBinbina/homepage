@@ -5,6 +5,7 @@ import {
   isNavigationFailure,
   NavigationFailureType,
   type RouteLocationNormalized,
+  type RouteRecordRaw,
 } from 'vue-router'
 import { beginPageLoading } from './loading/state'
 import { isProjectPage, isGazePage, knownPageForPath, pages, type PageName } from './pages'
@@ -101,39 +102,41 @@ async function waitForMain() {
   return null
 }
 
+/** One route table shared by the browser router and the build-time prerender. */
+export const routes: RouteRecordRaw[] = [
+  ...(Object.keys(pages) as PageName[]).map((name) => ({
+    name,
+    path: pages[name],
+    meta: isToolId(name) ? { tool: name } : {},
+    alias: name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
+    component: isErrorPage(name)
+      ? () => import('./errors/ErrorPage.vue')
+      : isBookPage(name)
+        ? () => import('./books/BookReader.vue')
+        : components[name],
+    props: isErrorPage(name)
+      ? { error: name }
+      : isBookPage(name)
+        ? { id: name.slice(5) }
+        : isGazePage(name)
+          ? { guide: name === 'gaze' ? null : name.slice(5) }
+          : isProjectPage(name)
+            ? { view: name }
+            : isToolId(name) || isGameId(name)
+              ? { id: name }
+              : undefined,
+  })),
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'unknown',
+    component: () => import('./errors/ErrorPage.vue'),
+    props: { error: 'error404' },
+  },
+]
+
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    ...(Object.keys(pages) as PageName[]).map((name) => ({
-      name,
-      path: pages[name],
-      meta: isToolId(name) ? { tool: name } : {},
-      alias:
-        name === 'home' ? ['/index.html'] : [`${pages[name]}/index.html`, `${pages[name]}.html`],
-      component: isErrorPage(name)
-        ? () => import('./errors/ErrorPage.vue')
-        : isBookPage(name)
-          ? () => import('./books/BookReader.vue')
-          : components[name],
-      props: isErrorPage(name)
-        ? { error: name }
-        : isBookPage(name)
-          ? { id: name.slice(5) }
-          : isGazePage(name)
-            ? { guide: name === 'gaze' ? null : name.slice(5) }
-            : isProjectPage(name)
-              ? { view: name }
-              : isToolId(name) || isGameId(name)
-                ? { id: name }
-                : undefined,
-    })),
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'unknown',
-      component: () => import('./errors/ErrorPage.vue'),
-      props: { error: 'error404' },
-    },
-  ],
+  routes,
   async scrollBehavior(to, from, savedPosition) {
     await nextTick()
     const changedPage = to.name !== from.name

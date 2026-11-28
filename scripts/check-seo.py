@@ -61,10 +61,16 @@ for file in root.rglob('*.html'):
     assert len(doc.structured) == 1, file
     data = doc.structured[0]
     assert data['@context'] == 'https://schema.org'
-    website, page = data['@graph']
+    graph = data['@graph']
+    assert 2 <= len(graph) <= 3, file
+    website, page = graph[0], graph[1]
     assert website['url'] == base
     assert page['url'] == expected and page['name'] and page['description']
     assert page['isPartOf']['@id'] == website['@id']
+    if len(graph) == 3:
+        entity = graph[2]
+        assert entity['url'] == expected and entity['name'], file
+        assert entity['@type'] in {'SoftwareApplication', 'VideoGame', 'Book'}, file
     if error:
         assert expected not in urls, f'Error page indexed: {expected}'
     else:
@@ -81,6 +87,8 @@ assert urljoin(base, 'book') in canonical_urls
 assert all(urljoin(base, 'books/' + book['id']) in canonical_urls for book in books)
 assert all(urljoin(base, tool['path']) in canonical_urls for tool in tools), 'Missing tool canonical URL'
 assert set(urls) == set(canonical_urls), 'Sitemap must contain all canonical pages only'
+url_nodes = sitemap.findall('{*}url')
+assert all(node.find('{*}lastmod') is not None and node.find('{*}priority') is not None for node in url_nodes), 'Sitemap entries need lastmod and priority'
 robots = (root / 'robots.txt').read_text()
 assert 'User-agent: *\nAllow: /' in robots
 assert f'Sitemap: {urljoin(base, "sitemap.xml")}' in robots

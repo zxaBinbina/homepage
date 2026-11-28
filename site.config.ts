@@ -10,11 +10,11 @@ export const siteContent = {
     '你好，我是 a彬彬a（zxabinbina）。在代码与方块之间，创造一点不一样。探索我的开发项目与 Minecraft 悠哉世界服务器。',
   name: 'a彬彬a · 个人主页',
   url: 'https://zxabinbina.cc.cd/',
-  image: 'images/share-avatar.jpg',
-  imageAlt: 'a彬彬a 的头像',
-  imageType: 'image/jpeg',
-  imageWidth: 256,
-  imageHeight: 256,
+  image: 'images/share-cover.png',
+  imageAlt: 'a彬彬a · 在代码与方块之间，创造一点不一样',
+  imageType: 'image/png',
+  imageWidth: 1200,
+  imageHeight: 630,
 }
 
 const projectPages = {
@@ -154,30 +154,61 @@ export function createSiteMeta(baseUrl = siteContent.url, page: PageName = 'home
 export function createStructuredData(baseUrl = siteContent.url, page: PageName = 'home') {
   const home = createSiteMeta(baseUrl)
   const meta = createSiteMeta(baseUrl, page)
+  const website = {
+    '@type': 'WebSite',
+    '@id': `${home.url}#website`,
+    url: home.url,
+    name: home.name,
+    inLanguage: 'zh-CN',
+  }
+  const webpage = {
+    '@type':
+      page === 'directory' || page === 'tools' || page === 'games' || page === 'bookshelf'
+        ? 'CollectionPage'
+        : 'WebPage',
+    '@id': `${meta.url}#webpage`,
+    url: meta.url,
+    name: meta.title,
+    description: meta.description,
+    inLanguage: 'zh-CN',
+    isPartOf: { '@id': `${home.url}#website` },
+    primaryImageOfPage: { '@type': 'ImageObject', url: meta.image },
+  }
+  // Richer entity types help search engines surface tools, games and books.
+  const entity = isToolId(page)
+    ? {
+        '@type': 'SoftwareApplication',
+        name: toolCatalog[page].name,
+        url: meta.url,
+        description: meta.description,
+        applicationCategory: 'WebApplication',
+        operatingSystem: 'Any',
+        inLanguage: 'zh-CN',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
+      }
+    : isGameId(page)
+      ? {
+          '@type': 'VideoGame',
+          name: gameCatalog[page].name,
+          url: meta.url,
+          description: meta.description,
+          applicationCategory: 'GameApplication',
+          inLanguage: 'zh-CN',
+          playMode: 'SinglePlayer',
+        }
+      : isBookPage(page)
+        ? {
+            '@type': 'Book',
+            name: bookForPage(page).title,
+            url: meta.url,
+            description: meta.description,
+            inLanguage: 'zh-CN',
+            author: { '@type': 'Person', name: 'a彬彬a' },
+          }
+        : null
   return {
     '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebSite',
-        '@id': `${home.url}#website`,
-        url: home.url,
-        name: home.name,
-        inLanguage: 'zh-CN',
-      },
-      {
-        '@type':
-          page === 'directory' || page === 'tools' || page === 'games' || page === 'bookshelf'
-            ? 'CollectionPage'
-            : 'WebPage',
-        '@id': `${meta.url}#webpage`,
-        url: meta.url,
-        name: meta.title,
-        description: meta.description,
-        inLanguage: 'zh-CN',
-        isPartOf: { '@id': `${home.url}#website` },
-        primaryImageOfPage: { '@type': 'ImageObject', url: meta.image },
-      },
-    ],
+    '@graph': entity ? [website, webpage, entity] : [website, webpage],
   }
 }
 

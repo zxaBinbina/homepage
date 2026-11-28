@@ -11,17 +11,17 @@
 - `og:image`、HTTPS 地址、类型、尺寸和替代文字。
 - QQ 的 `itemprop="name"`、`itemprop="image"`，以及复用同一个 description 标签的 `itemprop="description"`。
 - `robots` 索引指令与 `max-image-preview:large`，允许搜索结果使用大图预览。
-- JSON-LD `WebSite` 与 `WebPage`（项目 / 工具 / 游戏目录为 `CollectionPage`），标记页面名称、描述、规范地址及所属网站。
+- JSON-LD `WebSite` 与 `WebPage`（项目 / 工具 / 游戏目录为 `CollectionPage`），标记页面名称、描述、规范地址及所属网站；工具页、游戏页与书籍页额外携带 `SoftwareApplication`、`VideoGame` 与 `Book` 实体。
 
 分享图片按页面分组：
 
-| 页面范围                                 | 分享图片                                         | 格式与尺寸      |
-| ---------------------------------------- | ------------------------------------------------ | --------------- |
-| 个人主页、项目目录、工具、游戏与万象导航 | `public/images/share-avatar.jpg`（个人头像）     | JPEG，256 × 256 |
-| RDP 官网、Wiki 与下载页                  | `public/images/rdp-access-auth.png`（软件 Logo） | PNG，512 × 394  |
-| SPTL 官网                                | `public/images/sptl-share.png`（项目分享封面）   | PNG，1200 × 630 |
+| 页面范围                                 | 分享图片                                             | 格式与尺寸      |
+| ---------------------------------------- | ---------------------------------------------------- | --------------- |
+| 个人主页、项目目录、工具、游戏与万象导航 | `public/images/share-cover.png`（品牌分享封面）      | PNG，1200 × 630 |
+| RDP 官网、Wiki 与下载页                  | `public/images/rdp-access-auth.png`（软件 Logo）     | PNG，512 × 394  |
+| SPTL 官网                                | `public/images/sptl-share.png`（项目分享封面）       | PNG，1200 × 630 |
 
-头像原文件 `avatar.png` 实际为 JPEG；分享专用的 `share-avatar.jpg` 是它的原样副本，使用正确扩展名以匹配服务器响应格式。更新头像时同步更新该副本。OG 图片地址、格式、尺寸和替代文字统一由 `site.config.ts` 提供，QQ 图片与 JSON-LD 同步使用相同图片，站内切换时也同步更新。原 Minecraft `share-cover.jpg` 继续用于 README 展示。
+分享封面主图 `share-cover.png` 由 `scripts/generate-brand-assets.py` 生成：深色底上排列头像卡片、站点标语与代码符号，符合社交平台推荐的 1200 × 630 比例；重新设计品牌时重跑该脚本即可。旧的 `share-avatar.jpg` 仍保留在仓库，但不再作为分享主图。OG 图片地址、格式、尺寸和替代文字统一由 `site.config.ts` 提供，QQ 图片与 JSON-LD 同步使用相同图片，站内切换时也同步更新。原 Minecraft `share-cover.jpg` 继续用于 README 展示。
 
 修改文案可编辑 `site.config.ts`；修改部署地址可设置 `SITE_URL` 环境变量（完整 HTTPS 地址，也支持子目录）。运行 `npm run build` 后发布完整 `dist/`，确保页面和分享图片无需登录即可访问。正式域名上的内容只有部署后才会更新。
 
@@ -37,7 +37,7 @@
 
 未知 Vue 路由也显示 404，并保留访问地址；站内进入或离开错误页时同步更新 `robots`、标题、canonical 与分享标签，返回正常页面后恢复 `index, follow, max-image-preview:large`。文案和路径定义见 `src/errors/catalog.ts`，浏览器检查见 `scripts/check-errors.py`。
 
-正文继续按原来的 Vue 客户端逻辑加载，动画和交互不变；JSON-LD 随站内切换更新。当前优化帮助搜索引擎发现页面与理解元信息，正文抓取仍依赖搜索引擎执行 JavaScript 的能力，不能保证收录或排名。无需填写关键词堆砌标签，也不虚构评价或评分。
+正文在构建期由 `scripts/prerender.mjs` 通过 Vue SSR 与内存路由渲染成静态标记，注入产物 HTML 的 `#app` 容器，爬虫无需执行 JavaScript 即可读到页面正文。浏览器端 Vue 仍按原逻辑挂载并接管全部交互与动画，站内切换行为不变；JSON-LD 随站内切换更新。`npm run build` 会在 `vite build` 之后自动执行该步骤，也可以单独运行 `npm run prerender`。个别依赖浏览器环境的组件若渲染失败，脚本会保留该页的加载壳并逐条报告，不阻塞构建。这提高了正文被抓取的机会，但不保证收录或排名。无需填写关键词堆砌标签，也不虚构评价或评分。
 
 构建后运行 `python3 scripts/check-seo.py`，验证 sitemap 与所有 HTML canonical 一一对应、JSON-LD、robots 指令和错误页。自定义域名构建时，检查脚本使用相同的 `SITE_URL`。如果部署到子目录，需在域名根路径另外提供 `robots.txt`，搜索引擎只从根路径读取该文件。
 
@@ -45,7 +45,7 @@
 
 RDP Access Auth 官网和 Wiki 的标题与简介由 `site.config.ts` 的 `projectPages` 配置提供，通过 `createSiteMeta` 与主页共用生成逻辑，canonical 和 `og:url` 根据 `site.config.ts` 的基础域名生成，分别指向 `/projects/rdp-access-auth` 和 `/projects/rdp-access-auth/wiki`。官网、Wiki 与下载页使用 RDP Access Auth 软件 Logo 作为分享图片。元信息在构建时写入 HTML，不依赖 JavaScript；Wiki 正文在构建时转换为模块数据，由 Vue 组件在浏览器中渲染，与主页的客户端渲染架构保持一致。项目页面的浏览器检查使用 `scripts/check-rdp-pages.py`，所有页面的原始 HTML 分享检查均使用 `scripts/check-sharing.py`。
 
-个人主页浏览器图标沿用 `public/favicon.svg`；RDP 官网与 Wiki 使用透明的 `public/images/rdp-access-auth.png`。图标按页面由同一 EJS 模板选择，分享封面配置独立于浏览器图标。
+个人主页浏览器图标沿用 `public/favicon.svg`；RDP 官网与 Wiki 使用透明的 `public/images/rdp-access-auth.png`。图标按页面由同一 EJS 模板选择，分享封面配置独立于浏览器图标。苹果触摸图标与 PWA 图标（`apple-touch-icon.png`、`icon-192.png`、`icon-512.png` 及 `site.webmanifest`）由 `scripts/generate-brand-assets.py` 从同一造型生成，并经 `index.html` 的 `<link rel="apple-touch-icon">` 与 `<link rel="manifest">` 声明。
 
 项目目录 `/project` 的标题、简介同样由 `site.config.ts` 提供，复用主页头像分享图片与 favicon；`/project` 可直接访问，canonical 统一为 `/project`。
 
